@@ -1,0 +1,79 @@
+version: "3"
+
+services:
+  # db:
+  #   image: postgres:latest
+  #   environment:
+  #     POSTGRES_DB: area-db
+  #     POSTGRES_USER: area
+  #     POSTGRES_PASSWORD: area
+  #   volumes:
+  #     - pg_data:/var/lib/postgresql/data
+  #   ports:
+  #     - "5434:5432"
+  #   networks:
+  #     back-tier:
+
+  server:
+    build:
+      context: ./server/back-end
+      dockerfile: ../Dockerfile
+    restart:  on-failure
+    depends_on:
+      - db
+    environment:
+      - SERVER_PORT=8080
+    ports:
+      - "8080:8080"
+    networks:
+      - back-tier
+    volumes:
+      - common:/apk
+      
+  client_mobile:
+    build:
+      context: ./mobile/mobile
+      dockerfile: ../Dockerfile
+    depends_on:
+      - server
+    volumes:
+      - common:/apk
+
+  client_web:
+    build:
+      context: ./front-end/front-web
+      dockerfile: ../Dockerfile
+    depends_on:
+      - server
+      - client_mobile
+    environment:
+      HOST: 0.0.0.0    
+      PORT: 8081
+    ports:
+      - 8081:8081
+    volumes:
+      - common:/apk
+
+  ngrok:
+    image: ngrok/ngrok:latest
+    restart: unless-stopped
+    command:
+      - "http"
+      - "--config=/etc/ngrok.yml"
+      - "--domain=redfish-robust-roughly.ngrok-free.app"
+      - "192.168.1.77:8080"
+    depends_on:
+      - server
+    volumes:
+      - ./ngrok.yml:/etc/ngrok.yml
+    ports:
+      - 4040:4040
+
+
+networks:
+  back-tier:
+    driver: bridge
+
+volumes:
+  common:
+  pg_data:
