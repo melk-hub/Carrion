@@ -54,19 +54,19 @@ services:
   #   volumes:
   #     - common:/apk
 
-  # client_web:
-  #   build:
-  #     context: ./front-end
-  #     dockerfile: ../Dockerfile
-  #   depends_on:
-  #     - server
-  #   environment:
-  #     HOST: 0.0.0.0    
-  #     PORT: 8081
-  #   ports:
-  #     - 8081:8081
-  #   volumes:
-  #     - common:/apk
+  client_web:
+    build:
+      context: ./front_end/carrion
+      dockerfile: ../Dockerfile
+    depends_on:
+      - server
+    environment:
+      HOST: 0.0.0.0    
+      PORT: 8081
+    ports:
+      - 8081:8081
+    volumes:
+      - common:/apk
 
 networks:
   back-tier:
