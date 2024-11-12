@@ -1,18 +1,18 @@
 version: "3.8"
 
 services:
-  # db:
-  #   image: postgres:latest
-  #   environment:
-  #     POSTGRES_DB: area-db
-  #     POSTGRES_USER: area
-  #     POSTGRES_PASSWORD: area
-  #   volumes:
-  #     - pg_data:/var/lib/postgresql/data
-  #   ports:
-  #     - "5434:5432"
-  #   networks:
-  #     back-tier:
+  db:
+    image: postgres:latest
+    environment:
+      POSTGRES_DB: carrion-db
+      POSTGRES_USER: carrion
+      POSTGRES_PASSWORD: carrion
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    ports:
+      - "5434:5432"
+    networks:
+      back-tier:
 
   # ngrok:
   # image: ngrok/ngrok:latest
