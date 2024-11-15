@@ -7,7 +7,7 @@ function Header() {
     <header>
       <nav>
         <ul>
-          <li><Link to="/">Accueil</Link></li>
+          <li><Link to="/home">Accueil</Link></li>
         </ul>
       </nav>
     </header>
