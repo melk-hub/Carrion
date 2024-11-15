@@ -1,0 +1,15 @@
+header {
+background-color: #333;
+padding: 1em;
+}
+
+nav ul {
+list-style: none;
+display: flex;
+gap: 1em;
+}
+
+nav ul li a {
+color: white;
+text-decoration: none;
+}

@@ -1,23 +1,36 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useState } from 'react';
+import { BrowserRouter as Router, Route, Routes, Navigate, useLocation } from 'react-router-dom';
+import LandingPage from './pages/LandingPage';
+import HomePage from './pages/HomePage';
+import Header from './components/Header';
 
 function App() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/test</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <Router>
+      <AppLayout isAuthenticated={isAuthenticated} setIsAuthenticated={setIsAuthenticated} />
+    </Router>
+  );
+}
+
+function AppLayout({ isAuthenticated, setIsAuthenticated }) {
+  const location = useLocation();
+
+  return (
+    <div>
+      {location.pathname !== '/' && <Header />}
+
+      <Routes>
+        <Route path="/" element={<LandingPage setIsAuthenticated={setIsAuthenticated} />} />
+
+        <Route
+          path="/home"
+          element={
+            isAuthenticated ? <HomePage /> : <Navigate to="/" />
+          }
+        />
+      </Routes>
     </div>
   );
 }
