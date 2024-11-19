@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
-function RegisterForm({ onSubmit }) {
+function Register({ setIsAuthenticated }) {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -21,8 +23,31 @@ function RegisterForm({ onSubmit }) {
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleRegisterSubmit = () => {
-    onSubmit(formData);
+  const handleRegisterSubmit = async () => {
+    // try {
+    //   const response = await fetch('http://localhost:5000/register', {
+    //     method: 'POST',
+    //     headers: {
+    //       'Content-Type': 'application/json',
+    //     },
+    //     body: JSON.stringify(formData),
+    //   });
+
+    //   const data = await response.json();
+    //   if (response.ok) {
+    //     console.log('Registration successful:', data);
+         setIsAuthenticated(true);
+         navigate('/dashboard');
+    //   } else {
+    //     console.log('Registration failed:', data.message || 'Error registering');
+    //   }
+    // } catch (error) {
+    //   console.error('Error registering:', error);
+    // }
+  };
+  
+  const handleLoginRedirect = () => {
+    navigate('/login');
   };
 
   return (
@@ -56,7 +81,7 @@ function RegisterForm({ onSubmit }) {
         <label>Confirmer le mot de passe:</label>
         <input type="password" name="confirmPassword" value={formData.confirmPassword} onChange={handleRegisterChange} />
       </div>
-      <h3>Addresse</h3>
+      <h3>Adresse</h3>
       <div>
         <label>Rue:</label>
         <input type="text" name="street" value={formData.street} onChange={handleRegisterChange} />
@@ -78,8 +103,9 @@ function RegisterForm({ onSubmit }) {
         <input type="text" name="country" value={formData.country} onChange={handleRegisterChange} />
       </div>
       <button onClick={handleRegisterSubmit}>Valider l'inscription</button>
+      <button onClick={handleLoginRedirect}>Se connecter</button>
     </div>
   );
 }
 
-export default RegisterForm;
+export default Register;

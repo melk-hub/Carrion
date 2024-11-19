@@ -1,0 +1,145 @@
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
+import MicrosoftLogin from 'react-microsoft-login';
+import outlookIcon from '../assets/outlook-logo.png';
+
+function Login({ setIsAuthenticated }) {
+  const navigate = useNavigate();
+  const [credentials, setCredentials] = useState({ username: '', password: '' });
+  const [errorMessage, setErrorMessage] = useState('');
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setCredentials({ ...credentials, [name]: value });
+  };
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+
+    // try {
+    //   const response = await fetch('http://localhost:5000/login', {
+    //     method: 'POST',
+    //     headers: {
+    //       'Content-Type': 'application/json',
+    //     },
+    //     body: JSON.stringify(credentials),
+    //   });
+
+    //   const data = await response.json();
+
+    //   if (response.ok) {
+    //     console.log('Login successful:', data);
+         setIsAuthenticated(true);
+         navigate('/dashboard');
+    //   } else {
+    //     console.error('Login failed:', data.message);
+    //     setErrorMessage(data.message || 'Identifiants incorrects.');
+    //   }
+    // } catch (error) {
+    //   console.error('Error during login:', error);
+    //   setErrorMessage('Une erreur est survenue. Veuillez réessayer plus tard.');
+    // }
+  };
+
+  const handleGoogleLoginSuccess = (response) => {
+    console.log('Google Login Success:', response);
+    setIsAuthenticated(true);
+    navigate('/dashboard');
+  };
+
+  const handleGoogleLoginFailure = (error) => {
+    console.error('Google Login Failure:', error);
+  };
+
+  const handleMicrosoftLoginSuccess = (response) => {
+    console.log('Microsoft Login Success:', response);
+    setIsAuthenticated(true);
+    navigate('/dashboard');
+  };
+
+  const handleMicrosoftLoginFailure = (error) => {
+    console.error('Microsoft Login Failure:', error);
+  };
+
+  const handleRegisterRedirect = (response) => {
+    navigate('/register');
+  }
+
+  return (
+    <GoogleOAuthProvider clientId="YOUR_GOOGLE_CLIENT_ID">
+        <div className="login-page">
+            <h2>Connexion</h2>
+            <form onSubmit={handleLogin}>
+                <div>
+                    <label>Nom d'utilisateur:</label>
+                    <input
+                        type="text"
+                        name="username"
+                        value={credentials.username}
+                        onChange={handleChange}
+                        placeholder="Entrez votre nom d'utilisateur"
+                        //required
+                    />
+                </div>
+                <div>
+                    <label>Mot de passe:</label>
+                    <input
+                        type="password"
+                        name="password"
+                        value={credentials.password}
+                        onChange={handleChange}
+                        placeholder="Entrez votre mot de passe"
+                        //required
+                    />
+                </div>
+                {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>}
+                <button type="submit">Se connecter</button>
+                <button onClick={handleRegisterRedirect}>S'enregistrer</button>
+            </form>
+            <div>
+                <GoogleLogin
+                    onSuccess={handleGoogleLoginSuccess}
+                    onFailure={handleGoogleLoginFailure}
+                />
+                {/* <MicrosoftLogin
+                    clientId="YOUR_MICROSOFT_CLIENT_ID"
+                    buttonText="Se connecter avec Outlook"
+                    authCallback={handleMicrosoftLoginSuccess}
+                    onFailure={handleMicrosoftLoginFailure}
+                    redirectUri="http://localhost:3000"
+                    render={(renderProps) => (
+                        <button
+                        onClick={renderProps.onClick}
+                        style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            backgroundColor: '#0078D4',
+                            color: '#fff',
+                            padding: '10px 20px',
+                            border: 'none',
+                            borderRadius: '5px',
+                            cursor: 'pointer',
+                            marginTop: '10px',
+                        }}
+                        >
+                        <img
+                            src={outlookIcon}
+                            alt="Outlook"
+                            style={{ width: '20px', marginRight: '8px' }}
+                        />
+                        Se connecter avec Outlook
+                        </button>
+                    )}
+                /> */}
+                <button onClick={handleMicrosoftLoginSuccess} style={{ display: 'flex', alignItems: 'center' }}>
+                <img src={outlookIcon} alt="Outlook" style={{ width: '20px', marginRight: '8px' }} />
+                Se connecter avec Outlook
+                </button>
+            </div>
+        </div>
+    </GoogleOAuthProvider>
+  );
+}
+
+export default Login;

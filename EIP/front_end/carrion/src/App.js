@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate, useLocation } from 'react-router-dom';
-import LandingPage from './pages/LandingPage';
-import HomePage from './pages/HomePage';
+import Landing from './pages/Landing';
+import Dashboard from './pages/Dashboard';
 import Header from './components/Header';
+import Login from './pages/Login';
+import Register from './pages/Register';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -22,14 +24,10 @@ function AppLayout({ isAuthenticated, setIsAuthenticated }) {
       {location.pathname !== '/' && <Header />}
 
       <Routes>
-        <Route path="/" element={<LandingPage setIsAuthenticated={setIsAuthenticated} />} />
-
-        <Route
-          path="/home"
-          element={
-            isAuthenticated ? <HomePage /> : <Navigate to="/" />
-          }
-        />
+        <Route path="/" element={<Landing setIsAuthenticated={setIsAuthenticated} />} />
+        <Route path="/login" element={<Login setIsAuthenticated={setIsAuthenticated} />} />
+        <Route path="/register" element={<Register setIsAuthenticated={setIsAuthenticated} />} />
+        <Route path="/dashboard" element={isAuthenticated ? <Dashboard /> : <Navigate to="/" />} />
       </Routes>
     </div>
   );
