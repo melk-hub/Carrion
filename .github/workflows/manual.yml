@@ -14,6 +14,6 @@ jobs:
 
       - name: Push to Public Repository
         run: |
-          git remote add public git@github.com:VotreUtilisateur/Depot-Public.git
+          git remote add public git@github.com:melk-hub/Carrion.git
           git push public --mirror
 
