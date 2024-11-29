@@ -19,6 +19,7 @@ model User {
   username String?
   picture  String?
   Settings Settings?
+  jobApplies jobApply[] @relation("UserJobApplies")
 }
 
 model Token {
@@ -29,12 +30,12 @@ model Token {
   createdAt         DateTime  @default(now())
 }
 
-model Job-Apply {
+model jobApply {
   id               Int     @id @default(autoincrement())
   Company          String
   Location         String
   Salary           String
-  User             User    @relation(fields: [UserId], references: [id])
+  User             User?    @relation("UserJobApplies", fields: [UserId], references: [id])
   UserId           Int?    @unique
 }
 
