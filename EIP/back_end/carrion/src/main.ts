@@ -15,13 +15,15 @@ async function bootstrap() {
   );
 
   const config = new DocumentBuilder()
-  .setTitle('API Carrion')
-  .setDescription('The documentation of the routes defined for the web appliaction Carrion')
-  .setVersion('1.0')
-  .build();
+    .setTitle('API Carrion')
+    .setDescription(
+      'The documentation of the routes defined for the web appliaction Carrion',
+    )
+    .setVersion('1.0')
+    .build();
 
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
-  await app.listen(process.env.PORT ?? 3000);
+  await app.listen(process.env.PORT ?? 8080);
 }
 bootstrap();

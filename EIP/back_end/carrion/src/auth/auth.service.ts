@@ -1,20 +1,40 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class AuthService {
-  private users = []; // VALEUR STOCKÉE EN LOCAL, À REPLACER AVEC LA DB
-
-  constructor(private jwtService: JwtService) {}
+  constructor(
+    private jwtService: JwtService,
+    private prisma: PrismaService,
+  ) {}
 
   async signUp(email: string, password: string): Promise<void> {
+    const existingUser = await this.prisma.user.findUnique({
+      where: { email },
+    });
+    if (existingUser) {
+      throw new UnauthorizedException('Email already in use');
+    }
+
     const hashedPassword = await bcrypt.hash(password, 10);
-    this.users.push({ email, password: hashedPassword });
+
+    await this.prisma.user.create({
+      data: {
+        email,
+        password: hashedPassword,
+      },
+    });
   }
 
-  async signIn(email: string, password: string): Promise<{ accessToken: string }> {
-    const user = this.users.find((user) => user.email === email);
+  async signIn(
+    email: string,
+    password: string,
+  ): Promise<{ accessToken: string }> {
+    const user = await this.prisma.user.findUnique({
+      where: { email },
+    });
 
     if (!user || !(await bcrypt.compare(password, user.password))) {
       throw new UnauthorizedException('Invalid credentials');
@@ -22,6 +42,7 @@ export class AuthService {
 
     const payload = { email };
     const accessToken = this.jwtService.sign(payload);
+
     return { accessToken };
   }
 }
