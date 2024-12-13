@@ -1,0 +1,104 @@
+body {
+margin: 0;
+font-family: Arial, sans-serif;
+}
+
+.landing-background {
+background-image: url('../assets/spiral-1.jpg');
+background-size: cover;
+background-position: center;
+height: 100vh;
+display: flex;
+flex-direction: column;
+justify-content: space-between;
+}
+
+.landing-header {
+display: flex;
+justify-content: space-between;
+align-items: center;
+padding: 10px 20px;
+border-bottom: 1px solid #ccc;
+}
+
+.fixed-header {
+position: fixed;
+top: 0;
+left: 0;
+width: 100%;
+z-index: 1000;
+background-color: #FFFFFF;
+box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.landing-title {
+margin: 0;
+}
+
+.landing-buttons button {
+margin-right: 10px;
+padding: 10px 20px;
+font-size: 16px;
+color: #fff;
+background-color: #dabf9c;
+border: none;
+border-radius: 25px;
+cursor: pointer;
+}
+
+.landing-buttons button:hover {
+background-color: #696c70;
+transform: scale(1.03);
+}
+
+.landing-main {
+position: relative;
+height: 100vh;
+}
+
+.landing-welcome {
+position: absolute;
+left: 5%;
+top: 30%;
+transform: translateY(-50%);
+font-size: 5rem;
+font-weight: bold;
+color: #FFFFFF;
+max-width: 35%;
+}
+
+.landing-description {
+position: absolute;
+right: 8%;
+top: 32%;
+transform: translateY(-50%);
+font-size: 1.8rem;
+color: #FFFFFF;
+max-width: 32%;
+}
+
+.services-section {
+padding: 50px 20px;
+background-color: #f9f9f9;
+text-align: center;
+}
+
+.services-section h2 {
+font-size: 2rem;
+margin-bottom: 20px;
+}
+
+.services-section p {
+font-size: 1.2rem;
+margin-bottom: 20px;
+}
+
+.services-section ul {
+list-style-type: none;
+padding: 0;
+}
+
+.services-section li {
+font-size: 1.1rem;
+margin: 10px 0;
+}

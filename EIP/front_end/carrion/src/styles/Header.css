@@ -1,6 +1,7 @@
 header {
-background-color: #333;
+background-color: #FFFFFF;
 padding: 1em;
+border-bottom: 1px solid #ccc;
 }
 
 nav ul {
