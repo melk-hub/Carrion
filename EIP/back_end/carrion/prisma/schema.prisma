@@ -16,10 +16,12 @@ model User {
   emailGoogle String? @unique
   emailMicrosoft String? @unique
   password String
-  username String?
+  username String  @unique
   picture  String?
   Settings Settings?
   jobApplies jobApply[] @relation("UserJobApplies")
+  firstname String
+  lastname String
 }
 
 model Token {

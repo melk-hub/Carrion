@@ -13,7 +13,13 @@ export class AuthController {
   @ApiResponse({ status: 201, description: 'User successfully registered' })
   @ApiResponse({ status: 400, description: 'Validation error' })
   async signUp(@Body() signUpDto: SignUpDto): Promise<void> {
-    await this.authService.signUp(signUpDto.email, signUpDto.password);
+    await this.authService.signUp(
+      signUpDto.email,
+      signUpDto.password,
+      signUpDto.username,
+      signUpDto.firstname,
+      signUpDto.lastname,
+    );
   }
 
   @Post('signin')
@@ -21,6 +27,6 @@ export class AuthController {
   @ApiResponse({ status: 200, description: 'Successful login' })
   @ApiResponse({ status: 401, description: 'Invalid credentials' })
   async signIn(@Body() signInDto: SignInDto): Promise<{ accessToken: string }> {
-    return this.authService.signIn(signInDto.email, signInDto.password);
+    return this.authService.signIn(signInDto.username, signInDto.password);
   }
 }

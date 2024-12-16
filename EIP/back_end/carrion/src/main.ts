@@ -14,6 +14,19 @@ async function bootstrap() {
     }),
   );
 
+  app.enableCors({
+    origin: (origin, callback) => {
+      const allowedOrigins = ['http://localhost:3000', 'http://localhost:8080'];
+      if (allowedOrigins.includes(origin) || !origin) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    credentials: true,
+  });
+
   const config = new DocumentBuilder()
     .setTitle('API Carrion')
     .setDescription(
