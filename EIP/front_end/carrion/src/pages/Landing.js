@@ -17,9 +17,9 @@ function Landing() {
   return (
     <div>
       <div className="landing-background">
-        <header className="landing-header fixed-header">
-          <h1 className="landing-title"><img src={logo} alt="Carrion Logo" className="landing-logo"/></h1>
-          <div className="landing-buttons">
+        <header className="fixed-header">
+          <h1 className="logo"><img src={logo} alt="Carrion"/></h1>
+          <div className="header-buttons">
             <button onClick={handleLoginClick} className="login-button">Se connecter</button>
             <button onClick={handleRegisterToggle} className="register-button">S'enregistrer</button>
           </div>
