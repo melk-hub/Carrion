@@ -28,13 +28,13 @@ justify-content: space-between;
 align-items: center;
 }
 
-.landing-title {
+.logo {
 font-size: 1.5rem;
 font-weight: bold;
 color: var(--accent-color);
 }
 
-.landing-buttons button {
+.header-buttons {
 margin-left: 10px;
 padding: 10px 20px;
 font-size: 1rem;
@@ -52,29 +52,40 @@ background-color: var(--accent-color);
 /* Section principale */
 .landing-background {
 height: 100vh;
-background: url('../assets/spiral-1.jpg') no-repeat center center/cover;
+background: url('../assets/bg_carrion.webp') no-repeat center center/cover;
 }
 
 .landing-main {
-position: absolute;
-top: 75%;
-left: 10%;
-transform: translateY(-50%);
+    position: absolute;
+    top: 35%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 80%;
 }
 
 .landing-welcome {
-font-size: 2.5rem;
-font-weight: bold;
-margin: 0;
-color: var(--secondary-color);
+    font-size: 5rem;
+    font-weight: bold;
+    margin: 0;
+    max-width: 40%;
+    color: var(--secondary-color);
+    text-shadow: 
+        1px 1px 0 var(--accent-color), 
+        -1px 1px 0 var(--accent-color), 
+        1px -1px 0 var(--accent-color), 
+        -1px -1px 0 var(--accent-color);
 }
 
 .landing-description {
-font-size: 1.2rem;
-margin-top: 20px;
-max-width: 40%;
-color: var(--secondary-color);
+    font-size: 1.8rem;
+    margin-top: 0;
+    max-width: 40%;
+    color: var(--accent-color);
 }
+
 
 /* Services Section */
 .services-section {
@@ -151,7 +162,7 @@ height: 700px;
 
 .how-it-works-image {
 flex: 6;
-background: url('../assets/bg_carrion.webp') no-repeat left center/cover;
+background: url('../assets/spiral-1.jpg') no-repeat left center/cover;
 }
 
 .how-it-works-text {
