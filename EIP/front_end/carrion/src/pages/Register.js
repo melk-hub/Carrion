@@ -11,11 +11,6 @@ function Register({ setIsAuthenticated }) {
     username: '',
     password: '',
     confirmPassword: '',
-    street: '',
-    number: '',
-    city: '',
-    postalCode: '',
-    country: '',
   });
 
   const handleRegisterChange = (e) => {
@@ -24,26 +19,31 @@ function Register({ setIsAuthenticated }) {
   };
 
   const handleRegisterSubmit = async () => {
-    // try {
-    //   const response = await fetch('http://localhost:5000/register', {
-    //     method: 'POST',
-    //     headers: {
-    //       'Content-Type': 'application/json',
-    //     },
-    //     body: JSON.stringify(formData),
-    //   });
+    try {
+      const response = await fetch('http://localhost:8080/auth/signup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          firstname: formData.firstName,
+          lastname: formData.lastName,
+          email: formData.email,
+          username: formData.username,
+          password: formData.password,
+        }),
+      });
 
-    //   const data = await response.json();
-    //   if (response.ok) {
-    //     console.log('Registration successful:', data);
-         setIsAuthenticated(true);
-         navigate('/dashboard');
-    //   } else {
-    //     console.log('Registration failed:', data.message || 'Error registering');
-    //   }
-    // } catch (error) {
-    //   console.error('Error registering:', error);
-    // }
+      if (response.ok) {
+         setIsAuthenticated(false);
+         navigate('/login');
+      } else {
+        const errorData = await response.json();
+        console.log('Registration failed:', errorData.message || 'Error registering');
+      }
+    } catch (error) {
+      console.error('Error registering:', error);
+    }
   };
   
   const handleLoginRedirect = () => {
@@ -80,27 +80,6 @@ function Register({ setIsAuthenticated }) {
       <div>
         <label>Confirmer le mot de passe:</label>
         <input type="password" name="confirmPassword" value={formData.confirmPassword} onChange={handleRegisterChange} />
-      </div>
-      <h3>Adresse</h3>
-      <div>
-        <label>Rue:</label>
-        <input type="text" name="street" value={formData.street} onChange={handleRegisterChange} />
-      </div>
-      <div>
-        <label>Numéro:</label>
-        <input type="text" name="number" value={formData.number} onChange={handleRegisterChange} />
-      </div>
-      <div>
-        <label>Ville:</label>
-        <input type="text" name="city" value={formData.city} onChange={handleRegisterChange} />
-      </div>
-      <div>
-        <label>Code postal:</label>
-        <input type="text" name="postalCode" value={formData.postalCode} onChange={handleRegisterChange} />
-      </div>
-      <div>
-        <label>Pays:</label>
-        <input type="text" name="country" value={formData.country} onChange={handleRegisterChange} />
       </div>
       <button onClick={handleRegisterSubmit}>Valider l'inscription</button>
       <button onClick={handleLoginRedirect}>Se connecter</button>
