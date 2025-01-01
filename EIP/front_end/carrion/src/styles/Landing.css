@@ -34,7 +34,7 @@ font-weight: bold;
 color: var(--accent-color);
 }
 
-.header-buttons {
+.header-buttons button {
 margin-left: 10px;
 padding: 10px 20px;
 font-size: 1rem;
@@ -45,7 +45,7 @@ border-radius: 20px;
 cursor: pointer;
 }
 
-.landing-buttons button:hover {
+.header-buttons button:hover {
 background-color: var(--accent-color);
 }
 
@@ -56,34 +56,34 @@ background: url('../assets/bg_carrion.webp') no-repeat center center/cover;
 }
 
 .landing-main {
-    position: absolute;
-    top: 35%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 80%;
+position: absolute;
+top: 35%;
+left: 50%;
+transform: translate(-50%, -50%);
+display: flex;
+justify-content: space-between;
+align-items: center;
+width: 80%;
 }
 
 .landing-welcome {
-    font-size: 5rem;
-    font-weight: bold;
-    margin: 0;
-    max-width: 40%;
-    color: var(--secondary-color);
-    text-shadow: 
-        1px 1px 0 var(--accent-color), 
-        -1px 1px 0 var(--accent-color), 
-        1px -1px 0 var(--accent-color), 
-        -1px -1px 0 var(--accent-color);
+font-size: 5rem;
+font-weight: bold;
+margin: 0;
+max-width: 40%;
+color: var(--secondary-color);
+text-shadow: 
+    1px 1px 0 var(--accent-color), 
+    -1px 1px 0 var(--accent-color), 
+    1px -1px 0 var(--accent-color), 
+    -1px -1px 0 var(--accent-color);
 }
 
 .landing-description {
-    font-size: 1.8rem;
-    margin-top: 0;
-    max-width: 40%;
-    color: var(--accent-color);
+font-size: 1.8rem;
+margin-top: 0;
+max-width: 40%;
+color: var(--accent-color);
 }
 
 
