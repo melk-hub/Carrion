@@ -43,7 +43,7 @@ function Dashboard() {
   const fakeDatabase = [
     {
       id: 1,
-      logo: 'https://via.placeholder.com/50',
+      logo: 'https://via.placeholder.com/75',
       companyName: 'Entreprise A',
       jobTitle: 'Développeur Frontend',
       status: 'En cours',
@@ -51,7 +51,7 @@ function Dashboard() {
     },
     {
       id: 2,
-      logo: 'https://via.placeholder.com/50',
+      logo: 'https://via.placeholder.com/75',
       companyName: 'Entreprise B',
       jobTitle: 'Ingénieur Backend',
       status: 'Acceptée',
@@ -59,11 +59,35 @@ function Dashboard() {
     },
     {
       id: 3,
-      logo: 'https://via.placeholder.com/50',
+      logo: 'https://via.placeholder.com/75',
       companyName: 'Entreprise C',
       jobTitle: 'Designer UI/UX',
       status: 'Refusée',
       applicationDate: '2024-12-15',
+    },
+    {
+      id: 4,
+      logo: 'https://via.placeholder.com/75',
+      companyName: 'Entreprise D',
+      jobTitle: 'Développeur Backend',
+      status: 'En attente de réponse',
+      applicationDate: "Aujourd'hui",
+    },
+    {
+      id: 5,
+      logo: 'https://via.placeholder.com/75',
+      companyName: 'Entreprise E',
+      jobTitle: 'Chef de Projet IT',
+      status: 'En attente de réponse',
+      applicationDate: "Aujourd'hui",
+    },
+    {
+      id: 6,
+      logo: 'https://via.placeholder.com/75',
+      companyName: 'Entreprise F',
+      jobTitle: 'Consultant DevOps',
+      status: 'En attente de réponse',
+      applicationDate: "Aujourd'hui",
     },
   ];
 
@@ -127,6 +151,31 @@ function Dashboard() {
               </div>
             </div>
           ))
+        ) : (
+          <p>Aucune candidature trouvée</p>
+        )}
+      </div>
+      <div className="dashboard-row">
+      {filteredApplications.length > 0 ? (
+          filteredApplications.map((application) => (
+          <div key={application.id} className="dashboard-new-card">
+            <div className="card-header">
+              <img
+                src={application.logo}
+                alt={`${application.companyName} logo`}
+                className="new-card-logo"
+              />
+              <div className="new-card-company">{application.companyName}</div>
+            </div>
+            <div className="card-content">
+              <h4>{application.jobTitle}</h4>
+              <hr />
+              <p>{application.status}</p>
+              <small>{application.applicationDate}</small>
+            </div>
+            <button className="new-card-button">Voir les détails</button>
+          </div>
+        ))
         ) : (
           <p>Aucune candidature trouvée</p>
         )}
