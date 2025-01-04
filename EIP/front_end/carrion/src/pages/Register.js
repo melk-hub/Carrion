@@ -19,31 +19,26 @@ function Register({ setIsAuthenticated }) {
   };
 
   const handleRegisterSubmit = async () => {
-    try {
-      const response = await fetch('http://localhost:8080/auth/signup', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          firstname: formData.firstName,
-          lastname: formData.lastName,
-          email: formData.email,
-          username: formData.username,
-          password: formData.password,
-        }),
-      });
+    // try {
+    //   const response = await fetch('http://localhost:5000/register', {
+    //     method: 'POST',
+    //     headers: {
+    //       'Content-Type': 'application/json',
+    //     },
+    //     body: JSON.stringify(formData),
+    //   });
 
-      if (response.ok) {
-         setIsAuthenticated(false);
-         navigate('/login');
-      } else {
-        const errorData = await response.json();
-        console.log('Registration failed:', errorData.message || 'Error registering');
-      }
-    } catch (error) {
-      console.error('Error registering:', error);
-    }
+    //   const data = await response.json();
+    //   if (response.ok) {
+    //     console.log('Registration successful:', data);
+        setIsAuthenticated(true);
+        navigate('/dashboard');
+    //   } else {
+    //     console.log('Registration failed:', data.message || 'Error registering');
+    //   }
+    // } catch (error) {
+    //   console.error('Error registering:', error);
+    // }
   };
   
   const handleLoginRedirect = () => {

@@ -28,6 +28,8 @@ align-items: center;
 
 .logo-button {
 font-size: 1.5rem;
+margin-left: 20px;
+margin-top: 20px;
 font-weight: bold;
 color: var(--accent-color);
 cursor: pointer;
@@ -36,6 +38,7 @@ cursor: pointer;
 .logout-button {
 padding: 10px 20px;
 font-size: 1.2rem;
+margin-right: 20px;
 color: var(--text-color);
 background-color: var(--secondary-color);
 border-radius: 20px;

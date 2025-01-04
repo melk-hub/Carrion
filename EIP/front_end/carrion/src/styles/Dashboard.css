@@ -1,0 +1,127 @@
+/* Variables de couleurs */
+:root {
+--primary-color: #f7f0e8;
+--secondary-color: #ffffff;
+--text-color: #333333;
+--accent-color: #000000;
+--shadow-color: rgba(0, 0, 0, 0.1);
+}
+
+.preface {
+margin-top: 70px;
+background-color: var(--primary-color);
+display: flex;
+flex-direction: row;
+justify-content: space-between;
+}
+
+.objectives {
+display: flex;
+align-items: center;
+margin-left: 10%;
+font-size: 1.5rem;
+}
+
+.dashboard-title {
+font-size: 2rem;
+font-weight: bold;
+}
+
+.search-input-container {
+margin-right: 10%;
+position: relative;
+display: flex;
+align-items: center;
+width: 300px;
+}
+
+.search-icon {
+position: absolute;
+left: 5px;
+color: var(--text-color);
+font-size: 20px;
+}
+
+.search-input {
+width: 100%;
+padding: 10px 10px 10px 35px;
+border: 1px solid var(--shadow-color);
+border-radius: 20px;
+font-size: 20px;
+color: var(--text-color);
+outline: none;
+box-shadow: 0 2px 4px var(--shadow-color);
+}
+
+.search-input::placeholder {
+color: var(--accent-color);
+opacity: 0.7;
+}
+
+.search-input:focus {
+border-color: var(--accent-color);
+box-shadow: 0 0 5px var(--accent-color);
+}
+
+.dashboard-container {
+display: flex;
+flex-direction: column;
+gap: 10px;
+padding: 20px;
+align-items: center;
+box-sizing: border-box;
+margin-top: 70px;
+}
+
+.dashboard-card {
+display: flex;
+align-items: center;
+justify-content: space-between;
+background-color: var(--primary-color);
+border: 1px solid var(--shadow-color);
+border-radius: 8px;
+padding: 10px 20px;
+width: 90%;
+box-sizing: border-box;
+box-shadow: 0 2px 4px var(--shadow-color);
+}
+
+.dashboard-logo {
+width: 50px;
+height: 50px;
+border-radius: 50%;
+object-fit: cover;
+}
+
+.dashboard-details {
+flex: 1;
+margin-left: 20px;
+display: flex;
+flex-direction: column;
+justify-content: center;
+}
+
+.dashboard-company-name {
+margin: 0;
+font-size: 18px;
+font-weight: bold;
+color: var(--text-color);
+}
+
+.dashboard-job-title {
+margin: 5px 0;
+font-size: 16px;
+color: var(--accent-color);
+}
+
+.dashboard-status {
+margin: 5px 0;
+font-size: 14px;
+color: var(--text-color);
+}
+
+.dashboard-date {
+margin: 5px 0;
+font-size: 14px;
+color: var(--text-color);
+}
