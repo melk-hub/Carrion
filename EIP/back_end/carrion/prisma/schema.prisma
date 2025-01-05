@@ -12,18 +12,14 @@ datasource db {
 
 model User {
   id       Int       @id @default(autoincrement())
+  username String
   email    String    @unique
-  emailGoogle String? @unique
-  emailMicrosoft String? @unique
   password String
-  username String  @unique
-  picture  String?
-  Settings Settings?
-  jobApplies jobApply[] @relation("UserJobApplies")
-  firstname String
-  lastname String
   createdAt DateTime @default(now())
   role Role @default(USER)
+  jobApplies jobApply[] @relation("UserJobApplies")
+  Settings Settings?
+  hashedRefreshToken String?
   token Token? @relation(fields: [tokenId], references: [id])
   tokenId Int? @unique
 }
