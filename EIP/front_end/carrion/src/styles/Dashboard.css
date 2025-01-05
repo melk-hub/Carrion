@@ -7,8 +7,9 @@
 --shadow-color: rgba(0, 0, 0, 0.1);
 }
 
-.preface {
-margin-top: 70px;
+/* Top bar */
+.top-bar {
+margin-top: 50px;
 background-color: var(--primary-color);
 display: flex;
 flex-direction: row;
@@ -63,81 +64,127 @@ border-color: var(--accent-color);
 box-shadow: 0 0 5px var(--accent-color);
 }
 
-.dashboard-container {
+/* Toggle button */
+.dashboard-toggle-buttons {
 display: flex;
-flex-direction: column;
+justify-content: right;
+margin: 2% 15% 1% 0;
 gap: 10px;
-padding: 20px;
-align-items: center;
-box-sizing: border-box;
-margin-top: 70px;
 }
 
-.dashboard-card {
+.toggle-button {
+padding: 10px 20px;
+border: 1px solid var(--shadow-color);
+background-color: var(--primary-color);
+color: var(--text-color);
+border-radius: 5px;
+transition: all 0.3s ease;
+}
+
+.toggle-button.active {
+background-color: var(--accent-color);
+color: var(--secondary-color);
+cursor: auto;
+}
+
+.toggle-button:hover:not(.active) {
+cursor: pointer;
+background-color: var(--shadow-color);
+}
+
+/* Liste */
+.dashboard-list {
+display: flex;
+flex-direction: column;
+gap: 20px;
+align-items: center;
+box-sizing: border-box;
+}
+
+.dashboard-list-card {
 display: flex;
 align-items: center;
 justify-content: space-between;
 background-color: var(--primary-color);
 border: 1px solid var(--shadow-color);
 border-radius: 8px;
-padding: 10px 20px;
-width: 90%;
+padding: 20px;
+width: 70%;
 box-sizing: border-box;
 box-shadow: 0 2px 4px var(--shadow-color);
 }
 
-.dashboard-logo {
-width: 50px;
-height: 50px;
+.dashboard-list-logo {
+width: 100px;
+height: 100px;
+margin-left: 2%;
 border-radius: 50%;
 object-fit: cover;
 }
 
-.dashboard-details {
+.dashboard-list-details {
 flex: 1;
-margin-left: 20px;
+margin-left: 60px;
 display: flex;
 flex-direction: column;
 justify-content: center;
 }
 
-.dashboard-company-name {
+.dashboard-list-company-name {
 margin: 0;
-font-size: 18px;
+font-size: 20px;
 font-weight: bold;
 color: var(--text-color);
 }
 
-.dashboard-job-title {
+.dashboard-list-job-title {
 margin: 5px 0;
 font-size: 16px;
 color: var(--accent-color);
 }
 
-.dashboard-status {
+.dashboard-list-status {
 margin: 5px 0;
 font-size: 14px;
 color: var(--text-color);
 }
 
-.dashboard-date {
+.dashboard-list-date {
 margin: 5px 0;
 font-size: 14px;
 color: var(--text-color);
 }
 
-.dashboard-row {
+.dashboard-list-button {
+background-color: var(--primary-color);
+color: var(--text-color);
+border: none;
+padding: 10px 15px;
+border-radius: 20px;
+cursor: pointer;
+width: 18%;
+box-shadow: 0 2px 4px var(--shadow-color);
+transition: background-color 0.3s ease;
+}
+
+.dashboard-list-button:hover {
+background-color: var(--accent-color);
+color: var(--secondary-color);
+}
+
+/* Grille */
+.dashboard-grid {
 display: grid;
-grid-template-columns: repeat(3, 350px);
+grid-template-columns: repeat(3, 30%);
 justify-content: center;
-max-width: 1200px;
-column-gap: 150px;
+max-width: calc(70% - 230px);
+column-gap: 170px;
 row-gap: 50px;
 margin: 0 auto;
 width: 100%;
 }
 
-.dashboard-new-card {
+.dashboard-grid-card {
 background-color: var(--primary-color);
 border: 1px solid var(--shadow-color);
 height: 400px;
@@ -150,57 +197,60 @@ justify-content: space-between;
 text-align: center;
 }
 
-.card-header {
+.dashboard-grid-header {
 display: flex;
 align-items: center;
 justify-content: space-between;
-margin-bottom: 10px;
 }
 
-.new-card-logo {
-width: 75px;
-height: 75px;
-border-radius: 4px;
-background-color: #ccc;
+.dashboard-grid-logo {
+width: 100px;
+height: 100px;
+border-radius: 50px;
 }
 
-.new-card-company {
+.dashboard-grid-company-name {
+flex: 1;
+display: flex;
+justify-content: center;
 font-weight: bold;
 font-size: 22px;
 }
 
-.card-content {
+.dashboard-grid-content {
 margin: 10px 0;
 }
 
-.card-content h4 {
+.dashboard-grid-content h4 {
 font-size: 22px;
 font-weight: bold;
 margin-bottom: 50px;
 }
 
-.card-content hr {
+.dashboard-grid-content hr {
 border: 0.5px solid var(--shadow-color);
 }
 
-.card-content p {
+.dashboard-grid-content p {
 margin-top: 50px;
 margin-bottom: 10px;
 color: var(--text-color);
 }
 
-.new-card-button {
+.dashboard-grid-button {
 background-color: var(--primary-color);
 color: var(--text-color);
 border: none;
 padding: 10px 15px;
 border-radius: 20px;
 cursor: pointer;
+width: 90%;
 box-shadow: 0 2px 4px var(--shadow-color);
 transition: background-color 0.3s ease;
+margin: 0 auto;
 }
 
-.new-card-button:hover {
+.dashboard-grid-button:hover {
 background-color: var(--accent-color);
 color: var(--secondary-color);
 }
