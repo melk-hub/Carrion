@@ -1,81 +1,110 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { ConflictException, Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import * as bcrypt from 'bcrypt';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { compare } from 'bcrypt';
+import { UserService } from 'src/user/user.service';
+import { AuthJwtPayload } from './types/auth-jwtPayload';
+import refreshJwtConfig from './config/refresh-jwt.config';
+import { ConfigType } from '@nestjs/config';
+import * as argon2 from 'argon2';
+import { CurrentUser } from './types/current-user';
+import { CreateUserDto, LoginDto } from 'src/user/dto/create-user.dto';
+import { Role } from './enums/role.enum';
+import * as bcrypt from 'bcrypt'
 
 @Injectable()
 export class AuthService {
   constructor(
+    private userService: UserService,
     private jwtService: JwtService,
-    private prisma: PrismaService,
+    @Inject(refreshJwtConfig.KEY)
+    private refreshTokenConfig: ConfigType<typeof refreshJwtConfig>,
   ) {}
 
-  async signUp(
-    email: string,
-    password: string,
-    username: string,
-    firstname: string,
-    lastname: string,
-  ): Promise<void> {
-    const existingUserEmail = await this.prisma.user.findUnique({
-      where: { email },
-    });
-    if (existingUserEmail) {
-      throw new UnauthorizedException('Email already in use');
-    }
-    const existingUsername = await this.prisma.user.findUnique({
-      where: { username },
-    });
-    if (existingUsername) {
-      throw new UnauthorizedException('Username already in use');
-    }
+  async validateUser(email: string, password: string) {
+    const user = await this.userService.findByEmail(email);
+    if (!user) throw new UnauthorizedException('User not found!');
+    const isPasswordMatch = await compare(password, user.password);
+    if (!isPasswordMatch)
+      throw new UnauthorizedException('Invalid credentials');
 
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    try {
-      await this.prisma.user.create({
-        data: {
-          email,
-          username,
-          password: hashedPassword,
-          firstname,
-          lastname,
-        },
-      });
-    } catch (error) {
-      if (error instanceof this.prisma.handleKnownErrors) {
-        throw new UnauthorizedException('Unique constraint failed');
-      }
-      throw error;
-    }
+    return { id: user.id };
   }
 
-  async signIn(
-    username: string,
-    password: string,
-  ): Promise<{ accessToken: string }> {
-    try {
-      const loginField = username.includes('@') ? 'email' : 'username';
-      let user;
-      if (loginField === 'email') {
-        user = await this.prisma.user.findUnique({
-          where: { email: username },
-        });
-      } else if (loginField === 'username') {
-        user = await this.prisma.user.findUnique({
-          where: { username },
-        });
-      }
-      if (!user || !(await bcrypt.compare(password, user.password))) {
-        throw new UnauthorizedException('Invalid credentials');
-      }
+  async login(userId: number) {
+    const { accessToken, refreshToken } = await this.generateTokens(userId);
+    const hashedRefreshToken = await argon2.hash(refreshToken);
+    await this.userService.updateHashedRefreshToken(userId, hashedRefreshToken);
+    return {
+      id: userId,
+      accessToken,
+      refreshToken,
+    };
+  }
 
-      const payload = { email: user.email };
-      const accessToken = this.jwtService.sign(payload);
+  async signUp(createUserDto: CreateUserDto) {
+    const existingUser = await this.userService.findByEmail(createUserDto.email);
+    if (existingUser)
+      throw new ConflictException('User with this email already exists');
+    const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
+    const user = await this.userService.create({
+      ...createUserDto,
+      password: hashedPassword,
+    });
+    return await this.login(user.id);
+  }
 
-      return { accessToken };
-    } catch (error) {
-      console.error('Error during signIn:', error);
-    }
+  async generateTokens(userId: number) {
+    const payload: AuthJwtPayload = { sub: userId };
+    const [accessToken, refreshToken] = await Promise.all([
+      this.jwtService.signAsync(payload),
+      this.jwtService.signAsync(payload, this.refreshTokenConfig),
+    ]);
+    return {
+      accessToken,
+      refreshToken,
+    };
+  }
+
+  async refreshToken(userId: number) {
+    const { accessToken, refreshToken } = await this.generateTokens(userId);
+    const hashedRefreshToken = await argon2.hash(refreshToken);
+    await this.userService.updateHashedRefreshToken(userId, hashedRefreshToken);
+    return {
+      id: userId,
+      accessToken,
+      refreshToken,
+    };
+  }
+
+  async validateRefreshToken(userId: number, refreshToken: string) {
+    const user = await this.userService.findOne(userId);
+    if (!user || !user.token.RefreshToken)
+      throw new UnauthorizedException('Invalid Refresh Token');
+
+    const refreshTokenMatches = await argon2.verify(
+      user.token.RefreshToken,
+      refreshToken,
+    );
+    if (!refreshTokenMatches)
+      throw new UnauthorizedException('Invalid Refresh Token');
+
+    return { id: userId };
+  }
+
+  async signOut(userId: number) {
+    await this.userService.updateHashedRefreshToken(userId, null);
+  }
+
+  async validateJwtUser(userId: number) {
+    const user = await this.userService.findOne(userId);
+    if (!user) throw new UnauthorizedException('User not found!');
+    const currentUser: CurrentUser = { id: user.id, role: user.role as Role };
+    return currentUser;
+  }
+
+  async validateOAuthUser(OAuthUser: CreateUserDto) {
+    const user = await this.userService.findByEmail(OAuthUser.email);
+    if (user) return user;
+    return await this.userService.create(OAuthUser);
   }
 }
