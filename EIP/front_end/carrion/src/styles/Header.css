@@ -35,31 +35,29 @@ color: var(--accent-color);
 cursor: pointer;
 }
 
-.logout-button {
-padding: 10px 20px;
-font-size: 1.2rem;
-margin-right: 20px;
-color: var(--text-color);
-background-color: var(--secondary-color);
-border-radius: 20px;
-cursor: pointer;
-}
-
-.logout-button:hover {
-background-color: var(--primary-color);
-}
-
 .navigation-buttons button {
-padding: 10px 20px;
 font-size: 1.4rem;
-margin-left: 10px;
 margin-right: 10px;
 background-color: var(--secondary-color);
 font-weight: bold;
 border: none;
 cursor: pointer;
+margin-left: 10px;
 }
 
 .navigation-buttons button:hover {
 text-decoration: underline;
 }
+
+.logout-button {
+padding: 5px 20px;
+font-size: 1.2rem;
+margin-right: 20px;
+background-color: var(--secondary-color);
+border-radius: 20px;
+border: none;
+cursor: pointer;
+}
+
+.logout-button:hover {
+background-color: var(--primary-color);}
