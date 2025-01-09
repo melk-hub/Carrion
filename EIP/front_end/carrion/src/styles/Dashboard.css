@@ -103,6 +103,7 @@ padding: 20px;
 width: 70%;
 box-sizing: border-box;
 box-shadow: 0 2px 4px var(--shadow-color);
+position: relative;
 }
 
 .dashboard-list-logo {
@@ -164,6 +165,27 @@ background-color: var(--accent-color);
 color: var(--secondary-color);
 }
 
+.dashboard-list-status-banner {
+height: 100%;
+width: 250px;
+position: absolute;
+top: 0;
+right: 0;
+border-radius: 0 8px 8px 0;
+}
+
+.dashboard-list-status-banner.acceptée {
+background: linear-gradient(90deg, var(--primary-color), #0de406);
+}
+
+.dashboard-list-status-banner.attente {
+background: linear-gradient(90deg, var(--primary-color), #fc8f02);
+}
+
+.dashboard-list-status-banner.refusée {
+background: linear-gradient(90deg, var(--primary-color), #fa0202);
+}
+
 /* Grille */
 .dashboard-grid {
 display: grid;
@@ -187,6 +209,8 @@ display: flex;
 flex-direction: column;
 justify-content: space-between;
 text-align: center;
+position: relative;
+overflow: hidden;
 }
 
 .dashboard-grid-header {
@@ -245,4 +269,24 @@ margin: 0 auto;
 .dashboard-grid-button:hover {
 background-color: var(--accent-color);
 color: var(--secondary-color);
+}
+
+.dashboard-grid-status-banner {
+height: 100%;
+width: 40px;
+position: absolute;
+bottom: 0;
+right: 0;
+}
+
+.dashboard-grid-status-banner.acceptée {
+background: linear-gradient(90deg, var(--primary-color), #0de406);
+}
+
+.dashboard-grid-status-banner.attente {
+background: linear-gradient(90deg, var(--primary-color), #fc8f02);
+}
+
+.dashboard-grid-status-banner.refusée {
+background: linear-gradient(90deg, var(--primary-color), #fa0202);
 }

@@ -98,7 +98,7 @@ function Dashboard() {
     <div>
       <div className="top-bar">
         <div className="objectives">
-          <h3>Objectif de la semaine: 3/10</h3>
+          <h3>Objectif de la semaine:</h3>
         </div>
         <div className='dashboard-title'>
           <h1>Mes Candidatures</h1>
@@ -147,6 +147,7 @@ function Dashboard() {
                   <p className="dashboard-list-date">Date de candidature : {application.applicationDate}</p>
                   <button className="dashboard-list-button">Voir les détails</button>
                 </div>
+                <div className={`dashboard-list-status-banner ${application.status.toLowerCase()}`}></div>
               </div>
             ))
           ) : (
@@ -175,6 +176,7 @@ function Dashboard() {
                 <small>Date de candidature : {application.applicationDate}</small>
               </div>
               <button className="dashboard-grid-button">Voir les détails</button>
+              <div className={`dashboard-grid-status-banner ${application.status.toLowerCase()}`}></div>
             </div>
           ))
           ) : (
