@@ -5,6 +5,7 @@ import Landing from './pages/Landing';
 import Dashboard from './pages/Dashboard';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import Archives from './pages/Archives';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
@@ -60,6 +61,18 @@ function AppLayout({ isAuthenticated, setIsAuthenticated }) {
             ) : (
               // <Navigate to="/login" replace />
               <Navigate to="/dashboard" replace />
+            )
+          }
+        />
+        {/* Page Archives avec redirection si non authentifié */}
+        <Route
+          path="/archives"
+          element={
+            isAuthenticated ? (
+              <Archives />
+            ) : (
+              // <Navigate to="/login" replace />
+              <Navigate to="/archives" replace />
             )
           }
         />
