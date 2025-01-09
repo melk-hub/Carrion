@@ -26,7 +26,7 @@ function Dashboard() {
       logo: 'https://via.placeholder.com/100',
       companyName: 'Entreprise A',
       jobTitle: 'Développeur Frontend',
-      status: 'En cours',
+      status: 'En attente de réponse',
       applicationDate: '2024-12-01',
     },
     {
@@ -98,10 +98,10 @@ function Dashboard() {
     <div>
       <div className="top-bar">
         <div className="objectives">
-          <p>Objectif de la semaine: 3/10</p>
+          <h3>Objectif de la semaine: 3/10</h3>
         </div>
         <div className='dashboard-title'>
-          <p>Mes Candidatures</p>
+          <h1>Mes Candidatures</h1>
         </div>
         <div className="search-input-container">
           <span className="search-icon">🔍</span>
@@ -171,8 +171,8 @@ function Dashboard() {
               <div className="dashboard-grid-content">
                 <h4>{application.jobTitle}</h4>
                 <hr />
-                <p>{application.status}</p>
-                <small>{application.applicationDate}</small>
+                <p>Statut : {application.status}</p>
+                <small>Date de candidature : {application.applicationDate}</small>
               </div>
               <button className="dashboard-grid-button">Voir les détails</button>
             </div>

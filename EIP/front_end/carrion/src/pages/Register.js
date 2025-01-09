@@ -47,7 +47,7 @@ function Register({ setIsAuthenticated }) {
 
   return (
     <div>
-      <h2>S'enregistrer</h2>
+      <h2>S'inscrire</h2>
       <div>
         <label>Prénom:</label>
         <input type="text" name="firstName" value={formData.firstName} onChange={handleRegisterChange} />

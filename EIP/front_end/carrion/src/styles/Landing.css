@@ -1,23 +1,6 @@
-/* Variables de couleurs */
-:root {
---primary-color: #f7f0e8;
---secondary-color: #ffffff;
---text-color: #333333;
---accent-color: #000000;
---shadow-color: rgba(0, 0, 0, 0.1);
-}
-
-/* Général */
-body {
-margin: 0;
-font-family: Arial, sans-serif;
-color: var(--text-color);
-}
-
 /* Header */
 .fixed-header {
 position: fixed;
-top: 0;
 height: 5%;
 width: 100%;
 background-color: var(--secondary-color);
@@ -31,8 +14,6 @@ align-items: center;
 .logo {
 font-size: 1.5rem;
 margin-left: 20px;
-font-weight: bold;
-color: var(--accent-color);
 }
 
 .header-buttons button {
@@ -57,7 +38,7 @@ background: url('../assets/bg_carrion.webp') no-repeat center center/cover;
 
 .landing-main {
 position: absolute;
-top: 35%;
+top: 30%;
 left: 50%;
 transform: translate(-50%, -50%);
 display: flex;
@@ -67,10 +48,9 @@ width: 80%;
 }
 
 .landing-welcome {
-font-size: 5rem;
+font-size: 5.5rem;
 font-weight: bold;
-margin: 0;
-max-width: 40%;
+max-width: 45%;
 color: var(--secondary-color);
 text-shadow:
     1px 1px 0 var(--accent-color), 
@@ -81,11 +61,9 @@ text-shadow:
 
 .landing-description {
 font-size: 1.8rem;
-margin-top: 0;
 max-width: 40%;
 color: var(--accent-color);
 }
-
 
 /* Services Section */
 .services-section {
@@ -95,7 +73,7 @@ background-color: var(--secondary-color);
 }
 
 .services-title {
-font-size: 5rem;
+font-size: 4rem;
 font-weight: bold;
 margin-bottom: 100px;
 }
@@ -103,41 +81,37 @@ margin-bottom: 100px;
 .services-container {
 display: flex;
 justify-content: space-around;
-align-items: flex-start;
-gap: 20px;
 }
 
 .service-card {
 position: relative;
 background-color: var(--primary-color);
-padding: 40px 20px;
+padding: 20px 20px;
 text-align: center;
-width: 250px;
-height: 300px;
-border-radius: 8px;
+width: 14.5%;
+border-radius: 10px;
 box-shadow: 0 4px 6px var(--shadow-color);
 }
 
 .service-number {
 position: absolute;
-top: -20px;
+top: -7%;
 left: 50%;
 transform: translateX(-50%);
-background-color: var(--secondary-color);
+background-color: var(--primary-color);
 color: var(--accent-color);
 font-weight: bold;
-width: 50px;
-height: 50px;
-line-height: 50px;
+width: 16%;
+height: 14%;
+line-height: 200%;
 border-radius: 50%;
-border: 1px solid var(--accent-color);
-font-size: 1.2rem;
+font-size: 1.5rem;
 }
 
 .service-card h3 {
 margin: 20px 0 100px;
 font-size: 2rem;
-font-weight: bold;
+font-weight: normal;
 }
 
 .service-card p {
@@ -162,12 +136,12 @@ height: 700px;
 
 .how-it-works-image {
 flex: 6;
-background: url('../assets/spiral-1.jpg') no-repeat left center/cover;
+background: url('../assets/how-it-works.jpg') no-repeat left center/cover;
 }
 
 .how-it-works-text {
 flex: 4;
-padding-left: 40px;
+padding: 40px;
 display: flex;
 flex-direction: column;
 justify-content: center;
@@ -175,7 +149,7 @@ text-align: left;
 }
 
 .how-it-works-text h2 {
-font-size: 4rem;
+font-size: 3.5rem;
 font-weight: bold;
 margin-bottom: 10px;
 }
@@ -183,7 +157,6 @@ margin-bottom: 10px;
 .how-it-works-text h3 {
 font-size: 2rem;
 font-weight: normal;
-color: var(--accent-color);
 margin-bottom: 80px;
 }
 
@@ -198,12 +171,13 @@ line-height: 1.2;
 background-color: var(--secondary-color);
 padding: 50px 30px;
 text-align: center;
+margin-bottom: 200px;
 }
 
 .testimonials-title {
-font-size: 3rem;
+font-size: 4rem;
 font-weight: bold;
-margin-bottom: 70px;
+margin-bottom: 100px;
 }
 
 .testimonials-container {
@@ -215,7 +189,7 @@ gap: 50px;
 
 .testimonial {
 background-color: var(--primary-color);
-border-radius: 8px;
+border-radius: 10px;
 box-shadow: 0 4px 6px var(--shadow-color);
 }
 
@@ -224,15 +198,11 @@ font-size: 1.2rem;
 color: var(--text-color);
 line-height: 1.5;
 width: 70%;
-margin: 0 auto;
-margin-top: 15px;
+margin: 15px auto;
 }
 
 .testimonial-author {
-font-size: 1.1rem;
 font-weight: bold;
-margin-top: 15px;
-color: var(--accent-color);
 }
 
 .testimonials-container .testimonial:nth-child(1) {
