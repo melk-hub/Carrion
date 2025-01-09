@@ -135,12 +135,22 @@ function Dashboard() {
                   alt={`${application.companyName} logo`}
                   className="dashboard-list-logo"
                 />
-                <div className="dashboard-list-details">
+                <div className="dashboard-list-content">
                   <h3 className="dashboard-list-company-name">{application.companyName}</h3>
                   <p className="dashboard-list-job-title">{application.jobTitle}</p>
                   <p className="dashboard-list-status">Statut : {application.status}</p>
                   <p className="dashboard-list-date">Date de candidature : {application.applicationDate}</p>
-                  <button className="dashboard-list-button">Voir les détails</button>
+                  <button className="dashboard-list-details">Voir les détails</button>
+                </div>
+                <div className="dashboard-list-actions">
+                  <button className="action-button archive-button">
+                    📥
+                    <span className="list-tooltip">Archiver</span>
+                  </button>
+                  <button className="action-button delete-button">
+                    ❌
+                    <span className="list-tooltip">Supprimer</span>
+                  </button>
                 </div>
                 <div className={`dashboard-list-status-banner ${application.status.toLowerCase()}`}></div>
               </div>
@@ -170,7 +180,17 @@ function Dashboard() {
                 <p>Statut : {application.status}</p>
                 <small>Date de candidature : {application.applicationDate}</small>
               </div>
-              <button className="dashboard-grid-button">Voir les détails</button>
+              <button className="dashboard-grid-details">Voir les détails</button>
+              <div className="dashboard-grid-actions">
+                <button className="action-button archive-button">
+                  📥
+                  <span className="grid-tooltip">Archiver</span>
+                </button>
+                <button className="action-button delete-button">
+                  ❌
+                  <span className="grid-tooltip">Supprimer</span>
+                </button>
+              </div>
               <div className={`dashboard-grid-status-banner ${application.status.toLowerCase()}`}></div>
             </div>
           ))
