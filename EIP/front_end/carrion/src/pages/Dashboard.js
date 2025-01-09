@@ -2,8 +2,6 @@ import React, { useState, useEffect } from 'react';
 import '../styles/Dashboard.css';
 
 // function Dashboard() {
-//   const [applications, setApplications] = useState([]);
-
 //   useEffect(() => {
 //     const fetchApplications = async () => {
 //       try {
@@ -14,7 +12,6 @@ import '../styles/Dashboard.css';
 //         console.error('Erreur lors de la récupération des données:', error);
 //       }
 //     };
-
 //     fetchApplications();
 //   }, []);
 // }
@@ -119,14 +116,12 @@ function Dashboard() {
         <button
           className={`toggle-button ${viewMode === 'list' ? 'active' : ''}`}
           onClick={() => setViewMode('list')}
-        >
-          Voir liste
+        >Voir liste
         </button>
         <button
           className={`toggle-button ${viewMode === 'grid' ? 'active' : ''}`}
           onClick={() => setViewMode('grid')}
-        >
-          Voir grille
+        >Voir grille
         </button>
       </div>
 
