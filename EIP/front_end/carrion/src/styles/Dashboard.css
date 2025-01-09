@@ -72,7 +72,7 @@ transition: all 0.3s ease;
 }
 
 .toggle-button.active {
-background-color: var(--accent-color);
+background-color: grey;
 color: var(--secondary-color);
 cursor: auto;
 }
@@ -161,7 +161,7 @@ transition: background-color 0.3s ease;
 }
 
 .dashboard-list-button:hover {
-background-color: var(--accent-color);
+background-color: var(--text-color);
 color: var(--secondary-color);
 }
 
@@ -267,7 +267,7 @@ margin: 0 auto;
 }
 
 .dashboard-grid-button:hover {
-background-color: var(--accent-color);
+background-color: var(--text-color);
 color: var(--secondary-color);
 }
 
