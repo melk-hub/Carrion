@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import '../styles/Dashboard.css';
+import archiveIcon from '../assets/archiver.png';
+import deleteIcon from '../assets/supprimer.png';
 
 // function Dashboard() {
 //   useEffect(() => {
@@ -144,11 +146,11 @@ function Dashboard() {
                 </div>
                 <div className="dashboard-list-actions">
                   <button className="action-button archive-button">
-                    📥
+                    <img src={archiveIcon} alt="Archiver"/>
                     <span className="list-tooltip">Archiver</span>
                   </button>
                   <button className="action-button delete-button">
-                    ❌
+                    <img src={deleteIcon} alt="Supprimer"/>
                     <span className="list-tooltip">Supprimer</span>
                   </button>
                 </div>
@@ -183,11 +185,11 @@ function Dashboard() {
               <button className="dashboard-grid-details">Voir les détails</button>
               <div className="dashboard-grid-actions">
                 <button className="action-button archive-button">
-                  📥
+                  <img src={archiveIcon} alt="Archiver"/>
                   <span className="grid-tooltip">Archiver</span>
                 </button>
                 <button className="action-button delete-button">
-                  ❌
+                  <img src={deleteIcon} alt="Supprimer"/>
                   <span className="grid-tooltip">Supprimer</span>
                 </button>
               </div>
