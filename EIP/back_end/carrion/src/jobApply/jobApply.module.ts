@@ -4,7 +4,8 @@ import { JobApplyController } from './jobApply.controller';
 import { PrismaModule } from 'src/prisma/prisma.module';
 
 @Module({
+  imports: [PrismaModule],
   controllers: [JobApplyController],
-  providers: [JobApplyService, PrismaModule],
+  providers: [JobApplyService],
 })
 export class JobApplyModule {}
