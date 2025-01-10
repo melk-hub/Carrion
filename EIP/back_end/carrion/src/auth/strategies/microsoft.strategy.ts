@@ -1,11 +1,9 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ConfigType } from '@nestjs/config';
-import { VerifyCallback } from 'passport-jwt';
-import { Strategy } from 'passport-microsoft'
+import { Strategy, VerifyCallback, Profile } from 'passport-microsoft'
 import microsoftOauthConfig from '../config/microsoft-oauth.config';
 import { AuthService } from '../auth.service';
-import { Profile } from 'passport';
 
 @Injectable()
 export class MicrosoftStrategy extends PassportStrategy(Strategy, 'microsoft') {
@@ -25,7 +23,9 @@ export class MicrosoftStrategy extends PassportStrategy(Strategy, 'microsoft') {
   async validate( accessToken: string, refreshToken: string, profile: Profile, done: VerifyCallback) {
     console.log({ profile });
     const user = await this.authService.validateOAuthUser({
-      username: profile.name.givenName,
+      username: '',
+      firstName: profile.name.givenName,
+      lastName: profile.name.familyName,
       email: profile.emails[0].value,
       password: '',
     });
