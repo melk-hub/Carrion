@@ -6,10 +6,28 @@ export class CreateUserDto {
     name: 'username',
     description: 'username of the user',
     type: 'string',
-    example: 'JohnDoe',
+    example: 'JohnDoe733',
   })
   @IsNotEmpty()
   username: string;
+
+  @ApiProperty({
+    name: 'firstName',
+    description: 'First name of the user',
+    type: 'string',
+    example: 'John',
+  })
+  @IsNotEmpty()
+  firstName: string;
+
+  @ApiProperty({
+    name: 'lastName',
+    description: 'Last name of the user',
+    type: 'string',
+    example: 'Doe',
+  })
+  @IsNotEmpty()
+  lastName: string;
 
   @ApiProperty({
     name: 'email',

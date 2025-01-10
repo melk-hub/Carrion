@@ -17,12 +17,12 @@ export class AuthController {
   @Public()
   @HttpCode(HttpStatus.OK)
   @UseGuards(LocalAuthGuard)
-  @Post('login')
-  @ApiOperation({ summary: 'User login' })
+  @Post('signin')
+  @ApiOperation({ summary: 'User sign in' })
   @ApiBody({ type: LoginDto })
   @ApiResponse({
     status: 200,
-    description: 'Successfully logged in',
+    description: 'Successfully signed in',
     schema: {
       example: {
         accessToken: 'string',
