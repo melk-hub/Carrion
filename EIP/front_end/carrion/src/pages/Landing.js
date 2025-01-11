@@ -26,8 +26,8 @@ function Landing() {
 
       <div className="landing-background">
         <main className="landing-main">
-          <h1 className="landing-welcome">Bienvenue sur Carrion</h1>
-          <p className="landing-description">Explorez notre plateforme dédiée à la gestion de candidatures pour les travailleurs cherchant des stages ou des emplois.</p>
+          <h2 className="landing-welcome">Bienvenue sur Carrion</h2>
+          <p className="landing-description">Explorez notre plateforme dédiée à la gestion de candidatures pour les jeunes travailleurs cherchant des stages ou des emplois.</p>
         </main>
       </div>
 
@@ -46,7 +46,6 @@ function Landing() {
           </div>
           <div className="service-card">
             <div className="service-number">3</div>
-            <h3>Rappels et notifications personnalisés</h3>
             <p>Recevez des rappels automatiques pour vos candidatures en attente de réponse ou vos entretiens à venir. Restez organisé et proactif.</p>
           </div>
         </div>
@@ -66,15 +65,15 @@ function Landing() {
       <section className="testimonials-section">
         <h2 className="testimonials-title">Témoignages</h2>
         <div className="testimonials-container">
-          <div className="testimonial">
+          <div className="testimonial testimonial-left">
             <p>"Carrion m'a aidé à suivre mes candidatures de manière organisée et efficace. Je recommande vivement cette plateforme."</p>
             <p className="testimonial-author">Marie L.</p>
           </div>
-          <div className="testimonial">
+          <div className="testimonial testimonial-right">
             <p>"Grâce à Carrion, j'ai pu visualiser mes progrès dans ma recherche d'emploi. Une expérience très positive."</p>
             <p className="testimonial-author">Pierre G.</p>
           </div>
-          <div className="testimonial">
+          <div className="testimonial testimonial-left">
             <p>"La fonction de suivi automatique de Carrion m'a permis de rester motivée et organisée. Merci pour ce service très utile."</p>
             <p className="testimonial-author">Sophie B.</p>
           </div>

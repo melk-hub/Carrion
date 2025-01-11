@@ -33,7 +33,7 @@ border: 0.5px solid var(--accent-color);
 /* Section principale */
 .landing-background {
 height: 100vh;
-background: url('../assets/bg_carrion.webp') no-repeat center center/cover;
+background: url('../assets/landing_bg.png') no-repeat center center/cover;
 }
 
 .landing-main {
