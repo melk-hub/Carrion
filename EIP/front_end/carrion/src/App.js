@@ -44,6 +44,7 @@ function AppLayout() {
 
   return (
     <div>
+      {location.pathname !== '/' && location.pathname !== '/login' && location.pathname !== '/register' && <Header />}
 
 
       <Routes>
