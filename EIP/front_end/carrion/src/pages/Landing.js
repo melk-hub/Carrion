@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
 import '../styles/Landing.css';
 import logo from '../assets/logo-carrion.png';
 
@@ -13,6 +14,21 @@ function Landing() {
   const handleRegisterToggle = () => {
     navigate('/register');
   };
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const header = document.querySelector(".fixed-header");
+      const scrollPosition = window.scrollY;
+      const maxScroll = window.innerHeight;
+      const progress = Math.min(scrollPosition / maxScroll, 1);
+
+      header.style.width = `${80 + 20 * progress}%`;
+      header.style.left = `${10 - 10 * progress}%`;
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   return (
     <div>
@@ -29,6 +45,9 @@ function Landing() {
           <h1 className="landing-welcome">Bienvenue sur Carrion</h1>
           <p className="landing-description">Explorez notre plateforme dédiée à la gestion de candidatures pour les travailleurs cherchant des stages ou des emplois.</p>
         </main>
+        <button className="scroll-button" onClick={() => window.scrollBy({ top: window.innerHeight, behavior: 'smooth' })}>
+        <span className="arrow">↓</span>
+        </button>
       </div>
 
       <section className="services-section">
@@ -37,12 +56,12 @@ function Landing() {
           <div className="service-card">
             <div className="service-number">1</div>
             <h3>Suivi de vos candidatures personnelles</h3>
-            <p>Gérez facilement toutes vos candidatures depuis un tableau de bord intuitif. Suivez les statuts, ajoutez des notes, et ne manquez aucune opportunité.</p>
+            <p>Gérez facilement toutes vos candidatures depuis un tableau de bord intuitif. Suivez les statuts, ajoutez des notes, et ne manquez aucune opportunité</p>
           </div>
           <div className="service-card">
             <div className="service-number">2</div>
             <h3>Suivi des objectifs de candidature</h3>
-            <p>Définissez et suivez vos objectifs personnels dans votre recherche d'emploi. Vous recevez des conseils pour vous assurer de rester sur la bonne voie et atteindre vos objectifs en temps voulu.</p>
+            <p>Définissez et suivez vos objectifs personnels dans votre recherche d'emploi. Vous recevez des conseils pour vous assurer de rester sur la bonne voie et atteindre vos objectifs en temps voulu</p>
           </div>
           <div className="service-card">
             <div className="service-number">3</div>
@@ -51,7 +70,7 @@ function Landing() {
           </div>
         </div>
       </section>
-      
+
       <section className="how-it-works-section">
         <div className="how-it-works-container">
           <div className="how-it-works-image"></div>

@@ -1,5 +1,5 @@
 :root {
-  --primary-color: #f7f1e8;
+  --primary-color: #b7ecec;
   --secondary-color: #ffffff;
   --text-color: #333333;
   --accent-color: #000000;
@@ -17,7 +17,8 @@
 }
 
 body {
-  margin: 0;
+  margin: auto;
+  width: 80%;
   font-family: 'TextPolice', Arial, sans-serif;
 }
 
