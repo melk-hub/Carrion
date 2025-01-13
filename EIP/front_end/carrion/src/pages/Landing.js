@@ -73,6 +73,21 @@ function Landing() {
     }
   }, [isAuthenticated]);
 
+  useEffect(() => {
+    const handleScroll = () => {
+      const header = document.querySelector(".fixed-header");
+      const scrollPosition = window.scrollY;
+      const maxScroll = window.innerHeight;
+      const progress = Math.min(scrollPosition / maxScroll, 1);
+
+      header.style.width = `${80 + 20 * progress}%`;
+      header.style.left = `${10 - 10 * progress}%`;
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   return (
     <div className="landing-page">
       {/* Header avec navbar */}
