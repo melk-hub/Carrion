@@ -96,7 +96,7 @@ margin-bottom: 200px;
 display: flex;
 align-items: center;
 justify-content: space-between;
-background-color: var(--primary-color);
+background-color: var(--secondary-color);
 border: 1px solid var(--shadow-color);
 border-radius: 8px;
 padding: 10px;
@@ -147,7 +147,6 @@ color: var(--text-color);
 }
 
 .dashboard-list-details {
-background-color: var(--primary-color);
 color: var(--text-color);
 border: none;
 padding: 10px 15px;
@@ -202,15 +201,15 @@ border-radius: 0 8px 8px 0;
 }
 
 .dashboard-list-status-banner.acceptée {
-background: linear-gradient(90deg, var(--primary-color), #0de406);
+background: linear-gradient(90deg, var(--secondary-color), #0de406);
 }
 
 .dashboard-list-status-banner.attente {
-background: linear-gradient(90deg, var(--primary-color), #fc8f02);
+background: linear-gradient(90deg, var(--secondary-color), #fc8f02);
 }
 
 .dashboard-list-status-banner.refusée {
-background: linear-gradient(90deg, var(--primary-color), #fa0202);
+background: linear-gradient(90deg, var(--secondary-color), #fa0202);
 }
 
 /* Grille */
