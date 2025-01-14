@@ -1,0 +1,106 @@
+/* Conteneur principal */
+.login-page {
+    background-color: #e3f2fd; /* Bleu clair */
+    min-height: 100vh; /* Prend toute la hauteur de la page */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-family: Arial, sans-serif;
+    padding: 20px;
+  }
+  
+  /* Titre */
+  .login-page h2 {
+    color: #1565c0; /* Bleu plus foncé */
+    margin-bottom: 20px;
+  }
+  
+  /* Formulaire */
+  form {
+    background-color: #ffffff; /* Blanc pour le contraste */
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 400px;
+  }
+  
+  form label {
+    color: #1565c0; /* Bleu plus foncé */
+    font-weight: bold;
+    display: block;
+    margin-bottom: 5px;
+  }
+  
+  form input {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #b3e5fc; /* Bord bleu clair */
+    border-radius: 5px;
+    font-size: 14px;
+  }
+  
+  /* Boutons */
+  form button {
+    width: 100%;
+    padding: 10px;
+    margin-top: 10px;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+  }
+  
+  form button[type="submit"] {
+    background-color: #1565c0; /* Bleu foncé */
+    color: white;
+  }
+  
+  form button[type="submit"]:hover {
+    background-color: #0d47a1; /* Bleu encore plus foncé */
+  }
+  
+  form button[type="button"] {
+    background-color: #42a5f5; /* Bleu moyen */
+    color: white;
+  }
+  
+  form button[type="button"]:hover {
+    background-color: #1e88e5; /* Bleu légèrement plus foncé */
+  }
+  
+  /* Messages d'erreur */
+  form p {
+    color: red;
+    font-size: 14px;
+  }
+  
+  /* Section pour les boutons externes */
+  .login-page div {
+    margin-top: 20px;
+  }
+  
+  .login-page button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #1e88e5;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 10px;
+  }
+  
+  .login-page button:hover {
+    background-color: #1565c0;
+  }
+  
+  .login-page button img {
+    width: 20px;
+    margin-right: 10px;
+  }
+  
