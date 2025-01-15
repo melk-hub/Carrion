@@ -2,7 +2,6 @@
 .header {
 position: fixed;
 height: 5%;
-left: 10%;
 width: 80%;
 background-color: var(--secondary-color);
 display: flex;

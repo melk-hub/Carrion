@@ -114,21 +114,6 @@ border-radius: 10px;
 box-shadow: 0 4px 6px var(--shadow-color);
 }
 
-.service-number {
-position: absolute;
-top: -7%;
-left: 50%;
-transform: translateX(-50%);
-background-color: var(--primary-color);
-color: var(--accent-color);
-font-weight: bold;
-width: 16%;
-height: 14%;
-line-height: 200%;
-border-radius: 50%;
-font-size: 1.5rem;
-}
-
 .service-card h3 {
 margin: 20px 0 100px;
 font-size: 2rem;
@@ -147,6 +132,8 @@ align-items: center;
 justify-content: space-between;
 background-color: var(--primary-color);
 margin-top: 100px;
+border-radius: 20px;
+overflow: hidden;
 }
 
 .how-it-works-container {
