@@ -78,14 +78,34 @@ function Landing() {
       const scrollPosition = window.scrollY;
       const maxScroll = window.innerHeight;
       const progress = Math.min(scrollPosition / maxScroll, 1);
-
+  
       header.style.width = `${80 + 20 * progress}%`;
       header.style.left = `${10 - 10 * progress}%`;
     };
-
+  
+    const handleButtonClick = () => {
+      const currentScroll = window.scrollY;
+      const viewportHeight = window.innerHeight;
+      const nextPageScroll = currentScroll === 0 ? viewportHeight : Math.ceil(currentScroll / viewportHeight) * viewportHeight;
+  
+      window.scrollTo({top: nextPageScroll, behavior: "smooth",});
+    };
+  
     window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+  
+    const button = document.querySelector(".scroll-button");
+    if (button) {
+      button.addEventListener("click", handleButtonClick);
+    }
+  
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      if (button) {
+        button.removeEventListener("click", handleButtonClick);
+      }
+    };
   }, []);
+  
 
   return (
     <div className="landing-page">
