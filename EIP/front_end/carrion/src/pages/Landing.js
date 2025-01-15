@@ -66,6 +66,7 @@ function Landing() {
       window.removeEventListener("scroll", handleScroll);
     };
   }, []);
+  
 
   useEffect(() => {
     if (isAuthenticated) {
