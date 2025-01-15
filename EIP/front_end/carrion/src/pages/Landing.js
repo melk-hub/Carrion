@@ -21,14 +21,34 @@ function Landing() {
       const scrollPosition = window.scrollY;
       const maxScroll = window.innerHeight;
       const progress = Math.min(scrollPosition / maxScroll, 1);
-
+  
       header.style.width = `${80 + 20 * progress}%`;
       header.style.left = `${10 - 10 * progress}%`;
     };
-
+  
+    const handleButtonClick = () => {
+      const currentScroll = window.scrollY;
+      const viewportHeight = window.innerHeight;
+      const nextPageScroll = currentScroll === 0 ? viewportHeight : Math.ceil(currentScroll / viewportHeight) * viewportHeight;
+  
+      window.scrollTo({top: nextPageScroll, behavior: "smooth",});
+    };
+  
     window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+  
+    const button = document.querySelector(".scroll-button");
+    if (button) {
+      button.addEventListener("click", handleButtonClick);
+    }
+  
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      if (button) {
+        button.removeEventListener("click", handleButtonClick);
+      }
+    };
   }, []);
+  
 
   return (
     <div>
@@ -44,7 +64,7 @@ function Landing() {
         <main className="landing-main">
           <h1 className="landing-description">L'outil idéal pour gérer ses candidatures avec facilité</h1>
         </main>
-        <button className="scroll-button" onClick={() => window.scrollBy({ top: window.innerHeight, behavior: 'smooth' })}>
+        <button className="scroll-button">
         <span className="arrow">↓</span>
         </button>
       </div>
@@ -53,19 +73,20 @@ function Landing() {
         <h2 className="services-title">Nos services</h2>
         <div className="services-container">
           <div className="service-card">
-            <div className="service-number">1</div>
             <h3>Suivi de vos candidatures personnelles</h3>
             <p>Gérez facilement toutes vos candidatures depuis un tableau de bord intuitif. Suivez les statuts, ajoutez des notes, et ne manquez aucune opportunité</p>
           </div>
           <div className="service-card">
-            <div className="service-number">2</div>
             <h3>Suivi des objectifs de candidature</h3>
             <p>Définissez et suivez vos objectifs personnels dans votre recherche d'emploi. Vous recevez des conseils pour vous assurer de rester sur la bonne voie et atteindre vos objectifs en temps voulu</p>
           </div>
           <div className="service-card">
-            <div className="service-number">3</div>
             <h3>Rappels et notifications personnalisés</h3>
             <p>Recevez des rappels automatiques pour vos candidatures en attente de réponse ou vos entretiens à venir. Restez organisé et proactif</p>
+          </div>
+          <div className="service-card">
+            <h3>Espace documents professionels</h3>
+            <p>Centralisez et gérez tous vos documents importants, tels que CV, lettres de motivation, et portfolios. Accédez-y facilement à tout moment pour simplifier vos démarches</p>
           </div>
         </div>
       </section>
