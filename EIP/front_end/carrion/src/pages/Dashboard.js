@@ -97,10 +97,7 @@ function Dashboard() {
     <div>
       <div className="top-bar">
         <div className="objectives">
-          <h3>Objectif de la semaine:</h3>
-        </div>
-        <div className='dashboard-title'>
-          <h1>Mes Candidatures</h1>
+          <h3>Objectif de la semaine :</h3>
         </div>
         <div className="search-input-container">
           <span className="search-icon">🔍</span>

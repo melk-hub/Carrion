@@ -2,7 +2,8 @@
 .header {
 position: fixed;
 height: 5%;
-width: 80%;
+width: 100%;
+left: 0;
 background-color: var(--secondary-color);
 display: flex;
 justify-content: space-between;
