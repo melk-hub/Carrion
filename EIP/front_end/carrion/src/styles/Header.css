@@ -2,7 +2,8 @@
 .header {
 position: fixed;
 height: 5%;
-width: 80%;
+width: 100%;
+left: 0;
 background-color: var(--secondary-color);
 box-shadow: 0 2px 4px var(--shadow-color);
 z-index: 1000;
