@@ -1,7 +1,7 @@
-/* Conteneur principal */
+
 .login-page {
-    background-color: #e3f2fd; /* Bleu clair */
-    min-height: 100vh; /* Prend toute la hauteur de la page */
+    background-color: #e3f2fd;
+    min-height: 100vh;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -10,15 +10,13 @@
     padding: 20px;
   }
   
-  /* Titre */
   .login-page h2 {
-    color: #1565c0; /* Bleu plus foncé */
+    color: #1565c0; 
     margin-bottom: 20px;
   }
   
-  /* Formulaire */
   form {
-    background-color: #ffffff; /* Blanc pour le contraste */
+    background-color: #ffffff; 
     padding: 20px;
     border-radius: 10px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
@@ -27,7 +25,7 @@
   }
   
   form label {
-    color: #1565c0; /* Bleu plus foncé */
+    color: #1565c0;
     font-weight: bold;
     display: block;
     margin-bottom: 5px;
@@ -37,12 +35,11 @@
     width: 100%;
     padding: 10px;
     margin-bottom: 15px;
-    border: 1px solid #b3e5fc; /* Bord bleu clair */
+    border: 1px solid #b3e5fc;
     border-radius: 5px;
     font-size: 14px;
   }
   
-  /* Boutons */
   form button {
     width: 100%;
     padding: 10px;
@@ -54,30 +51,28 @@
   }
   
   form button[type="submit"] {
-    background-color: #1565c0; /* Bleu foncé */
+    background-color: #1565c0;
     color: white;
   }
   
   form button[type="submit"]:hover {
-    background-color: #0d47a1; /* Bleu encore plus foncé */
+    background-color: #0d47a1; 
   }
   
   form button[type="button"] {
-    background-color: #42a5f5; /* Bleu moyen */
+    background-color: #42a5f5; 
     color: white;
   }
   
   form button[type="button"]:hover {
-    background-color: #1e88e5; /* Bleu légèrement plus foncé */
+    background-color: #1e88e5; 
   }
   
-  /* Messages d'erreur */
   form p {
     color: red;
     font-size: 14px;
   }
   
-  /* Section pour les boutons externes */
   .login-page div {
     margin-top: 20px;
   }
