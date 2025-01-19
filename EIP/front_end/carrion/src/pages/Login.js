@@ -103,36 +103,6 @@ function Login({ setIsAuthenticated }) {
                     onSuccess={handleGoogleLoginSuccess}
                     onFailure={handleGoogleLoginFailure}
                 />
-                {/* <MicrosoftLogin
-                    clientId="YOUR_MICROSOFT_CLIENT_ID"
-                    buttonText="Se connecter avec Outlook"
-                    authCallback={handleMicrosoftLoginSuccess}
-                    onFailure={handleMicrosoftLoginFailure}
-                    redirectUri="http://localhost:3000"
-                    render={(renderProps) => (
-                        <button
-                        onClick={renderProps.onClick}
-                        style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            backgroundColor: '#0078D4',
-                            color: '#fff',
-                            padding: '10px 20px',
-                            border: 'none',
-                            borderRadius: '5px',
-                            cursor: 'pointer',
-                            marginTop: '10px',
-                        }}
-                        >
-                        <img
-                            src={outlookIcon}
-                            alt="Outlook"
-                            style={{ width: '20px', marginRight: '8px' }}
-                        />
-                        Se connecter avec Outlook
-                        </button>
-                    )}
-                /> */}
                 <button onClick={handleMicrosoftLoginSuccess} style={{ display: 'flex', alignItems: 'center' }}>
                 <img src={outlookIcon} alt="Outlook" style={{ width: '20px', marginRight: '8px' }} />
                 Se connecter avec Outlook
