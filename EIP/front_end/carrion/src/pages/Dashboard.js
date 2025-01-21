@@ -177,7 +177,7 @@ function Dashboard() {
                 <h4>{application.jobTitle}</h4>
                 <hr />
                 <p>Statut : {application.status}</p>
-                <small>Date de candidature : {application.applicationDate}</small>
+                <p>Date de candidature : {application.applicationDate}</p>
               </div>
               <button className="dashboard-grid-details">Voir les détails</button>
               <div className="dashboard-grid-actions">
