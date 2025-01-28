@@ -27,6 +27,14 @@ function Dashboard() {
     }
   }, []);
 
+  const handleStatusChange = (status) => {
+    setSelectedStatuses((prev) =>
+      prev.includes(status)
+        ? prev.filter((s) => s !== status)
+        : [...prev, status]
+    );
+  };
+
   useEffect(() => {
     const fetchApplications = async () => {
       try {
