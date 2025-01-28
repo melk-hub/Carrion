@@ -73,6 +73,7 @@ function Dashboard() {
   const [applications, setApplications] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [viewMode, setViewMode] = useState('list');
+  const [selectedStatuses, setSelectedStatuses] = useState([]);
 
   useEffect(() => {
     const loadFakeData = () => {
@@ -83,6 +84,14 @@ function Dashboard() {
     loadFakeData();
   }, []);
 
+  const handleStatusChange = (status) => {
+    setSelectedStatuses((prev) =>
+      prev.includes(status)
+        ? prev.filter((s) => s !== status)
+        : [...prev, status]
+    );
+  };
+
   const filteredApplications = applications.filter((application) => {
     const searchableContent = `
       ${application.companyName.toLowerCase()}
@@ -90,7 +99,11 @@ function Dashboard() {
       ${application.status.toLowerCase()}
       ${application.applicationDate.toLowerCase()}
     `;
-    return searchableContent.includes(searchTerm.toLowerCase());
+    const matchesSearch = searchableContent.includes(searchTerm.toLowerCase());
+    const matchesStatus = selectedStatuses.length
+      ? selectedStatuses.includes(application.status)
+      : true;
+    return matchesSearch && matchesStatus;
   });
 
   return (
@@ -111,17 +124,34 @@ function Dashboard() {
         </div>
       </div>
 
-      <div className="dashboard-toggle-buttons">
-        <button
-          className={`toggle-button ${viewMode === 'list' ? 'active' : ''}`}
-          onClick={() => setViewMode('list')}
-        >Voir liste
-        </button>
-        <button
-          className={`toggle-button ${viewMode === 'grid' ? 'active' : ''}`}
-          onClick={() => setViewMode('grid')}
-        >Voir grille
-        </button>
+      <div className="dashboard-filter-buttons">
+        <div className="filter-checkbox-group">
+          {['Acceptée', 'En attente de réponse', 'Refusée'].map((status) => (
+            <label key={status} className="filter-checkbox">
+              <input
+                type="checkbox"
+                checked={selectedStatuses.includes(status)}
+                onChange={() => handleStatusChange(status)}
+              />
+              <span className="custom-checkbox"></span>
+              {status}
+            </label>
+          ))}
+        </div>
+        <div className="view-toggle">
+          <button
+            className={`toggle-button ${viewMode === 'list' ? 'active' : ''}`}
+            onClick={() => setViewMode('list')}
+          >
+            Liste
+          </button>
+          <button
+            className={`toggle-button ${viewMode === 'grid' ? 'active' : ''}`}
+            onClick={() => setViewMode('grid')}
+          >
+            Grille
+          </button>
+        </div>
       </div>
 
       {viewMode === 'list' && (
