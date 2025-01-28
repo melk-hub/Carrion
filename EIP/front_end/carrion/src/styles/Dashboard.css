@@ -7,7 +7,6 @@ display: flex;
 flex-direction: row;
 justify-content: space-between;
 align-items: center;
-border-radius: 20px;
 }
 
 .objectives {
@@ -46,35 +45,100 @@ opacity: 0.7;
 }
 
 .search-input:focus {
-border-color: var(--accent-color);
-box-shadow: 0 0 5px var(--accent-color);
+border-color: var(--shadow-color);
 }
 
-/* Toggle button */
-.dashboard-toggle-buttons {
+.dashboard-filter-buttons {
 display: flex;
-justify-content: right;
-margin: 2% 10% 1% 0;
-gap: 10px;
+flex-wrap: wrap;
+justify-content: center;
+gap: 400px;
+margin: 20px auto;
+padding: 15px;
+border-radius: 10px;
+background: var(--secondary-color);
+box-shadow: 0 4px 8px var(--shadow-color);
+}
+
+/* Checkboxes */
+.filter-checkbox-group {
+display: flex;
+gap: 20px;
+}
+
+.filter-checkbox {
+display: flex;
+align-items: center;
+gap: 10px;  
+font-size: 14px;
+color: var(--text-color);
+cursor: pointer;
+padding: 8px 12px;
+border-radius: 8px;
+background: var(--primary-color);
+}
+
+.filter-checkbox input[type="checkbox"] {
+display: none;
+}
+
+.filter-checkbox:hover .custom-checkbox {
+background: var(--primary-color);
+border-color: var(--accent-color);
+}
+
+.custom-checkbox {
+width: 18px;
+height: 18px;
+border-radius: 4px;
+border: 2px solid var(--shadow-color);
+display: inline-block;
+position: relative;
+transition: all 0.3s ease;
+background: var(--secondary-color);
+}
+
+.filter-checkbox input[type="checkbox"]:checked + .custom-checkbox {
+background: var(--primary-color);
+}
+
+.filter-checkbox input[type="checkbox"]:checked + .custom-checkbox::after {
+content: '✔';
+color: var(--accent-color);
+font-size: 12px;
+position: absolute;
+top: 50%;
+left: 50%;
+transform: translate(-50%, -50%);
+}
+
+/* Toggle Buttons */
+.view-toggle {
+display: flex;
+gap: 20px;
 }
 
 .toggle-button {
-padding: 10px 20px;
-border: 1px solid var(--shadow-color);
-background-color: var(--secondary-color);
+padding: 12px 24px;
+border: 2px solid var(--primary-color);
+border-radius: 8px;
+font-size: 14px;
+font-weight: bold;
+text-transform: uppercase;
 color: var(--text-color);
-border-radius: 5px;
+background: var(--secondary-color);
+cursor: pointer;
 transition: all 0.3s ease;
 }
 
 .toggle-button.active {
+background: var(--primary-color);
 cursor: auto;
-background-color: var(--shadow-color);
+box-shadow: none;
 }
 
 .toggle-button:hover:not(.active) {
-cursor: pointer;
-background-color: var(--primary-color);
+background: var(--primary-color);
 }
 
 /* Liste */
@@ -84,6 +148,7 @@ flex-direction: column;
 gap: 40px;
 align-items: center;
 box-sizing: border-box;
+margin-top: 80px;
 margin-bottom: 200px;
 }
 
@@ -146,6 +211,7 @@ border: none;
 padding: 10px 15px;
 border-radius: 20px;
 margin-top: 2%;
+width: 85%;
 cursor: pointer;
 box-shadow: 0 2px 4px var(--shadow-color);
 transition: background-color 0.3s ease;
@@ -214,7 +280,7 @@ grid-template-columns: repeat(3, 25%);
 justify-content: center;
 column-gap: 70px;
 row-gap: 70px;
-margin: 0 auto 200px;
+margin: 80px auto 200px;
 }
 
 .dashboard-grid-card {
@@ -268,7 +334,7 @@ margin-bottom: 50px;
 border: 0.5px solid var(--shadow-color);
 width: 80%;
 background-color: var(--primary-color);
-margin-bottom: 50px;
+margin-bottom: 100px;
 }
 
 .dashboard-grid-content p {
