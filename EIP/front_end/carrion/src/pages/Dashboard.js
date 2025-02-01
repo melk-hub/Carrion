@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import '../styles/Dashboard.css';
 import archiveIcon from '../assets/archiver.png';
 import deleteIcon from '../assets/supprimer.png';
@@ -70,41 +70,31 @@ function Dashboard() {
     },
   ];
 
-  const [applications, setApplications] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [viewMode, setViewMode] = useState('list');
-  const [selectedStatuses, setSelectedStatuses] = useState([]);
-
-  useEffect(() => {
-    const loadFakeData = () => {
-      setTimeout(() => {
-        setApplications(fakeDatabase);
-      }, 500);
-    };
-    loadFakeData();
-  }, []);
+  const [sortBy, setSortBy] = useState('date');
+  const [selectedStatuses, setSelectedStatuses] = useState(new Set());
 
   const handleStatusChange = (status) => {
-    setSelectedStatuses((prev) =>
-      prev.includes(status)
-        ? prev.filter((s) => s !== status)
-        : [...prev, status]
-    );
+    setSelectedStatuses((prev) => {
+        const newSet = new Set(prev);
+        newSet.has(status) ? newSet.delete(status) : newSet.add(status);
+        return newSet;
+    });
   };
 
-  const filteredApplications = applications.filter((application) => {
-    const searchableContent = `
-      ${application.companyName.toLowerCase()}
-      ${application.jobTitle.toLowerCase()}
-      ${application.status.toLowerCase()}
-      ${application.applicationDate.toLowerCase()}
-    `;
-    const matchesSearch = searchableContent.includes(searchTerm.toLowerCase());
-    const matchesStatus = selectedStatuses.length
-      ? selectedStatuses.includes(application.status)
-      : true;
-    return matchesSearch && matchesStatus;
-  });
+  const sortedAndFilteredApplications = useMemo(() => {
+    return fakeDatabase
+        .filter(app => selectedStatuses.size === 0 || selectedStatuses.has(app.status))
+        .sort((a, b) => {
+            if (sortBy === 'date') {
+                return new Date(b.date) - new Date(a.date);
+            } else if (sortBy === 'status') {
+                return a.status.localeCompare(b.status);
+            }
+            return 0;
+        });
+  }, [fakeDatabase, selectedStatuses, sortBy]);
 
   return (
     <div>
@@ -126,18 +116,27 @@ function Dashboard() {
 
       <div className="dashboard-filter-buttons">
         <div className="filter-checkbox-group">
-          {['Acceptée', 'En attente de réponse', 'Refusée'].map((status) => (
-            <label key={status} className="filter-checkbox">
-              <input
-                type="checkbox"
-                checked={selectedStatuses.includes(status)}
-                onChange={() => handleStatusChange(status)}
-              />
-              <span className="custom-checkbox"></span>
-              {status}
-            </label>
+          {['Acceptée', 'En attente de réponse', 'Refusée'].map(status => (
+              <label key={status} className="filter-checkbox">
+                  <input
+                      type="checkbox"
+                      checked={selectedStatuses.has(status)}
+                      onChange={() => handleStatusChange(status)}
+                  />
+                  <span className="custom-checkbox"></span>
+                  {status}
+              </label>
           ))}
         </div>
+        
+        <div className="sort-options">
+            <label htmlFor="sort-select">Trier par : </label>
+            <select id="sort-select" value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
+                <option value="date">Date</option>
+                <option value="status">Statut</option>
+            </select>
+        </div>
+
         <div className="view-toggle">
           <button
             className={`toggle-button ${viewMode === 'list' ? 'active' : ''}`}
@@ -156,8 +155,8 @@ function Dashboard() {
 
       {viewMode === 'list' && (
         <div className="dashboard-list">
-          {filteredApplications.length > 0 ? (
-            filteredApplications.map((application) => (
+          {sortedAndFilteredApplications.length > 0 ? (
+            sortedAndFilteredApplications.map((application) => (
               <div key={application.id} className="dashboard-list-card">
                 <img
                   src={application.logo}
@@ -192,8 +191,8 @@ function Dashboard() {
 
       {viewMode === 'grid' && (
         <div className="dashboard-grid">
-          {filteredApplications.length > 0 ? (
-            filteredApplications.map((application) => (
+          {sortedAndFilteredApplications.length > 0 ? (
+            sortedAndFilteredApplications.map((application) => (
             <div key={application.id} className="dashboard-grid-card">
               <div className="dashboard-grid-header">
                 <img
