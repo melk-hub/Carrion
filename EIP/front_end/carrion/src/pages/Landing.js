@@ -60,13 +60,18 @@ function Landing() {
         </div>
       </header>
 
+      <div className="intro-section">
+        <h1>La plateforme idéale pour gérer ses candidatures</h1>
+        <p>Simplifiez votre recherche d'emploi avec un suivi clair et organisé grâce a Carrion</p>
+      </div>
+      
       <div className="landing-background">
         <main className="landing-main">
           <h1 className="landing-welcome">Bienvenue sur Carrion</h1>
           <p className="landing-description">Explorez notre plateforme dédiée à la gestion de candidatures pour les travailleurs cherchant des stages ou des emplois.</p>
         </main>
         <button className="scroll-button">
-        <span className="arrow">↓</span>
+          <span className="arrow">↓</span>
         </button>
       </div>
 
