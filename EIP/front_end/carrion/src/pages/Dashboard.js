@@ -128,7 +128,6 @@ function Dashboard() {
               </label>
           ))}
         </div>
-
         <div className="sort-options">
             <label htmlFor="sort-select">Trier par : </label>
             <select id="sort-select" value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
