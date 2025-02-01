@@ -2,7 +2,6 @@
 .fixed-header {
 position: fixed;
 height: 5%;
-width: 80%;
 background-color: var(--secondary-color);
 box-shadow: 0 2px 4px var(--shadow-color);
 z-index: 1000;
@@ -23,34 +22,37 @@ font-size: 1.2rem;
 border: 0.5px solid var(--primary-color);
 border-radius: 20px;
 cursor: pointer;
+background-color: var(--secondary-color);
 }
 
 .header-buttons button:hover {
 background-color: var(--primary-color)
 }
 
+.intro-section {
+text-align: center;
+padding-top: 40px;
+margin-bottom: 40px;
+background-color: var(--secondary-color);
+}
+
+.intro-section h1 {
+font-size: 2.5rem;
+color: var(--accent-color);
+}
+
+.intro-section p {
+font-size: 1.2rem;
+color: var(--text-color);
+}
+
 /* Section principale */
 .landing-background {
-height: 100vh;
+height: 83vh;
 background: url('../assets/landing_bg.png') no-repeat center center/cover;
 display: flex;
 justify-content: center;
-border-radius: 1% / 2%;;
-}
-
-.landing-main {
-display: flex;
-justify-content: center;
-align-items: flex-start;
-position: relative;
-top: 10%;
-width: 100%;
-}
-
-.landing-description {
-font-size: 2rem;
-color: var(--accent-color);
-text-align: center;
+border-radius: 1% / 2%;
 }
 
 .scroll-button {
