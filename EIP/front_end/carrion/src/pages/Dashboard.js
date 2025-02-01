@@ -28,11 +28,11 @@ function Dashboard() {
   }, []);
 
   const handleStatusChange = (status) => {
-    setSelectedStatuses((prev) =>
-      prev.includes(status)
-        ? prev.filter((s) => s !== status)
-        : [...prev, status]
-    );
+    setSelectedStatuses((prev) => {
+        const newSet = new Set(prev);
+        newSet.has(status) ? newSet.delete(status) : newSet.add(status);
+        return newSet;
+    });
   };
 
   useEffect(() => {
