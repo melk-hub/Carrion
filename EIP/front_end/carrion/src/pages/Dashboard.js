@@ -128,7 +128,7 @@ function Dashboard() {
               </label>
           ))}
         </div>
-        
+
         <div className="sort-options">
             <label htmlFor="sort-select">Trier par : </label>
             <select id="sort-select" value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
@@ -157,7 +157,7 @@ function Dashboard() {
         <div className="dashboard-list">
           {sortedAndFilteredApplications.length > 0 ? (
             sortedAndFilteredApplications.map((application) => (
-              <div key={application.id} className="dashboard-list-card">
+              <div key={application.id} className={`dashboard-list-card ${application.status.toLowerCase()}`}>
                 <img
                   src={application.logo}
                   alt={`${application.companyName} logo`}
@@ -166,7 +166,9 @@ function Dashboard() {
                 <div className="dashboard-list-content">
                   <h3 className="dashboard-list-company-name">{application.companyName}</h3>
                   <p className="dashboard-list-job-title">{application.jobTitle}</p>
-                  <p className="dashboard-list-status">Statut : {application.status}</p>
+                  <p className="dashboard-list-status">
+                    Statut : <span className={`status-text ${application.status.toLowerCase()}`}>{application.status}</span>
+                  </p>
                   <p className="dashboard-list-date">Date de candidature : {application.applicationDate}</p>
                   <button className="dashboard-list-details">Voir les détails</button>
                 </div>
@@ -193,7 +195,7 @@ function Dashboard() {
         <div className="dashboard-grid">
           {sortedAndFilteredApplications.length > 0 ? (
             sortedAndFilteredApplications.map((application) => (
-            <div key={application.id} className="dashboard-grid-card">
+            <div key={application.id} className={`dashboard-grid-card ${application.status.toLowerCase()}`}>
               <div className="dashboard-grid-header">
                 <img
                   src={application.logo}
@@ -205,7 +207,9 @@ function Dashboard() {
               <div className="dashboard-grid-content">
                 <h4>{application.jobTitle}</h4>
                 <hr />
-                <p>Statut : {application.status}</p>
+                <p className="dashboard-grid-status">
+                  Statut : <span className={`status-text ${application.status.toLowerCase()}`}>{application.status}</span>
+                </p>
                 <p>Date de candidature : {application.applicationDate}</p>
               </div>
               <button className="dashboard-grid-details">Voir les détails</button>
