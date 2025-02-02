@@ -106,7 +106,6 @@ function Landing() {
       }
     };
   }, []);
-  
 
   return (
     <div className="landing-page">
