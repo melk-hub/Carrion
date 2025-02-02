@@ -48,7 +48,6 @@ function Landing() {
       }
     };
   }, []);
-  
 
   return (
     <div>
