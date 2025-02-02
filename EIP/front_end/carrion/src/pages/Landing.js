@@ -48,7 +48,6 @@ function Landing() {
       }
     };
   }, []);
-  
 
   return (
     <div>
@@ -62,7 +61,7 @@ function Landing() {
 
       <div className="intro-section">
         <h1>La plateforme idéale pour gérer ses candidatures</h1>
-        <p>Simplifiez votre recherche d'emploi avec un suivi clair et organisé grâce a Carrion</p>
+        <p>Simplifiez votre recherche d'emploi grâce a Carrion</p>
       </div>
       
       <div className="landing-background">

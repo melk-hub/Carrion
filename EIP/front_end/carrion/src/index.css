@@ -19,9 +19,9 @@
 body {
   margin: auto;
   width: 80%;
-  font-family: 'TextPolice', Arial, sans-serif;
+  font-family: 'TextPolice', sans-serif;
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: 'TitlePolice', 'MaPolice', Arial, sans-serif;
+  font-family: 'TitlePolice', Arial, sans-serif;
 }
