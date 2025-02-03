@@ -2,7 +2,6 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
 import '../styles/Landing.css';
-// import logo from '../assets/logo-carrion.png';
 import logo from '../assets/carrion_logo.png';
 
 function Landing() {
@@ -66,10 +65,6 @@ function Landing() {
       </div>
       
       <div className="landing-background">
-        <main className="landing-main">
-          <h1 className="landing-welcome">Bienvenue sur Carrion</h1>
-          <p className="landing-description">Explorez notre plateforme dédiée à la gestion de candidatures pour les travailleurs cherchant des stages ou des emplois.</p>
-        </main>
         <button className="scroll-button">
           <span className="arrow">↓</span>
         </button>

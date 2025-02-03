@@ -49,23 +49,11 @@ color: var(--text-color);
 
 /* Section principale */
 .landing-background {
-height: 100vh;
-background: url('../assets/bg_carrion.webp') no-repeat center center/cover;
-}
-
-.landing-main {
+height: 83vh;
+background: url('../assets/landing_bg.png') no-repeat center center/cover;
 display: flex;
 justify-content: center;
-align-items: flex-start;
-position: relative;
-top: 10%;
-width: 100%;
-}
-
-.landing-description {
-font-size: 2rem;
-color: var(--accent-color);
-text-align: center;
+border-radius: 1% / 2%;
 }
 
 .scroll-button {
@@ -102,7 +90,6 @@ animation: bounce 1.5s infinite;
     transform: translateY(-5px);
 }
 }
-
 
 /* Services Section */
 .services-section {
