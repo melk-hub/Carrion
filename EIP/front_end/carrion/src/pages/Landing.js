@@ -83,7 +83,11 @@ function Landing() {
           </div>
           <div className="service-card">
             <h3>Rappels et notifications personnalisés</h3>
-            <p>Recevez des rappels automatiques pour vos candidatures en attente de réponse ou vos entretiens à venir. Restez organisé et proactif.</p>
+            <p>Recevez des rappels automatiques pour vos candidatures en attente de réponse ou vos entretiens à venir. Restez organisé et proactif</p>
+          </div>
+          <div className="service-card">
+            <h3>Espace documents professionels</h3>
+            <p>Centralisez et gérez tous vos documents importants, tels que CV, lettres de motivation, et portfolios. Accédez-y facilement à tout moment pour simplifier vos démarches</p>
           </div>
           <div className="service-card">
             <h3>Espace documents professionels</h3>
@@ -106,15 +110,15 @@ function Landing() {
       <section className="testimonials-section">
         <h2 className="testimonials-title">Témoignages</h2>
         <div className="testimonials-container">
-          <div className="testimonial">
+          <div className="testimonial testimonial-left">
             <p>"Carrion m'a aidé à suivre mes candidatures de manière organisée et efficace. Je recommande vivement cette plateforme."</p>
             <p className="testimonial-author">Marie L.</p>
           </div>
-          <div className="testimonial">
+          <div className="testimonial testimonial-right">
             <p>"Grâce à Carrion, j'ai pu visualiser mes progrès dans ma recherche d'emploi. Une expérience très positive."</p>
             <p className="testimonial-author">Pierre G.</p>
           </div>
-          <div className="testimonial">
+          <div className="testimonial testimonial-left">
             <p>"La fonction de suivi automatique de Carrion m'a permis de rester motivée et organisée. Merci pour ce service très utile."</p>
             <p className="testimonial-author">Sophie B.</p>
           </div>
