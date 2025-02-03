@@ -2,7 +2,8 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
 import '../styles/Landing.css';
-import logo from '../assets/logo-carrion.png';
+// import logo from '../assets/logo-carrion.png';
+import logo from '../assets/carrion_logo.png';
 
 function Landing() {
   const navigate = useNavigate();
