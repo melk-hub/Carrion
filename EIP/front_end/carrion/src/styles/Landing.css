@@ -11,9 +11,8 @@ justify-content: space-between;
 align-items: center;
 }
 
-.logo {
-font-size: 1.5rem;
-margin-left: 20px;
+.logo img {
+width: 175px;
 }
 
 .header-buttons button {

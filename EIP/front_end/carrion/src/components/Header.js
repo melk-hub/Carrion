@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../styles/Header.css';
-import logo from '../assets/logo-carrion.png';
+import logo from '../assets/carrion_logo.png';
 
 function Header() {
   const navigate = useNavigate();
