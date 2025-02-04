@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import "./Register.css";
+import "../styles/Register.css";
 
 function Register({ setIsAuthenticated }) {
   const navigate = useNavigate();

@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
 import MicrosoftLogin from 'react-microsoft-login';
 import outlookIcon from '../assets/outlook-logo.png';
-import "./LoginPage.css";
+import "../styles/LoginPage.css";
 
 function Login({ setIsAuthenticated }) {
   const navigate = useNavigate();
