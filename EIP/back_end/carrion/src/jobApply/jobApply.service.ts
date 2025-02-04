@@ -6,9 +6,12 @@ import { JobApplyDto } from './dto/jobApply.dto';
 export class JobApplyService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async getAllJobApplies(): Promise<JobApplyDto[]> {
+  async getAllJobApplies(userId: number): Promise<JobApplyDto[]> {
     try {
       const jobApplies = await this.prisma.jobApply.findMany({
+        where: {
+          UserId: userId,
+        },
         include: {
           User: true,
         },

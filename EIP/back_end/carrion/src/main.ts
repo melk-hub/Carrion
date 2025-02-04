@@ -16,7 +16,10 @@ async function bootstrap() {
 
   app.enableCors({
     origin: (origin, callback) => {
-      const allowedOrigins = ['http://localhost:3000', 'http://localhost:8080'];
+      const allowedOrigins = [
+        `http://localhost:${process.env.PORT}`,
+        'http://localhost:8080',
+      ];
       if (allowedOrigins.includes(origin) || !origin) {
         callback(null, true);
       } else {
@@ -32,6 +35,7 @@ async function bootstrap() {
     .setDescription(
       'The documentation of the routes defined for the web appliaction Carrion',
     )
+    .addBearerAuth()
     .setVersion('1.0')
     .build();
 
