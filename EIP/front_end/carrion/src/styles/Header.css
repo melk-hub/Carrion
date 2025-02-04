@@ -1,16 +1,41 @@
-header {
-background-color: #FFFFFF;
-padding: 1em;
-border-bottom: 1px solid #ccc;
-}
-
-nav ul {
-list-style: none;
+/* Header */
+.header {
+position: fixed;
+height: 5%;
+width: 100%;
+left: 0;
+background-color: var(--secondary-color);
 display: flex;
-gap: 1em;
+justify-content: space-between;
+align-items: center;
 }
 
-nav ul li a {
-color: white;
-text-decoration: none;
+.logo-button img {
+width: 175px;
 }
+
+.navigation-buttons button {
+font-size: 1.4rem;
+margin-right: 10px;
+background-color: var(--secondary-color);
+font-weight: bold;
+border: none;
+cursor: pointer;
+margin-left: 10px;
+}
+
+.navigation-buttons button:hover {
+text-decoration: underline;
+}
+
+.logout-button {
+padding: 5px 20px;
+font-size: 1.2rem;
+background-color: var(--secondary-color);
+border-radius: 20px;
+border: none;
+cursor: pointer;
+}
+
+.logout-button:hover {
+background-color: var(--primary-color);}

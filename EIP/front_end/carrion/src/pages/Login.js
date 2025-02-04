@@ -18,27 +18,27 @@ function Login({ setIsAuthenticated }) {
   const handleLogin = async (e) => {
     e.preventDefault();
 
-    try {
-      const response = await fetch('http://localhost:8080/auth/signin', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(credentials),
-      });
+    // try {
+    //   const response = await fetch('http://localhost:8080/auth/signin', {
+    //     method: 'POST',
+    //     headers: {
+    //       'Content-Type': 'application/json',
+    //     },
+    //     body: JSON.stringify(credentials),
+    //   });
 
-      const data = await response.json();
+    //   const data = await response.json();
 
-      if (response.ok) {
-         setIsAuthenticated(true);
-         navigate('/dashboard');
-      } else {
-        setErrorMessage(data.message || 'Identifiants incorrects.');
-      }
-    } catch (error) {
-      console.error('Error during login:', error);
-      setErrorMessage('Une erreur est survenue. Veuillez réessayer plus tard.');
-    }
+    //   if (response.ok) {
+          setIsAuthenticated(true);
+          navigate('/dashboard');
+    //   } else {
+    //     setErrorMessage(data.message || 'Identifiants incorrects.');
+    //   }
+    // } catch (error) {
+    //   console.error('Error during login:', error);
+    //   setErrorMessage('Une erreur est survenue. Veuillez réessayer plus tard.');
+    // }
   };
 
   const handleGoogleLoginSuccess = (response) => {

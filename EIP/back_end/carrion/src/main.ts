@@ -1,6 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { ValidationPipe } from '@nestjs/common';
+import { Req, Res, ValidationPipe} from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 async function bootstrap() {
@@ -16,7 +16,10 @@ async function bootstrap() {
 
   app.enableCors({
     origin: (origin, callback) => {
-      const allowedOrigins = ['http://localhost:3000', 'http://localhost:8080'];
+      const allowedOrigins = [
+        `http://localhost:${process.env.PORT}`,
+        'http://localhost:8080',
+      ];
       if (allowedOrigins.includes(origin) || !origin) {
         callback(null, true);
       } else {
@@ -32,11 +35,12 @@ async function bootstrap() {
     .setDescription(
       'The documentation of the routes defined for the web appliaction Carrion',
     )
+    .addBearerAuth()
     .setVersion('1.0')
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
-  await app.listen(process.env.PORT ?? 8080);
+  await app.listen(process.env.PORT);
 }
 bootstrap();

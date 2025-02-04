@@ -1,0 +1,215 @@
+/* Top bar */
+
+.archives-title {
+font-size: 1.5rem;
+margin-left: 40%;
+}
+
+/* Liste */
+.archives-list {
+display: flex;
+flex-direction: column;
+gap: 40px;
+align-items: center;
+box-sizing: border-box;
+margin-bottom: 200px;
+}
+
+.archives-list-card {
+display: flex;
+align-items: center;
+justify-content: space-between;
+background-color: var(--primary-color);
+border: 1px solid var(--shadow-color);
+border-radius: 8px;
+padding: 20px;
+width: 70%;
+box-sizing: border-box;
+box-shadow: 0 2px 4px var(--shadow-color);
+position: relative;
+}
+
+.archives-list-logo {
+width: 100px;
+height: 100px;
+margin-left: 2%;
+border-radius: 50%;
+object-fit: cover;
+}
+
+.archives-list-details {
+flex: 1;
+margin-left: 60px;
+display: flex;
+flex-direction: column;
+justify-content: center;
+}
+
+.archives-list-company-name {
+margin: 0;
+font-size: 20px;
+font-weight: bold;
+color: var(--text-color);
+}
+
+.archives-list-job-title {
+margin: 5px 0;
+font-size: 16px;
+color: var(--accent-color);
+}
+
+.archives-list-status {
+margin: 5px 0;
+font-size: 14px;
+color: var(--text-color);
+}
+
+.archives-list-date {
+margin: 5px 0;
+font-size: 14px;
+color: var(--text-color);
+}
+
+.archives-list-button {
+background-color: var(--primary-color);
+color: var(--text-color);
+border: none;
+padding: 10px 15px;
+border-radius: 20px;
+margin-top: 1%;
+cursor: pointer;
+width: 20%;
+box-shadow: 0 2px 4px var(--shadow-color);
+transition: background-color 0.3s ease;
+}
+
+.archives-list-button:hover {
+background-color: var(--text-color);
+color: var(--secondary-color);
+}
+
+.archives-list-status-banner {
+height: 100%;
+width: 250px;
+position: absolute;
+top: 0;
+right: 0;
+border-radius: 0 8px 8px 0;
+}
+
+.archives-list-status-banner.acceptée {
+background: linear-gradient(90deg, var(--primary-color), #0de406);
+}
+
+.archives-list-status-banner.attente {
+background: linear-gradient(90deg, var(--primary-color), #fc8f02);
+}
+
+.archives-list-status-banner.refusée {
+background: linear-gradient(90deg, var(--primary-color), #fa0202);
+}
+
+/* Grille */
+.archives-grid {
+display: grid;
+grid-template-columns: repeat(3, 30%);
+justify-content: center;
+max-width: calc(70% - 230px);
+column-gap: 170px;
+row-gap: 50px;
+margin: 0 auto 200px;
+width: 100%;
+}
+
+.archives-grid-card {
+background-color: var(--primary-color);
+border: 1px solid var(--shadow-color);
+height: 400px;
+border-radius: 8px;
+padding: 15px;
+box-shadow: 0 2px 6px var(--shadow-color);
+display: flex;
+flex-direction: column;
+justify-content: space-between;
+text-align: center;
+position: relative;
+overflow: hidden;
+}
+
+.archives-grid-header {
+display: flex;
+align-items: center;
+justify-content: space-between;
+}
+
+.archives-grid-logo {
+width: 100px;
+height: 100px;
+border-radius: 50px;
+}
+
+.archives-grid-company-name {
+flex: 1;
+display: flex;
+justify-content: center;
+font-weight: bold;
+font-size: 22px;
+}
+
+.archives-grid-content {
+margin: 10px 0;
+}
+
+.archives-grid-content h4 {
+font-size: 22px;
+font-weight: bold;
+margin-bottom: 50px;
+}
+
+.archives-grid-content hr {
+border: 0.5px solid var(--shadow-color);
+}
+
+.archives-grid-content p {
+margin-top: 50px;
+margin-bottom: 10px;
+color: var(--text-color);
+}
+
+.archives-grid-button {
+background-color: var(--primary-color);
+color: var(--text-color);
+border: none;
+padding: 10px 15px;
+border-radius: 20px;
+cursor: pointer;
+width: 90%;
+box-shadow: 0 2px 4px var(--shadow-color);
+transition: background-color 0.3s ease;
+margin: 0 auto;
+}
+
+.archives-grid-button:hover {
+background-color: var(--text-color);
+color: var(--secondary-color);
+}
+
+.archives-grid-status-banner {
+height: 100%;
+width: 40px;
+position: absolute;
+bottom: 0;
+right: 0;
+}
+
+.archives-grid-status-banner.acceptée {
+background: linear-gradient(90deg, var(--primary-color), #0de406);
+}
+
+.archives-grid-status-banner.attente {
+background: linear-gradient(90deg, var(--primary-color), #fc8f02);
+}
+
+.archives-grid-status-banner.refusée {
+background: linear-gradient(90deg, var(--primary-color), #fa0202);
+}
