@@ -85,15 +85,19 @@ function Dashboard() {
 
   const sortedAndFilteredApplications = useMemo(() => {
     return fakeDatabase
-        .filter(app => selectedStatuses.size === 0 || selectedStatuses.has(app.status))
-        .sort((a, b) => {
-            if (sortBy === 'date') {
-                return new Date(b.date) - new Date(a.date);
-            } else if (sortBy === 'status') {
-                return a.status.localeCompare(b.status);
-            }
-            return 0;
-        });
+      .filter(app => 
+        (selectedStatuses.size === 0 || selectedStatuses.has(app.status)) &&
+        (app.companyName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        app.jobTitle.toLowerCase().includes(searchTerm.toLowerCase()))
+      )
+      .sort((a, b) => {
+          if (sortBy === 'date') {
+            return new Date(b.date) - new Date(a.date);
+          } else if (sortBy === 'status') {
+            return a.status.localeCompare(b.status);
+          }
+          return 0;
+      });
   }, [fakeDatabase, selectedStatuses, sortBy]);
 
   return (
