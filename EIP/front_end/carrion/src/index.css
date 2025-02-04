@@ -1,5 +1,5 @@
 :root {
-  --primary-color: #f7f1e8;
+  --primary-color: #e3f2fd;
   --secondary-color: #ffffff;
   --text-color: #333333;
   --accent-color: #000000;
@@ -17,10 +17,11 @@
 }
 
 body {
-  margin: 0;
-  font-family: 'TextPolice', Arial, sans-serif;
+  margin: auto;
+  width: 80%;
+  font-family: 'TextPolice', sans-serif;
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: 'TitlePolice', 'MaPolice', Arial, sans-serif;
+  font-family: 'TitlePolice', Arial, sans-serif;
 }

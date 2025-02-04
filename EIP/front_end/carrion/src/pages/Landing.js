@@ -1,7 +1,8 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
 import '../styles/Landing.css';
-import logo from '../assets/logo-carrion.png';
+import logo from '../assets/carrion_logo.png';
 
 function Landing() {
   const navigate = useNavigate();
@@ -14,6 +15,40 @@ function Landing() {
     navigate('/register');
   };
 
+  useEffect(() => {
+    const handleScroll = () => {
+      const header = document.querySelector(".fixed-header");
+      const scrollPosition = window.scrollY;
+      const maxScroll = window.innerHeight;
+      const progress = Math.min(scrollPosition / maxScroll, 1);
+  
+      header.style.width = `${80 + 20 * progress}%`;
+      header.style.left = `${10 - 10 * progress}%`;
+    };
+  
+    const handleButtonClick = () => {
+      const currentScroll = window.scrollY;
+      const viewportHeight = window.innerHeight;
+      const nextPageScroll = currentScroll === 0 ? viewportHeight : Math.ceil(currentScroll / viewportHeight) * viewportHeight;
+  
+      window.scrollTo({top: nextPageScroll, behavior: "smooth",});
+    };
+  
+    window.addEventListener("scroll", handleScroll);
+  
+    const button = document.querySelector(".scroll-button");
+    if (button) {
+      button.addEventListener("click", handleButtonClick);
+    }
+  
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      if (button) {
+        button.removeEventListener("click", handleButtonClick);
+      }
+    };
+  }, []);
+
   return (
     <div>
       <header className="fixed-header">
@@ -24,34 +59,43 @@ function Landing() {
         </div>
       </header>
 
+      <div className="intro-section">
+        <h1>La plateforme idéale pour gérer ses candidatures</h1>
+        <p>Simplifiez votre recherche d'emploi grâce a Carrion</p>
+      </div>
+      
       <div className="landing-background">
-        <main className="landing-main">
-          <h1 className="landing-welcome">Bienvenue sur Carrion</h1>
-          <p className="landing-description">Explorez notre plateforme dédiée à la gestion de candidatures pour les travailleurs cherchant des stages ou des emplois.</p>
-        </main>
+        <button className="scroll-button">
+          <span className="arrow">↓</span>
+        </button>
       </div>
 
       <section className="services-section">
         <h2 className="services-title">Nos services</h2>
         <div className="services-container">
           <div className="service-card">
-            <div className="service-number">1</div>
             <h3>Suivi de vos candidatures personnelles</h3>
-            <p>Gérez facilement toutes vos candidatures depuis un tableau de bord intuitif. Suivez les statuts, ajoutez des notes, et ne manquez aucune opportunité.</p>
+            <p>Gérez facilement toutes vos candidatures depuis un tableau de bord intuitif. Suivez les statuts, ajoutez des notes, et ne manquez aucune opportunité</p>
           </div>
           <div className="service-card">
-            <div className="service-number">2</div>
             <h3>Suivi des objectifs de candidature</h3>
-            <p>Définissez et suivez vos objectifs personnels dans votre recherche d'emploi. Vous recevez des conseils pour vous assurer de rester sur la bonne voie et atteindre vos objectifs en temps voulu.</p>
+            <p>Définissez et suivez vos objectifs personnels dans votre recherche d'emploi. Vous recevez des conseils pour vous assurer de rester sur la bonne voie et atteindre vos objectifs en temps voulu</p>
           </div>
           <div className="service-card">
-            <div className="service-number">3</div>
             <h3>Rappels et notifications personnalisés</h3>
             <p>Recevez des rappels automatiques pour vos candidatures en attente de réponse ou vos entretiens à venir. Restez organisé et proactif.</p>
           </div>
+          <div className="service-card">
+            <h3>Espace documents professionels</h3>
+            <p>Centralisez et gérez tous vos documents importants, tels que CV, lettres de motivation, et portfolios. Accédez-y facilement à tout moment pour simplifier vos démarches</p>
+          </div>
+          <div className="service-card">
+            <h3>Espace documents professionels</h3>
+            <p>Centralisez et gérez tous vos documents importants, tels que CV, lettres de motivation, et portfolios. Accédez-y facilement à tout moment pour simplifier vos démarches</p>
+          </div>
         </div>
       </section>
-      
+
       <section className="how-it-works-section">
         <div className="how-it-works-container">
           <div className="how-it-works-image"></div>

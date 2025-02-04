@@ -1,81 +1,8 @@
 /* Top bar */
-.top-bar {
-margin-top: 50px;
-height: 200px;
-background-color: var(--primary-color);
-display: flex;
-flex-direction: row;
-justify-content: space-between;
-align-items: center;
-}
 
 .archives-title {
 font-size: 1.5rem;
 margin-left: 40%;
-}
-
-.search-input-container {
-margin-right: 10%;
-position: relative;
-display: flex;
-align-items: center;
-width: 350px;
-}
-
-.search-icon {
-position: absolute;
-left: 10px;
-color: var(--text-color);
-font-size: 20px;
-}
-
-.search-input {
-width: 100%;
-padding: 10px 45px;
-border: 1px solid var(--shadow-color);
-border-radius: 20px;
-font-size: 20px;
-color: var(--text-color);
-box-shadow: 0 2px 4px var(--shadow-color);
-}
-
-.search-input::placeholder {
-color: var(--accent-color);
-opacity: 0.7;
-text-align: center;
-}
-
-.search-input:focus {
-border-color: var(--accent-color);
-box-shadow: 0 0 5px var(--accent-color);
-}
-
-/* Toggle button */
-.archives-toggle-buttons {
-display: flex;
-justify-content: right;
-margin: 2% 15% 1% 0;
-gap: 10px;
-}
-
-.toggle-button {
-padding: 10px 20px;
-border: 1px solid var(--shadow-color);
-background-color: var(--primary-color);
-color: var(--text-color);
-border-radius: 5px;
-transition: all 0.3s ease;
-}
-
-.toggle-button.active {
-background-color: grey;
-color: var(--secondary-color);
-cursor: auto;
-}
-
-.toggle-button:hover:not(.active) {
-cursor: pointer;
-background-color: var(--shadow-color);
 }
 
 /* Liste */

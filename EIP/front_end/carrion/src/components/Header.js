@@ -1,12 +1,12 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../styles/Header.css';
-import logo from '../assets/logo-carrion.png';
+import logo from '../assets/carrion_logo.png';
 
 function Header() {
   const navigate = useNavigate();
   return (
-    <header className="fixed-header">
+    <header className="header">
       <h1 onClick={() => navigate('/dashboard')} className="logo-button"><img src={logo} alt="Carrion"/></h1>
       <div className="navigation-buttons">
         <button onClick={() => navigate('/dashboard')} className='applications-button'>Mes Candidatures</button>

@@ -9,7 +9,6 @@ import Archives from './pages/Archives';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
-    // Charger l'état d'authentification à partir de localStorage
     return localStorage.getItem('isAuthenticated') === 'true';
   });
 
@@ -24,12 +23,10 @@ function AppLayout({ isAuthenticated, setIsAuthenticated }) {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Sauvegarde la dernière page visitée dans localStorage
   useEffect(() => {
     localStorage.setItem('lastPath', location.pathname);
   }, [location]);
 
-  // Redirection vers la dernière page visitée après le rechargement
   useEffect(() => {
     const lastPath = localStorage.getItem('lastPath');
     if (lastPath && location.pathname === '/') {
@@ -39,20 +36,12 @@ function AppLayout({ isAuthenticated, setIsAuthenticated }) {
 
   return (
     <div>
-      {/* Afficher le header sur certaines pages */}
       {location.pathname !== '/' && location.pathname !== '/login' && location.pathname !== '/register' && <Header />}
 
       <Routes>
-        {/* Page Landing */}
-        <Route path="/" element={<Landing setIsAuthenticated={setIsAuthenticated} />} />
-        
-        {/* Page Login */}
-        <Route path="/login" element={<Login setIsAuthenticated={setIsAuthenticated} />} />
-        
-        {/* Page Register */}
+        <Route path="/" element={<Landing setIsAuthenticated={setIsAuthenticated} />} />        
+        <Route path="/login" element={<Login setIsAuthenticated={setIsAuthenticated} />} />        
         <Route path="/register" element={<Register setIsAuthenticated={setIsAuthenticated} />} />
-        
-        {/* Page Dashboard avec redirection si non authentifié */}
         <Route
           path="/dashboard"
           element={
@@ -64,7 +53,6 @@ function AppLayout({ isAuthenticated, setIsAuthenticated }) {
             )
           }
         />
-        {/* Page Archives avec redirection si non authentifié */}
         <Route
           path="/archives"
           element={
