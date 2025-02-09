@@ -49,6 +49,7 @@ color: var(--text-color);
 
 /* Section principale */
 .landing-background {
+
 height: 83vh;
 background: url('../assets/landing_bg.png') no-repeat center center/cover;
 display: flex;
