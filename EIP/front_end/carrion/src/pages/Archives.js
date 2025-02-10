@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import '../styles/Archives.css';
 
 // function Archives() {
@@ -17,7 +17,7 @@ import '../styles/Archives.css';
 // }
 
 function Archives() {
-  const fakeDatabase = [
+  const fakeDatabase = useMemo(() => [
     {
       id: 1,
       logo: 'https://via.placeholder.com/100',
@@ -66,7 +66,7 @@ function Archives() {
       status: 'En attente de réponse',
       applicationDate: "Aujourd'hui",
     },
-  ];
+  ], []);
 
   const [applications, setApplications] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
@@ -79,7 +79,7 @@ function Archives() {
       }, 500);
     };
     loadFakeData();
-  }, []);
+  }, [fakeDatabase]);
 
   const filteredApplications = applications.filter((application) => {
     const searchableContent = `

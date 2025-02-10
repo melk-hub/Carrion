@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
-import MicrosoftLogin from 'react-microsoft-login';
+// import MicrosoftLogin from 'react-microsoft-login';
 import outlookIcon from '../assets/outlook-logo.png';
 import "../styles/LoginPage.css";
 
@@ -17,7 +17,6 @@ function Login({ setIsAuthenticated }) {
 
   const API_URL = process.env.REACT_APP_API_URL;
 
-  console.log(process.env.REACT_APP_API_URL);
   const handleLogin = async (e) => {
     e.preventDefault();
 
@@ -60,9 +59,9 @@ function Login({ setIsAuthenticated }) {
     navigate('/dashboard');
   };
 
-  const handleMicrosoftLoginFailure = (error) => {
-    console.error('Microsoft Login Failure:', error);
-  };
+  // const handleMicrosoftLoginFailure = (error) => {
+  //   console.error('Microsoft Login Failure:', error);
+  // };
 
   const handleRegisterRedirect = (response) => {
     navigate('/register');

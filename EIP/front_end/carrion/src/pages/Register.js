@@ -18,41 +18,37 @@ function Register({ setIsAuthenticated }) {
   const [error, setError] = useState('');
   const API_URL = process.env.REACT_APP_API_URL;
 
-  console.log(process.env.REACT_APP_API_URL);
-
   const handleRegisterChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
 
   const handleRegisterSubmit = async () => {
-    console.log(formData)
     setError('');
     if (formData.password !== confirmPassword) {
       setError("Les mots de passe ne correspondent pas.");
-      return;
-    }
-    try {
-      const response = await fetch(`${API_URL}/auth/signup`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
-      });
+      console.error('Error password:', error);
+    } else {
+      try {
+        const response = await fetch(`${API_URL}/auth/signup`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(formData),
+        });
 
-      const data = await response;
-      console.log(response)
-      if (response.ok) {
-        console.log('Registration successful:', data);
-        setIsAuthenticated(true);
-        navigate('/dashboard');
-      } else {
-        setError(data.message || 'Erreur lors de l\'inscription');
+        const data = await response;
+        if (response.ok) {
+          setIsAuthenticated(true);
+          navigate('/dashboard');
+        } else {
+          setError(data.message || 'Erreur lors de l\'inscription');
+        }
+      } catch (error) {
+        setError('Une erreur est survenue. Veuillez réessayer.');
+        console.error('Error registering:', error);
       }
-    } catch (error) {
-      console.error('Error registering:', error);
-      setError('Une erreur est survenue. Veuillez réessayer.');
     }
   };
   
