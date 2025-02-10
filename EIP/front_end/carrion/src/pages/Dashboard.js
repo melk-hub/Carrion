@@ -19,7 +19,7 @@ import deleteIcon from '../assets/supprimer.png';
 // }
 
 function Dashboard() {
-  const fakeDatabase = [
+  const fakeDatabase = useMemo (() => [
     {
       id: 1,
       logo: 'https://via.placeholder.com/100',
@@ -68,7 +68,7 @@ function Dashboard() {
       status: 'En attente de réponse',
       applicationDate: "Aujourd'hui",
     },
-  ];
+  ]);
 
   const [searchTerm, setSearchTerm] = useState('');
   const [viewMode, setViewMode] = useState('list');
