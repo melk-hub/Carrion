@@ -3,21 +3,6 @@ import '../styles/Dashboard.css';
 import archiveIcon from '../assets/archiver.png';
 import deleteIcon from '../assets/supprimer.png';
 
-// function Dashboard() {
-//   useEffect(() => {
-//     const fetchApplications = async () => {
-//       try {
-//         const response = await fetch('https://api.example.com/applications');
-//         const data = await response.json();
-//         setApplications(data);
-//       } catch (error) {
-//         console.error('Erreur lors de la récupération des données:', error);
-//       }
-//     };
-//     fetchApplications();
-//   }, []);
-// }
-
 function Dashboard() {
   const fakeDatabase = useMemo (() => [
     {
@@ -70,10 +55,26 @@ function Dashboard() {
     },
   ], []);
 
+  const [applications, setApplications] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [viewMode, setViewMode] = useState('list');
   const [sortBy, setSortBy] = useState('date');
   const [selectedStatuses, setSelectedStatuses] = useState(new Set());
+
+  useEffect(() => {
+    const fetchApplications = async () => {
+      try {
+        const response = await fetch('http://localhost:3030/job-applies/jobApply');
+        console.log('Réponse brute:', response);
+        const data = await response.json();
+        console.log('Data received:', data);
+        setApplications(Array.isArray(data) ? data : []);
+      } catch (error) {
+        console.error('Erreur lors de la récupération des données:', error);
+      }
+    };
+    fetchApplications();
+  }, []);
 
   const handleStatusChange = (status) => {
     setSelectedStatuses((prev) => {
@@ -84,8 +85,7 @@ function Dashboard() {
   };
 
   const sortedAndFilteredApplications = useMemo(() => {
-    return fakeDatabase
-      .filter(app => 
+    return applications.filter(app => 
         (selectedStatuses.size === 0 || selectedStatuses.has(app.status)) &&
         (app.companyName.toLowerCase().includes(searchTerm.toLowerCase()) ||
         app.jobTitle.toLowerCase().includes(searchTerm.toLowerCase()))

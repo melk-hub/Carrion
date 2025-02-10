@@ -31,6 +31,8 @@ function App() {
     checkAuth();
   }, []);
 
+  console.log("app is rendering");
+
   return (
     <Router>
       <AppLayout isAuthenticated={isAuthenticated} setIsAuthenticated={setIsAuthenticated} />
