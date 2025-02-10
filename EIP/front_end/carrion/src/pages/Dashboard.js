@@ -173,6 +173,21 @@ function Dashboard() {
   }, [API_URL]);
   
 
+  useEffect(() => {
+    const fetchApplications = async () => {
+      try {
+        const response = await fetch('http://localhost:3030/job-applies/jobApply');
+        console.log('Réponse brute:', response);
+        const data = await response.json();
+        console.log('Data received:', data);
+        setApplications(Array.isArray(data) ? data : []);
+      } catch (error) {
+        console.error('Erreur lors de la récupération des données:', error);
+      }
+    };
+    fetchApplications();
+  }, []);
+
   const handleStatusChange = (status) => {
     setSelectedStatuses((prev) => {
         const newSet = new Set(prev);
