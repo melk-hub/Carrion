@@ -18,7 +18,6 @@ export class UserService {
     const formattedDate = createUserDto.birthDate
       ? new Date(createUserDto.birthDate).toISOString()
       : null;
-    console.log(formattedDate);
     return await this.prisma.user.create({
       data: {
         ...createUserDto,

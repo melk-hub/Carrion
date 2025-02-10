@@ -21,7 +21,6 @@ export class MicrosoftStrategy extends PassportStrategy(Strategy, 'microsoft') {
   }
 
   async validate( accessToken: string, refreshToken: string, profile: Profile, done: VerifyCallback) {
-    console.log({ profile });
     const user = await this.authService.validateOAuthUser({
       firstName: profile.name.givenName,
       lastName: profile.name.familyName,

@@ -79,7 +79,7 @@ function Archives() {
       }, 500);
     };
     loadFakeData();
-  }, []);
+  }, [fakeDatabase]);
 
   const filteredApplications = applications.filter((application) => {
     const searchableContent = `

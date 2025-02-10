@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import '../styles/Dashboard.css';
 import archiveIcon from '../assets/archiver.png';
 import deleteIcon from '../assets/supprimer.png';
@@ -98,7 +98,7 @@ function Dashboard() {
           }
           return 0;
       });
-  }, [fakeDatabase, selectedStatuses, sortBy]);
+  }, [fakeDatabase, searchTerm, selectedStatuses, sortBy]);
 
   return (
     <div>
