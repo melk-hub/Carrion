@@ -14,16 +14,22 @@ export class UserService {
     });
   }
 
-
   async create(createUserDto: CreateUserDto) {
+    const formattedDate = createUserDto.birthDate
+      ? new Date(createUserDto.birthDate).toISOString()
+      : null;
+    console.log(formattedDate);
     return await this.prisma.user.create({
-      data: createUserDto,
+      data: {
+        ...createUserDto,
+        birthDate: formattedDate,
+      },
     });
   }
 
-  async findByEmail(email: string) {
+  async findByIdentifier(identifier: string, isEmail: boolean) {
     return await this.prisma.user.findUnique({
-      where: { email },
+      where: isEmail ? { email: identifier } : { username: identifier },
     });
   }
 

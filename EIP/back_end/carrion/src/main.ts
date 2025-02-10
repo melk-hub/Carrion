@@ -18,7 +18,7 @@ async function bootstrap() {
     origin: (origin, callback) => {
       const allowedOrigins = [
         `http://localhost:${process.env.PORT}`,
-        'http://localhost:8080',
+        'http://localhost:3000',
       ];
       if (allowedOrigins.includes(origin) || !origin) {
         callback(null, true);

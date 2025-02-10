@@ -7,13 +7,31 @@ import { AuthService } from '../auth.service';
 export class LocalStrategy extends PassportStrategy(Strategy) {
   constructor(private authService: AuthService) {
     super({
-      usernameField: 'email',
+      usernameField: 'identifier',
     });
   }
 
-  async validate(email: string, password: string) {
-    if (password === '')
-      throw new UnauthorizedException('Please Provide The Password');
-    return this.authService.validateUser(email, password);
+  async validate(identifier: string, password: string) {
+    if (!password) {
+      throw new UnauthorizedException('Please provide the password');
+    }
+
+    const isEmail = this.isEmail(identifier);
+    const user = await this.authService.validateUser(
+      identifier,
+      password,
+      isEmail,
+    );
+
+    if (!user) {
+      throw new UnauthorizedException('Invalid credentials');
+    }
+
+    return user;
+  }
+
+  private isEmail(value: string): boolean {
+    // Vérification simple si l'entrée contient "@" (email)
+    return /\S+@\S+\.\S+/.test(value);
   }
 }

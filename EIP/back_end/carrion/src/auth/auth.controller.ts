@@ -36,8 +36,14 @@ export class AuthController {
   @Public()
   @Post('signup')
   @ApiOperation({ summary: 'User signup' })
-  @ApiResponse({status: 201, description: 'Successfully created a new user'})
-  @ApiResponse({status: 400, description: 'Bad request, validation error or user already exists'})
+  @ApiResponse({
+    status: 201,
+    description: 'Successfully created a new user',
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Bad request, validation error or user already exists',
+  })
   async signUp(@Body() createUserDto: CreateUserDto) {
     return (await this.authService.signUp(createUserDto)).accessToken;
   }

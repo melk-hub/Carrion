@@ -27,6 +27,7 @@ export class MicrosoftStrategy extends PassportStrategy(Strategy, 'microsoft') {
       lastName: profile.name.familyName,
       username: profile.name.givenName,
       email: profile.emails[0].value,
+      birthDate: '',
       password: '',
     });
     return user;

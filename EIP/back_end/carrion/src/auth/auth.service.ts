@@ -10,6 +10,7 @@ import { CurrentUser } from './types/current-user';
 import { CreateUserDto, LoginDto } from 'src/user/dto/create-user.dto';
 import { Role } from './enums/role.enum';
 import * as bcrypt from 'bcrypt'
+import { console } from 'inspector';
 
 @Injectable()
 export class AuthService {
@@ -20,14 +21,15 @@ export class AuthService {
     private refreshTokenConfig: ConfigType<typeof refreshJwtConfig>,
   ) {}
 
-  async validateUser(email: string, password: string) {
-    const user = await this.userService.findByEmail(email);
-    if (!user) throw new UnauthorizedException('User not found!');
-    const isPasswordMatch = await compare(password, user.password);
-    if (!isPasswordMatch)
-      throw new UnauthorizedException('Invalid credentials');
+  async validateUser(identifier: string, password: string, isEmail: boolean) {
+    const user = await this.userService.findByIdentifier(identifier, isEmail);
 
-    return { id: user.id };
+    if (!user) return null;
+
+    const passwordMatch = await bcrypt.compare(password, user.password);
+    if (!passwordMatch) return null;
+
+    return user;
   }
 
   async login(userId: number) {
@@ -42,8 +44,15 @@ export class AuthService {
   }
 
   async signUp(createUserDto: CreateUserDto) {
-    const existingUser = await this.userService.findByEmail(createUserDto.email);
-    if (existingUser)
+    const existingUserByEmail = await this.userService.findByIdentifier(
+      createUserDto.email,
+      true,
+    );
+    const existingUser = await this.userService.findByIdentifier(
+      createUserDto.username,
+      false,
+    );
+    if (existingUserByEmail || existingUser)
       throw new ConflictException('User with this email already exists');
     const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
     const user = await this.userService.create({
@@ -103,7 +112,7 @@ export class AuthService {
   }
 
   async validateOAuthUser(OAuthUser: CreateUserDto) {
-    const user = await this.userService.findByEmail(OAuthUser.email);
+    const user = await this.userService.findByIdentifier(OAuthUser.email, true);
     if (user) return user;
     return await this.userService.create(OAuthUser);
   }

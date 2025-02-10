@@ -7,7 +7,7 @@ import "../styles/LoginPage.css";
 
 function Login({ setIsAuthenticated }) {
   const navigate = useNavigate();
-  const [credentials, setCredentials] = useState({ username: '', password: '' });
+  const [credentials, setCredentials] = useState({ identifier: '', password: '' });
   const [errorMessage, setErrorMessage] = useState('');
 
   const handleChange = (e) => {
@@ -15,30 +15,33 @@ function Login({ setIsAuthenticated }) {
     setCredentials({ ...credentials, [name]: value });
   };
 
+  const API_URL = process.env.REACT_APP_API_URL;
+
+  console.log(process.env.REACT_APP_API_URL);
   const handleLogin = async (e) => {
     e.preventDefault();
 
-    // try {
-    //   const response = await fetch('http://localhost:8080/auth/signin', {
-    //     method: 'POST',
-    //     headers: {
-    //       'Content-Type': 'application/json',
-    //     },
-    //     body: JSON.stringify(credentials),
-    //   });
+    try {
+      const response = await fetch(`${API_URL}/auth/signin`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(credentials),
+      });
 
-    //   const data = await response.json();
+      const data = await response;
 
-    //   if (response.ok) {
+      if (response.ok) {
           setIsAuthenticated(true);
           navigate('/dashboard');
-    //   } else {
-    //     setErrorMessage(data.message || 'Identifiants incorrects.');
-    //   }
-    // } catch (error) {
-    //   console.error('Error during login:', error);
-    //   setErrorMessage('Une erreur est survenue. Veuillez réessayer plus tard.');
-    // }
+      } else {
+        setErrorMessage(data.message || 'Identifiants incorrects.');
+      }
+    } catch (error) {
+      console.error('Error during login:', error);
+      setErrorMessage('Une erreur est survenue. Veuillez réessayer plus tard.');
+    }
   };
 
   const handleGoogleLoginSuccess = (response) => {
@@ -74,8 +77,8 @@ function Login({ setIsAuthenticated }) {
                     <label>Nom d'utilisateur:</label>
                     <input
                         type="text"
-                        name="username"
-                        value={credentials.username}
+                        name="identifier"
+                        value={credentials.identifier}
                         onChange={handleChange}
                         placeholder="Entrez votre nom d'utilisateur"
                         //required
