@@ -12,6 +12,8 @@ function App() {
     return localStorage.getItem('isAuthenticated') === 'true';
   });
 
+  console.log("app is rendering");
+
   return (
     <Router>
       <AppLayout isAuthenticated={isAuthenticated} setIsAuthenticated={setIsAuthenticated} />
