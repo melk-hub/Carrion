@@ -68,7 +68,7 @@ function Dashboard() {
       status: 'En attente de réponse',
       applicationDate: "Aujourd'hui",
     },
-  ]);
+  ], []);
 
   const [searchTerm, setSearchTerm] = useState('');
   const [viewMode, setViewMode] = useState('list');
