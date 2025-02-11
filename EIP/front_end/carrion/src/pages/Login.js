@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
 import MicrosoftLogin from 'react-microsoft-login';
@@ -40,7 +40,37 @@ function Login({ setIsAuthenticated }) {
     //   setErrorMessage('Une erreur est survenue. Veuillez réessayer plus tard.');
     // }
   };
-
+/*
+  const OAuth2Login = () => {
+    const [data, setData] = useState(null);
+    const [error, setError] = useState(null);
+  
+    useEffect(() => {
+      const fetchOAuth2Data = async () => {
+        try {
+          const response = await fetch("API-CALL", {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+              "Content-Type": "application/json",
+            },
+          });
+  
+          if (!response.ok) {
+            throw new Error("Erreur lors de la récupération des données");
+          }
+  
+          const result = await response.json();
+          setData(result);
+        } catch (err) {
+          setError(err.message);
+        }
+      };
+  
+      fetchOAuth2Data();
+    }, []);
+  };
+*/
   const handleGoogleLoginSuccess = (response) => {
     console.log('Google Login Success:', response);
     setIsAuthenticated(true);
@@ -102,6 +132,7 @@ function Login({ setIsAuthenticated }) {
                 <GoogleLogin
                     onSuccess={handleGoogleLoginSuccess}
                     onFailure={handleGoogleLoginFailure}
+                    style={{ display: 'flex', alignItems: 'center' }}
                 />
                 <button onClick={handleMicrosoftLoginSuccess} style={{ display: 'flex', alignItems: 'center' }}>
                 <img src={outlookIcon} alt="Outlook" style={{ width: '20px', marginRight: '8px' }} />
