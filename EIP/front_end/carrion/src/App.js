@@ -11,6 +11,10 @@ function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
     return localStorage.getItem('isAuthenticated') === 'true';
   });
+  
+  useEffect(() => {
+    localStorage.setItem('isAuthenticated', isAuthenticated);
+  }, [isAuthenticated]);
 
   return (
     <Router>
@@ -48,8 +52,7 @@ function AppLayout({ isAuthenticated, setIsAuthenticated }) {
             isAuthenticated ? (
               <Dashboard />
             ) : (
-              // <Navigate to="/login" replace />
-              <Navigate to="/dashboard" replace />
+              <Navigate to="/login"/>
             )
           }
         />
@@ -59,8 +62,7 @@ function AppLayout({ isAuthenticated, setIsAuthenticated }) {
             isAuthenticated ? (
               <Archives />
             ) : (
-              // <Navigate to="/login" replace />
-              <Navigate to="/archives" replace />
+              <Navigate to="/login"/>
             )
           }
         />
