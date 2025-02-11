@@ -1,80 +1,37 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import '../styles/Dashboard.css';
 import archiveIcon from '../assets/archiver.png';
 import deleteIcon from '../assets/supprimer.png';
 
 function Dashboard() {
-  const fakeDatabase = useMemo (() => [
-    {
-      id: 1,
-      logo: 'https://via.placeholder.com/100',
-      companyName: 'Entreprise A',
-      jobTitle: 'Développeur Frontend',
-      status: 'En attente de réponse',
-      applicationDate: '2024-12-01',
-    },
-    {
-      id: 2,
-      logo: 'https://via.placeholder.com/100',
-      companyName: 'Entreprise B',
-      jobTitle: 'Ingénieur Backend',
-      status: 'Acceptée',
-      applicationDate: '2024-12-10',
-    },
-    {
-      id: 3,
-      logo: 'https://via.placeholder.com/100',
-      companyName: 'Entreprise C',
-      jobTitle: 'Designer UI/UX',
-      status: 'Refusée',
-      applicationDate: '2024-12-15',
-    },
-    {
-      id: 4,
-      logo: 'https://via.placeholder.com/100',
-      companyName: 'Entreprise D',
-      jobTitle: 'Développeur Backend',
-      status: 'En attente de réponse',
-      applicationDate: "Aujourd'hui",
-    },
-    {
-      id: 5,
-      logo: 'https://via.placeholder.com/100',
-      companyName: 'Entreprise E',
-      jobTitle: 'Chef de Projet IT',
-      status: 'En attente de réponse',
-      applicationDate: "Aujourd'hui",
-    },
-    {
-      id: 6,
-      logo: 'https://via.placeholder.com/100',
-      companyName: 'Entreprise F',
-      jobTitle: 'Consultant DevOps',
-      status: 'En attente de réponse',
-      applicationDate: "Aujourd'hui",
-    },
-  ], []);
-
   const [applications, setApplications] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [viewMode, setViewMode] = useState('list');
   const [sortBy, setSortBy] = useState('date');
   const [selectedStatuses, setSelectedStatuses] = useState(new Set());
+  const API_URL = process.env.REACT_APP_API_URL;
 
   useEffect(() => {
     const fetchApplications = async () => {
       try {
-        const response = await fetch('http://localhost:3030/job-applies/jobApply');
-        console.log('Réponse brute:', response);
+        const token = localStorage.getItem("token");
+        const response = await fetch(`${API_URL}/job-applies/jobApply`, {
+          headers: {
+            "Authorization": `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        });
+        if (!response.ok) {
+          throw new Error(`Erreur HTTP: ${response.status}`);
+        }
         const data = await response.json();
-        console.log('Data received:', data);
         setApplications(Array.isArray(data) ? data : []);
       } catch (error) {
         console.error('Erreur lors de la récupération des données:', error);
       }
     };
     fetchApplications();
-  }, []);
+  }, [API_URL]);
 
   const handleStatusChange = (status) => {
     setSelectedStatuses((prev) => {
@@ -85,21 +42,23 @@ function Dashboard() {
   };
 
   const sortedAndFilteredApplications = useMemo(() => {
-    return applications.filter(app => 
-        (selectedStatuses.size === 0 || selectedStatuses.has(app.status)) &&
-        (app.companyName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        app.jobTitle.toLowerCase().includes(searchTerm.toLowerCase()))
+    const filtered = applications.filter(app => 
+      (selectedStatuses.size === 0 || selectedStatuses.has(app.status)) &&
+      (
+        (app.company?.toLowerCase().includes(searchTerm.toLowerCase()) || '') || 
+        (app.jobTitle?.toLowerCase().includes(searchTerm.toLowerCase()) || '')
       )
-      .sort((a, b) => {
-          if (sortBy === 'date') {
-            return new Date(b.date) - new Date(a.date);
-          } else if (sortBy === 'status') {
-            return a.status.localeCompare(b.status);
-          }
-          return 0;
-      });
-  }, [fakeDatabase, searchTerm, selectedStatuses, sortBy]);
-
+    );  
+    return filtered.sort((a, b) => {
+      if (sortBy === 'date') {
+        return new Date(b.date) - new Date(a.date);
+      } else if (sortBy === 'status') {
+        return a.status.localeCompare(b.status);
+      }
+      return 0;
+    });
+  }, [applications, selectedStatuses, sortBy, searchTerm]);
+  
   return (
     <div>
       <div className="top-bar">
@@ -162,17 +121,17 @@ function Dashboard() {
             sortedAndFilteredApplications.map((application) => (
               <div key={application.id} className={`dashboard-list-card ${application.status.toLowerCase()}`}>
                 <img
-                  src={application.logo}
-                  alt={`${application.companyName} logo`}
+                  src={application.imageUrl}
+                  alt={`${application.company} logo`}
                   className="dashboard-list-logo"
                 />
                 <div className="dashboard-list-content">
-                  <h3 className="dashboard-list-company-name">{application.companyName}</h3>
-                  <p className="dashboard-list-job-title">{application.jobTitle}</p>
+                  <h3 className="dashboard-list-company-name">{application.company}</h3>
+                  <p className="dashboard-list-job-title">{application.jobTitle || "Titre non spécifié"}</p>
                   <p className="dashboard-list-status">
                     Statut : <span className={`status-text ${application.status.toLowerCase()}`}>{application.status}</span>
                   </p>
-                  <p className="dashboard-list-date">Date de candidature : {application.applicationDate}</p>
+                  <p className="dashboard-list-date">Date de candidature : {new Date(application.createdAt).toLocaleDateString('fr-FR')}</p>
                   <button className="dashboard-list-details">Voir les détails</button>
                 </div>
                 <div className="dashboard-list-actions">
@@ -200,20 +159,20 @@ function Dashboard() {
             sortedAndFilteredApplications.map((application) => (
             <div key={application.id} className={`dashboard-grid-card ${application.status.toLowerCase()}`}>
               <div className="dashboard-grid-header">
-                <img
-                  src={application.logo}
-                  alt={`${application.companyName} logo`}
+              <img
+                  src={application.imageUrl}
+                  alt={`${application.company} logo`}
                   className="dashboard-grid-logo"
                 />
-                <div className="dashboard-grid-company-name">{application.companyName}</div>
+                <div className="dashboard-grid-company-name">{application.company}</div>
               </div>
               <div className="dashboard-grid-content">
-                <h4>{application.jobTitle}</h4>
+                <h4>{application.jobTitle || "Titre non spécifié"}</h4>
                 <hr />
                 <p className="dashboard-grid-status">
                   Statut : <span className={`status-text ${application.status.toLowerCase()}`}>{application.status}</span>
                 </p>
-                <p>Date de candidature : {application.applicationDate}</p>
+                <p>Date de candidature : {new Date(application.createdAt).toLocaleDateString('fr-FR')}</p>
               </div>
               <button className="dashboard-grid-details">Voir les détails</button>
               <div className="dashboard-grid-actions">
