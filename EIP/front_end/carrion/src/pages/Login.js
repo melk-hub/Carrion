@@ -11,6 +11,21 @@ function Login({ setIsAuthenticated }) {
   const [credentials, setCredentials] = useState({ identifier: '', password: '' });
   const [errorMessage, setErrorMessage] = useState('');
 
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const token = params.get("token");
+
+    if (token) {
+      localStorage.setItem("jwt_token", token);
+      setIsAuthenticated(true);
+      navigate("/dashboard");
+    }
+  }, [location, navigate, setIsAuthenticated]);
+
+  const handleGoogleLogin = () => {
+    window.location.href = "http://localhost:8080/auth/google/login";
+  };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setCredentials({ ...credentials, [name]: value });
@@ -52,7 +67,7 @@ function Login({ setIsAuthenticated }) {
 
   const handleRegisterRedirect = () => {
     navigate('/register');
-  }
+  };
 
   return (
     <div className="login-page">
