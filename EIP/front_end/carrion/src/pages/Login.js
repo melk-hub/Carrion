@@ -31,9 +31,16 @@ function Login({ setIsAuthenticated }) {
         credentials: 'include',
       });
 
-      const data = await response;
+      const textData = await response.text();
+      let data;
+        try {
+            data = JSON.parse(textData);
+        } catch (error) {
+            data = { accessToken: textData };
+        }
 
       if (response.ok) {
+          localStorage.setItem("token", data.accessToken);
           setIsAuthenticated(true);
           navigate('/dashboard');
       } else {
