@@ -16,6 +16,8 @@ function Dashboard() {
   const API_URL = process.env.REACT_APP_API_URL;
 
   useEffect(() => {
+    console.log("Token récupéré :", localStorage.getItem("token"));
+
     const fetchApplications = async () => {
       const token = localStorage.getItem("token");
       if (!token) {
@@ -154,24 +156,28 @@ function Dashboard() {
   useEffect(() => {
     const fetchApplications = async () => {
       try {
-        const token = localStorage.getItem("token");
         const response = await fetch(`${API_URL}/job-applies/jobApply`, {
           headers: {
             "Authorization": `Bearer ${token}`,
             "Content-Type": "application/json",
           },
         });
+  
         if (!response.ok) {
           throw new Error(`Erreur HTTP: ${response.status}`);
         }
+  
         const data = await response.json();
         setApplications(Array.isArray(data) ? data : []);
       } catch (error) {
         console.error('Erreur lors de la récupération des données:', error);
+        setApplications([]); // Réinitialiser pour éviter que le front disparaisse
       }
     };
+  
     fetchApplications();
   }, [API_URL]);
+  
 
   const handleStatusChange = (status) => {
     setSelectedStatuses((prev) => {
