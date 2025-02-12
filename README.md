@@ -28,7 +28,7 @@
 
 ## Key Features
 
-* ![CI Status](https://github.com/EpitechPromo2026/G-EIP-700-PAR-7-1-eip-sean.jaboulet.git/actions/workflows/basics.yml/badge.svg)
+* 
 
 ## How To Use
 
