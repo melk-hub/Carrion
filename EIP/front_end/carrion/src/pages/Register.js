@@ -6,14 +6,18 @@ import logo from '../assets/carrion_logo.png';
 function Register({ setIsAuthenticated }) {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
-    birthDate: "",
-    email: "",
-    username: "",
-    password: "",
-    confirmPassword: "",
+    firstName: '',
+    lastName: '',
+    birthDate: '',
+    email: '',
+    username: '',
+    password: '',
   });
+
+  const [confirmPassword, setConfirmPassword] = useState('');
+
+  const [error, setError] = useState('');
+  const API_URL = process.env.REACT_APP_API_URL;
 
   const handleRegisterChange = (e) => {
     const { name, value } = e.target;
@@ -21,30 +25,36 @@ function Register({ setIsAuthenticated }) {
   };
 
   const handleRegisterSubmit = async () => {
-    // try {
-    //   const response = await fetch('http://localhost:5000/register', {
-    //     method: 'POST',
-    //     headers: {
-    //       'Content-Type': 'application/json',
-    //     },
-    //     body: JSON.stringify(formData),
-    //   });
+    setError('');
+    if (formData.password !== confirmPassword) {
+      setError("Les mots de passe ne correspondent pas.");
+      console.error('Error password:', error);
+    } else {
+      try {
+        const response = await fetch(`${API_URL}/auth/signup`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(formData),
+        });
 
-    //   const data = await response.json();
-    //   if (response.ok) {
-    //     console.log('Registration successful:', data);
-        setIsAuthenticated(true);
-        navigate('/dashboard');
-    //   } else {
-    //     console.log('Registration failed:', data.message || 'Error registering');
-    //   }
-    // } catch (error) {
-    //   console.error('Error registering:', error);
-    // }
+        const data = await response;
+        if (response.ok) {
+          setIsAuthenticated(true);
+          navigate('/dashboard');
+        } else {
+          setError(data.message || 'Erreur lors de l\'inscription');
+        }
+      } catch (error) {
+        setError('Une erreur est survenue. Veuillez réessayer.');
+        console.error('Error registering:', error);
+      }
+    }
   };
-
+  
   const handleLoginRedirect = () => {
-    navigate("/login");
+    navigate('/login');
   };
 
   return (
@@ -117,8 +127,8 @@ function Register({ setIsAuthenticated }) {
           <input
             type="password"
             name="confirmPassword"
-            value={formData.confirmPassword}
-            onChange={handleRegisterChange}
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
             className="register-input"
           />
         </div>

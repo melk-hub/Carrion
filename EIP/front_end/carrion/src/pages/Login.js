@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
-import MicrosoftLogin from 'react-microsoft-login';
+// import MicrosoftLogin from 'react-microsoft-login';
 import outlookIcon from '../assets/outlook-logo.png';
 import "../styles/LoginPage.css";
 import logo from '../assets/carrion_logo.png';
 
 function Login({ setIsAuthenticated }) {
   const navigate = useNavigate();
+
   const location = useLocation();
   const [credentials, setCredentials] = useState({ username: '', password: '' });
   const [errorMessage, setErrorMessage] = useState('');
@@ -32,8 +33,36 @@ function Login({ setIsAuthenticated }) {
     setCredentials({ ...credentials, [name]: value });
   };
 
+  const API_URL = process.env.REACT_APP_API_URL;
+
   const handleLogin = async (e) => {
     e.preventDefault();
+
+    try {
+      const response = await fetch(`${API_URL}/auth/signin`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(credentials),
+      });
+
+      const data = await response;
+
+      if (response.ok) {
+          setIsAuthenticated(true);
+          navigate('/dashboard');
+      } else {
+        setErrorMessage(data.message || 'Identifiants incorrects.');
+      }
+    } catch (error) {
+      console.error('Error during login:', error);
+      setErrorMessage('Une erreur est survenue. Veuillez réessayer plus tard.');
+    }
+  };
+
+  const handleGoogleLoginSuccess = (response) => {
+    console.log('Google Login Success:', response);
     setIsAuthenticated(true);
     navigate('/dashboard');
   };
@@ -44,9 +73,9 @@ function Login({ setIsAuthenticated }) {
     navigate('/dashboard');
   };
 
-  const handleMicrosoftLoginFailure = (error) => {
-    console.error('Microsoft Login Failure:', error);
-  };
+  // const handleMicrosoftLoginFailure = (error) => {
+  //   console.error('Microsoft Login Failure:', error);
+  // };
 
   const handleRegisterRedirect = () => {
     navigate('/register');

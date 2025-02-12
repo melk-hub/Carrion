@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import '../styles/Dashboard.css';
 import archiveIcon from '../assets/archiver.png';
 import deleteIcon from '../assets/supprimer.png';
@@ -19,7 +19,7 @@ import deleteIcon from '../assets/supprimer.png';
 // }
 
 function Dashboard() {
-  const fakeDatabase = [
+  const fakeDatabase = useMemo (() => [
     {
       id: 1,
       logo: 'https://via.placeholder.com/100',
@@ -68,7 +68,7 @@ function Dashboard() {
       status: 'En attente de réponse',
       applicationDate: "Aujourd'hui",
     },
-  ];
+  ], []);
 
   const [searchTerm, setSearchTerm] = useState('');
   const [viewMode, setViewMode] = useState('list');
@@ -98,7 +98,7 @@ function Dashboard() {
           }
           return 0;
       });
-  }, [fakeDatabase, selectedStatuses, sortBy]);
+  }, [fakeDatabase, searchTerm, selectedStatuses, sortBy]);
 
   return (
     <div>

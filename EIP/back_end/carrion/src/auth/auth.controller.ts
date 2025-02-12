@@ -36,8 +36,14 @@ export class AuthController {
   @Public()
   @Post('signup')
   @ApiOperation({ summary: 'User signup' })
-  @ApiResponse({status: 201, description: 'Successfully created a new user'})
-  @ApiResponse({status: 400, description: 'Bad request, validation error or user already exists'})
+  @ApiResponse({
+    status: 201,
+    description: 'Successfully created a new user',
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Bad request, validation error or user already exists',
+  })
   async signUp(@Body() createUserDto: CreateUserDto) {
     return (await this.authService.signUp(createUserDto)).accessToken;
   }
@@ -89,7 +95,6 @@ export class AuthController {
       },
     },
   })
-
   async googleCallback(@Req() req, @Res() res) {
     const response = await this.authService.login(req.user.id);
     res.redirect(`http://localhost:3030?token=${response.accessToken}`);
@@ -99,7 +104,10 @@ export class AuthController {
   @UseGuards(MicrosoftAuthGuard)
   @Get('microsoft/login')
   @ApiOperation({ summary: 'Microsoft login initiation' })
-  @ApiResponse({ status: 200, description: 'Redirects to Microsoft login page'})
+  @ApiResponse({
+    status: 200,
+    description: 'Redirects to Microsoft login page',
+  })
   microsoftLogin() {}
 
   @Public()
@@ -115,7 +123,6 @@ export class AuthController {
       },
     },
   })
-
   async microsoftCallback(@Req() req, @Res() res) {
     const response = await this.authService.login(req.user.id);
     //res.redirect(`http://localhost:3030?token=${response.accessToken}`);
