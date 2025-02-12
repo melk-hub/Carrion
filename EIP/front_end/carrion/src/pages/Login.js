@@ -4,6 +4,7 @@ import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
 import MicrosoftLogin from 'react-microsoft-login';
 import outlookIcon from '../assets/outlook-logo.png';
 import "../styles/LoginPage.css";
+import logo from '../assets/carrion_logo.png';
 
 function Login({ setIsAuthenticated }) {
   const navigate = useNavigate();
@@ -54,7 +55,7 @@ function Login({ setIsAuthenticated }) {
   return (
     <GoogleOAuthProvider clientId="YOUR_GOOGLE_CLIENT_ID">
       <div className="login-page">
-      <div className="logo" onClick={navigate("/dashboard")} >LOGO</div>
+      <img src={logo} className="logo" onClick={navigate("/dashboard")} />
         <h2>Connexion</h2>
         <form onSubmit={handleLogin}>
           <div>
