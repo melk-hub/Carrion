@@ -98,3 +98,11 @@ form p {
   width: 20px;
   margin-right: 10px;
 }
+
+.logo {
+  position: absolute;
+  top: 5px;
+  left: 20px;
+  width: 100px;
+  height: 100px;
+}

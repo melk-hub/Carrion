@@ -48,6 +48,7 @@ function Register({ setIsAuthenticated }) {
 
   return (
     <div className="register-page">
+      <div className="logo">LOGO</div>
       <h2 className="register-title">S'enregistrer</h2>
       <div className="register-form">
         <div>

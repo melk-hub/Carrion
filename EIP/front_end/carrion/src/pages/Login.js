@@ -54,6 +54,7 @@ function Login({ setIsAuthenticated }) {
   return (
     <GoogleOAuthProvider clientId="YOUR_GOOGLE_CLIENT_ID">
       <div className="login-page">
+      <div className="logo">LOGO</div>
         <h2>Connexion</h2>
         <form onSubmit={handleLogin}>
           <div>
