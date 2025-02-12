@@ -37,29 +37,6 @@ function Dashboard() {
     };
     fetchApplications();
   }, [API_URL]);
-  
-
-  useEffect(() => {
-    const fetchApplications = async () => {
-      try {
-        const response = await fetch(`${API_URL}/job-applies/jobApply`, {
-          headers: {
-            "Authorization": `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        });
-        if (!response.ok) {
-          throw new Error(`Erreur HTTP: ${response.status}`);
-        }
-        const data = await response.json();
-        setApplications(Array.isArray(data) ? data : []);
-      } catch (error) {
-        console.error('Erreur lors de la récupération des données:', error);
-      }
-    };
-    fetchApplications();
-  }, [API_URL]);
-  
 
   const handleStatusChange = (status) => {
     setSelectedStatuses((prev) => {
