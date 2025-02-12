@@ -7,7 +7,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 export class UserService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async updateHashedRefreshToken(userId: number, hashedRefreshToken: string) {
+  async updateHashedRefreshToken(userId: string, hashedRefreshToken: string) {
     return await this.prisma.user.update({
       where: { id: userId },
       data: { hashedRefreshToken },
@@ -36,7 +36,7 @@ export class UserService {
     return await this.prisma.user.findMany();
   }
 
-  async findOne(id: number) {
+  async findOne(id: string) {
     return await this.prisma.user.findUnique({
       where: { id },
       select: {
@@ -47,14 +47,14 @@ export class UserService {
     });
   }
 
-  async update(id: number, updateUserDto: UpdateUserDto) {
+  async update(id: string, updateUserDto: UpdateUserDto) {
     return await this.prisma.user.update({
       where: { id },
       data: updateUserDto,
     });
   }
 
-  async remove(id: number) {
+  async remove(id: string) {
     return await this.prisma.user.delete({
       where: { id },
     });

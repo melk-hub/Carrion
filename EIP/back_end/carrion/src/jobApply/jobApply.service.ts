@@ -6,7 +6,7 @@ import { JobApplyDto } from './dto/jobApply.dto';
 export class JobApplyService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async getAllJobApplies(userId: number): Promise<JobApplyDto[]> {
+  async getAllJobApplies(userId: string): Promise<JobApplyDto[]> {
     try {
       const jobApplies = await this.prisma.jobApply.findMany({
         where: {
@@ -26,7 +26,9 @@ export class JobApplyService {
         createdAt: jobApply.createdAt,
       }));
     } catch (error) {
-      throw new Error('Erreur lors de la récupération des candidatures');
+      throw new Error(
+        `Erreur lors de la récupération des candidatures ${error}`,
+      );
     }
   }
 }

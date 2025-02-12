@@ -95,7 +95,6 @@ export class AuthController {
       },
     },
   })
-
   async googleCallback(@Req() req, @Res() res) {
     const response = await this.authService.login(req.user.id);
     res.redirect(`http://localhost:3030?token=${response.accessToken}`);
@@ -105,7 +104,10 @@ export class AuthController {
   @UseGuards(MicrosoftAuthGuard)
   @Get('microsoft/login')
   @ApiOperation({ summary: 'Microsoft login initiation' })
-  @ApiResponse({ status: 200, description: 'Redirects to Microsoft login page'})
+  @ApiResponse({
+    status: 200,
+    description: 'Redirects to Microsoft login page',
+  })
   microsoftLogin() {}
 
   @Public()
@@ -121,7 +123,6 @@ export class AuthController {
       },
     },
   })
-
   async microsoftCallback(@Req() req, @Res() res) {
     const response = await this.authService.login(req.user.id);
     //res.redirect(`http://localhost:3030?token=${response.accessToken}`);

@@ -11,24 +11,24 @@ datasource db {
 }
 
 model User {
-  id       Int       @id @default(uuid())
+  id       String    @id @default(uuid()) @db.Uuid
   username String    @unique
   firstName String
   lastName String
   email    String    @unique
   password String
-  birthDate DateTime
+  birthDate DateTime?
   createdAt DateTime @default(now())
   role Role @default(VISITOR)
   jobApplies jobApply[] @relation("UserJobApplies")
-  Settings Settings?
+  Settings Settings? @relation("UserSettings")
   hashedRefreshToken String?
-  token Token @relation(fields: [tokenId], references: [id])
-  tokenId Int @unique
+  token Token? @relation(fields: [tokenId], references: [id])
+  tokenId String? @default(uuid()) @db.Uuid @unique
 }
 
 model Token {
-  id                Int       @id @default(autoincrement())
+  id                String    @id @default(uuid()) @db.Uuid
   Token             String
   TokenTimeValidity String
   RefreshToken String
@@ -37,22 +37,22 @@ model Token {
 }
 
 model jobApply {
-  id               Int     @id @default(uuid())
+  id               String     @id @default(uuid()) @db.Uuid
   Title            String
   Company          String
   Location         String
   Salary           Int
-  User             User    @relation("UserJobApplies", fields: [UserId], references: [id], onDelete: Cascade)
-  UserId           Int    @unique
+  User             User       @relation("UserJobApplies", fields: [UserId], references: [id], onDelete: Cascade)
+  UserId           String        @unique @db.Uuid
   status           Status
   imageUrl         String
-  createdAt        DateTime  @default(now())
+  createdAt        DateTime   @default(now())
 }
 
 model Settings {
-  id Int @id @default(autoincrement())
-  user User @relation(fields: [UserId], references: [id], onDelete: Cascade)
-  UserId Int @unique
+  id String     @id @default(uuid()) @db.Uuid
+  user User     @relation("UserSettings", fields: [UserId], references: [id], onDelete: Cascade)
+  UserId String @unique @db.Uuid
 }
 
 enum Status {

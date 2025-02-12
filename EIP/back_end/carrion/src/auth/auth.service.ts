@@ -1,16 +1,19 @@
-import { ConflictException, Inject, Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  ConflictException,
+  Inject,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { compare } from 'bcrypt';
 import { UserService } from 'src/user/user.service';
 import { AuthJwtPayload } from './types/auth-jwtPayload';
 import refreshJwtConfig from './config/refresh-jwt.config';
 import { ConfigType } from '@nestjs/config';
 import * as argon2 from 'argon2';
 import { CurrentUser } from './types/current-user';
-import { CreateUserDto, LoginDto } from 'src/user/dto/create-user.dto';
+import { CreateUserDto } from 'src/user/dto/create-user.dto';
 import { Role } from './enums/role.enum';
-import * as bcrypt from 'bcrypt'
-import { console } from 'inspector';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class AuthService {
@@ -32,7 +35,7 @@ export class AuthService {
     return user;
   }
 
-  async login(userId: number) {
+  async login(userId: string) {
     const { accessToken, refreshToken } = await this.generateTokens(userId);
     const hashedRefreshToken = await argon2.hash(refreshToken);
     await this.userService.updateHashedRefreshToken(userId, hashedRefreshToken);
@@ -62,7 +65,7 @@ export class AuthService {
     return await this.login(user.id);
   }
 
-  async generateTokens(userId: number) {
+  async generateTokens(userId: string) {
     const payload: AuthJwtPayload = { sub: userId };
     const [accessToken, refreshToken] = await Promise.all([
       this.jwtService.signAsync(payload),
@@ -74,7 +77,7 @@ export class AuthService {
     };
   }
 
-  async refreshToken(userId: number) {
+  async refreshToken(userId: string) {
     const { accessToken, refreshToken } = await this.generateTokens(userId);
     const hashedRefreshToken = await argon2.hash(refreshToken);
     await this.userService.updateHashedRefreshToken(userId, hashedRefreshToken);
@@ -85,7 +88,7 @@ export class AuthService {
     };
   }
 
-  async validateRefreshToken(userId: number, refreshToken: string) {
+  async validateRefreshToken(userId: string, refreshToken: string) {
     const user = await this.userService.findOne(userId);
     if (!user || !user.token.RefreshToken)
       throw new UnauthorizedException('Invalid Refresh Token');
@@ -100,11 +103,11 @@ export class AuthService {
     return { id: userId };
   }
 
-  async signOut(userId: number) {
+  async signOut(userId: string) {
     await this.userService.updateHashedRefreshToken(userId, null);
   }
 
-  async validateJwtUser(userId: number) {
+  async validateJwtUser(userId: string) {
     const user = await this.userService.findOne(userId);
     if (!user) throw new UnauthorizedException('User not found!');
     const currentUser: CurrentUser = { id: user.id, role: user.role as Role };

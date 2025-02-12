@@ -1,16 +1,16 @@
 import {
   IsNotEmpty,
   IsString,
-  IsInt,
   MaxLength,
   IsEnum,
   IsDate,
   IsOptional,
+  IsUUID,
 } from 'class-validator';
 
 export class JobApplyDto {
-  @IsInt()
-  id: number;
+  @IsUUID()
+  id: string;
 
   @IsNotEmpty()
   @IsString()
@@ -25,15 +25,15 @@ export class JobApplyDto {
   @IsNotEmpty()
   @IsString()
   @MaxLength(40)
-  salary: string;
+  salary: number;
 
   @IsOptional()
   @IsString()
   @MaxLength(255)
   imageUrl?: string;
 
-  @IsEnum(['TRUE', 'FALSE'])
-  status: 'TRUE' | 'FALSE';
+  @IsEnum(['ON', 'OFF', 'PENDING'])
+  status: 'ON' | 'OFF' | 'PENDING';
 
   @IsNotEmpty()
   @IsDate()
