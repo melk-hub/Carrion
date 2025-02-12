@@ -57,3 +57,11 @@
   background-color: #42a5f5;
   color: white;
 }
+
+.logo {
+  position: absolute;
+  top: 5px;
+  left: 20px;
+  width: 100px;
+  height: 100px;
+}
