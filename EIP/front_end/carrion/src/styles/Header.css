@@ -15,14 +15,17 @@ z-index: 1000;
 width: 175px;
 }
 
+.navigation-buttons {
+display: flex;
+gap: 50px;
+}
+
 .navigation-buttons button {
 font-size: 1.4rem;
-margin-right: 10px;
 background-color: var(--secondary-color);
 font-weight: bold;
 border: none;
 cursor: pointer;
-margin-left: 10px;
 }
 
 .navigation-buttons button:hover {
