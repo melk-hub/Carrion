@@ -16,14 +16,14 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
       clientID: googleConfiguration.clientID,
       clientSecret: googleConfiguration.clientSecret,
       callbackURL: googleConfiguration.callbackURL,
-      scope: ['email', 'profile'],
+      scope: ['email', 'profile', 'https://www.googleapis.com/auth/gmail.readonly'],
     });
   }
 
   async validate(accessToken: string, refreshToken: string, profile: Profile) {
     const user = await this.authService.validateOAuthUser({
-      firstName: profile.name.givenName,
-      lastName: profile.name.familyName,
+      firstName: profile.name.givenName ?? null,
+      lastName: profile.name.familyName ?? null,
       username: profile.name.givenName,
       email: profile.emails[0].value,
       birthDate: '',

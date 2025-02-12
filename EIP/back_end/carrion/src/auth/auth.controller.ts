@@ -97,7 +97,7 @@ export class AuthController {
   })
   async googleCallback(@Req() req, @Res() res) {
     const response = await this.authService.login(req.user.id);
-    res.redirect(`http://localhost:3030?token=${response.accessToken}`);
+    res.redirect(`http://localhost:3030`);
   }
 
   @Public()
@@ -125,6 +125,6 @@ export class AuthController {
   })
   async microsoftCallback(@Req() req, @Res() res) {
     const response = await this.authService.login(req.user.id);
-    //res.redirect(`http://localhost:3030?token=${response.accessToken}`);
+    res.redirect(`http://localhost:3030?token=${response.accessToken}`);
   }
 }

@@ -1,6 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { Req, Res, ValidationPipe} from '@nestjs/common';
+import { ValidationPipe} from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 async function bootstrap() {
@@ -16,7 +16,7 @@ async function bootstrap() {
 
   app.enableCors({
     origin: (origin, callback) => {
-      const allowedOrigins = [`${process.env.FRONT}`, `${process.env.BACK}`];
+      const allowedOrigins = [`${process.env.FRONT}`, `${process.env.BACK}`, 'http://localhost:3030'];
       if (allowedOrigins.includes(origin) || !origin) {
         callback(null, true);
       } else {
