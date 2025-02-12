@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import '../styles/Dashboard.css';
 import archiveIcon from '../assets/archiver.png';
 import deleteIcon from '../assets/supprimer.png';
+import editIcon from '../assets/edit-button.png';
 
 function Dashboard() {
   const [applications, setApplications] = useState([]);
@@ -140,6 +141,10 @@ function Dashboard() {
                   <button className="dashboard-list-details">Voir les détails</button>
                 </div>
                 <div className="dashboard-list-actions">
+                  <button className="action-button edit-button">
+                    <img src={editIcon} alt="Modifier"/>
+                    <span className="list-tooltip">Modifier</span>
+                  </button>
                   <button className="action-button archive-button">
                     <img src={archiveIcon} alt="Archiver"/>
                     <span className="list-tooltip">Archiver</span>
@@ -181,6 +186,10 @@ function Dashboard() {
               </div>
               <button className="dashboard-grid-details">Voir les détails</button>
               <div className="dashboard-grid-actions">
+                <button className="action-button edit-button">
+                  <img src={editIcon} alt="Modifier" />
+                  <span className="grid-tooltip">Modifier</span>
+                </button>
                 <button className="action-button archive-button">
                   <img src={archiveIcon} alt="Archiver"/>
                   <span className="grid-tooltip">Archiver</span>

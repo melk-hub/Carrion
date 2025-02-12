@@ -482,7 +482,6 @@ background: linear-gradient(90deg, var(--secondary-color), #fa0202);
 position: relative;
 background: none;
 border: none;
-font-size: 20px;
 cursor: pointer;
 padding: 5px;
 transition: transform 0.3s ease;
@@ -496,4 +495,11 @@ height: 30px;
 .action-button:hover {
 transform: scale(1.2);
 }
-  
+
+.edit-button {
+transform: scale(0.9);
+}
+
+.edit-button:hover {
+transform: scale(1.1);
+}
