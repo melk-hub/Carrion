@@ -3,7 +3,7 @@ name: Sync to Public Repo
 on:
   push:
     branches:
-      - main  # ou toutes les branches: '*'
+      - '*'
 
 jobs:
   sync:
@@ -12,8 +12,14 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v3
 
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan github.com >> ~/.ssh/known_hosts
+
       - name: Push to Public Repository
         run: |
           git remote add public git@github.com:melk-hub/Carrion.git
           git push public --mirror
-
