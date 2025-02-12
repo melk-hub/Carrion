@@ -11,7 +11,7 @@ datasource db {
 }
 
 model User {
-  id       Int       @id @default(autoincrement())
+  id       Int       @id @default(uuid())
   username String    @unique
   firstName String
   lastName String
@@ -19,18 +19,12 @@ model User {
   password String
   birthDate DateTime
   createdAt DateTime @default(now())
-  role Role @default(USER)
+  role Role @default(VISITOR)
   jobApplies jobApply[] @relation("UserJobApplies")
   Settings Settings?
   hashedRefreshToken String?
-  token Token? @relation(fields: [tokenId], references: [id])
-  tokenId Int? @unique
-}
-
-enum Role {
-  ADMIN
-  USER
-  EDITOR
+  token Token @relation(fields: [tokenId], references: [id])
+  tokenId Int @unique
 }
 
 model Token {
@@ -43,12 +37,13 @@ model Token {
 }
 
 model jobApply {
-  id               Int     @id @default(autoincrement())
+  id               Int     @id @default(uuid())
+  Title            String
   Company          String
   Location         String
-  Salary           String
-  User             User?    @relation("UserJobApplies", fields: [UserId], references: [id])
-  UserId           Int?    @unique
+  Salary           Int
+  User             User    @relation("UserJobApplies", fields: [UserId], references: [id], onDelete: Cascade)
+  UserId           Int    @unique
   status           Status
   imageUrl         String
   createdAt        DateTime  @default(now())
@@ -56,11 +51,20 @@ model jobApply {
 
 model Settings {
   id Int @id @default(autoincrement())
-  user User? @relation(fields: [UserId], references: [id])
-  UserId Int? @unique
+  user User @relation(fields: [UserId], references: [id], onDelete: Cascade)
+  UserId Int @unique
 }
 
 enum Status {
-  TRUE
-  FALSE
+  ON
+  OFF
+  PENDING
+}
+
+enum Role {
+  ADMIN
+  USER
+  MANAGER
+  DEV
+  VISITOR
 }
