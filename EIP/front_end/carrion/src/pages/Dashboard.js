@@ -12,15 +12,12 @@ function Dashboard() {
   const API_URL = process.env.REACT_APP_API_URL;
 
   useEffect(() => {
-    console.log("Token récupéré :", localStorage.getItem("token"));
-
     const fetchApplications = async () => {
       const token = localStorage.getItem("token");
       if (!token) {
         console.error("Aucun token trouvé, l'utilisateur doit se reconnecter.");
         return;
       }
-  
       try {
         const response = await fetch(`${API_URL}/job-applies/jobApply`, {
           headers: {
@@ -28,19 +25,15 @@ function Dashboard() {
             "Content-Type": "application/json",
           },
         });
-  
         if (!response.ok) {
           throw new Error(`Erreur HTTP: ${response.status}`);
         }
-  
         const data = await response.json();
         setApplications(Array.isArray(data) ? data : []);
       } catch (error) {
         console.error('Erreur lors de la récupération des données:', error);
-        setApplications([]); // Réinitialiser pour éviter que le front disparaisse
       }
     };
-  
     fetchApplications();
   }, [API_URL]);
   
@@ -75,7 +68,7 @@ function Dashboard() {
     <div>
       <div className="top-bar">
         <div className="objectives">
-          <h3>Objectif de la semaine :</h3>
+          {/* <h3>Objectif de la semaine :</h3> */}
         </div>
         <div className="search-input-container">
           <span className="search-icon">🔍</span>
@@ -138,12 +131,12 @@ function Dashboard() {
                   className="dashboard-list-logo"
                 />
                 <div className="dashboard-list-content">
-                  <h3 className="dashboard-list-company-name">{application.company}</h3>
-                  <p className="dashboard-list-job-title">{application.jobTitle || "Titre non spécifié"}</p>
+                  <h3 className="dashboard-list-company-name">{application.company || "Entreprise inconnue"}</h3>
+                  <p className="dashboard-list-job-title">{application.jobTitle || "Titre inconnu"}</p>
                   <p className="dashboard-list-status">
                     Statut : <span className={`status-text ${application.status.toLowerCase()}`}>{application.status}</span>
                   </p>
-                  <p className="dashboard-list-date">Date de candidature : {new Date(application.createdAt).toLocaleDateString('fr-FR')}</p>
+                  <p className="dashboard-list-date">Date de candidature : {new Date(application.createdAt).toLocaleDateString('fr-FR') || "Date inconnue"}</p>
                   <button className="dashboard-list-details">Voir les détails</button>
                 </div>
                 <div className="dashboard-list-actions">
@@ -176,15 +169,15 @@ function Dashboard() {
                   alt={`${application.company} logo`}
                   className="dashboard-grid-logo"
                 />
-                <div className="dashboard-grid-company-name">{application.company}</div>
+                <div className="dashboard-grid-company-name">{application.company || "Entreprise inconnue"}</div>
               </div>
               <div className="dashboard-grid-content">
-                <h4>{application.jobTitle || "Titre non spécifié"}</h4>
+                <h4>{application.jobTitle || "Titre inconnu"}</h4>
                 <hr />
                 <p className="dashboard-grid-status">
                   Statut : <span className={`status-text ${application.status.toLowerCase()}`}>{application.status}</span>
                 </p>
-                <p>Date de candidature : {new Date(application.createdAt).toLocaleDateString('fr-FR')}</p>
+                <p>Date de candidature : {new Date(application.createdAt).toLocaleDateString('fr-FR') || "Date inconnue"}</p>
               </div>
               <button className="dashboard-grid-details">Voir les détails</button>
               <div className="dashboard-grid-actions">
