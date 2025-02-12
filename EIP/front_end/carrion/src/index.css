@@ -1,5 +1,5 @@
 :root {
-  --primary-color: #e3f2fd;
+  --primary-color: #7dcffc;
   --secondary-color: #ffffff;
   --text-color: #333333;
   --accent-color: #000000;
@@ -24,4 +24,8 @@ body {
 
 h1, h2, h3, h4, h5, h6 {
   font-family: 'TitlePolice', Arial, sans-serif;
+}
+
+html {
+  overflow-y: scroll;
 }
