@@ -13,25 +13,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: ⚙️ Setup Node.js
+      - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 18
-
-      - name: Install frontend dependencies
-        run: |
-          cd EIP/front_end/carrion
-          npm install
-
-      - name: Build frontend
-        run: |
-          cd EIP/front_end/carrion
-          npm run build
-
-      - name: Run frontend tests
-        run: |
-          cd EIP/front_end/carrion
-          npm test
+          node-version: 23.1.0
 
       - name: Install backend dependencies
         run: |
@@ -47,4 +32,19 @@ jobs:
       - name: Run backend tests
         run: |
           cd EIP/back_end/carrion
+          npm test
+
+      - name: Install frontend dependencies
+        run: |
+          cd EIP/front_end/carrion
+          npm install
+
+      - name: Build frontend
+        run: |
+          cd EIP/front_end/carrion
+          npm run build
+
+      - name: Run frontend tests
+        run: |
+          cd EIP/front_end/carrion
           npm test
