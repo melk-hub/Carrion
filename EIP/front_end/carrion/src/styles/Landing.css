@@ -12,7 +12,8 @@ align-items: center;
 }
 
 .logo img {
-width: 175px;
+width: 200px;
+margin-top: 5px;
 }
 
 .header-buttons button {
