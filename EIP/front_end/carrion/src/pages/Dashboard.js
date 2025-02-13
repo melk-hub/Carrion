@@ -102,208 +102,19 @@ function Dashboard() {
       if (!response.ok) {
         throw new Error(`Erreur HTTP: ${response.status}`);
       }
-    };
-    fetchApplications();
-  }, [API_URL]);
-  
+      const data = await response.json();
+      setApplications((prevApps) => [...prevApps, data]);
+      closeAddPopup();
+    } catch (error) {
+      console.error('Erreur lors de l\'ajout de la candidature:', error);
+    }
+  };  
 
-  useEffect(() => {
-    const fetchApplications = async () => {
-      try {
-        const response = await fetch(`${API_URL}/job-applies/jobApply`, {
-          headers: {
-            "Authorization": `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        });
-        if (!response.ok) {
-          throw new Error(`Erreur HTTP: ${response.status}`);
-        }
-        const data = await response.json();
-        setApplications(Array.isArray(data) ? data : []);
-      } catch (error) {
-        console.error('Erreur lors de la récupération des données:', error);
-      }
-    };
-    fetchApplications();
-  }, [API_URL]);
-  
-
-  useEffect(() => {
-    const fetchApplications = async () => {
-      try {
-        const response = await fetch(`${API_URL}/job-applies/jobApply`, {
-          headers: {
-            "Authorization": `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        });
-        if (!response.ok) {
-          throw new Error(`Erreur HTTP: ${response.status}`);
-        }
-        const data = await response.json();
-        setApplications(Array.isArray(data) ? data : []);
-      } catch (error) {
-        console.error('Erreur lors de la récupération des données:', error);
-      }
-    };
-    fetchApplications();
-  }, [API_URL]);
-  
-
-  useEffect(() => {
-    const fetchApplications = async () => {
-      try {
-        const response = await fetch(`${API_URL}/job-applies/jobApply`, {
-          headers: {
-            "Authorization": `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        });
-        if (!response.ok) {
-          throw new Error(`Erreur HTTP: ${response.status}`);
-        }
-        const data = await response.json();
-        setApplications(Array.isArray(data) ? data : []);
-      } catch (error) {
-        console.error('Erreur lors de la récupération des données:', error);
-      }
-    };
-    fetchApplications();
-  }, [API_URL]);
-  
-
-  useEffect(() => {
-    const fetchApplications = async () => {
-      try {
-        const response = await fetch(`${API_URL}/job-applies/jobApply`, {
-          headers: {
-            "Authorization": `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        });
-        if (!response.ok) {
-          throw new Error(`Erreur HTTP: ${response.status}`);
-        }
-        const data = await response.json();
-        setApplications(Array.isArray(data) ? data : []);
-      } catch (error) {
-        console.error('Erreur lors de la récupération des données:', error);
-      }
-    };
-    fetchApplications();
-  }, [API_URL]);
-  
-
-  useEffect(() => {
-    const fetchApplications = async () => {
-      try {
-        const response = await fetch(`${API_URL}/job-applies/jobApply`, {
-          headers: {
-            "Authorization": `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        });
-        if (!response.ok) {
-          throw new Error(`Erreur HTTP: ${response.status}`);
-        }
-        const data = await response.json();
-        setApplications(Array.isArray(data) ? data : []);
-      } catch (error) {
-        console.error('Erreur lors de la récupération des données:', error);
-      }
-    };
-    fetchApplications();
-  }, [API_URL]);
-  
-
-  useEffect(() => {
-    const fetchApplications = async () => {
-      try {
-        const response = await fetch(`${API_URL}/job-applies/jobApply`, {
-          headers: {
-            "Authorization": `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        });
-        if (!response.ok) {
-          throw new Error(`Erreur HTTP: ${response.status}`);
-        }
-        const data = await response.json();
-        setApplications(Array.isArray(data) ? data : []);
-      } catch (error) {
-        console.error('Erreur lors de la récupération des données:', error);
-      }
-    };
-    fetchApplications();
-  }, [API_URL]);
-  
-
-  useEffect(() => {
-    const fetchApplications = async () => {
-      try {
-        const response = await fetch(`${API_URL}/job-applies/jobApply`, {
-          headers: {
-            "Authorization": `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        });
-        if (!response.ok) {
-          throw new Error(`Erreur HTTP: ${response.status}`);
-        }
-        const data = await response.json();
-        setApplications(Array.isArray(data) ? data : []);
-      } catch (error) {
-        console.error('Erreur lors de la récupération des données:', error);
-      }
-    };
-    fetchApplications();
-  }, [API_URL]);
-  
-
-  useEffect(() => {
-    const fetchApplications = async () => {
-      try {
-        const response = await fetch(`${API_URL}/job-applies/jobApply`, {
-          headers: {
-            "Authorization": `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        });
-        if (!response.ok) {
-          throw new Error(`Erreur HTTP: ${response.status}`);
-        }
-        const data = await response.json();
-        setApplications(Array.isArray(data) ? data : []);
-      } catch (error) {
-        console.error('Erreur lors de la récupération des données:', error);
-      }
-    };
-    fetchApplications();
-  }, [API_URL]);
-  
-
-  useEffect(() => {
-    const fetchApplications = async () => {
-      try {
-        const response = await fetch(`${API_URL}/job-applies/jobApply`, {
-          headers: {
-            "Authorization": `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        });
-        if (!response.ok) {
-          throw new Error(`Erreur HTTP: ${response.status}`);
-        }
-        const data = await response.json();
-        setApplications(Array.isArray(data) ? data : []);
-      } catch (error) {
-        console.error('Erreur lors de la récupération des données:', error);
-      }
-    };
-    fetchApplications();
-  }, [API_URL]);
-  
+  const statusMap = {
+    ON: "Acceptée",
+    PENDING: "En attente de réponse",
+    OFF: "Refusée"
+  };
 
   const handleStatusChange = (status) => {
     setSelectedStatuses((prev) => {
@@ -344,6 +155,18 @@ function Dashboard() {
   const closePopup = () => {
     setSelectedApplication(null);
     setPopupType(null);
+  };
+
+  const openAddPopup = () => {
+    setNewApplication({
+      company: '',
+      jobTitle: '',
+      status: 'PENDING',
+    });
+  };
+  
+  const closeAddPopup = () => {
+    setNewApplication(null);
   };
 
   const openAddPopup = () => {
@@ -415,18 +238,6 @@ function Dashboard() {
         <div className="add-button">
           <button className="add-application" onClick={openAddPopup}>
             Ajouter une candidature
-          </button>
-          <button
-            className={`toggle-button ${viewMode === 'list' ? 'active' : ''}`}
-            onClick={() => setViewMode('list')}
-          >
-            Liste
-          </button>
-          <button
-            className={`toggle-button ${viewMode === 'list' ? 'active' : ''}`}
-            onClick={() => setViewMode('list')}
-          >
-            Liste
           </button>
         </div>
       </div>
@@ -558,15 +369,22 @@ function Dashboard() {
               <label>Entreprise :</label>
               <input
                 type="text"
-                defaultValue={selectedApplication.company}
+                value={newApplication.company}
+                onChange={(e) => setNewApplication({ ...newApplication, company: e.target.value })}
               />
+
               <label>Poste :</label>
               <input
                 type="text"
-                defaultValue={selectedApplication.jobTitle}
+                value={newApplication.jobTitle}
+                onChange={(e) => setNewApplication({ ...newApplication, jobTitle: e.target.value })}
               />
+
               <label>Statut :</label>
-              <select defaultValue={selectedApplication.status}>
+              <select
+                value={newApplication.status}
+                onChange={(e) => setNewApplication({ ...newApplication, status: e.target.value })}
+              >
                 <option value="PENDING">En attente de réponse</option>
                 <option value="ON">Acceptée</option>
                 <option value="OFF">Refusée</option>
