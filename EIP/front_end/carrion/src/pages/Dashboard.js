@@ -422,6 +422,12 @@ function Dashboard() {
           >
             Liste
           </button>
+          <button
+            className={`toggle-button ${viewMode === 'list' ? 'active' : ''}`}
+            onClick={() => setViewMode('list')}
+          >
+            Liste
+          </button>
         </div>
       </div>
 
@@ -515,129 +521,30 @@ function Dashboard() {
           )}
         </div>
       )}
-      {newApplication && (
-        <div className={`popup-overlay ${newApplication ? 'active' : ''}`}>
-          <div className="popup-container">
-            <h2 className="popup-header">Ajouter une candidature</h2>
-            <div className="popup-content">
-              <label>Entreprise :</label>
-              <input
-                type="text"
-                value={newApplication.company}
-                onChange={(e) => setNewApplication({ ...newApplication, company: e.target.value })}
-              />
-
-              <label>Poste :</label>
-              <input
-                type="text"
-                value={newApplication.jobTitle}
-                onChange={(e) => setNewApplication({ ...newApplication, jobTitle: e.target.value })}
-              />
-
-              <label>Statut :</label>
-              <select
-                value={newApplication.status}
-                onChange={(e) => setNewApplication({ ...newApplication, status: e.target.value })}
-              >
-                <option value="PENDING">En attente de réponse</option>
-                <option value="ON">Acceptée</option>
-                <option value="OFF">Refusée</option>
-              </select>
-            </div>
-            <div className="popup-buttons">
-              <button className="popup-button cancel" onClick={closeAddPopup}>
-                Annuler
-              </button>
-              <button className="popup-button confirm" onClick={handleAddApplication}>
-                Ajouter
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-      {selectedApplication && popupType === 'edit' && (
-        <div className="popup-overlay active">
+      {selectedApplication && (
+        <div className={`popup-overlay ${selectedApplication ? 'active' : ''}`}>
           <div className="popup-container">
             <h2 className="popup-header">Modifier la candidature</h2>
             <div className="popup-content">
               <label>Entreprise :</label>
-              <input
-                type="text"
-                defaultValue={selectedApplication.company}
-              />
+              <input type="text" defaultValue={selectedApplication.company} />
+
               <label>Poste :</label>
-              <input
-                type="text"
-                defaultValue={selectedApplication.jobTitle}
-              />
+              <input type="text" defaultValue={selectedApplication.jobTitle} />
+
               <label>Statut :</label>
               <select defaultValue={selectedApplication.status}>
-                <option value="PENDING">En attente de réponse</option>
-                <option value="ON">Acceptée</option>
-                <option value="OFF">Refusée</option>
+                <option value="Acceptée">Acceptée</option>
+                <option value="En attente de réponse">En attente de réponse</option>
+                <option value="Refusée">Refusée</option>
               </select>
             </div>
             <div className="popup-buttons">
-              <button className="popup-button cancel" onClick={closePopup}>Annuler</button>
-              <button className="popup-button confirm" onClick={handleUpdateApplication}>Confirmer</button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {selectedApplication && popupType === 'details' && (
-        <div className="popup-overlay active">
-          <div className="popup-container">
-            <h2 className="popup-header">Détails de la candidature</h2>
-            <div className="popup-content">
-              <p><strong>Entreprise :</strong> {selectedApplication.company || "Entreprise inconnue"}</p>
-              <p><strong>Poste :</strong> {selectedApplication.jobTitle || "Poste inconnu"}</p>
-              <p><strong>Statut :</strong> {statusMap[selectedApplication.status.toUpperCase()] || "Statut inconnu"}</p>
-              <p><strong>Date de candidature :</strong> {new Date(selectedApplication.createdAt).toLocaleDateString('fr-FR') || "Date inconnue"}</p>
-              <p><strong>Lieu :</strong> {selectedApplication.location}</p>
-              <p><strong>Salaire :</strong> {selectedApplication.salary}</p>
-            </div>
-            <div className="popup-buttons">
-              <button className="popup-button confirm" onClick={closePopup}>Fermer</button>
-            </div>
-          </div>
-        </div>
-      )}
-      {newApplication && (
-        <div className={`popup-overlay ${newApplication ? 'active' : ''}`}>
-          <div className="popup-container">
-            <h2 className="popup-header">Ajouter une candidature</h2>
-            <div className="popup-content">
-              <label>Entreprise :</label>
-              <input
-                type="text"
-                value={newApplication.company}
-                onChange={(e) => setNewApplication({ ...newApplication, company: e.target.value })}
-              />
-
-              <label>Poste :</label>
-              <input
-                type="text"
-                value={newApplication.jobTitle}
-                onChange={(e) => setNewApplication({ ...newApplication, jobTitle: e.target.value })}
-              />
-
-              <label>Statut :</label>
-              <select
-                value={newApplication.status}
-                onChange={(e) => setNewApplication({ ...newApplication, status: e.target.value })}
-              >
-                <option value="PENDING">En attente de réponse</option>
-                <option value="ON">Acceptée</option>
-                <option value="OFF">Refusée</option>
-              </select>
-            </div>
-            <div className="popup-buttons">
-              <button className="popup-button cancel" onClick={closeAddPopup}>
+              <button className="popup-button cancel" onClick={closeEditPopup}>
                 Annuler
               </button>
-              <button className="popup-button confirm" onClick={handleAddApplication}>
-                Ajouter
+              <button className="popup-button confirm">
+                Confirmer
               </button>
             </div>
           </div>
