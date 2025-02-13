@@ -116,94 +116,6 @@ function Dashboard() {
     OFF: "Refusée"
   };
 
-  useEffect(() => {
-    const fetchApplications = async () => {
-      try {
-        const response = await fetch(`${API_URL}/job-applies/jobApply`, {
-          headers: {
-            "Authorization": `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        });
-        if (!response.ok) {
-          throw new Error(`Erreur HTTP: ${response.status}`);
-        }
-        const data = await response.json();
-        setApplications(Array.isArray(data) ? data : []);
-      } catch (error) {
-        console.error('Erreur lors de la récupération des données:', error);
-      }
-    };
-    fetchApplications();
-  }, [API_URL]);
-  
-
-  useEffect(() => {
-    const fetchApplications = async () => {
-      try {
-        const response = await fetch(`${API_URL}/job-applies/jobApply`, {
-          headers: {
-            "Authorization": `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        });
-        if (!response.ok) {
-          throw new Error(`Erreur HTTP: ${response.status}`);
-        }
-        const data = await response.json();
-        setApplications(Array.isArray(data) ? data : []);
-      } catch (error) {
-        console.error('Erreur lors de la récupération des données:', error);
-      }
-    };
-    fetchApplications();
-  }, [API_URL]);
-  
-
-  useEffect(() => {
-    const fetchApplications = async () => {
-      try {
-        const response = await fetch(`${API_URL}/job-applies/jobApply`, {
-          headers: {
-            "Authorization": `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        });
-        if (!response.ok) {
-          throw new Error(`Erreur HTTP: ${response.status}`);
-        }
-        const data = await response.json();
-        setApplications(Array.isArray(data) ? data : []);
-      } catch (error) {
-        console.error('Erreur lors de la récupération des données:', error);
-      }
-    };
-    fetchApplications();
-  }, [API_URL]);
-  
-
-  useEffect(() => {
-    const fetchApplications = async () => {
-      try {
-        const response = await fetch(`${API_URL}/job-applies/jobApply`, {
-          headers: {
-            "Authorization": `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        });
-        if (!response.ok) {
-          throw new Error(`Erreur HTTP: ${response.status}`);
-        }
-        const data = await response.json();
-        setApplications(Array.isArray(data) ? data : []);
-      } catch (error) {
-        console.error('Erreur lors de la récupération des données:', error);
-      }
-    };
-    fetchApplications();
-  }, [API_URL]);
-  
-
   const handleStatusChange = (status) => {
     setSelectedStatuses((prev) => {
         const newSet = new Set(prev);
@@ -314,12 +226,6 @@ function Dashboard() {
         <div className="add-button">
           <button className="add-application" onClick={openAddPopup}>
             Ajouter une candidature
-          </button>
-          <button
-            className={`toggle-button ${viewMode === 'list' ? 'active' : ''}`}
-            onClick={() => setViewMode('list')}
-          >
-            Liste
           </button>
         </div>
       </div>
@@ -538,52 +444,6 @@ function Dashboard() {
               <button className="popup-button confirm" onClick={handleAddApplication}>
                 Ajouter
               </button>
-            </div>
-          </div>
-        </div>
-      )}
-      {selectedApplication && popupType === 'edit' && (
-        <div className="popup-overlay active">
-          <div className="popup-container">
-            <h2 className="popup-header">Modifier la candidature</h2>
-            <div className="popup-content">
-              <label>Entreprise :</label>
-              <input
-                type="text"
-                defaultValue={selectedApplication.company}
-              />
-              <label>Poste :</label>
-              <input
-                type="text"
-                defaultValue={selectedApplication.jobTitle}
-              />
-              <label>Statut :</label>
-              <select defaultValue={selectedApplication.status}>
-                <option value="PENDING">En attente de réponse</option>
-                <option value="ON">Acceptée</option>
-                <option value="OFF">Refusée</option>
-              </select>
-            </div>
-            <div className="popup-buttons">
-              <button className="popup-button cancel" onClick={closePopup}>Annuler</button>
-              <button className="popup-button confirm" onClick={handleUpdateApplication}>Confirmer</button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {selectedApplication && popupType === 'details' && (
-        <div className="popup-overlay active">
-          <div className="popup-container">
-            <h2 className="popup-header">Détails de la candidature</h2>
-            <div className="popup-content">
-              <p><strong>Entreprise :</strong> {selectedApplication.company || "Entreprise inconnue"}</p>
-              <p><strong>Poste :</strong> {selectedApplication.jobTitle || "Poste inconnu"}</p>
-              <p><strong>Statut :</strong> {statusMap[selectedApplication.status.toUpperCase()] || "Statut inconnu"}</p>
-              <p><strong>Date de candidature :</strong> {new Date(selectedApplication.createdAt).toLocaleDateString('fr-FR') || "Date inconnue"}</p>
-            </div>
-            <div className="popup-buttons">
-              <button className="popup-button confirm" onClick={closePopup}>Fermer</button>
             </div>
           </div>
         </div>
