@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/Register.css";
+import logo from '../assets/carrion_logo.png';
 
 function Register({ setIsAuthenticated }) {
   const navigate = useNavigate();
@@ -59,6 +60,7 @@ function Register({ setIsAuthenticated }) {
 
   return (
     <div className="register-page">
+      <img src={logo} className="logo" onClick={() => navigate("/dashboard")}/>
       <h2 className="register-title">S'enregistrer</h2>
       <div className="register-form">
         <div>
