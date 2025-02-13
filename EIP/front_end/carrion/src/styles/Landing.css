@@ -1,3 +1,7 @@
+body.landing-page {
+background-color: var(--secondary-color);
+}
+
 /* Header */
 .fixed-header {
 position: fixed;
