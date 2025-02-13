@@ -134,7 +134,7 @@ function Dashboard() {
     );  
     return filtered.sort((a, b) => {
       if (sortBy === 'date') {
-        return new Date(b.date) - new Date(a.date);
+        return new Date(b.createdAt) - new Date(a.createdAt);
       } else if (sortBy === 'status') {
         return statusMap[a.status].localeCompare(statusMap[b.status]);
       }
