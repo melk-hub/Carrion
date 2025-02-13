@@ -7,9 +7,10 @@ import editIcon from '../assets/edit-button.png';
 function Dashboard() {
   const [applications, setApplications] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
-  const [viewMode, setViewMode] = useState('list');
+  const [viewMode, setViewMode] = useState('grid');
   const [sortBy, setSortBy] = useState('date');
   const [selectedStatuses, setSelectedStatuses] = useState(new Set());
+  const [selectedApplication, setSelectedApplication] = useState(null);
   const API_URL = process.env.REACT_APP_API_URL;
 
   useEffect(() => {
@@ -64,6 +65,14 @@ function Dashboard() {
     });
   }, [applications, selectedStatuses, sortBy, searchTerm]);
   
+  const openEditPopup = (application) => {
+    setSelectedApplication(application);
+  };
+
+  const closeEditPopup = () => {
+    setSelectedApplication(null);
+  };
+
   return (
     <div>
       <div className="top-bar">
@@ -106,16 +115,16 @@ function Dashboard() {
 
         <div className="view-toggle">
           <button
-            className={`toggle-button ${viewMode === 'list' ? 'active' : ''}`}
-            onClick={() => setViewMode('list')}
-          >
-            Liste
-          </button>
-          <button
             className={`toggle-button ${viewMode === 'grid' ? 'active' : ''}`}
             onClick={() => setViewMode('grid')}
           >
             Grille
+          </button>
+          <button
+            className={`toggle-button ${viewMode === 'list' ? 'active' : ''}`}
+            onClick={() => setViewMode('list')}
+          >
+            Liste
           </button>
         </div>
       </div>
@@ -132,15 +141,22 @@ function Dashboard() {
                 />
                 <div className="dashboard-list-content">
                   <h3 className="dashboard-list-company-name">{application.company || "Entreprise inconnue"}</h3>
-                  <p className="dashboard-list-job-title">{application.title || "Titre inconnu"}</p>
+                  <p className="dashboard-list-job-title">{application.title || "Poste inconnu"}</p>
                   <p className="dashboard-list-status">
-                    Statut : <span className={`status-text ${application.status.toLowerCase()}`}>{application.status}</span>
+                    Statut :
+                    <span className={`status-text ${application.status.toLowerCase()}`}>
+                      {{
+                        on: " Acceptée",
+                        pending: " En attente de réponse",
+                        off: " Refusée"
+                      }[application.status.trim().toLowerCase()] || " Statut inconnu"}
+                    </span>
                   </p>                  
-                  <p className="dashboard-list-date">Date de candidature : {new Date(application.createdAt).toLocaleDateString('fr-FR') || "Date inconnue"}</p>
+                  <p className="dashboard-list-date">Date de candidature : {new Date(application.createdAt).toLocaleDateString('fr-FR') || " Date inconnue"}</p>
                   <button className="dashboard-list-details">Voir les détails</button>
                 </div>
                 <div className="dashboard-list-actions">
-                  <button className="action-button edit-button">
+                  <button className="action-button edit-button" onClick={() => openEditPopup(application)}>
                     <img src={editIcon} alt="Modifier"/>
                     <span className="list-tooltip">Modifier</span>
                   </button>
@@ -176,16 +192,23 @@ function Dashboard() {
                 <div className="dashboard-grid-company-name">{application.company || "Entreprise inconnue"}</div>
               </div>
               <div className="dashboard-grid-content">
-                <h4>{application.jobTitle || "Titre inconnu"}</h4>
+                <h4>{application.jobTitle || "Poste inconnu"}</h4>
                 <hr />
                 <p className="dashboard-grid-status">
-                  Statut : <span className={`status-text ${application.status.toLowerCase()}`}>{application.status}</span>
+                  Statut :
+                    <span className={`status-text ${application.status.toLowerCase()}`}>
+                      {{
+                        on: " Acceptée",
+                        pending: " En attente de réponse",
+                        off: " Refusée"
+                      }[application.status.trim().toLowerCase()] || " Statut inconnu"}
+                    </span>
                 </p>
                 <p>Date de candidature : {new Date(application.createdAt).toLocaleDateString('fr-FR') || "Date inconnue"}</p>
               </div>
               <button className="dashboard-grid-details">Voir les détails</button>
               <div className="dashboard-grid-actions">
-                <button className="action-button edit-button">
+                <button className="action-button edit-button" onClick={() => openEditPopup(application)}>
                   <img src={editIcon} alt="Modifier" />
                   <span className="grid-tooltip">Modifier</span>
                 </button>
@@ -204,6 +227,35 @@ function Dashboard() {
           ) : (
             <p>Aucune candidature trouvée</p>
           )}
+        </div>
+      )}
+      {selectedApplication && (
+        <div className={`popup-overlay ${selectedApplication ? 'active' : ''}`}>
+          <div className="popup-container">
+            <h2 className="popup-header">Modifier la candidature</h2>
+            <div className="popup-content">
+              <label>Entreprise :</label>
+              <input type="text" defaultValue={selectedApplication.company} />
+
+              <label>Poste :</label>
+              <input type="text" defaultValue={selectedApplication.jobTitle} />
+
+              <label>Statut :</label>
+              <select defaultValue={selectedApplication.status}>
+                <option value="Acceptée">Acceptée</option>
+                <option value="En attente de réponse">En attente de réponse</option>
+                <option value="Refusée">Refusée</option>
+              </select>
+            </div>
+            <div className="popup-buttons">
+              <button className="popup-button cancel" onClick={closeEditPopup}>
+                Annuler
+              </button>
+              <button className="popup-button confirm">
+                Confirmer
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>
