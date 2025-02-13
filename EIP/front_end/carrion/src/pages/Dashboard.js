@@ -399,6 +399,8 @@ function Dashboard() {
               <p><strong>Poste :</strong> {selectedApplication.jobTitle || "Poste inconnu"}</p>
               <p><strong>Statut :</strong> {statusMap[selectedApplication.status.toUpperCase()] || "Statut inconnu"}</p>
               <p><strong>Date de candidature :</strong> {new Date(selectedApplication.createdAt).toLocaleDateString('fr-FR') || "Date inconnue"}</p>
+              <p><strong>Lieu :</strong> {selectedApplication.location}</p>
+              <p><strong>Salaire :</strong> {selectedApplication.salary}</p>
             </div>
             <div className="popup-buttons">
               <button className="popup-button confirm" onClick={closePopup}>Fermer</button>
