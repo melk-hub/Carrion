@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import outlookIcon from '../assets/outlook-logo.png';
 import "../styles/LoginPage.css";
 import GoogleLoginButton from './GoogleLoginBtn';
+import logo from '../assets/carrion_logo.png';
 
 function Login({ setIsAuthenticated }) {
   const navigate = useNavigate();
@@ -53,46 +54,58 @@ function Login({ setIsAuthenticated }) {
   const handleRegisterRedirect = () => {
     navigate('/register');
   }
-
   return (
     <div className="login-page">
+      <img src={logo} className="logo-home" onClick={() => navigate("/")} />
+
+      <div className="login-container">
         <h2>Connexion</h2>
         <form onSubmit={handleLogin}>
-            <div>
+          <div className="form-content">
+            <div className="input-fields">
+              <div className="input-group">
                 <label>Nom d'utilisateur:</label>
                 <input
-                    type="text"
-                    name="identifier"
-                    value={credentials.identifier}
-                    onChange={handleChange}
-                    placeholder="Entrez votre nom d'utilisateur"
-                    //required
+                  type="text"
+                  name="identifier"
+                  value={credentials.identifier}
+                  onChange={handleChange}
+                  placeholder="Entrez votre nom d'utilisateur"
+                  required
                 />
-            </div>
-            <div>
+              </div>
+
+              <div className="input-group">
                 <label>Mot de passe:</label>
                 <input
-                    type="password"
-                    name="password"
-                    value={credentials.password}
-                    onChange={handleChange}
-                    placeholder="Entrez votre mot de passe"
-                    //required
+                  type="password"
+                  name="password"
+                  value={credentials.password}
+                  onChange={handleChange}
+                  placeholder="Entrez votre mot de passe"
+                  required
                 />
+              </div>
+
+              {errorMessage && <p className="error-message">{errorMessage}</p>}
             </div>
-            {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>}
-            <button type="submit">Se connecter</button>
-            <button onClick={handleRegisterRedirect}>
-              S'enregistrer
-            </button>
+
+              <div className="button-group">
+                <button type="submit" className="login-button">Se connecter</button>
+                <button onClick={handleRegisterRedirect} className="register-button">
+                  S'enregistrer
+                </button>
+              </div>
+              </div>
+                <div className="social-login" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%"}}>
+                <GoogleLoginButton />
+                <button onClick={handleLoginSuccess} className="outlook-button" style={{marginTop: "0", marginRight: "2em", marginLeft: "2em", height: "2.5em"}} >
+                  <img src={outlookIcon} alt="Outlook" />
+                  Se connecter avec Outlook
+                </button>
+              </div>
         </form>
-        <div>
-          <GoogleLoginButton></GoogleLoginButton>
-          <button onClick={handleLoginSuccess} style={{ display: 'flex', alignItems: 'center' }}>
-          <img src={outlookIcon} alt="Outlook" style={{ width: '20px', marginRight: '8px' }} />
-          Se connecter avec Outlook
-          </button>
-        </div>
+      </div>
     </div>
   );
 }

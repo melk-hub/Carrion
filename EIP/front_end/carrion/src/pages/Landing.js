@@ -52,10 +52,12 @@ function Landing() {
   return (
     <div>
       <header className="fixed-header">
-        <h1 className="logo"><img src={logo} alt="Carrion"/></h1>
-        <div className="header-buttons">
-          <button onClick={handleLoginClick} className="login-button">Se connecter</button>
-          <button onClick={handleRegisterToggle} className="register-button">S'inscrire</button>
+        <div className="logo"><img src={logo} alt="Carrion"/></div>
+        <div 
+          className="header-buttons" 
+          style={{ position: "absolute", right: "20px", top: "50%", transform: "translateY(-50%)" }} >
+            <button onClick={handleLoginClick} className="login-button">Se connecter</button>
+            <button onClick={handleRegisterToggle} className="register-button">S'inscrire</button>
         </div>
       </header>
 
@@ -84,10 +86,6 @@ function Landing() {
           <div className="service-card">
             <h3>Rappels et notifications personnalisés</h3>
             <p>Recevez des rappels automatiques pour vos candidatures en attente de réponse ou vos entretiens à venir. Restez organisé et proactif.</p>
-          </div>
-          <div className="service-card">
-            <h3>Espace documents professionels</h3>
-            <p>Centralisez et gérez tous vos documents importants, tels que CV, lettres de motivation, et portfolios. Accédez-y facilement à tout moment pour simplifier vos démarches</p>
           </div>
           <div className="service-card">
             <h3>Espace documents professionels</h3>
