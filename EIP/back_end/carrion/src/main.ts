@@ -1,7 +1,8 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { Req, Res, ValidationPipe} from '@nestjs/common';
+import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import * as cookieParser from 'cookie-parser';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -13,6 +14,8 @@ async function bootstrap() {
       transform: true,
     }),
   );
+
+  app.use(cookieParser());
 
   app.enableCors({
     origin: (origin, callback) => {
@@ -33,6 +36,7 @@ async function bootstrap() {
       'The documentation of the routes defined for the web appliaction Carrion',
     )
     .addBearerAuth()
+    .addCookieAuth()
     .setVersion('1.0')
     .build();
 

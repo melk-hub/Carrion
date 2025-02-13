@@ -1,10 +1,12 @@
+
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
+// import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
 // import MicrosoftLogin from 'react-microsoft-login';
 import outlookIcon from '../assets/outlook-logo.png';
 import "../styles/LoginPage.css";
 import logo from '../assets/carrion_logo.png';
+import GoogleLoginButton from './GoogleLoginBtn';
 
 function Login({ setIsAuthenticated }) {
   const navigate = useNavigate();
@@ -45,6 +47,7 @@ function Login({ setIsAuthenticated }) {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(credentials),
+        credentials: 'include',
       });
 
       const data = await response;
@@ -61,30 +64,18 @@ function Login({ setIsAuthenticated }) {
     }
   };
 
-  const handleGoogleLoginSuccess = (response) => {
-    console.log('Google Login Success:', response);
+  const handleLoginSuccess = () => {
     setIsAuthenticated(true);
     navigate('/dashboard');
   };
-
-  const handleMicrosoftLoginSuccess = (response) => {
-    console.log('Microsoft Login Success:', response);
-    setIsAuthenticated(true);
-    navigate('/dashboard');
-  };
-
-  // const handleMicrosoftLoginFailure = (error) => {
-  //   console.error('Microsoft Login Failure:', error);
-  // };
 
   const handleRegisterRedirect = () => {
     navigate('/register');
   };
 
   return (
-    <GoogleOAuthProvider clientId="YOUR_GOOGLE_CLIENT_ID">
       <div className="login-page">
-      <img src={logo} className="logo" onClick={navigate("/dashboard")} />
+      <img src={logo} className="logo" onClick={() => navigate("/dashboard")} />
         <h2>Connexion</h2>
         <form onSubmit={handleLogin}>
           <div>
@@ -112,17 +103,13 @@ function Login({ setIsAuthenticated }) {
           <button onClick={handleRegisterRedirect}>S'enregistrer</button>
         </form>
         <div>
-          <GoogleLogin
-            onSuccess={handleGoogleLogin}
-            style={{ display: 'flex', alignItems: 'center' }}
-          />
-          <button onClick={handleMicrosoftLoginSuccess} style={{ display: 'flex', alignItems: 'center' }}>
-            <img src={outlookIcon} alt="Outlook" style={{ width: '20px', marginRight: '8px' }} />
-            Se connecter avec Outlook
+          <GoogleLoginButton></GoogleLoginButton>
+          <button onClick={handleLoginSuccess} style={{ display: 'flex', alignItems: 'center' }}>
+          <img src={outlookIcon} alt="Outlook" style={{ width: '20px', marginRight: '8px' }} />
+          Se connecter avec Outlook
           </button>
         </div>
-      </div>
-    </GoogleOAuthProvider>
+    </div>
   );
 }
 

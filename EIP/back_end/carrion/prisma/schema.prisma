@@ -16,13 +16,13 @@ model User {
   firstName String
   lastName String
   email    String    @unique
-  password String
+  password String?
   birthDate DateTime?
   createdAt DateTime @default(now())
   role Role @default(VISITOR)
   jobApplies jobApply[] @relation("UserJobApplies")
   Settings Settings? @relation("UserSettings")
-  hashedRefreshToken String?
+  hashedRefreshToken String? @unique
   token Token? @relation(fields: [tokenId], references: [id])
   tokenId String? @default(uuid()) @db.Uuid @unique
 }
@@ -43,7 +43,7 @@ model jobApply {
   Location         String
   Salary           Int
   User             User       @relation("UserJobApplies", fields: [UserId], references: [id], onDelete: Cascade)
-  UserId           String        @unique @db.Uuid
+  UserId           String     @db.Uuid
   status           Status
   imageUrl         String
   createdAt        DateTime   @default(now())

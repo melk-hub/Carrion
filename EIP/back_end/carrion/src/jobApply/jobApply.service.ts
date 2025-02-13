@@ -26,9 +26,7 @@ export class JobApplyService {
         createdAt: jobApply.createdAt,
       }));
     } catch (error) {
-      throw new Error(
-        `Erreur lors de la récupération des candidatures ${error}`,
-      );
+      throw new Error(`Error retrieving applications ${error}`);
     }
   }
 }

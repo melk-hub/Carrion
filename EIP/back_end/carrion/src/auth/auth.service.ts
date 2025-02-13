@@ -14,6 +14,7 @@ import { CurrentUser } from './types/current-user';
 import { CreateUserDto } from 'src/user/dto/create-user.dto';
 import { Role } from './enums/role.enum';
 import * as bcrypt from 'bcrypt';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class AuthService {
@@ -22,6 +23,7 @@ export class AuthService {
     private jwtService: JwtService,
     @Inject(refreshJwtConfig.KEY)
     private refreshTokenConfig: ConfigType<typeof refreshJwtConfig>,
+    private readonly prisma: PrismaService,
   ) {}
 
   async validateUser(identifier: string, password: string, isEmail: boolean) {
@@ -101,6 +103,26 @@ export class AuthService {
       throw new UnauthorizedException('Invalid Refresh Token');
 
     return { id: userId };
+  }
+
+  async validateCookie(token: string) {
+    try {
+      const decoded = this.jwtService.verify(token);
+
+      if (!decoded || !decoded.sub) {
+        return null;
+      }
+
+      const user = await this.prisma.user.findUnique({
+        where: { id: decoded.sub },
+        select: { id: true, email: true, role: true },
+      });
+
+      return user || null;
+    } catch (error) {
+      console.error('Token validation error:', error);
+      return null;
+    }
   }
 
   async signOut(userId: string) {
