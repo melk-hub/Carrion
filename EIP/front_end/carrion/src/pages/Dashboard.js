@@ -12,6 +12,7 @@ function Dashboard() {
   const [selectedStatuses, setSelectedStatuses] = useState(new Set());
   const [selectedApplication, setSelectedApplication] = useState(null);
   const [newApplication, setNewApplication] = useState(null);
+  const [popupType, setPopupType] = useState(null);
   const API_URL = process.env.REACT_APP_API_URL;
 
   useEffect(() => {
@@ -73,7 +74,7 @@ function Dashboard() {
           app.id === data.id ? { ...app, ...data } : app
         )
       );
-      closeEditPopup();
+      closePopup();
     } catch (error) {
       console.error('Erreur lors de la mise à jour de la candidature:', error);
     }
@@ -156,10 +157,17 @@ function Dashboard() {
   
   const openEditPopup = (application) => {
     setSelectedApplication(application);
+    setPopupType('edit');
+  };
+  
+  const openDetailsPopup = (application) => {
+    setSelectedApplication(application);
+    setPopupType('details');
   };
 
-  const closeEditPopup = () => {
+  const closePopup = () => {
     setSelectedApplication(null);
+    setPopupType(null);
   };
 
   const openAddPopup = () => {
@@ -254,7 +262,7 @@ function Dashboard() {
                     </span>
                   </p>                
                   <p className="dashboard-list-date">Date de candidature : {new Date(application.createdAt).toLocaleDateString('fr-FR') || " Date inconnue"}</p>
-                  <button className="dashboard-list-details">Voir les détails</button>
+                  <button className="dashboard-list-details" onClick={() => openDetailsPopup(application)}>Voir les détails</button>
                 </div>
                 <div className="dashboard-list-actions">
                   <button className="action-button edit-button" onClick={() => openEditPopup(application)}>
@@ -302,7 +310,7 @@ function Dashboard() {
                 </p>
                 <p>Date de candidature : {new Date(application.createdAt).toLocaleDateString('fr-FR') || " Date inconnue"}</p>
               </div>
-              <button className="dashboard-grid-details">Voir les détails</button>
+              <button className="dashboard-grid-details" onClick={() => openDetailsPopup(application)}>Voir les détails</button>
               <div className="dashboard-grid-actions">
                 <button className="action-button edit-button" onClick={() => openEditPopup(application)}>
                   <img src={editIcon} alt="Modifier" />
@@ -323,35 +331,6 @@ function Dashboard() {
           ) : (
             <p>Aucune candidature trouvée</p>
           )}
-        </div>
-      )}
-      {selectedApplication && (
-        <div className={`popup-overlay ${selectedApplication ? 'active' : ''}`}>
-          <div className="popup-container">
-            <h2 className="popup-header">Modifier la candidature</h2>
-            <div className="popup-content">
-              <label>Entreprise :</label>
-              <input type="text" defaultValue={selectedApplication.company} />
-
-              <label>Poste :</label>
-              <input type="text" defaultValue={selectedApplication.jobTitle} />
-
-              <label>Statut :</label>
-              <select defaultValue={selectedApplication.status}>
-                <option value="PENDING">En attente de réponse</option>
-                <option value="ON">Acceptée</option>
-                <option value="OFF">Refusée</option>
-              </select>
-            </div>
-            <div className="popup-buttons">
-              <button className="popup-button cancel" onClick={closeEditPopup}>
-                Annuler
-              </button>
-              <button className="popup-button confirm" onClick={handleUpdateApplication}>
-                Confirmer
-              </button>
-            </div>
-          </div>
         </div>
       )}
       {newApplication && (
@@ -390,6 +369,52 @@ function Dashboard() {
               <button className="popup-button confirm" onClick={handleAddApplication}>
                 Ajouter
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {selectedApplication && popupType === 'edit' && (
+        <div className="popup-overlay active">
+          <div className="popup-container">
+            <h2 className="popup-header">Modifier la candidature</h2>
+            <div className="popup-content">
+              <label>Entreprise :</label>
+              <input
+                type="text"
+                defaultValue={selectedApplication.company}
+              />
+              <label>Poste :</label>
+              <input
+                type="text"
+                defaultValue={selectedApplication.jobTitle}
+              />
+              <label>Statut :</label>
+              <select defaultValue={selectedApplication.status}>
+                <option value="PENDING">En attente de réponse</option>
+                <option value="ON">Acceptée</option>
+                <option value="OFF">Refusée</option>
+              </select>
+            </div>
+            <div className="popup-buttons">
+              <button className="popup-button cancel" onClick={closePopup}>Annuler</button>
+              <button className="popup-button confirm" onClick={handleUpdateApplication}>Confirmer</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {selectedApplication && popupType === 'details' && (
+        <div className="popup-overlay active">
+          <div className="popup-container">
+            <h2 className="popup-header">Détails de la candidature</h2>
+            <div className="popup-content">
+              <p><strong>Entreprise :</strong> {selectedApplication.company || "Entreprise inconnue"}</p>
+              <p><strong>Poste :</strong> {selectedApplication.jobTitle || "Poste inconnu"}</p>
+              <p><strong>Statut :</strong> {statusMap[selectedApplication.status.toUpperCase()] || "Statut inconnu"}</p>
+              <p><strong>Date de candidature :</strong> {new Date(selectedApplication.createdAt).toLocaleDateString('fr-FR') || "Date inconnue"}</p>
+            </div>
+            <div className="popup-buttons">
+              <button className="popup-button confirm" onClick={closePopup}>Fermer</button>
             </div>
           </div>
         </div>
