@@ -97,10 +97,6 @@ function Landing() {
             <h3>Espace documents professionels</h3>
             <p>Centralisez et gérez tous vos documents importants, tels que CV, lettres de motivation, et portfolios. Accédez-y facilement à tout moment pour simplifier vos démarches</p>
           </div>
-          <div className="service-card">
-            <h3>Espace documents professionels</h3>
-            <p>Centralisez et gérez tous vos documents importants, tels que CV, lettres de motivation, et portfolios. Accédez-y facilement à tout moment pour simplifier vos démarches</p>
-          </div>
         </div>
       </section>
 
