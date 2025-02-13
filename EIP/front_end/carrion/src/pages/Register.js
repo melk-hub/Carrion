@@ -59,7 +59,7 @@ function Register({ setIsAuthenticated }) {
 
   return (
     <div className="register-page">
-      <img src={logo} className="logo" onClick={navigate("/dashboard")}/>
+      <img src={logo} className="logo" onClick={() => navigate("/dashboard")}/>
       <h2 className="register-title">S'enregistrer</h2>
       <div className="register-form">
         <div>
