@@ -270,6 +270,18 @@ function Dashboard() {
     setNewApplication(null);
   };
 
+  const openAddPopup = () => {
+    setNewApplication({
+      company: '',
+      jobTitle: '',
+      status: 'PENDING',
+    });
+  };
+  
+  const closeAddPopup = () => {
+    setNewApplication(null);
+  };
+
   return (
     <div>
       <div className="top-bar">
@@ -511,6 +523,46 @@ function Dashboard() {
             </div>
             <div className="popup-buttons">
               <button className="popup-button confirm" onClick={closePopup}>Fermer</button>
+            </div>
+          </div>
+        </div>
+      )}
+      {newApplication && (
+        <div className={`popup-overlay ${newApplication ? 'active' : ''}`}>
+          <div className="popup-container">
+            <h2 className="popup-header">Ajouter une candidature</h2>
+            <div className="popup-content">
+              <label>Entreprise :</label>
+              <input
+                type="text"
+                value={newApplication.company}
+                onChange={(e) => setNewApplication({ ...newApplication, company: e.target.value })}
+              />
+
+              <label>Poste :</label>
+              <input
+                type="text"
+                value={newApplication.jobTitle}
+                onChange={(e) => setNewApplication({ ...newApplication, jobTitle: e.target.value })}
+              />
+
+              <label>Statut :</label>
+              <select
+                value={newApplication.status}
+                onChange={(e) => setNewApplication({ ...newApplication, status: e.target.value })}
+              >
+                <option value="PENDING">En attente de réponse</option>
+                <option value="ON">Acceptée</option>
+                <option value="OFF">Refusée</option>
+              </select>
+            </div>
+            <div className="popup-buttons">
+              <button className="popup-button cancel" onClick={closeAddPopup}>
+                Annuler
+              </button>
+              <button className="popup-button confirm" onClick={handleAddApplication}>
+                Ajouter
+              </button>
             </div>
           </div>
         </div>
