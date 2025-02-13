@@ -345,16 +345,16 @@ function Dashboard() {
 
               <label>Statut :</label>
               <select defaultValue={selectedApplication.status}>
-                <option value="Acceptée">Acceptée</option>
-                <option value="En attente de réponse">En attente de réponse</option>
-                <option value="Refusée">Refusée</option>
+                <option value="PENDING">En attente de réponse</option>
+                <option value="ON">Acceptée</option>
+                <option value="OFF">Refusée</option>
               </select>
             </div>
             <div className="popup-buttons">
               <button className="popup-button cancel" onClick={closeEditPopup}>
                 Annuler
               </button>
-              <button className="popup-button confirm">
+              <button className="popup-button confirm" onClick={handleUpdateApplication}>
                 Confirmer
               </button>
             </div>
