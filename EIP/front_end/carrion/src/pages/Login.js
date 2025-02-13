@@ -70,9 +70,9 @@ function Login({ setIsAuthenticated }) {
   //   console.error('Microsoft Login Failure:', error);
   // };
 
-  const handleRegisterRedirect = (response) => {
-    navigate('/register');
-  }
+  // const handleRegisterRedirect = (response) => {
+  //   navigate('/register');
+  // }
 
   return (
     <GoogleOAuthProvider clientId="YOUR_GOOGLE_CLIENT_ID">
@@ -103,9 +103,9 @@ function Login({ setIsAuthenticated }) {
                 </div>
                 {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>}
                 <button type="submit">Se connecter</button>
-                <button onClick={handleRegisterRedirect}>
+                {/* <button onClick={handleRegisterRedirect}>
                   S'enregistrer
-                </button>
+                </button> */}
             </form>
             <div>
                 <GoogleLogin

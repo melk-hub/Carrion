@@ -132,10 +132,10 @@ function Dashboard() {
                 />
                 <div className="dashboard-list-content">
                   <h3 className="dashboard-list-company-name">{application.company || "Entreprise inconnue"}</h3>
-                  <p className="dashboard-list-job-title">{application.jobTitle || "Titre inconnu"}</p>
+                  <p className="dashboard-list-job-title">{application.title || "Titre inconnu"}</p>
                   <p className="dashboard-list-status">
                     Statut : <span className={`status-text ${application.status.toLowerCase()}`}>{application.status}</span>
-                  </p>
+                  </p>                  
                   <p className="dashboard-list-date">Date de candidature : {new Date(application.createdAt).toLocaleDateString('fr-FR') || "Date inconnue"}</p>
                   <button className="dashboard-list-details">Voir les détails</button>
                 </div>
