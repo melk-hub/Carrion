@@ -60,10 +60,12 @@ function Landing() {
   return (
     <div>
       <header className="fixed-header">
-        <h1 className="logo"><img src={logo} alt="Carrion"/></h1>
-        <div className="header-buttons">
-          <button onClick={handleLoginClick} className="login-button">Se connecter</button>
-          <button onClick={handleRegisterToggle} className="register-button">S'inscrire</button>
+        <div className="logo"><img src={logo} alt="Carrion"/></div>
+        <div 
+          className="header-buttons" 
+          style={{ position: "absolute", right: "20px", top: "50%", transform: "translateY(-50%)" }} >
+            <button onClick={handleLoginClick} className="login-button">Se connecter</button>
+            <button onClick={handleRegisterToggle} className="register-button">S'inscrire</button>
         </div>
       </header>
 
