@@ -40,22 +40,66 @@ function Dashboard() {
     fetchApplications();
   }, [API_URL]);
 
-  useEffect(() => {
-    const fetchApplications = async () => {
-      try {
-        const response = await fetch(`${API_URL}/job-applies/jobApply`, {
-          headers: {
-            "Authorization": `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        });
-        if (!response.ok) {
-          throw new Error(`Erreur HTTP: ${response.status}`);
-        }
-        const data = await response.json();
-        setApplications(Array.isArray(data) ? data : []);
-      } catch (error) {
-        console.error('Erreur lors de la récupération des données:', error);
+  const handleUpdateApplication = async () => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      console.error("Aucun token trouvé, l'utilisateur doit se reconnecter.");
+      return;
+    }
+  
+    const updatedApplication = {
+      company: selectedApplication.company,
+      jobTitle: selectedApplication.jobTitle,
+      status: selectedApplication.status,
+    };
+  
+    try {
+      const response = await fetch(`${API_URL}/job-applies/jobApply/${selectedApplication.id}`, {
+        method: 'PUT',
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(updatedApplication),
+      });
+  
+      if (!response.ok) {
+        throw new Error(`Erreur HTTP: ${response.status}`);
+      }
+  
+      const data = await response.json();
+      setApplications((prevApps) =>
+        prevApps.map((app) =>
+          app.id === data.id ? { ...app, ...data } : app
+        )
+      );
+      closeEditPopup();
+    } catch (error) {
+      console.error('Erreur lors de la mise à jour de la candidature:', error);
+    }
+  };
+
+  const handleAddApplication = async () => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      console.error("Aucun token trouvé, l'utilisateur doit se reconnecter.");
+      return;
+    }
+    try {
+      const response = await fetch(`${API_URL}/job-applies/jobApply`, {
+        method: 'POST',
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          company: newApplication.company,
+          title: newApplication.title,
+          status: newApplication.status,
+        }),
+      });
+      if (!response.ok) {
+        throw new Error(`Erreur HTTP: ${response.status}`);
       }
     };
     fetchApplications();
@@ -294,16 +338,16 @@ function Dashboard() {
 
               <label>Statut :</label>
               <select defaultValue={selectedApplication.status}>
-                <option value="Acceptée">Acceptée</option>
-                <option value="En attente de réponse">En attente de réponse</option>
-                <option value="Refusée">Refusée</option>
+                <option value="PENDING">En attente de réponse</option>
+                <option value="ON">Acceptée</option>
+                <option value="OFF">Refusée</option>
               </select>
             </div>
             <div className="popup-buttons">
               <button className="popup-button cancel" onClick={closeEditPopup}>
                 Annuler
               </button>
-              <button className="popup-button confirm">
+              <button className="popup-button confirm" onClick={handleUpdateApplication}>
                 Confirmer
               </button>
             </div>
