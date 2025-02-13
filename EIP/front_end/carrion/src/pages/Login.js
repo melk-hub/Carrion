@@ -1,34 +1,15 @@
-
-import React, { useEffect, useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 // import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
 // import MicrosoftLogin from 'react-microsoft-login';
 import outlookIcon from '../assets/outlook-logo.png';
 import "../styles/LoginPage.css";
-import logo from '../assets/carrion_logo.png';
 import GoogleLoginButton from './GoogleLoginBtn';
 
 function Login({ setIsAuthenticated }) {
   const navigate = useNavigate();
-
-  const location = useLocation();
-  const [credentials, setCredentials] = useState({ username: '', password: '' });
+  const [credentials, setCredentials] = useState({ identifier: '', password: '' });
   const [errorMessage, setErrorMessage] = useState('');
-
-  useEffect(() => {
-    const params = new URLSearchParams(location.search);
-    const token = params.get("token");
-
-    if (token) {
-      localStorage.setItem("jwt_token", token);
-      setIsAuthenticated(true);
-      navigate("/dashboard");
-    }
-  }, [location, navigate, setIsAuthenticated]);
-
-  const handleGoogleLogin = () => {
-    window.location.href = "http://localhost:8080/auth/google/login";
-  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -71,36 +52,39 @@ function Login({ setIsAuthenticated }) {
 
   const handleRegisterRedirect = () => {
     navigate('/register');
-  };
+  }
 
   return (
-      <div className="login-page">
-      <img src={logo} className="logo" onClick={() => navigate("/dashboard")} />
+    <div className="login-page">
         <h2>Connexion</h2>
         <form onSubmit={handleLogin}>
-          <div>
-            <label>Nom d'utilisateur:</label>
-            <input
-              type="text"
-              name="username"
-              value={credentials.username}
-              onChange={handleChange}
-              placeholder="Entrez votre nom d'utilisateur"
-            />
-          </div>
-          <div>
-            <label>Mot de passe:</label>
-            <input
-              type="password"
-              name="password"
-              value={credentials.password}
-              onChange={handleChange}
-              placeholder="Entrez votre mot de passe"
-            />
-          </div>
-          {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>}
-          <button type="submit">Se connecter</button>
-          <button onClick={handleRegisterRedirect}>S'enregistrer</button>
+            <div>
+                <label>Nom d'utilisateur:</label>
+                <input
+                    type="text"
+                    name="identifier"
+                    value={credentials.identifier}
+                    onChange={handleChange}
+                    placeholder="Entrez votre nom d'utilisateur"
+                    //required
+                />
+            </div>
+            <div>
+                <label>Mot de passe:</label>
+                <input
+                    type="password"
+                    name="password"
+                    value={credentials.password}
+                    onChange={handleChange}
+                    placeholder="Entrez votre mot de passe"
+                    //required
+                />
+            </div>
+            {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>}
+            <button type="submit">Se connecter</button>
+            <button onClick={handleRegisterRedirect}>
+              S'enregistrer
+            </button>
         </form>
         <div>
           <GoogleLoginButton></GoogleLoginButton>
