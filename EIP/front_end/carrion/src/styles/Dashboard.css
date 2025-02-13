@@ -240,15 +240,15 @@ margin: 5px 0;
 font-size: 14px;
 }
 
-.status-text.acceptée {
+.status-text.on {
 color: #0de406;
 }
 
-.status-text.attente {
+.status-text.pending {
 color: #fc8f02;
 }
 
-.status-text.refusée {
+.status-text.off {
 color: #fa0202;
 }
 
@@ -304,28 +304,15 @@ visibility: visible;
 opacity: 1;
 }
 
-/* .dashboard-list-status-banner {
-height: 100%;
-width: 33%;
-position: absolute;
-top: 0;
-right: 0;
-border-radius: 0 8px 8px 0;
-z-index: 0;
-} */
-
-.dashboard-list-card.acceptée {
-/* background: linear-gradient(90deg, var(--secondary-color), #0de406); */
+.dashboard-list-card.on {
 border: 1px solid #0de406;
 }
 
-.dashboard-list-card.attente {
-/* background: linear-gradient(90deg, var(--secondary-color), #fc8f02); */
+.dashboard-list-card.pending {
 border: 1px solid #fc8f02;
 }
 
-.dashboard-list-card.refusée {
-/* background: linear-gradient(90deg, var(--secondary-color), #fa0202); */
+.dashboard-list-card.off {
 border: 1px solid #fa0202;
 }
 
@@ -353,18 +340,15 @@ overflow: visible;
 z-index: 10;
 }
 
-.dashboard-grid-card.acceptée {
-/* background: linear-gradient(90deg, var(--secondary-color), #0de406); */
+.dashboard-grid-card.on {
 border: 1px solid #0de406;
 }
 
-.dashboard-grid-card.attente {
-/* background: linear-gradient(90deg, var(--secondary-color), #fc8f02); */
+.dashboard-grid-card.pending {
 border: 1px solid #fc8f02;
 }
 
-.dashboard-grid-card.refusée {
-/* background: linear-gradient(90deg, var(--secondary-color), #fa0202); */
+.dashboard-grid-card.off {
 border: 1px solid #fa0202;
 }
 
@@ -433,6 +417,7 @@ background-color: var(--primary-color);
 display: flex;
 justify-content: space-around;
 margin-top: 20px;
+margin-bottom: 15px;
 }
 
 .grid-tooltip {
@@ -456,25 +441,15 @@ visibility: visible;
 opacity: 1;
 }
 
-/* .dashboard-grid-status-banner {
-height: 100%;
-width: 40px;
-position: absolute;
-bottom: 0;
-right: 0;
-z-index: 0;
-border-radius: 0 8px 8px 0;
-} */
-
-.dashboard-grid-status-banner.acceptée {
+.dashboard-grid-status-banner.on {
 background: linear-gradient(90deg, var(--secondary-color), #0de406);
 }
 
-.dashboard-grid-status-banner.attente {
+.dashboard-grid-status-banner.pending {
 background: linear-gradient(90deg, var(--secondary-color), #fc8f02);
 }
 
-.dashboard-grid-status-banner.refusée {
+.dashboard-grid-status-banner.off {
 background: linear-gradient(90deg, var(--secondary-color), #fa0202);
 }
 
@@ -497,7 +472,7 @@ transform: scale(1.2);
 }
 
 .edit-button {
-transform: scale(0.9);
+transform: scale(0.85);
 }
 
 .edit-button:hover {

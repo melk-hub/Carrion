@@ -14,6 +14,14 @@ function Landing() {
   const handleRegisterToggle = () => {
     navigate('/register');
   };
+  
+  useEffect(() => {
+    document.body.classList.add('landing-page');
+  
+    return () => {
+      document.body.classList.remove('landing-page');
+    };
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => {
