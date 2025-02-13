@@ -328,6 +328,12 @@ function Dashboard() {
           <button className="add-application" onClick={openAddPopup}>
             Ajouter une candidature
           </button>
+          <button
+            className={`toggle-button ${viewMode === 'list' ? 'active' : ''}`}
+            onClick={() => setViewMode('list')}
+          >
+            Liste
+          </button>
         </div>
       </div>
 
