@@ -31,16 +31,9 @@ function Login({ setIsAuthenticated }) {
         credentials: 'include',
       });
 
-      const textData = await response.text();
-      let data;
-        try {
-            data = JSON.parse(textData);
-        } catch (error) {
-            data = { accessToken: textData };
-        }
+      const data = await response;
 
       if (response.ok) {
-          localStorage.setItem("token", data.accessToken);
           setIsAuthenticated(true);
           navigate('/dashboard');
       } else {
@@ -57,57 +50,14 @@ function Login({ setIsAuthenticated }) {
     navigate('/dashboard');
   };
 
-  const handleGoogleLoginFailure = (error) => {
-    console.error('Google Login Failure:', error);
-  };
-
-  const handleMicrosoftLoginSuccess = (response) => {
-    console.log('Microsoft Login Success:', response);
-    setIsAuthenticated(true);
-    navigate('/dashboard');
-  };
-
-  // const handleMicrosoftLoginFailure = (error) => {
-  //   console.error('Microsoft Login Failure:', error);
-  // };
-
-  // const handleRegisterRedirect = (response) => {
-  //   navigate('/register');
-  // }
+  const handleRegisterRedirect = () => {
+    navigate('/register');
+  }
 
   return (
-    <GoogleOAuthProvider clientId="YOUR_GOOGLE_CLIENT_ID">
-        <div className="login-page">
-            <h2>Connexion</h2>
-            <form onSubmit={handleLogin}>
-                <div>
-                    <label>Nom d'utilisateur:</label>
-                    <input
-                        type="text"
-                        name="identifier"
-                        value={credentials.identifier}
-                        onChange={handleChange}
-                        placeholder="Entrez votre nom d'utilisateur"
-                        //required
-                    />
-                </div>
-                <div>
-                    <label>Mot de passe:</label>
-                    <input
-                        type="password"
-                        name="password"
-                        value={credentials.password}
-                        onChange={handleChange}
-                        placeholder="Entrez votre mot de passe"
-                        //required
-                    />
-                </div>
-                {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>}
-                <button type="submit">Se connecter</button>
-                {/* <button onClick={handleRegisterRedirect}>
-                  S'enregistrer
-                </button> */}
-            </form>
+    <div className="login-page">
+        <h2>Connexion</h2>
+        <form onSubmit={handleLogin}>
             <div>
                 <label>Nom d'utilisateur:</label>
                 <input
