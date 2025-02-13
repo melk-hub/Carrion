@@ -19,16 +19,19 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
       scope: ['email', 'profile'],
     });
   }
-
   async validate(accessToken: string, refreshToken: string, profile: Profile) {
-    const user = await this.authService.validateOAuthUser({
-      firstName: profile.name.givenName,
-      lastName: profile.name.familyName,
-      username: profile.name.givenName,
-      email: profile.emails[0].value,
-      birthDate: '',
-      password: '',
-    });
-    return user;
+    try {
+      const user = await this.authService.validateOAuthUser({
+        firstName: profile.name.givenName,
+        lastName: profile.name.familyName,
+        username: profile.name.givenName,
+        email: profile.emails[0].value,
+        birthDate: '',
+        password: '',
+      });
+      return user;
+    } catch {
+      return;
+    }
   }
 }

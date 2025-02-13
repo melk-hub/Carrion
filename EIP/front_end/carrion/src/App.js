@@ -6,11 +6,30 @@ import Dashboard from './pages/Dashboard';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Archives from './pages/Archives';
+import axios from 'axios';
 
 function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState(() => {
-    return localStorage.getItem('isAuthenticated') === 'true';
-  });
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const API_URL = process.env.REACT_APP_API_URL;
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const response = await axios.get(`${API_URL}/auth/check`, { withCredentials: true });
+
+        if (response.status === 200) {
+          setIsAuthenticated(true);
+        } else {
+          setIsAuthenticated(false);
+        }
+      } catch (error) {
+        console.error('Error while verifying authentication:', error);
+        setIsAuthenticated(false);
+      }
+    };
+
+    checkAuth();
+  }, []);
 
   return (
     <Router>
@@ -28,6 +47,12 @@ function AppLayout({ isAuthenticated, setIsAuthenticated }) {
   }, [location]);
 
   useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/dashboard');
+    }
+  }, [isAuthenticated, navigate]);
+
+  useEffect(() => {
     const lastPath = localStorage.getItem('lastPath');
     if (lastPath && location.pathname === '/') {
       navigate(lastPath);
@@ -36,11 +61,11 @@ function AppLayout({ isAuthenticated, setIsAuthenticated }) {
 
   return (
     <div>
-      {location.pathname !== '/' && location.pathname !== '/login' && location.pathname !== '/register' && <Header />}
+      {location.pathname !== '/' && location.pathname !== '/login' && location.pathname !== '/register' && <Header setIsAuthenticated={setIsAuthenticated} />}
 
       <Routes>
-        <Route path="/" element={<Landing setIsAuthenticated={setIsAuthenticated} />} />        
-        <Route path="/login" element={<Login setIsAuthenticated={setIsAuthenticated} />} />        
+        <Route path="/" element={<Landing setIsAuthenticated={setIsAuthenticated} />} />
+        <Route path="/login" element={<Login setIsAuthenticated={setIsAuthenticated} />} />
         <Route path="/register" element={<Register setIsAuthenticated={setIsAuthenticated} />} />
         <Route
           path="/dashboard"
@@ -48,8 +73,7 @@ function AppLayout({ isAuthenticated, setIsAuthenticated }) {
             isAuthenticated ? (
               <Dashboard />
             ) : (
-              // <Navigate to="/login" replace />
-              <Navigate to="/dashboard" replace />
+              <Navigate to="/login" replace />
             )
           }
         />
@@ -59,8 +83,7 @@ function AppLayout({ isAuthenticated, setIsAuthenticated }) {
             isAuthenticated ? (
               <Archives />
             ) : (
-              // <Navigate to="/login" replace />
-              <Navigate to="/archives" replace />
+              <Navigate to="/login" replace />
             )
           }
         />

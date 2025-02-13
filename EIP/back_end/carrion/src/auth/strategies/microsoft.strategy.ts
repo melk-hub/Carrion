@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ConfigType } from '@nestjs/config';
-import { Strategy, VerifyCallback, Profile } from 'passport-microsoft'
+import { Strategy, Profile } from 'passport-microsoft';
 import microsoftOauthConfig from '../config/microsoft-oauth.config';
 import { AuthService } from '../auth.service';
 
@@ -10,7 +10,7 @@ export class MicrosoftStrategy extends PassportStrategy(Strategy, 'microsoft') {
   constructor(
     @Inject(microsoftOauthConfig.KEY)
     private microsoftConfig: ConfigType<typeof microsoftOauthConfig>,
-    private authService: AuthService
+    private authService: AuthService,
   ) {
     super({
       clientID: microsoftConfig.clientID,
@@ -20,7 +20,7 @@ export class MicrosoftStrategy extends PassportStrategy(Strategy, 'microsoft') {
     });
   }
 
-  async validate( accessToken: string, refreshToken: string, profile: Profile, done: VerifyCallback) {
+  async validate(accessToken: string, refreshToken: string, profile: Profile) {
     const user = await this.authService.validateOAuthUser({
       firstName: profile.name.givenName,
       lastName: profile.name.familyName,

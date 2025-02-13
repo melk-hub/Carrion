@@ -9,9 +9,14 @@ import { ConfigModule } from '@nestjs/config';
 @Module({
   imports: [UserModule, JwtModule, ConfigModule, PrismaModule],
   controllers: [UserController],
-  providers: [UserService, AuthService, JwtService, {
-    provide: 'CONFIGURATION(refresh-jwt)',
-    useValue: process.env.REFRESH_JWT_SECRET,
-  }],
+  providers: [
+    UserService,
+    AuthService,
+    JwtService,
+    {
+      provide: 'CONFIGURATION(refresh-jwt)',
+      useValue: process.env.REFRESH_JWT_SECRET,
+    },
+  ],
 })
 export class UserModule {}

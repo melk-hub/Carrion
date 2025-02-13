@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
+// import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
 // import MicrosoftLogin from 'react-microsoft-login';
 import outlookIcon from '../assets/outlook-logo.png';
 import "../styles/LoginPage.css";
+import GoogleLoginButton from './GoogleLoginBtn';
 
 function Login({ setIsAuthenticated }) {
   const navigate = useNavigate();
@@ -27,6 +28,7 @@ function Login({ setIsAuthenticated }) {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(credentials),
+        credentials: 'include',
       });
 
       const data = await response;
@@ -43,75 +45,55 @@ function Login({ setIsAuthenticated }) {
     }
   };
 
-  const handleGoogleLoginSuccess = (response) => {
-    console.log('Google Login Success:', response);
+  const handleLoginSuccess = () => {
     setIsAuthenticated(true);
     navigate('/dashboard');
   };
 
-  const handleGoogleLoginFailure = (error) => {
-    console.error('Google Login Failure:', error);
-  };
-
-  const handleMicrosoftLoginSuccess = (response) => {
-    console.log('Microsoft Login Success:', response);
-    setIsAuthenticated(true);
-    navigate('/dashboard');
-  };
-
-  // const handleMicrosoftLoginFailure = (error) => {
-  //   console.error('Microsoft Login Failure:', error);
-  // };
-
-  const handleRegisterRedirect = (response) => {
+  const handleRegisterRedirect = () => {
     navigate('/register');
   }
 
   return (
-    <GoogleOAuthProvider clientId="YOUR_GOOGLE_CLIENT_ID">
-        <div className="login-page">
-            <h2>Connexion</h2>
-            <form onSubmit={handleLogin}>
-                <div>
-                    <label>Nom d'utilisateur:</label>
-                    <input
-                        type="text"
-                        name="identifier"
-                        value={credentials.identifier}
-                        onChange={handleChange}
-                        placeholder="Entrez votre nom d'utilisateur"
-                        //required
-                    />
-                </div>
-                <div>
-                    <label>Mot de passe:</label>
-                    <input
-                        type="password"
-                        name="password"
-                        value={credentials.password}
-                        onChange={handleChange}
-                        placeholder="Entrez votre mot de passe"
-                        //required
-                    />
-                </div>
-                {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>}
-                <button type="submit">Se connecter</button>
-                <button onClick={handleRegisterRedirect}>
-                  S'enregistrer
-                </button>
-            </form>
+    <div className="login-page">
+        <h2>Connexion</h2>
+        <form onSubmit={handleLogin}>
             <div>
-                <GoogleLogin
-                    onSuccess={handleGoogleLoginSuccess}
-                    onFailure={handleGoogleLoginFailure}
+                <label>Nom d'utilisateur:</label>
+                <input
+                    type="text"
+                    name="identifier"
+                    value={credentials.identifier}
+                    onChange={handleChange}
+                    placeholder="Entrez votre nom d'utilisateur"
+                    //required
                 />
-                <button onClick={handleMicrosoftLoginSuccess} style={{ display: 'flex', alignItems: 'center' }}>
-                <img src={outlookIcon} alt="Outlook" style={{ width: '20px', marginRight: '8px' }} />
-                Se connecter avec Outlook
-                </button>
             </div>
+            <div>
+                <label>Mot de passe:</label>
+                <input
+                    type="password"
+                    name="password"
+                    value={credentials.password}
+                    onChange={handleChange}
+                    placeholder="Entrez votre mot de passe"
+                    //required
+                />
+            </div>
+            {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>}
+            <button type="submit">Se connecter</button>
+            <button onClick={handleRegisterRedirect}>
+              S'enregistrer
+            </button>
+        </form>
+        <div>
+          <GoogleLoginButton></GoogleLoginButton>
+          <button onClick={handleLoginSuccess} style={{ display: 'flex', alignItems: 'center' }}>
+          <img src={outlookIcon} alt="Outlook" style={{ width: '20px', marginRight: '8px' }} />
+          Se connecter avec Outlook
+          </button>
         </div>
-    </GoogleOAuthProvider>
+    </div>
   );
 }
 

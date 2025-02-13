@@ -25,7 +25,7 @@ import microsoftOauthConfig from './config/microsoft-oauth.config';
     ConfigModule.forFeature(jwtConfig),
     ConfigModule.forFeature(refreshJwtConfig),
     ConfigModule.forFeature(googleOauthConfig),
-    ConfigModule.forFeature(microsoftOauthConfig)
+    ConfigModule.forFeature(microsoftOauthConfig),
   ],
   controllers: [AuthController],
   providers: [
