@@ -11,6 +11,7 @@ function Dashboard() {
   const [sortBy, setSortBy] = useState('date');
   const [selectedStatuses, setSelectedStatuses] = useState(new Set());
   const [selectedApplication, setSelectedApplication] = useState(null);
+  const [newApplication, setNewApplication] = useState(null);
   const API_URL = process.env.REACT_APP_API_URL;
 
   useEffect(() => {
@@ -39,6 +40,42 @@ function Dashboard() {
     fetchApplications();
   }, [API_URL]);
 
+  const handleAddApplication = async () => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      console.error("Aucun token trouvé, l'utilisateur doit se reconnecter.");
+      return;
+    }
+    try {
+      const response = await fetch(`${API_URL}/job-applies/jobApply`, {
+        method: 'POST',
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          company: newApplication.company,
+          title: newApplication.title,
+          status: newApplication.status,
+        }),
+      });
+      if (!response.ok) {
+        throw new Error(`Erreur HTTP: ${response.status}`);
+      }
+      const data = await response.json();
+      setApplications((prevApps) => [...prevApps, data]);
+      closeAddPopup();
+    } catch (error) {
+      console.error('Erreur lors de l\'ajout de la candidature:', error);
+    }
+  };  
+
+  const statusMap = {
+    ON: "Acceptée",
+    PENDING: "En attente de réponse",
+    OFF: "Refusée"
+  };
+
   const handleStatusChange = (status) => {
     setSelectedStatuses((prev) => {
         const newSet = new Set(prev);
@@ -49,17 +86,17 @@ function Dashboard() {
 
   const sortedAndFilteredApplications = useMemo(() => {
     const filtered = applications.filter(app => 
-      (selectedStatuses.size === 0 || selectedStatuses.has(app.status)) &&
+      (selectedStatuses.size === 0 || selectedStatuses.has(statusMap[app.status])) &&
       (
         (app.company?.toLowerCase().includes(searchTerm.toLowerCase()) || '') || 
-        (app.jobTitle?.toLowerCase().includes(searchTerm.toLowerCase()) || '')
+        (app.title?.toLowerCase().includes(searchTerm.toLowerCase()) || '')
       )
     );  
     return filtered.sort((a, b) => {
       if (sortBy === 'date') {
         return new Date(b.date) - new Date(a.date);
       } else if (sortBy === 'status') {
-        return a.status.localeCompare(b.status);
+        return statusMap[a.status].localeCompare(statusMap[b.status]);
       }
       return 0;
     });
@@ -71,6 +108,18 @@ function Dashboard() {
 
   const closeEditPopup = () => {
     setSelectedApplication(null);
+  };
+
+  const openAddPopup = () => {
+    setNewApplication({
+      company: '',
+      jobTitle: '',
+      status: 'PENDING',
+    });
+  };
+  
+  const closeAddPopup = () => {
+    setNewApplication(null);
   };
 
   return (
@@ -93,24 +142,24 @@ function Dashboard() {
 
       <div className="dashboard-filter-buttons">
         <div className="filter-checkbox-group">
-          {['Acceptée', 'En attente de réponse', 'Refusée'].map(status => (
-              <label key={status} className="filter-checkbox">
-                  <input
-                      type="checkbox"
-                      checked={selectedStatuses.has(status)}
-                      onChange={() => handleStatusChange(status)}
-                  />
-                  <span className="custom-checkbox"></span>
-                  {status}
-              </label>
+          {Object.values(statusMap).map(status => (
+            <label key={status} className="filter-checkbox">
+              <input
+                type="checkbox"
+                checked={selectedStatuses.has(status)}
+                onChange={() => handleStatusChange(status)}
+              />
+              <span className="custom-checkbox"></span>
+              {status}
+            </label>
           ))}
         </div>
         <div className="sort-options">
-            <label htmlFor="sort-select">Trier par : </label>
-            <select id="sort-select" value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
-                <option value="date">Date</option>
-                <option value="status">Statut</option>
-            </select>
+          <label htmlFor="sort-select">Trier par : </label>
+          <select id="sort-select" value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
+            <option value="date">Date</option>
+            <option value="status">Statut</option>
+          </select>
         </div>
 
         <div className="view-toggle">
@@ -125,6 +174,11 @@ function Dashboard() {
             onClick={() => setViewMode('list')}
           >
             Liste
+          </button>
+        </div>
+        <div className="add-button">
+          <button className="add-application" onClick={openAddPopup}>
+            Ajouter une candidature
           </button>
         </div>
       </div>
@@ -143,15 +197,10 @@ function Dashboard() {
                   <h3 className="dashboard-list-company-name">{application.company || "Entreprise inconnue"}</h3>
                   <p className="dashboard-list-job-title">{application.title || "Poste inconnu"}</p>
                   <p className="dashboard-list-status">
-                    Statut :
-                    <span className={`status-text ${application.status.toLowerCase()}`}>
-                      {{
-                        on: " Acceptée",
-                        pending: " En attente de réponse",
-                        off: " Refusée"
-                      }[application.status.trim().toLowerCase()] || " Statut inconnu"}
+                    Statut : <span className={`status-text ${application.status.toLowerCase()}`}>
+                      {statusMap[application.status.trim().toUpperCase()] || " Statut inconnu"}
                     </span>
-                  </p>                  
+                  </p>                
                   <p className="dashboard-list-date">Date de candidature : {new Date(application.createdAt).toLocaleDateString('fr-FR') || " Date inconnue"}</p>
                   <button className="dashboard-list-details">Voir les détails</button>
                 </div>
@@ -194,17 +243,12 @@ function Dashboard() {
               <div className="dashboard-grid-content">
                 <h4>{application.jobTitle || "Poste inconnu"}</h4>
                 <hr />
-                <p className="dashboard-grid-status">
-                  Statut :
-                    <span className={`status-text ${application.status.toLowerCase()}`}>
-                      {{
-                        on: " Acceptée",
-                        pending: " En attente de réponse",
-                        off: " Refusée"
-                      }[application.status.trim().toLowerCase()] || " Statut inconnu"}
-                    </span>
+                <p className="dashboard-list-status">
+                  Statut : <span className={`status-text ${application.status.toLowerCase()}`}>
+                    {statusMap[application.status.trim().toUpperCase()] || " Statut inconnu"}
+                  </span>
                 </p>
-                <p>Date de candidature : {new Date(application.createdAt).toLocaleDateString('fr-FR') || "Date inconnue"}</p>
+                <p>Date de candidature : {new Date(application.createdAt).toLocaleDateString('fr-FR') || " Date inconnue"}</p>
               </div>
               <button className="dashboard-grid-details">Voir les détails</button>
               <div className="dashboard-grid-actions">
@@ -253,6 +297,46 @@ function Dashboard() {
               </button>
               <button className="popup-button confirm">
                 Confirmer
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {newApplication && (
+        <div className={`popup-overlay ${newApplication ? 'active' : ''}`}>
+          <div className="popup-container">
+            <h2 className="popup-header">Ajouter une candidature</h2>
+            <div className="popup-content">
+              <label>Entreprise :</label>
+              <input
+                type="text"
+                value={newApplication.company}
+                onChange={(e) => setNewApplication({ ...newApplication, company: e.target.value })}
+              />
+
+              <label>Poste :</label>
+              <input
+                type="text"
+                value={newApplication.jobTitle}
+                onChange={(e) => setNewApplication({ ...newApplication, jobTitle: e.target.value })}
+              />
+
+              <label>Statut :</label>
+              <select
+                value={newApplication.status}
+                onChange={(e) => setNewApplication({ ...newApplication, status: e.target.value })}
+              >
+                <option value="PENDING">En attente de réponse</option>
+                <option value="ON">Acceptée</option>
+                <option value="OFF">Refusée</option>
+              </select>
+            </div>
+            <div className="popup-buttons">
+              <button className="popup-button cancel" onClick={closeAddPopup}>
+                Annuler
+              </button>
+              <button className="popup-button confirm" onClick={handleAddApplication}>
+                Ajouter
               </button>
             </div>
           </div>
