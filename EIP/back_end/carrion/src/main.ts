@@ -36,7 +36,7 @@ async function bootstrap() {
       'The documentation of the routes defined for the web appliaction Carrion',
     )
     .addBearerAuth()
-    .addCookieAuth()
+    .addCookieAuth('access_token')
     .setVersion('1.0')
     .build();
 
