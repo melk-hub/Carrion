@@ -60,11 +60,11 @@ function Login({ setIsAuthenticated }) {
 
   const handleRegisterRedirect = () => {
     navigate('/register');
-  }
+  };
+
   return (
     <div className="login-page">
-      <img src={logo} className="logo-home" onClick={() => navigate("/")} />
-
+      <img src={logo} className="logo-home" onClick={() => navigate("/")} alt="Logo"/>
       <div className="login-container">
         <h2>Connexion</h2>
         <form onSubmit={handleLogin}>
@@ -81,7 +81,6 @@ function Login({ setIsAuthenticated }) {
                   required
                 />
               </div>
-
               <div className="input-group">
                 <label>Mot de passe:</label>
                 <input
@@ -93,24 +92,22 @@ function Login({ setIsAuthenticated }) {
                   required
                 />
               </div>
-
               {errorMessage && <p className="error-message">{errorMessage}</p>}
             </div>
-
-              <div className="button-group">
-                <button type="submit" className="login-button">Se connecter</button>
-                <button onClick={handleRegisterRedirect} className="register-button">
-                  Pas de compte? S'enregistrer
-                </button>
-              </div>
-              </div>
-                <div className="social-login" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%"}}>
-                <GoogleLoginButton />
-                <button onClick={handleLoginSuccess} className="outlook-button" style={{marginTop: "0", marginRight: "2em", marginLeft: "2em", height: "2.5em"}} >
-                  <img src={outlookIcon} alt="Outlook" />
-                  Se connecter avec Outlook
-                </button>
-              </div>
+            <div className="button-group">
+              <button type="submit" className="login-button">Se connecter</button>
+              <button onClick={handleRegisterRedirect} className="register-button">
+                Pas de compte? S'enregistrer
+              </button>
+            </div>
+          </div>
+          <div className="social-login">
+            <GoogleLoginButton />
+            <button onClick={handleLoginSuccess} className="outlook-button">
+            <img src={outlookIcon} alt="Outlook" />
+              Se connecter avec Outlook
+            </button>
+          </div>
         </form>
       </div>
     </div>
