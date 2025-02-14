@@ -62,22 +62,20 @@ function Dashboard() {
   };
 
   const handleAddApplication = async () => {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      console.error("Aucun token trouvé, l'utilisateur doit se reconnecter.");
-      return;
-    }
     try {
-      const response = await fetch(`${API_URL}/job-applies/jobApply`, {
+      const response = await fetch(`${API_URL}/job_applies/add_jobApply`, {
         method: 'POST',
+        credentials: 'include',
         headers: {
-          "Authorization": `Bearer ${token}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
           company: newApplication.company,
           title: newApplication.title,
           status: newApplication.status,
+          location: newApplication.location,
+          imageUrl: newApplication.imageUrl,
+          salary: newApplication.salary,
         }),
       });
       if (!response.ok) {
@@ -346,6 +344,24 @@ function Dashboard() {
                 <option value="ON">Acceptée</option>
                 <option value="OFF">Refusée</option>
               </select>
+              <label>Lieu :</label>
+              <input
+                type="text"
+                value={newApplication.location}
+                onChange={(e) => setNewApplication({ ...newApplication, location: e.target.value })}
+              />
+              <label>Salaire :</label>
+              <input
+                type="text"
+                value={newApplication.salary}
+                onChange={(e) => setNewApplication({ ...newApplication, salary: Number(e.target.value) })}
+              />
+              <label>Logo :</label>
+              <input
+                type="text"
+                value={newApplication.imageUrl}
+                onChange={(e) => setNewApplication({ ...newApplication, imageUrl: e.target.value })}
+              />
             </div>
             <div className="popup-buttons">
               <button className="popup-button cancel" onClick={closeAddPopup}>
