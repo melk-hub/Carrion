@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 // import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
 // import MicrosoftLogin from 'react-microsoft-login';
@@ -11,13 +11,20 @@ function Login({ setIsAuthenticated }) {
   const navigate = useNavigate();
   const [credentials, setCredentials] = useState({ identifier: '', password: '' });
   const [errorMessage, setErrorMessage] = useState('');
+  const API_URL = process.env.REACT_APP_API_URL;
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setCredentials({ ...credentials, [name]: value });
   };
 
-  const API_URL = process.env.REACT_APP_API_URL;
+  useEffect(() => {
+      document.body.classList.add('login-page-bg');
+    
+      return () => {
+        document.body.classList.remove('login-page-bg');
+      };
+    }, []);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -93,7 +100,7 @@ function Login({ setIsAuthenticated }) {
               <div className="button-group">
                 <button type="submit" className="login-button">Se connecter</button>
                 <button onClick={handleRegisterRedirect} className="register-button">
-                  S'enregistrer
+                  Pas de compte? S'enregistrer
                 </button>
               </div>
               </div>

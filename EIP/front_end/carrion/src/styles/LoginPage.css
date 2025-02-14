@@ -1,3 +1,6 @@
+body.login-page-bg {
+background-color: var(--secondary-color);
+}
 
 .login-page h2 {
   color: #1565c0;
