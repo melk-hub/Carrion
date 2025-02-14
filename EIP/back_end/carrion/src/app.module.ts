@@ -7,6 +7,9 @@ import { UserModule } from './user/user.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { JobApplyModule } from './jobApply/jobApply.module';
 import { GmailModule } from './webhooks/google/gmail.module';
+import { MailFilterModule } from './services/mailFilter/mailFilter.module';
+import { MailFilterController } from './services/mailFilter/mailFilter.controller';
+import { MailFilterService } from './services/mailFilter/mailFilter.service';
 
 @Module({
   imports: [
@@ -16,8 +19,9 @@ import { GmailModule } from './webhooks/google/gmail.module';
     PrismaModule,
     JobApplyModule,
     GmailModule,
+    MailFilterModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [AppController, MailFilterController],
+  providers: [AppService, MailFilterService],
 })
 export class AppModule {}

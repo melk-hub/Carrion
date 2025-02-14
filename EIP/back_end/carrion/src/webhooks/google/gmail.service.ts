@@ -6,6 +6,7 @@ import { AuthService } from 'src/auth/auth.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { Token } from '@prisma/client';
 import { UserService } from 'src/user/user.service';
+import { MailFilterService } from 'src/services/mailFilter/mailFilter.service';
 
 @Injectable()
 export class GmailService {
@@ -14,6 +15,7 @@ export class GmailService {
     private readonly authService: AuthService,
     private readonly prisma: PrismaService,
     private readonly userService: UserService,
+    private readonly mailFilter: MailFilterService,
   ) {}
 
   async refreshAccessToken(refreshToken: string): Promise<string> {
@@ -70,7 +72,7 @@ export class GmailService {
     const token = await this.getTokenForUser(emailAddress);
     const user = await this.userService.findByIdentifier(emailAddress, true);
     let accessToken = token.accessToken;
-    if (token.refreshToken != null) {
+    if (token.refreshToken != null && token.refreshToken != '') {
       const isAccessTokenExpired = this.isTokenExpired(token.tokenTimeValidity);
 
       if (isAccessTokenExpired) {
@@ -107,7 +109,10 @@ export class GmailService {
               (h) => h.name.toLowerCase() === 'subject',
             );
             const subject = subjectHeader ? subjectHeader.value : 'No Subject';
-            console.log(subject);
+            this.mailFilter.getInformationFromText(
+              `${subject}   ${message.snippet}`,
+              user.id,
+            );
 
             if (this.isJobApplication(message)) {
               const jobDescription = this.extractJobDescription(message);
@@ -123,7 +128,7 @@ export class GmailService {
     } catch (error) {
       this.logger.error('Error processing history update: ' + error.message);
     }
-    this.userService.updateHistoryIdOfUser(user.id, historyId);
+    await this.userService.updateHistoryIdOfUser(user.id, historyId);
   }
 
   isJobApplication(message: any): boolean {
