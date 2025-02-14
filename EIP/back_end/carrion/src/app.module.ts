@@ -6,6 +6,7 @@ import { ConfigModule } from '@nestjs/config';
 import { UserModule } from './user/user.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { JobApplyModule } from './jobApply/jobApply.module';
+import { GmailModule } from './webhooks/google/gmail.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { JobApplyModule } from './jobApply/jobApply.module';
     UserModule,
     PrismaModule,
     JobApplyModule,
+    GmailModule
   ],
   controllers: [AppController],
   providers: [AppService],

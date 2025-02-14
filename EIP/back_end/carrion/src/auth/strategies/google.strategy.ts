@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, Request } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy, Profile } from 'passport-google-oauth20';
 import googleOauthConfig from '../config/google-oauth.config';
@@ -16,7 +16,11 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
       clientID: googleConfiguration.clientID,
       clientSecret: googleConfiguration.clientSecret,
       callbackURL: googleConfiguration.callbackURL,
-      scope: ['email', 'profile'],
+      scope: [
+        'email',
+        'profile',
+        'https://www.googleapis.com/auth/gmail.readonly',
+      ],
     });
   }
   async validate(accessToken: string, refreshToken: string, profile: Profile) {
