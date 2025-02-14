@@ -23,17 +23,19 @@ model User {
   jobApplies jobApply[] @relation("UserJobApplies")
   Settings Settings? @relation("UserSettings")
   hashedRefreshToken String? @unique
-  token Token? @relation(fields: [tokenId], references: [id])
-  tokenId String? @default(uuid()) @db.Uuid @unique
+  tokens Token[] @relation("UserTokens")
+  historyId       String?
 }
 
 model Token {
   id                String    @id @default(uuid()) @db.Uuid
-  Token             String
-  TokenTimeValidity String
-  RefreshToken String
+  name              String
+  accessToken       String
+  refreshToken      String
+  tokenTimeValidity DateTime
   createdAt         DateTime  @default(now())
-  user User? @relation
+  userId            String    @db.Uuid
+  user              User      @relation("UserTokens", fields: [userId], references: [id])
 }
 
 model jobApply {

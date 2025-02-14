@@ -138,6 +138,15 @@ export class AuthController {
       const user = req.user;
       const tokens = await this.authService.login(user.id);
 
+      await this.authService.saveTokens(
+        user.id,
+        user.accessToken,
+        user.refreshToken || '',
+        7,
+        'Google_oauth2',
+      );
+      await this.authService.createGmailWebhook(user.accessToken, user.id);
+
       res.cookie('access_token', tokens.accessToken, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
@@ -235,7 +244,6 @@ export class AuthController {
         return res.status(401).json({ message: 'Token invalide' });
       }
 
-      // Authentification réussie
       return res.status(200).json({ message: 'Authenticated' });
     } catch (error) {
       return res

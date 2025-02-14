@@ -6,6 +6,7 @@ import { JwtModule, JwtService } from '@nestjs/jwt';
 import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from 'src/auth/auth.module';
 import { AuthService } from 'src/auth/auth.service';
+import { HttpModule } from '@nestjs/axios';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { AuthService } from 'src/auth/auth.service';
     ConfigModule,
     PrismaModule,
     forwardRef(() => AuthModule),
+    HttpModule,
   ],
   controllers: [UserController],
   providers: [
@@ -24,5 +26,6 @@ import { AuthService } from 'src/auth/auth.service';
       useValue: process.env.REFRESH_JWT_SECRET,
     },
   ],
+  exports: [UserService],
 })
 export class UserModule {}

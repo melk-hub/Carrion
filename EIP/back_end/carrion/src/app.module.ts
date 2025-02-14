@@ -1,4 +1,4 @@
-import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
@@ -15,7 +15,7 @@ import { GmailModule } from './webhooks/google/gmail.module';
     UserModule,
     PrismaModule,
     JobApplyModule,
-    GmailModule
+    GmailModule,
   ],
   controllers: [AppController],
   providers: [AppService],

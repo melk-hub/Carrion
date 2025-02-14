@@ -41,7 +41,7 @@ export class UserService {
       where: { id },
       select: {
         id: true,
-        token: true,
+        hashedRefreshToken: true,
         role: true,
       },
     });
@@ -58,5 +58,22 @@ export class UserService {
     return await this.prisma.user.delete({
       where: { id },
     });
+  }
+
+  async updateHistoryIdOfUser(userId: string, newHistoryId: string) {
+    try {
+      const user = await this.prisma.user.findUnique({
+        where: { id: userId },
+      });
+      if (!user) {
+        throw new Error(`User with id ${userId} not found`);
+      }
+      return await this.prisma.user.update({
+        where: { id: userId },
+        data: { historyId: newHistoryId.toString() },
+      });
+    } catch (error) {
+      console.error('Error updating historyId:', error);
+    }
   }
 }

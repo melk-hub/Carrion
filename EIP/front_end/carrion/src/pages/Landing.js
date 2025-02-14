@@ -3,8 +3,10 @@ import { useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
 import '../styles/Landing.css';
 import logo from '../assets/carrion_logo.png';
+import { useAuth } from '../AuthContext';
 
 function Landing() {
+  const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
 
   const handleLoginClick = () => {
@@ -56,6 +58,13 @@ function Landing() {
       }
     };
   }, []);
+
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      window.location.href = '/dashboard';
+    }
+  }, [isAuthenticated]);
 
   return (
     <div>

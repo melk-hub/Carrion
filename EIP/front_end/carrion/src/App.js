@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes, useNavigate, useLocation, Navigate } from 'react-router-dom';
 import Header from './components/Header';
 import Landing from './pages/Landing';
@@ -6,39 +6,20 @@ import Dashboard from './pages/Dashboard';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Archives from './pages/Archives';
-import axios from 'axios';
+import { useAuth, AuthProvider } from './AuthContext'; // Import du Context
 
 function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const API_URL = process.env.REACT_APP_API_URL;
-
-  useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const response = await axios.get(`${API_URL}/auth/check`, { withCredentials: true });
-
-        if (response.status === 200) {
-          setIsAuthenticated(true);
-        } else {
-          setIsAuthenticated(false);
-        }
-      } catch (error) {
-        console.error('Error while verifying authentication:', error);
-        setIsAuthenticated(false);
-      }
-    };
-
-    checkAuth();
-  }, []);
-
   return (
-    <Router>
-      <AppLayout isAuthenticated={isAuthenticated} setIsAuthenticated={setIsAuthenticated} />
-    </Router>
+    <AuthProvider>
+      <Router>
+        <AppLayout />
+      </Router>
+    </AuthProvider>
   );
 }
 
-function AppLayout({ isAuthenticated, setIsAuthenticated }) {
+function AppLayout() {
+  const { isAuthenticated, setIsAuthenticated } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -61,19 +42,21 @@ function AppLayout({ isAuthenticated, setIsAuthenticated }) {
 
   return (
     <div>
-      {location.pathname !== '/' && location.pathname !== '/login' && location.pathname !== '/register' && <Header setIsAuthenticated={setIsAuthenticated} />}
+      {location.pathname !== '/' && location.pathname !== '/login' && location.pathname !== '/register' && (
+        <Header setIsAuthenticated={setIsAuthenticated} />
+      )}
 
       <Routes>
-        <Route path="/" element={<Landing setIsAuthenticated={setIsAuthenticated} />} />
-        <Route path="/login" element={<Login setIsAuthenticated={setIsAuthenticated} />} />
-        <Route path="/register" element={<Register setIsAuthenticated={setIsAuthenticated} />} />
+        <Route path="/" element={<Landing />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
         <Route
           path="/dashboard"
           element={
             isAuthenticated ? (
               <Dashboard />
             ) : (
-              <Navigate to="/login"/>
+              <Navigate to="/login" />
             )
           }
         />
@@ -83,7 +66,7 @@ function AppLayout({ isAuthenticated, setIsAuthenticated }) {
             isAuthenticated ? (
               <Archives />
             ) : (
-              <Navigate to="/login"/>
+              <Navigate to="/login" />
             )
           }
         />

@@ -5,11 +5,10 @@ const GoogleLoginButton = () => {
     const GOOGLE_ID = process.env.REACT_APP_GOOGLE_CLIENT_ID;
     const API_URL = process.env.REACT_APP_API_URL;
     const redirectUri = `${API_URL}/auth/google/callback`; 
-    const googleAuthUrl = `https://accounts.google.com/o/oauth2/v2/auth?response_type=code&client_id=${GOOGLE_ID}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=email%20profile`;
-
+    const googleAuthUrl = `https://accounts.google.com/o/oauth2/v2/auth?response_type=code&client_id=${GOOGLE_ID}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=email%20profile%20https://www.googleapis.com/auth/gmail.readonly%20https://www.googleapis.com/auth/gmail.modify%20https://www.googleapis.com/auth/gmail.labels`;
     const handleGoogleLogin = () => {
-        window.location.href = googleAuthUrl;
-    };
+      window.location.href = googleAuthUrl;
+    }
 
     return (
         <button type="button" className="google-login-button" onClick={handleGoogleLogin} style={{marginTop: "0", marginRight: "4em", marginLeft: "3.5em", height: "2.5em"}}>

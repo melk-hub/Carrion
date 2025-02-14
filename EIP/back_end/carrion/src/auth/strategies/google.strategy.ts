@@ -1,4 +1,4 @@
-import { Inject, Injectable, Request } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy, Profile } from 'passport-google-oauth20';
 import googleOauthConfig from '../config/google-oauth.config';
@@ -20,7 +20,11 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
         'email',
         'profile',
         'https://www.googleapis.com/auth/gmail.readonly',
+        'https://www.googleapis.com/auth/gmail.modify',
+        'https://www.googleapis.com/auth/gmail.labels',
       ],
+      accessType: 'offline',
+      prompt: 'consent',
     });
   }
   async validate(accessToken: string, refreshToken: string, profile: Profile) {
@@ -33,7 +37,7 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
         birthDate: '',
         password: '',
       });
-      return user;
+      return { ...user, accessToken, refreshToken };
     } catch {
       return;
     }

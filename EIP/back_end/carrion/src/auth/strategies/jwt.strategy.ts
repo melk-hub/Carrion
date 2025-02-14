@@ -22,8 +22,12 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
   }
 
-  async validate(payload: AuthJwtPayload) {
+  async validate(payload: AuthJwtPayload, req: Request) {
     const userId = payload.sub;
+    const refreshToken = req['cookies']?.['refresh_token'] || '';
+    if (refreshToken && refreshToken !== '') {
+      await this.authService.validateRefreshToken(userId, refreshToken);
+    }
     return this.authService.validateJwtUser(userId);
   }
 }

@@ -15,6 +15,7 @@ import { CreateUserDto } from 'src/user/dto/create-user.dto';
 import { Role } from './enums/role.enum';
 import * as bcrypt from 'bcrypt';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { HttpService } from '@nestjs/axios';
 
 @Injectable()
 export class AuthService {
@@ -24,6 +25,7 @@ export class AuthService {
     @Inject(refreshJwtConfig.KEY)
     private refreshTokenConfig: ConfigType<typeof refreshJwtConfig>,
     private readonly prisma: PrismaService,
+    private readonly httpService: HttpService,
   ) {}
 
   async validateUser(identifier: string, password: string, isEmail: boolean) {
@@ -91,17 +93,20 @@ export class AuthService {
   }
 
   async validateRefreshToken(userId: string, refreshToken: string) {
-    const user = await this.userService.findOne(userId);
-    if (!user || !user.token.RefreshToken)
+    const userToken = await this.prisma.token.findFirst({
+      where: { userId: userId },
+      orderBy: { createdAt: 'desc' },
+    });
+    if (!userToken) {
       throw new UnauthorizedException('Invalid Refresh Token');
-
+    }
     const refreshTokenMatches = await argon2.verify(
-      user.token.RefreshToken,
+      userToken.refreshToken,
       refreshToken,
     );
-    if (!refreshTokenMatches)
+    if (!refreshTokenMatches) {
       throw new UnauthorizedException('Invalid Refresh Token');
-
+    }
     return { id: userId };
   }
 
@@ -146,7 +151,78 @@ export class AuthService {
     let hashedRefreshToken: string;
     if (refreshToken) {
       hashedRefreshToken = await argon2.hash(refreshToken);
-      await this.userService.updateHashedRefreshToken(userId, hashedRefreshToken);
+      await this.userService.updateHashedRefreshToken(
+        userId,
+        hashedRefreshToken,
+      );
+    }
+  }
+
+  async createGmailWebhook(accessToken: string, userId: string) {
+    const url = 'https://gmail.googleapis.com/gmail/v1/users/me/watch';
+    const payload = {
+      labelIds: ['INBOX'],
+      topicName: `projects/${process.env.GOOGLE_PROJECT_ID}/topics/${process.env.GOOGLE_PROJECT_WEBHOOK}`,
+    };
+
+    try {
+      const response = await this.httpService
+        .post(url, payload, {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            'Content-Type': 'application/json',
+          },
+        })
+        .toPromise();
+      this.userService.updateHistoryIdOfUser(
+        userId,
+        response.data['historyId'],
+      );
+    } catch (error) {
+      console.error('Erreur lors de la création du webhook Gmail:', error);
+      throw new Error('Failed to set up Gmail webhook');
+    }
+  }
+
+  calculateTokenExpiration(days: number): Date {
+    const expirationTime = new Date();
+    expirationTime.setHours(expirationTime.getDate() + days);
+    return expirationTime;
+  }
+
+  async saveTokens(
+    userId: string,
+    accessToken: string,
+    refreshToken: string,
+    days: number,
+    name: string,
+  ): Promise<void> {
+    const expirationTime = this.calculateTokenExpiration(days);
+    const existingToken = await this.prisma.token.findFirst({
+      where: {
+        userId,
+        name,
+      },
+    });
+    if (existingToken) {
+      await this.prisma.token.update({
+        where: { id: existingToken.id },
+        data: {
+          accessToken,
+          refreshToken,
+          tokenTimeValidity: expirationTime,
+        },
+      });
+    } else {
+      await this.prisma.token.create({
+        data: {
+          name: name,
+          accessToken,
+          refreshToken,
+          tokenTimeValidity: expirationTime,
+          userId,
+        },
+      });
     }
   }
 }

@@ -4,10 +4,12 @@ import { useNavigate } from 'react-router-dom';
 // import MicrosoftLogin from 'react-microsoft-login';
 import outlookIcon from '../assets/outlook-logo.png';
 import "../styles/LoginPage.css";
-import GoogleLoginButton from './GoogleLoginBtn';
+import GoogleLoginButton from '../components/GoogleLoginBtn';
 import logo from '../assets/carrion_logo.png';
+import { useAuth } from '../AuthContext';
 
-function Login({ setIsAuthenticated }) {
+function Login() {
+  const { setIsAuthenticated } = useAuth();
   const navigate = useNavigate();
   const [credentials, setCredentials] = useState({ identifier: '', password: '' });
   const [errorMessage, setErrorMessage] = useState('');
