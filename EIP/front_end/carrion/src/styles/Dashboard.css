@@ -475,6 +475,13 @@ background: linear-gradient(90deg, var(--secondary-color), #fc8f02);
 background: linear-gradient(90deg, var(--secondary-color), #fa0202);
 }
 
+.dashboard-grid p {
+text-align: center;
+width: 100%;
+grid-column: 1 / -1;
+justify-self: center;
+}  
+
 .action-button {
 position: relative;
 background: none;
