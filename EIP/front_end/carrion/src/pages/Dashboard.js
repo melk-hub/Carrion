@@ -35,36 +35,24 @@ function Dashboard() {
   }, [API_URL]);
 
   const handleUpdateApplication = async () => {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      console.error("Aucun token trouvé, l'utilisateur doit se reconnecter.");
-      return;
-    }
-  
-    const updatedApplication = {
-      company: selectedApplication.company,
-      jobTitle: selectedApplication.title,
-      status: selectedApplication.status,
-    };
-  
     try {
-      const response = await fetch(`${API_URL}/job-applies/jobApply/${selectedApplication.id}`, {
-        method: 'PUT',
+      const response = await fetch(`${API_URL}/job_applies/${selectedApplication.id}/status`, {
+        method: 'PATCH',
+        credentials: 'include',
         headers: {
-          "Authorization": `Bearer ${token}`,
-          "Content-Type": "application/json",
+          "Content-Type": "application/json"
         },
-        body: JSON.stringify(updatedApplication),
+        body: JSON.stringify(selectedApplication),
       });
   
       if (!response.ok) {
         throw new Error(`Erreur HTTP: ${response.status}`);
       }
   
-      const data = await response.json();
+      const updatedData = await response.json();
       setApplications((prevApps) =>
         prevApps.map((app) =>
-          app.id === data.id ? { ...app, ...data } : app
+          app.id === updatedData.id ? { ...app, ...updatedData } : app
         )
       );
       closePopup();
@@ -102,6 +90,23 @@ function Dashboard() {
       console.error('Erreur lors de l\'ajout de la candidature:', error);
     }
   };  
+
+  const handleDeleteApplication = async (id) => {
+    try {
+      const response = await fetch(`${API_URL}/job_applies/${id}`, {
+        method: "DELETE",
+        credentials: 'include',
+      });
+
+      if (!response.ok) {
+        throw new Error("Erreur lors de la suppression");
+      }
+
+      setApplications(applications.filter((app) => app.id !== id));
+    } catch (error) {
+      console.error("Erreur :", error);
+    }
+  };
 
   const statusMap = {
     ON: "Acceptée",
@@ -153,7 +158,7 @@ function Dashboard() {
   const openAddPopup = () => {
     setNewApplication({
       company: '',
-      jobTitle: '',
+      title: '',
       status: 'PENDING',
     });
   };
@@ -253,7 +258,7 @@ function Dashboard() {
                     <img src={archiveIcon} alt="Archiver"/>
                     <span className="list-tooltip">Archiver</span>
                   </button>
-                  <button className="action-button delete-button">
+                  <button className="action-button delete-button" onClick={() => handleDeleteApplication(application.id)}>
                     <img src={deleteIcon} alt="Supprimer"/>
                     <span className="list-tooltip">Supprimer</span>
                   </button>
@@ -281,7 +286,7 @@ function Dashboard() {
                 <div className="dashboard-grid-company-name">{application.company || "Entreprise inconnue"}</div>
               </div>
               <div className="dashboard-grid-content">
-                <h4>{application.jobTitle || "Poste inconnu"}</h4>
+                <h4>{application.title || "Poste inconnu"}</h4>
                 <hr />
                 <p className="dashboard-list-status">
                   Statut : <span className={`status-text ${application.status.toLowerCase()}`}>
@@ -300,7 +305,7 @@ function Dashboard() {
                   <img src={archiveIcon} alt="Archiver"/>
                   <span className="grid-tooltip">Archiver</span>
                 </button>
-                <button className="action-button delete-button">
+                <button className="action-button delete-button" onClick={() => handleDeleteApplication(application.id)}>
                   <img src={deleteIcon} alt="Supprimer"/>
                   <span className="grid-tooltip">Supprimer</span>
                 </button>
@@ -328,8 +333,8 @@ function Dashboard() {
               <label>Poste :</label>
               <input
                 type="text"
-                value={newApplication.jobTitle}
-                onChange={(e) => setNewApplication({ ...newApplication, jobTitle: e.target.value })}
+                value={newApplication.title}
+                onChange={(e) => setNewApplication({ ...newApplication, title: e.target.value })}
               />
 
               <label>Statut :</label>
@@ -361,15 +366,20 @@ function Dashboard() {
               <label>Entreprise :</label>
               <input
                 type="text"
-                defaultValue={selectedApplication.company}
+                value={selectedApplication.company}
+                onChange={(e) => setSelectedApplication({ ...selectedApplication, company: e.target.value })}
               />
               <label>Poste :</label>
               <input
                 type="text"
-                defaultValue={selectedApplication.jobTitle}
+                value={selectedApplication.title}
+                onChange={(e) => setSelectedApplication({ ...selectedApplication, title: e.target.value })}
               />
               <label>Statut :</label>
-              <select defaultValue={selectedApplication.status}>
+              <select
+                value={selectedApplication.status}
+                onChange={(e) => setSelectedApplication({ ...selectedApplication, status: e.target.value })}
+              >
                 <option value="PENDING">En attente de réponse</option>
                 <option value="ON">Acceptée</option>
                 <option value="OFF">Refusée</option>
@@ -389,7 +399,7 @@ function Dashboard() {
             <h2 className="popup-header">Détails de la candidature</h2>
             <div className="popup-content">
               <p><strong>Entreprise :</strong> {selectedApplication.company || "Entreprise inconnue"}</p>
-              <p><strong>Poste :</strong> {selectedApplication.jobTitle || "Poste inconnu"}</p>
+              <p><strong>Poste :</strong> {selectedApplication.title || "Poste inconnu"}</p>
               <p><strong>Statut :</strong> {statusMap[selectedApplication.status.toUpperCase()] || "Statut inconnu"}</p>
               <p><strong>Date de candidature :</strong> {new Date(selectedApplication.createdAt).toLocaleDateString('fr-FR') || "Date inconnue"}</p>
               <p><strong>Lieu :</strong> {selectedApplication.location}</p>
@@ -397,46 +407,6 @@ function Dashboard() {
             </div>
             <div className="popup-buttons">
               <button className="popup-button confirm" onClick={closePopup}>Fermer</button>
-            </div>
-          </div>
-        </div>
-      )}
-      {newApplication && (
-        <div className={`popup-overlay ${newApplication ? 'active' : ''}`}>
-          <div className="popup-container">
-            <h2 className="popup-header">Ajouter une candidature</h2>
-            <div className="popup-content">
-              <label>Entreprise :</label>
-              <input
-                type="text"
-                value={newApplication.company}
-                onChange={(e) => setNewApplication({ ...newApplication, company: e.target.value })}
-              />
-
-              <label>Poste :</label>
-              <input
-                type="text"
-                value={newApplication.jobTitle}
-                onChange={(e) => setNewApplication({ ...newApplication, jobTitle: e.target.value })}
-              />
-
-              <label>Statut :</label>
-              <select
-                value={newApplication.status}
-                onChange={(e) => setNewApplication({ ...newApplication, status: e.target.value })}
-              >
-                <option value="PENDING">En attente de réponse</option>
-                <option value="ON">Acceptée</option>
-                <option value="OFF">Refusée</option>
-              </select>
-            </div>
-            <div className="popup-buttons">
-              <button className="popup-button cancel" onClick={closeAddPopup}>
-                Annuler
-              </button>
-              <button className="popup-button confirm" onClick={handleAddApplication}>
-                Ajouter
-              </button>
             </div>
           </div>
         </div>

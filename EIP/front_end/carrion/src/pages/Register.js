@@ -139,12 +139,14 @@ function Register({ setIsAuthenticated }) {
           />
         </div>
         <button
+        type="submit"
           onClick={handleRegisterSubmit}
           className="register-button register-submit"
         >
           Valider l'inscription
         </button>
         <button
+          type="button"
           onClick={handleLoginRedirect}
           className="register-button register-login"
         >

@@ -96,14 +96,14 @@ function Login({ setIsAuthenticated }) {
             </div>
             <div className="button-group">
               <button type="submit" className="login-button">Se connecter</button>
-              <button onClick={handleRegisterRedirect} className="register-button">
+              <button type="button" onClick={handleRegisterRedirect} className="register-button">
                 Pas de compte? S'enregistrer
               </button>
             </div>
           </div>
           <div className="social-login">
             <GoogleLoginButton />
-            <button onClick={handleLoginSuccess} className="outlook-button">
+            <button type="button" onClick={handleLoginSuccess} className="outlook-button">
             <img src={outlookIcon} alt="Outlook" />
               Se connecter avec Outlook
             </button>

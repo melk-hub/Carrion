@@ -7,12 +7,11 @@
     background-color: var(--secondary-color);
     display: flex;
     align-items: center;
-    justify-content: space-between; /* Assure la répartition des éléments */
+    justify-content: space-between;
     padding: 0 20px;
     z-index: 1000;
   }
   
-  /* Logo à gauche */
   .logo-button {
     display: flex;
     align-items: center;
@@ -23,14 +22,12 @@
     width: 175px;
   }
   
-  /* Conteneur pour centrer la navigation */
   .navigation-container {
-    flex: 1; /* Permet à la navigation de prendre l’espace restant */
+    flex: 1;
     display: flex;
-    justify-content: center; /* Centre les boutons */
+    justify-content: center;
   }
   
-  /* Navigation centrée */
   .navigation-buttons {
     display: flex;
     gap: 50px;
@@ -48,7 +45,6 @@
     text-decoration: underline;
   }
   
-  /* Bouton de déconnexion à droite */
   .logout-button {
     padding: 5px 20px;
     font-size: 1.2rem;
@@ -56,6 +52,7 @@
     border-radius: 20px;
     border: none;
     cursor: pointer;
+    margin-right: 20px;
   }
   
   .logout-button:hover {
