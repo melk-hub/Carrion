@@ -119,4 +119,12 @@ export class AuthService {
     if (user) return user;
     return await this.userService.create(OAuthUser);
   }
+
+  async googleLogin(userId: string, refreshToken: string) {
+    let hashedRefreshToken: string;
+    if (refreshToken) {
+      hashedRefreshToken = await argon2.hash(refreshToken);
+      await this.userService.updateHashedRefreshToken(userId, hashedRefreshToken);
+    }
+  }
 }
