@@ -17,17 +17,10 @@ function Dashboard() {
 
   useEffect(() => {
     const fetchApplications = async () => {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        console.error("Aucun token trouvé, l'utilisateur doit se reconnecter.");
-        return;
-      }
       try {
-        const response = await fetch(`${API_URL}/job-applies/jobApply`, {
-          headers: {
-            "Authorization": `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
+        const response = await fetch(`${API_URL}/job_applies/get_jobApply`, {
+          method: "GET",
+          credentials: "include",
         });
         if (!response.ok) {
           throw new Error(`Erreur HTTP: ${response.status}`);
@@ -35,7 +28,7 @@ function Dashboard() {
         const data = await response.json();
         setApplications(Array.isArray(data) ? data : []);
       } catch (error) {
-        console.error('Erreur lors de la récupération des données:', error);
+        console.error("Erreur lors de la récupération des données:", error);
       }
     };
     fetchApplications();
@@ -50,7 +43,7 @@ function Dashboard() {
   
     const updatedApplication = {
       company: selectedApplication.company,
-      jobTitle: selectedApplication.jobTitle,
+      jobTitle: selectedApplication.title,
       status: selectedApplication.status,
     };
   
