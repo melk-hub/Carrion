@@ -1,5 +1,5 @@
 :root {
-  --primary-color: #7dcffc;
+  --primary-color: #91d0f3;
   --secondary-color: #ffffff;
   --text-color: #333333;
   --accent-color: #000000;
@@ -20,7 +20,7 @@ body {
   margin: auto;
   width: 80%;
   font-family: 'TextPolice', sans-serif;
-  background-color:beige;
+  background-color: #F2F2F2;
 }
 
 h1, h2, h3, h4, h5, h6 {

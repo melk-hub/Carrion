@@ -2,7 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
 import '../styles/Landing.css';
-import logo from '../assets/carrion_logo2.png';
+import logo from '../assets/carrion_logo.png';
 
 function Landing() {
   const navigate = useNavigate();
@@ -62,8 +62,7 @@ function Landing() {
       <header className="fixed-header">
         <div className="logo"><img src={logo} alt="Carrion"/></div>
         <div 
-          className="header-buttons" 
-          style={{ position: "absolute", right: "20px", top: "50%", transform: "translateY(-50%)" }} >
+          className="header-buttons">
             <button onClick={handleLoginClick} className="login-button">Se connecter</button>
             <button onClick={handleRegisterToggle} className="register-button">S'inscrire</button>
         </div>

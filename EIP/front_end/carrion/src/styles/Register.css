@@ -1,3 +1,7 @@
+body.register-page-bg {
+background-color: var(--secondary-color);
+}
+
 .register-page {
   background-color: #e3f2fd;
   min-height: 98vh;

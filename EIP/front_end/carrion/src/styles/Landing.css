@@ -5,7 +5,7 @@ background-color: var(--secondary-color);
 /* Header */
 .fixed-header {
 position: fixed;
-height: 7%;
+height: 6%;
 width: 80%;
 background-color: var(--secondary-color);
 box-shadow: 0 2px 4px var(--shadow-color);
@@ -17,11 +17,12 @@ align-items: center;
 
 .logo img {
 width: 9em;
-margin: 0em 1.5em;
+margin: 0em 3em;
+scale: 150%;
 }
 
 .header-buttons button {
-margin-bottom: 0.5em;
+margin-bottom: 1em;
 margin-right: 1em;
 padding: 0.3em 1em;
 font-size: 1.2em;
@@ -29,6 +30,7 @@ width: 10em;
 border: 0.1em solid var(--primary-color);
 border-radius: 1.5em;
 cursor: pointer;
+color: var(--text-color);
 background-color: var(--secondary-color);
 }
 
@@ -38,9 +40,8 @@ background-color: var(--primary-color)
 
 .intro-section {
 text-align: center;
-padding-top: 40px;
+padding-top: 50px;
 margin-bottom: 40px;
-background-color: var(--secondary-color);
 }
 
 .intro-section h1 {
@@ -56,7 +57,6 @@ color: var(--text-color);
 
 /* Section principale */
 .landing-background {
-
 height: 83vh;
 background: url('../assets/landing_bg.png') no-repeat center center/cover;
 display: flex;
@@ -67,6 +67,7 @@ border-radius: 1% / 2%;
 .scroll-button {
 position: absolute;
 bottom: 3rem;
+left: 49%;
 width: 4rem;
 height: 4rem;
 background-color: var(--secondary-color);
@@ -98,7 +99,6 @@ animation: bounce 1.5s infinite;
     transform: translateY(-5px);
 }
 }
-
 
 /* Services Section */
 .services-section {

@@ -1,10 +1,13 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/Register.css";
 import logo from '../assets/carrion_logo.png';
 
 function Register({ setIsAuthenticated }) {
   const navigate = useNavigate();
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [error, setError] = useState('');
+  const API_URL = process.env.REACT_APP_API_URL;
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -13,10 +16,13 @@ function Register({ setIsAuthenticated }) {
     password: '',
   });
 
-  const [confirmPassword, setConfirmPassword] = useState('');
-
-  const [error, setError] = useState('');
-  const API_URL = process.env.REACT_APP_API_URL;
+  useEffect(() => {
+    document.body.classList.add('register-page-bg');
+  
+    return () => {
+      document.body.classList.remove('register-page-bg');
+    };
+  }, []);
 
   const handleRegisterChange = (e) => {
     const { name, value } = e.target;
@@ -133,16 +139,18 @@ function Register({ setIsAuthenticated }) {
           />
         </div>
         <button
+        type="submit"
           onClick={handleRegisterSubmit}
           className="register-button register-submit"
         >
           Valider l'inscription
         </button>
         <button
+          type="button"
           onClick={handleLoginRedirect}
           className="register-button register-login"
         >
-          Se connecter
+          Vous avez deja un compte? Se connecter
         </button>
       </div>
     </div>

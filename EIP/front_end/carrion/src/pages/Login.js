@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 // import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
 // import MicrosoftLogin from 'react-microsoft-login';
@@ -11,13 +11,20 @@ function Login({ setIsAuthenticated }) {
   const navigate = useNavigate();
   const [credentials, setCredentials] = useState({ identifier: '', password: '' });
   const [errorMessage, setErrorMessage] = useState('');
+  const API_URL = process.env.REACT_APP_API_URL;
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setCredentials({ ...credentials, [name]: value });
   };
 
-  const API_URL = process.env.REACT_APP_API_URL;
+  useEffect(() => {
+      document.body.classList.add('login-page-bg');
+    
+      return () => {
+        document.body.classList.remove('login-page-bg');
+      };
+    }, []);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -53,11 +60,11 @@ function Login({ setIsAuthenticated }) {
 
   const handleRegisterRedirect = () => {
     navigate('/register');
-  }
+  };
+
   return (
     <div className="login-page">
-      <img src={logo} className="logo-home" onClick={() => navigate("/")} />
-
+      <img src={logo} className="logo-home" onClick={() => navigate("/")} alt="Logo"/>
       <div className="login-container">
         <h2>Connexion</h2>
         <form onSubmit={handleLogin}>
@@ -74,7 +81,6 @@ function Login({ setIsAuthenticated }) {
                   required
                 />
               </div>
-
               <div className="input-group">
                 <label>Mot de passe:</label>
                 <input
@@ -86,24 +92,22 @@ function Login({ setIsAuthenticated }) {
                   required
                 />
               </div>
-
               {errorMessage && <p className="error-message">{errorMessage}</p>}
             </div>
-
-              <div className="button-group">
-                <button type="submit" className="login-button">Se connecter</button>
-                <button onClick={handleRegisterRedirect} className="register-button">
-                  S'enregistrer
-                </button>
-              </div>
-              </div>
-                <div className="social-login" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%"}}>
-                <GoogleLoginButton />
-                <button onClick={handleLoginSuccess} className="outlook-button" style={{marginTop: "0", marginRight: "2em", marginLeft: "2em", height: "2.5em"}} >
-                  <img src={outlookIcon} alt="Outlook" />
-                  Se connecter avec Outlook
-                </button>
-              </div>
+            <div className="button-group">
+              <button type="submit" className="login-button">Se connecter</button>
+              <button type="button" onClick={handleRegisterRedirect} className="register-button">
+                Pas de compte? S'enregistrer
+              </button>
+            </div>
+          </div>
+          <div className="social-login">
+            <GoogleLoginButton />
+            <button type="button" onClick={handleLoginSuccess} className="outlook-button">
+            <img src={outlookIcon} alt="Outlook" />
+              Se connecter avec Outlook
+            </button>
+          </div>
         </form>
       </div>
     </div>

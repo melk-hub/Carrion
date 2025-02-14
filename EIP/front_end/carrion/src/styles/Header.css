@@ -1,45 +1,61 @@
-/* Header */
 .header {
-position: fixed;
-height: 5%;
-width: 100%;
-left: 0;
-background-color: var(--secondary-color);
-display: flex;
-justify-content: space-between;
-align-items: center;
-z-index: 1000;
-}
-
-.logo-button img {
-width: 175px;
-}
-
-.navigation-buttons {
-display: flex;
-gap: 50px;
-}
-
-.navigation-buttons button {
-font-size: 1.4rem;
-background-color: var(--secondary-color);
-font-weight: bold;
-border: none;
-cursor: pointer;
-}
-
-.navigation-buttons button:hover {
-text-decoration: underline;
-}
-
-.logout-button {
-padding: 5px 20px;
-font-size: 1.2rem;
-background-color: var(--secondary-color);
-border-radius: 20px;
-border: none;
-cursor: pointer;
-}
-
-.logout-button:hover {
-background-color: var(--primary-color);}
+    position: fixed;
+    height: 60px;
+    width: 100%;
+    left: 0;
+    top: 0;
+    background-color: var(--secondary-color);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    z-index: 1000;
+  }
+  
+  .logo-button {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+  }
+  
+  .logo-button img {
+    width: 175px;
+  }
+  
+  .navigation-container {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+  }
+  
+  .navigation-buttons {
+    display: flex;
+    gap: 50px;
+  }
+  
+  .navigation-buttons button {
+    font-size: 1.4rem;
+    background-color: var(--secondary-color);
+    font-weight: bold;
+    border: none;
+    cursor: pointer;
+  }
+  
+  .navigation-buttons button:hover {
+    text-decoration: underline;
+  }
+  
+  .logout-button {
+    padding: 5px 20px;
+    font-size: 1.2rem;
+    background-color: var(--secondary-color);
+    border-radius: 20px;
+    border: none;
+    cursor: pointer;
+    margin-right: 20px;
+  }
+  
+  .logout-button:hover {
+    background-color: var(--primary-color);
+  }
+  
