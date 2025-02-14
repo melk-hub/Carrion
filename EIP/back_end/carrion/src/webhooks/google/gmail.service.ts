@@ -11,24 +11,21 @@ export class GmailService {
     private readonly authService: AuthService
   ) {}
 
-  async getOAuth2Client(id: number): Promise<OAuth2Client> {
+  async getOAuth2Client(emailAddress: string): Promise<OAuth2Client> {
     const oauth2Client = new google.auth.OAuth2(
       process.env.GOOGLE_CLIENT_ID,
       process.env.GOOGLE_CLIENT_SECRET,
       process.env.GOOGLE_REDIRECT_URI,
     );
 
-    const {accessToken, refreshToken} = await this.authService.generateTokens(id);
-    oauth2Client.setCredentials({
-      access_token: accessToken,
-      refresh_token: refreshToken,
-    });
+    // ici mettre access token const accessToken =
+    // ici mettre access token oauth2Client.setCredentials({access_token: accessToken});
 
     return oauth2Client;
   }
 
-  async processHistoryUpdate(id : number, emailAddress: string, historyId: string): Promise<void> {
-    const auth = await this.getOAuth2Client(id);
+  async processHistoryUpdate(emailAddress: string, historyId: string): Promise<void> {
+    const auth = await this.getOAuth2Client(emailAddress);
     const gmail = google.gmail({ version: 'v1', auth });
 
     try {
@@ -71,7 +68,6 @@ export class GmailService {
     const subjectHeader = headers.find((h) => h.name.toLowerCase() === 'subject');
     if (subjectHeader) {
       const subject = subjectHeader.value.toLowerCase();
-      // Define job-related keywords
       const keywords = ['job application', 'career opportunity', 'position', 'job offer'];
       return keywords.some((keyword) => subject.includes(keyword));
     }
@@ -100,7 +96,7 @@ export class GmailService {
     const subjectHeader = headers.find((h) => h.name.toLowerCase() === 'subject');
     const subject = subjectHeader ? subjectHeader.value : 'No Subject';
 
-    this.logger.log(`Saving job application for ${emailAddress} – Subject: ${subject}`);
+    this.logger.log(`Saving job application for ${emailAddress} - Subject: ${subject}`);
     this.logger.log(`Job Description Extracted: ${jobDescription}`);
   }
 }
