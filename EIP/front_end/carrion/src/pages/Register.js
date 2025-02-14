@@ -8,7 +8,6 @@ function Register({ setIsAuthenticated }) {
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
-    birthDate: '',
     email: '',
     username: '',
     password: '',

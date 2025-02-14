@@ -2,7 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
 import '../styles/Landing.css';
-import logo from '../assets/carrion_logo.png';
+import logo from '../assets/carrion_logo2.png';
 
 function Landing() {
   const navigate = useNavigate();
@@ -14,6 +14,14 @@ function Landing() {
   const handleRegisterToggle = () => {
     navigate('/register');
   };
+  
+  useEffect(() => {
+    document.body.classList.add('landing-page');
+  
+    return () => {
+      document.body.classList.remove('landing-page');
+    };
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => {

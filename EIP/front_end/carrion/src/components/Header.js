@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../styles/Header.css';
-import logo from '../assets/carrion_logo.png';
+import logo from '../assets/carrion_logo2.png';
 import axios from 'axios';
 
 function Header({ setIsAuthenticated }) {
@@ -22,10 +22,10 @@ function Header({ setIsAuthenticated }) {
     <header className="header">
       <h1 onClick={() => navigate('/dashboard')} className="logo-button"><img src={logo} alt="Carrion"/></h1>
       <div className="navigation-buttons">
-        <button onClick={() => navigate('/dashboard')} className='applications-button'>Mes Candidatures</button>
-        <button onClick={() => navigate('/archives')} className='archives-button'>Mes Archives</button>
-        <button onClick={() => navigate('/objectives')} className='objectives-button'>Mes Objectifs</button>
-        <button onClick={() => navigate('/parameters')} className='parameters-button'>Mes Paramètres</button>
+        <button onClick={() => navigate('/dashboard')} className='applications-button'>Candidatures</button>
+        <button onClick={() => navigate('/archives')} className='archives-button'>Archives</button>
+        <button onClick={() => navigate('/objectives')} className='objectives-button'>Objectifs</button>
+        <button onClick={() => navigate('/parameters')} className='parameters-button'>Profil</button>
       </div>
       <button onClick={() => handleLogout()} className="logout-button">Déconnexion</button>
     </header>
