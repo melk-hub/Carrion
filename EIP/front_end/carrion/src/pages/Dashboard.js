@@ -274,43 +274,44 @@ function Dashboard() {
         <div className="dashboard-grid">
           {sortedAndFilteredApplications.length > 0 ? (
             sortedAndFilteredApplications.map((application) => (
-            <div key={application.id} className={`dashboard-grid-card ${application.status.toLowerCase()}`}>
-              <div className="dashboard-grid-header">
-              <img
-                  src={application.imageUrl}
-                  alt={`${application.company} logo`}
-                  className="dashboard-grid-logo"
-                />
-                <div className="dashboard-grid-company-name">{application.company || "Entreprise inconnue"}</div>
+              <div key={application.id} className={`dashboard-grid-card ${application.status.toLowerCase()}`}>
+                {/* Partie 1 - Logo */}
+                <div className="dashboard-grid-logo-container">
+                  <img
+                    src={application.imageUrl}
+                    alt={`${application.company} logo`}
+                    className="dashboard-grid-logo"
+                  />
+                </div>
+                {/* Partie 2 - Infos principales */}
+                <div className="dashboard-grid-content">
+                  <div className="dashboard-grid-company-name">{application.company || "Entreprise inconnue"}</div>
+                  <h4>{application.title || "Poste inconnu"}</h4>
+                  <p className="dashboard-list-status">
+                    Statut : <span className={`status-text ${application.status.toLowerCase()}`}>
+                      {statusMap[application.status.trim().toUpperCase()] || " Statut inconnu"}
+                    </span>
+                  </p>
+                  <p>Date de candidature : {new Date(application.createdAt).toLocaleDateString('fr-FR') || " Date inconnue"}</p>
+                  <button className="dashboard-grid-details" onClick={() => openDetailsPopup(application)}>Voir les détails</button>
+                </div>
+                {/* Partie 3 - Actions */}
+                <div className="dashboard-grid-actions">
+                  <button className="action-button archive-button">
+                    <img src={archiveIcon} alt="Archiver"/>
+                    <span className="grid-tooltip">Archiver</span>
+                  </button>
+                  <button className="action-button edit-button" onClick={() => openEditPopup(application)}>
+                    <img src={editIcon} alt="Modifier" />
+                    <span className="grid-tooltip">Modifier</span>
+                  </button>
+                  <button className="action-button delete-button" onClick={() => handleDeleteApplication(application.id)}>
+                    <img src={deleteIcon} alt="Supprimer"/>
+                    <span className="grid-tooltip">Supprimer</span>
+                  </button>
+                </div>
               </div>
-              <div className="dashboard-grid-content">
-                <h4>{application.title || "Poste inconnu"}</h4>
-                <hr />
-                <p className="dashboard-list-status">
-                  Statut : <span className={`status-text ${application.status.toLowerCase()}`}>
-                    {statusMap[application.status.trim().toUpperCase()] || " Statut inconnu"}
-                  </span>
-                </p>
-                <p>Date de candidature : {new Date(application.createdAt).toLocaleDateString('fr-FR') || " Date inconnue"}</p>
-              </div>
-              <button className="dashboard-grid-details" onClick={() => openDetailsPopup(application)}>Voir les détails</button>
-              <div className="dashboard-grid-actions">
-                <button className="action-button edit-button" onClick={() => openEditPopup(application)}>
-                  <img src={editIcon} alt="Modifier" />
-                  <span className="grid-tooltip">Modifier</span>
-                </button>
-                <button className="action-button archive-button">
-                  <img src={archiveIcon} alt="Archiver"/>
-                  <span className="grid-tooltip">Archiver</span>
-                </button>
-                <button className="action-button delete-button" onClick={() => handleDeleteApplication(application.id)}>
-                  <img src={deleteIcon} alt="Supprimer"/>
-                  <span className="grid-tooltip">Supprimer</span>
-                </button>
-              </div>
-              <div className={`dashboard-grid-status-banner ${application.status.toLowerCase()}`}></div>
-            </div>
-          ))
+            ))
           ) : (
             <p>Aucune candidature trouvée</p>
           )}
