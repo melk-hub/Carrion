@@ -9,6 +9,7 @@ export const useAuth = () => {
 
 export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const API_URL = process.env.REACT_APP_API_URL;
 
   useEffect(() => {
@@ -23,6 +24,8 @@ export const AuthProvider = ({ children }) => {
       } catch (error) {
         console.error('Error while verifying authentication:', error);
         setIsAuthenticated(false);
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -35,7 +38,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, setIsAuthenticated, logOut }}>
+    <AuthContext.Provider value={{ isAuthenticated, setIsAuthenticated, logOut, isLoading }}>
       {children}
     </AuthContext.Provider>
   );

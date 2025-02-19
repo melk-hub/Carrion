@@ -6,7 +6,7 @@ import Dashboard from './pages/Dashboard';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Archives from './pages/Archives';
-import { useAuth, AuthProvider } from './AuthContext'; // Import du Context
+import { useAuth, AuthProvider } from './AuthContext';
 
 function App() {
   return (
@@ -19,7 +19,7 @@ function App() {
 }
 
 function AppLayout() {
-  const { isAuthenticated, setIsAuthenticated } = useAuth();
+  const { isAuthenticated, setIsAuthenticated, isLoading } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -28,17 +28,14 @@ function AppLayout() {
   }, [location]);
 
   useEffect(() => {
-    if (isAuthenticated) {
+    if (!isLoading && isAuthenticated && location.pathname === '/') {
       navigate('/dashboard');
     }
-  }, [isAuthenticated, navigate]);
+  }, [isAuthenticated, navigate, location.pathname, isLoading]);
 
-  useEffect(() => {
-    const lastPath = localStorage.getItem('lastPath');
-    if (lastPath && location.pathname === '/') {
-      navigate(lastPath);
-    }
-  }, [navigate, location.pathname]);
+  if (isLoading) {
+    return <div>Chargement...</div>;
+  }
 
   return (
     <div>
@@ -53,21 +50,13 @@ function AppLayout() {
         <Route
           path="/dashboard"
           element={
-            isAuthenticated ? (
-              <Dashboard />
-            ) : (
-              <Navigate to="/login" />
-            )
+            isAuthenticated ? <Dashboard /> : <Navigate to="/login" />
           }
         />
         <Route
           path="/archives"
           element={
-            isAuthenticated ? (
-              <Archives />
-            ) : (
-              <Navigate to="/login" />
-            )
+            isAuthenticated ? <Archives /> : <Navigate to="/login" />
           }
         />
       </Routes>
