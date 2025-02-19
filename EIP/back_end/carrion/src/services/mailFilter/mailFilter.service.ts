@@ -8,12 +8,12 @@ export class MailFilterService {
   private openai: OpenAI;
   private readonly jobApply: JobApplyService;
 
-  constructor(jobApply: JobApplyService) {
-    this.openai = new OpenAI({
-      apiKey: process.env.OPENAI_API_KEY,
-    });
-    this.jobApply = jobApply;
-  }
+  // constructor(jobApply: JobApplyService) {
+  //   this.openai = new OpenAI({
+  //     apiKey: process.env.OPENAI_API_KEY,
+  //   });
+  //   this.jobApply = jobApply;
+  // }
 
   async getInformationFromText(text: string, userId: string): Promise<string> {
     try {

@@ -3,6 +3,7 @@ import '../styles/Dashboard.css';
 import archiveIcon from '../assets/archiver.png';
 import deleteIcon from '../assets/supprimer.png';
 import editIcon from '../assets/edit-button.png';
+import logoTest from '../assets/DS_Group_logo.jpg';
 
 function Dashboard() {
   const [applications, setApplications] = useState([]);
@@ -278,7 +279,8 @@ function Dashboard() {
                 {/* Partie 1 - Logo */}
                 <div className="dashboard-grid-logo-container">
                   <img
-                    src={application.imageUrl}
+                    //src={application.imageUrl}
+                    src={logoTest}
                     alt={`${application.company} logo`}
                     className="dashboard-grid-logo"
                   />
