@@ -45,7 +45,7 @@ function Login() {
 
       if (response.ok) {
           setIsAuthenticated(true);
-          navigate('/dashboard');
+          navigate('/home');
       } else {
         setErrorMessage(data.message || 'Identifiants incorrects.');
       }
@@ -57,7 +57,7 @@ function Login() {
 
   const handleLoginSuccess = () => {
     setIsAuthenticated(true);
-    navigate('/dashboard');
+    navigate('/home');
   };
 
   const handleRegisterRedirect = () => {

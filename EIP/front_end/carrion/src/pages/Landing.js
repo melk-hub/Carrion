@@ -33,7 +33,6 @@ function Landing() {
       const progress = Math.min(scrollPosition / maxScroll, 1);
   
       header.style.width = `${80 + 20 * progress}%`;
-      header.style.left = `${10 - 10 * progress}%`;
     };
   
     const handleButtonClick = () => {

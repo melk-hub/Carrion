@@ -1,576 +1,576 @@
 /* Top bar */
 .top-bar {
-padding-top: 50px;
-height: 200px;
-background-color: var(--primary-color);
-display: flex;
-flex-direction: row;
-justify-content: space-between;
-align-items: center;
-}
-
-.objectives {
-margin-left: 5%;
-font-size: 1.5rem;
-}
-
-.objectives h3 {
-font-weight: normal;
-}
-
-.search-input-container {
-margin-right: 5%;
-position: relative;
-display: flex;
-align-items: center;
-width: 350px;
-}
-
-.search-icon {
-position: absolute;
-padding: 5px;
-left: 10px;
-color: var(--text-color);
-font-size: 20px;
-}
-
-.search-input {
-padding: 10px 35px 10px 50px;
-border: 1px solid var(--shadow-color);
-border-radius: 20px;
-font-size: 20px;
-color: var(--text-color);
-box-shadow: 0 2px 4px var(--shadow-color);
-}
-
-.search-input::placeholder {
-color: var(--accent-color);
-opacity: 0.7;
-}
-
-.search-input:focus {
-border-color: var(--shadow-color);
-}
-
-.dashboard-filter-buttons {
-display: flex;
-flex-wrap: wrap;
-justify-content: center;
-gap: 100px;
-padding: 15px;
-border-radius: 10px;
-background: var(--secondary-color);
-box-shadow: 0 4px 8px var(--shadow-color);
-}
-
-/* Checkboxes */
-.filter-checkbox-group {
-display: flex;
-gap: 20px;
-}
-
-.filter-checkbox {
-display: flex;
-align-items: center;
-gap: 10px;  
-font-size: 14px;
-color: var(--text-color);
-cursor: pointer;
-padding: 8px 12px;
-border-radius: 8px;
-background: var(--primary-color);
-}
-
-.filter-checkbox input[type="checkbox"] {
-display: none;
-}
-
-.filter-checkbox:hover .custom-checkbox {
-background: var(--primary-color);
-border-color: var(--accent-color);
-}
-
-.custom-checkbox {
-width: 18px;
-height: 18px;
-border-radius: 4px;
-border: 2px solid var(--shadow-color);
-display: inline-block;
-position: relative;
-transition: all 0.3s ease;
-background: var(--secondary-color);
-}
-
-.filter-checkbox input[type="checkbox"]:checked + .custom-checkbox {
-background: var(--primary-color);
-}
-
-.filter-checkbox input[type="checkbox"]:checked + .custom-checkbox::after {
-content: '✔';
-color: var(--accent-color);
-font-size: 12px;
-position: absolute;
-top: 50%;
-left: 50%;
-transform: translate(-50%, -50%);
-}
-
-/* Sort Options */
-.sort-options {
-display: flex;
-align-items: center;
-text-transform: uppercase;
-font-size: 14px;
-color: var(--text-color);
-gap: 10px;
-background: var(--primary-color);
-border-radius: 10px;
-padding: 8px 15px;
-box-shadow: 0 4px 8px var(--shadow-color);
-}
-
-.sort-options label {
-font-size: 14px;
-font-weight: bold;
-color: var(--text-color);
-}
-
-.sort-options select {
-padding: 10px 15px;
-font-size: 14px;
-color: var(--text-color);
-background: var(--secondary-color);
-border: 1px solid var(--shadow-color);
-border-radius: 8px;
-box-shadow: 0 2px 4px var(--shadow-color);
-cursor: pointer;
-transition: all 0.3s ease;
-}
-
-.sort-options select:hover {
-border-color: var(--accent-color);
-}
-
-.sort-options select:focus {
-outline: none;
-border-color: var(--primary-color);
-}   
-
-/* Toggle Buttons */
-.view-toggle {
-display: flex;
-gap: 20px;
-}
-
-.toggle-button {
-padding: 12px 24px;
-border: 2px solid var(--primary-color);
-border-radius: 8px;
-font-size: 14px;
-font-weight: bold;
-text-transform: uppercase;
-color: var(--text-color);
-background: var(--secondary-color);
-cursor: pointer;
-transition: all 0.3s ease;
-}
-
-.toggle-button.active {
-background: var(--primary-color);
-cursor: auto;
-box-shadow: none;
-}
-
-.toggle-button:hover:not(.active) {
-background: var(--primary-color);
-}
-
-.add-button {
-display: flex;
-}
-
-.add-application {
-padding: 12px 24px;
-border: 2px solid var(--primary-color);
-border-radius: 8px;
-font-size: 14px;
-font-weight: bold;
-text-transform: uppercase;
-color: var(--text-color);
-background: var(--secondary-color);
-cursor: pointer;
-transition: all 0.3s ease;
-}
-
-.add-application:hover {
-background: var(--primary-color);
-}
-
-/* Liste */
-.dashboard-list {
-display: flex;
-flex-direction: column;
-gap: 40px;
-align-items: center;
-box-sizing: border-box;
-margin-top: 80px;
-margin-bottom: 200px;
-}
-
-.dashboard-list-card {
-display: flex;
-align-items: center;
-justify-content: space-between;
-background-color: var(--secondary-color);
-border-radius: 8px;
-padding: 10px;
-width: 70%;
-box-sizing: border-box;
-box-shadow: 0 2px 4px var(--shadow-color);
-position: relative;
-overflow: hidden;
-}
-
-.dashboard-list-logo {
-width: 100px;
-height: 100px;
-margin-left: 2%;
-}
-
-.dashboard-list-content {
-flex: 1;
-margin-left: 50px;
-display: flex;
-flex-direction: column;
-}
-
-.dashboard-list-company-name {
-margin: 0;
-font-size: 20px;
-font-weight: bold;
-color: var(--text-color);
-}
-
-.dashboard-list-job-title {
-margin: 5px 0;
-font-size: 16px;
-color: var(--accent-color);
-}
-
-.dashboard-list-status {
-margin: 5px 0;
-font-size: 14px;
-}
-
-.status-text.on {
-color: #0de406;
-}
-
-.status-text.pending {
-color: #fc8f02;
-}
-
-.status-text.off {
-color: #fa0202;
-}
-
-.dashboard-list-date {
-margin: 5px 0;
-font-size: 14px;
-color: var(--text-color);
-}
-
-.dashboard-list-details {
-color: var(--text-color);
-border: none;
-padding: 10px 15px;
-border-radius: 20px;
-margin-top: 2%;
-width: 85%;
-cursor: pointer;
-box-shadow: 0 2px 4px var(--shadow-color);
-transition: background-color 0.3s ease;
-}
-
-.dashboard-list-details:hover {
-background-color: var(--primary-color);
-}
-
-.dashboard-list-actions {
-display: flex;
-flex-direction: column;
-margin-right: 55%;
-gap: 10px;
-position: relative;
-z-index: 1;
-}
-
-.list-tooltip {
-visibility: hidden;
-opacity: 0;
-position: absolute;
-left: 100%;
-background-color: var(--text-color);
-color: var(--secondary-color);
-padding: 5px 10px;
-border-radius: 5px;
-font-size: 12px;
-white-space: nowrap;
-box-shadow: 0px 2px 4px var(--shadow-color);
-transition: opacity 0.3s ease;
-z-index: 10;
-}
-
-.action-button:hover .list-tooltip {
-visibility: visible;
-opacity: 1;
-}
-
-.dashboard-list-card.on {
-border: 1px solid #0de406;
-}
-
-.dashboard-list-card.pending {
-border: 1px solid #fc8f02;
-}
-
-.dashboard-list-card.off {
-border: 1px solid #fa0202;
-}
-
-/* Grille */
-.dashboard-grid {
-display: grid;
-grid-template-columns: repeat(3, 23%);
-justify-content: center;
-column-gap: 100px;
-row-gap: 70px;
-margin: 80px auto 200px;
-}
-
-.dashboard-grid-card {
-background-color: var(--secondary-color);
-border-radius: 10px;
-box-shadow: 0 2px 6px var(--shadow-color);
-display: flex;
-flex-direction: column;
-justify-content: space-between;
-text-align: center;
-position: relative;
-overflow: hidden;
-z-index: 10;
-width: 100%;
-height: 500px;
-}
-
-/* Partie 1 - Logo */
-.dashboard-grid-logo-container {
-height: 40%;
-display: flex;
-align-items: center;
-justify-content: center;
-overflow: hidden;
-border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-}
-
-.dashboard-grid-logo {
-max-width: 90%;
-max-height: 90%;
-object-fit: contain;
-}
-
-/* Partie 2 - Infos principales */
-.dashboard-grid-content {
-height: 45%;
-display: flex;
-flex-direction: column;
-justify-content: center;
-align-items: center;
-padding: 10px;
-border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-}
-
-.dashboard-grid-company-name {
-font-weight: bold;
-font-size: 30px;
-margin-top: 20px;
-padding: 0;
-line-height: 0.1;
-}
-
-.dashboard-grid-content h4 {
-font-size: 20px;
-font-weight: normal;
-}
-
-.dashboard-list-status {
-font-size: 14px;
-line-height: 0.5;
-}
-
-.dashboard-grid-content p {
-font-size: 14px;
-}
-
-.dashboard-grid-details {
-background-color: var(--primary-color);
-color: var(--text-color);
-border: none;
-padding: 8px 12px;
-border-radius: 15px;
-cursor: pointer;
-box-shadow: 0 2px 4px var(--shadow-color);
-transition: background-color 0.3s ease;
-margin-top: 10px;
-margin-bottom: 10px;
-}
-
-.dashboard-grid-details:hover {
-background-color: var(--secondary-color);
-}
-
-/* Partie 3 - Boutons d'action */
-.dashboard-grid-actions {
-height: 15%;
-display: flex;
-justify-content: space-around;
-align-items: center;
-background-color: #F2F2F2;
-border-radius: 0 0 10px 10px;
-padding: 10px;
-}
-
-.action-button {
-background: none;
-border: none;
-cursor: pointer;
-position: relative;
-}
-
-.action-button img {
-width: 24px;
-height: 24px;
-}
-
-.grid-tooltip {
-visibility: hidden;
-opacity: 0;
-position: absolute;
-bottom: 100%;
-left: 50%;
-transform: translateX(-50%);
-background-color: var(--text-color);
-color: var(--secondary-color);
-padding: 5px 10px;
-border-radius: 5px;
-font-size: 12px;
-white-space: nowrap;
-transition: opacity 0.3s ease;
-z-index: 10;
-}
-
-.action-button:hover .grid-tooltip {
-visibility: visible;
-opacity: 1;
-}
-
-.popup-overlay {
-position: fixed;
-top: 0;
-left: 0;
-width: 100%;
-height: 100%;
-background: rgba(0, 0, 0, 0.5);
-display: flex;
-align-items: center;
-justify-content: center;
-z-index: 1000;
-visibility: hidden;
-opacity: 0;
-transition: opacity 0.3s ease, visibility 0.3s ease;
-}
-
-.popup-overlay.active {
-visibility: visible;
-opacity: 1;
-}
-
-.popup-container {
-background: var(--secondary-color);
-padding: 25px;
-border-radius: 12px;
-box-shadow: 0 4px 15px var(--shadow-color);
-width: 420px;
-max-width: 90%;
-text-align: center;
-position: relative;
-transform: translateY(-20px);
-transition: transform 0.3s ease;
-}
-
-.popup-overlay.active .popup-container {
-transform: translateY(0);
-}
-
-.popup-header {
-font-size: 22px;
-font-weight: bold;
-color: var(--text-color);
-margin-bottom: 20px;
-}
-
-.popup-content {
-display: flex;
-flex-direction: column;
-gap: 12px;
-text-align: left;
-}
-
-.popup-content label {
-font-size: 14px;
-font-weight: 600;
-color: var(--text-color);
-}
-
-.popup-content input,
-.popup-content select {
-padding: 10px;
-border-radius: 8px;
-border: 1px solid var(--shadow-color);
-background: var(--secondary-color);
-color: var(--text-color);
-font-size: 14px;
-}
-
-.popup-buttons {
-display: flex;
-justify-content: space-between;
-margin-top: 20px;
-}
-
-.popup-button {
-flex: 1;
-padding: 12px;
-border-radius: 8px;
-font-size: 14px;
-font-weight: bold;
-cursor: pointer;
-border: none;
-transition: background 0.3s ease, transform 0.2s ease;
-}
-
-.popup-button.cancel {
-background: var(--accent-color);
-color: var(--secondary-color);
-margin-right: 10px;
-}
-
-.popup-button.confirm {
-background: var(--primary-color);
-color: var(--text-color);
-}
-
-.popup-button:hover {
-opacity: 0.9;
-transform: scale(1.05);
-}
+    padding-top: 50px;
+    height: 200px;
+    background-color: var(--primary-color);
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    }
+    
+    .objectives {
+    margin-left: 5%;
+    font-size: 1.5rem;
+    }
+    
+    .objectives h3 {
+    font-weight: normal;
+    }
+    
+    .search-input-container {
+    margin-right: 5%;
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 350px;
+    }
+    
+    .search-icon {
+    position: absolute;
+    padding: 5px;
+    left: 10px;
+    color: var(--text-color);
+    font-size: 20px;
+    }
+    
+    .search-input {
+    padding: 10px 35px 10px 50px;
+    border: 1px solid var(--shadow-color);
+    border-radius: 20px;
+    font-size: 20px;
+    color: var(--text-color);
+    box-shadow: 0 2px 4px var(--shadow-color);
+    }
+    
+    .search-input::placeholder {
+    color: var(--accent-color);
+    opacity: 0.7;
+    }
+    
+    .search-input:focus {
+    border-color: var(--shadow-color);
+    }
+    
+    .dashboard-filter-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 100px;
+    padding: 15px;
+    border-radius: 10px;
+    background: var(--secondary-color);
+    box-shadow: 0 4px 8px var(--shadow-color);
+    }
+    
+    /* Checkboxes */
+    .filter-checkbox-group {
+    display: flex;
+    gap: 20px;
+    }
+    
+    .filter-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 10px;  
+    font-size: 14px;
+    color: var(--text-color);
+    cursor: pointer;
+    padding: 8px 12px;
+    border-radius: 8px;
+    background: var(--primary-color);
+    }
+    
+    .filter-checkbox input[type="checkbox"] {
+    display: none;
+    }
+    
+    .filter-checkbox:hover .custom-checkbox {
+    background: var(--primary-color);
+    border-color: var(--accent-color);
+    }
+    
+    .custom-checkbox {
+    width: 18px;
+    height: 18px;
+    border-radius: 4px;
+    border: 2px solid var(--shadow-color);
+    display: inline-block;
+    position: relative;
+    transition: all 0.3s ease;
+    background: var(--secondary-color);
+    }
+    
+    .filter-checkbox input[type="checkbox"]:checked + .custom-checkbox {
+    background: var(--primary-color);
+    }
+    
+    .filter-checkbox input[type="checkbox"]:checked + .custom-checkbox::after {
+    content: '✔';
+    color: var(--accent-color);
+    font-size: 12px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    }
+    
+    /* Sort Options */
+    .sort-options {
+    display: flex;
+    align-items: center;
+    text-transform: uppercase;
+    font-size: 14px;
+    color: var(--text-color);
+    gap: 10px;
+    background: var(--primary-color);
+    border-radius: 10px;
+    padding: 8px 15px;
+    box-shadow: 0 4px 8px var(--shadow-color);
+    }
+    
+    .sort-options label {
+    font-size: 14px;
+    font-weight: bold;
+    color: var(--text-color);
+    }
+    
+    .sort-options select {
+    padding: 10px 15px;
+    font-size: 14px;
+    color: var(--text-color);
+    background: var(--secondary-color);
+    border: 1px solid var(--shadow-color);
+    border-radius: 8px;
+    box-shadow: 0 2px 4px var(--shadow-color);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    }
+    
+    .sort-options select:hover {
+    border-color: var(--accent-color);
+    }
+    
+    .sort-options select:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    }   
+    
+    /* Toggle Buttons */
+    .view-toggle {
+    display: flex;
+    gap: 20px;
+    }
+    
+    .toggle-button {
+    padding: 12px 24px;
+    border: 2px solid var(--primary-color);
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: bold;
+    text-transform: uppercase;
+    color: var(--text-color);
+    background: var(--secondary-color);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    }
+    
+    .toggle-button.active {
+    background: var(--primary-color);
+    cursor: auto;
+    box-shadow: none;
+    }
+    
+    .toggle-button:hover:not(.active) {
+    background: var(--primary-color);
+    }
+    
+    .add-button {
+    display: flex;
+    }
+    
+    .add-application {
+    padding: 12px 24px;
+    border: 2px solid var(--primary-color);
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: bold;
+    text-transform: uppercase;
+    color: var(--text-color);
+    background: var(--secondary-color);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    }
+    
+    .add-application:hover {
+    background: var(--primary-color);
+    }
+    
+    /* Liste */
+    .dashboard-list {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+    align-items: center;
+    box-sizing: border-box;
+    margin-top: 80px;
+    margin-bottom: 200px;
+    }
+    
+    .dashboard-list-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: var(--secondary-color);
+    border-radius: 8px;
+    padding: 10px;
+    width: 70%;
+    box-sizing: border-box;
+    box-shadow: 0 2px 4px var(--shadow-color);
+    position: relative;
+    overflow: hidden;
+    }
+    
+    .dashboard-list-logo {
+    width: 100px;
+    height: 100px;
+    margin-left: 2%;
+    }
+    
+    .dashboard-list-content {
+    flex: 1;
+    margin-left: 50px;
+    display: flex;
+    flex-direction: column;
+    }
+    
+    .dashboard-list-company-name {
+    margin: 0;
+    font-size: 20px;
+    font-weight: bold;
+    color: var(--text-color);
+    }
+    
+    .dashboard-list-job-title {
+    margin: 5px 0;
+    font-size: 16px;
+    color: var(--accent-color);
+    }
+    
+    .dashboard-list-status {
+    margin: 5px 0;
+    font-size: 14px;
+    }
+    
+    .status-text.on {
+    color: #0de406;
+    }
+    
+    .status-text.pending {
+    color: #fc8f02;
+    }
+    
+    .status-text.off {
+    color: #fa0202;
+    }
+    
+    .dashboard-list-date {
+    margin: 5px 0;
+    font-size: 14px;
+    color: var(--text-color);
+    }
+    
+    .dashboard-list-details {
+    color: var(--text-color);
+    border: none;
+    padding: 10px 15px;
+    border-radius: 20px;
+    margin-top: 2%;
+    width: 85%;
+    cursor: pointer;
+    box-shadow: 0 2px 4px var(--shadow-color);
+    transition: background-color 0.3s ease;
+    }
+    
+    .dashboard-list-details:hover {
+    background-color: var(--primary-color);
+    }
+    
+    .dashboard-list-actions {
+    display: flex;
+    flex-direction: column;
+    margin-right: 55%;
+    gap: 10px;
+    position: relative;
+    z-index: 1;
+    }
+    
+    .list-tooltip {
+    visibility: hidden;
+    opacity: 0;
+    position: absolute;
+    left: 100%;
+    background-color: var(--text-color);
+    color: var(--secondary-color);
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 12px;
+    white-space: nowrap;
+    box-shadow: 0px 2px 4px var(--shadow-color);
+    transition: opacity 0.3s ease;
+    z-index: 10;
+    }
+    
+    .action-button:hover .list-tooltip {
+    visibility: visible;
+    opacity: 1;
+    }
+    
+    .dashboard-list-card.on {
+    border: 1px solid #0de406;
+    }
+    
+    .dashboard-list-card.pending {
+    border: 1px solid #fc8f02;
+    }
+    
+    .dashboard-list-card.off {
+    border: 1px solid #fa0202;
+    }
+    
+    /* Grille */
+    .dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 23%);
+    justify-content: center;
+    column-gap: 100px;
+    row-gap: 70px;
+    margin: 80px auto 200px;
+    }
+    
+    .dashboard-grid-card {
+    background-color: var(--secondary-color);
+    border-radius: 10px;
+    box-shadow: 0 2px 6px var(--shadow-color);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    z-index: 10;
+    width: 100%;
+    height: 500px;
+    }
+    
+    /* Partie 1 - Logo */
+    .dashboard-grid-logo-container {
+    height: 40%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    }
+    
+    .dashboard-grid-logo {
+    max-width: 90%;
+    max-height: 90%;
+    object-fit: contain;
+    }
+    
+    /* Partie 2 - Infos principales */
+    .dashboard-grid-content {
+    height: 45%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 10px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    }
+    
+    .dashboard-grid-company-name {
+    font-weight: bold;
+    font-size: 30px;
+    margin-top: 20px;
+    padding: 0;
+    line-height: 0.1;
+    }
+    
+    .dashboard-grid-content h4 {
+    font-size: 20px;
+    font-weight: normal;
+    }
+    
+    .dashboard-list-status {
+    font-size: 14px;
+    line-height: 0.5;
+    }
+    
+    .dashboard-grid-content p {
+    font-size: 14px;
+    }
+    
+    .dashboard-grid-details {
+    background-color: var(--primary-color);
+    color: var(--text-color);
+    border: none;
+    padding: 8px 12px;
+    border-radius: 15px;
+    cursor: pointer;
+    box-shadow: 0 2px 4px var(--shadow-color);
+    transition: background-color 0.3s ease;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    }
+    
+    .dashboard-grid-details:hover {
+    background-color: var(--secondary-color);
+    }
+    
+    /* Partie 3 - Boutons d'action */
+    .dashboard-grid-actions {
+    height: 15%;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    background-color: #F2F2F2;
+    border-radius: 0 0 10px 10px;
+    padding: 10px;
+    }
+    
+    .action-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    position: relative;
+    }
+    
+    .action-button img {
+    width: 24px;
+    height: 24px;
+    }
+    
+    .grid-tooltip {
+    visibility: hidden;
+    opacity: 0;
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: var(--text-color);
+    color: var(--secondary-color);
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 12px;
+    white-space: nowrap;
+    transition: opacity 0.3s ease;
+    z-index: 10;
+    }
+    
+    .action-button:hover .grid-tooltip {
+    visibility: visible;
+    opacity: 1;
+    }
+    
+    .popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+    }
+    
+    .popup-overlay.active {
+    visibility: visible;
+    opacity: 1;
+    }
+    
+    .popup-container {
+    background: var(--secondary-color);
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px var(--shadow-color);
+    width: 420px;
+    max-width: 90%;
+    text-align: center;
+    position: relative;
+    transform: translateY(-20px);
+    transition: transform 0.3s ease;
+    }
+    
+    .popup-overlay.active .popup-container {
+    transform: translateY(0);
+    }
+    
+    .popup-header {
+    font-size: 22px;
+    font-weight: bold;
+    color: var(--text-color);
+    margin-bottom: 20px;
+    }
+    
+    .popup-content {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    text-align: left;
+    }
+    
+    .popup-content label {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-color);
+    }
+    
+    .popup-content input,
+    .popup-content select {
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid var(--shadow-color);
+    background: var(--secondary-color);
+    color: var(--text-color);
+    font-size: 14px;
+    }
+    
+    .popup-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+    }
+    
+    .popup-button {
+    flex: 1;
+    padding: 12px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    border: none;
+    transition: background 0.3s ease, transform 0.2s ease;
+    }
+    
+    .popup-button.cancel {
+    background: var(--accent-color);
+    color: var(--secondary-color);
+    margin-right: 10px;
+    }
+    
+    .popup-button.confirm {
+    background: var(--primary-color);
+    color: var(--text-color);
+    }
+    
+    .popup-button:hover {
+    opacity: 0.9;
+    transform: scale(1.05);
+    }

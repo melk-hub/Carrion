@@ -1,12 +1,17 @@
 import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes, useNavigate, useLocation, Navigate } from 'react-router-dom';
-import Header from './components/Header';
 import Landing from './pages/Landing';
 import Dashboard from './pages/Dashboard';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Archives from './pages/Archives';
-import { useAuth, AuthProvider } from './AuthContext'; // Import du Context
+import Objectives from './pages/Objectives';
+import Statistics from './pages/Statistics';
+import Career from './pages/Career';
+import Leaderboard from './pages/Leaderboard';
+import Home from './pages/Home';
+import { useAuth, AuthProvider } from './AuthContext';
+import Layout from './components/Layout';
 
 function App() {
   return (
@@ -19,7 +24,7 @@ function App() {
 }
 
 function AppLayout() {
-  const { isAuthenticated, setIsAuthenticated } = useAuth();
+  const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -28,24 +33,12 @@ function AppLayout() {
   }, [location]);
 
   useEffect(() => {
-    if (isAuthenticated) {
-      navigate('/dashboard');
-    }
-  }, [isAuthenticated, navigate]);
-
-  useEffect(() => {
     const lastPath = localStorage.getItem('lastPath');
-    if (lastPath && location.pathname === '/') {
-      navigate(lastPath);
-    }
+    navigate(lastPath);
   }, [navigate, location.pathname]);
 
   return (
     <div>
-      {location.pathname !== '/' && location.pathname !== '/login' && location.pathname !== '/register' && (
-        <Header setIsAuthenticated={setIsAuthenticated} />
-      )}
-
       <Routes>
         <Route path="/" element={<Landing />} />
         <Route path="/login" element={<Login />} />
@@ -54,7 +47,7 @@ function AppLayout() {
           path="/dashboard"
           element={
             isAuthenticated ? (
-              <Dashboard />
+              <Layout><Dashboard /></Layout>
             ) : (
               <Navigate to="/login" />
             )
@@ -64,7 +57,57 @@ function AppLayout() {
           path="/archives"
           element={
             isAuthenticated ? (
-              <Archives />
+              <Layout><Archives /></Layout>
+            ) : (
+              <Navigate to="/login" />
+            )
+          }
+        />
+        <Route
+          path="/objectives"
+          element={
+            isAuthenticated ? (
+              <Layout><Objectives /></Layout>
+            ) : (
+              <Navigate to="/login" />
+            )
+          }
+        />
+        <Route
+          path="/home"
+          element={
+            isAuthenticated ? (
+              <Layout><Home /></Layout>
+            ) : (
+              <Navigate to="/login" />
+            )
+          }
+        />
+        <Route
+          path="/statistics"
+          element={
+            isAuthenticated ? (
+              <Layout><Statistics /></Layout>
+            ) : (
+              <Navigate to="/login" />
+            )
+          }
+        />
+        <Route
+          path="/career"
+          element={
+            isAuthenticated ? (
+              <Layout><Career /></Layout>
+            ) : (
+              <Navigate to="/login" />
+            )
+          }
+        />
+        <Route
+          path="/leaderboard"
+          element={
+            isAuthenticated ? (
+              <Layout><Leaderboard /></Layout>
             ) : (
               <Navigate to="/login" />
             )
