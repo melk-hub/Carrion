@@ -7,7 +7,7 @@ height: 100vh;
 position: fixed;
 left: 0;
 top: 0;
-width: 10rem;
+width: 8rem;
 height: 100vh;
 background-color: var(--primary-color);
 display: flex;
@@ -16,7 +16,7 @@ justify-content: center;
 z-index: 100;
 }
 
-.main-bubble-container {
+/* .main-bubble-container {
 position: relative;
 display: flex;
 flex-direction: column;
@@ -34,9 +34,9 @@ justify-content: center;
 box-shadow: 0 4px 8px var(--shadow-color);
 cursor: pointer;
 transition: transform 1.5s ease-out, opacity 1.5s ease-out;
-}
+} */
 
-.nav-dropdown {
+/* .nav-dropdown {
 position: absolute;
 top: 5rem;
 left: 50%;
@@ -47,9 +47,16 @@ gap: 1rem;
 opacity: 0;
 visibility: hidden;
 transition: opacity 1.5s ease, visibility 1.5s ease, top 1.5s ease;
-}
+} */
 
-.nav-dropdown.expanded {
+.nav-dropdown {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    align-items: center;
+  }
+
+/* .nav-dropdown.expanded {
 opacity: 1;
 visibility: visible;
 top: 2rem;
@@ -58,12 +65,12 @@ top: 2rem;
 .main-bubble-container:hover .main-bubble {
 opacity: 0;
 transform: translateY(-18rem) rotate(180deg);
-}
+} */
 
-.main-bubble-container:hover .nav-dropdown {
+/* .main-bubble-container:hover .nav-dropdown {
 top: -13rem;
 opacity: 1;
-}
+} */
 
 .nav-bubble {
 width: 4rem;
@@ -76,6 +83,7 @@ justify-content: center;
 box-shadow: 0 4px 8px var(--shadow-color);
 cursor: pointer;
 position: relative;
+border: 1px solid;
 }
 
 .nav-bubble:hover {
@@ -87,10 +95,10 @@ position: absolute;
 left: 120%;
 top: 50%;
 transform: translateY(-50%);
-white-space: nowrap;
 background-color: var(--secondary-color);
 color: var(--text-color);
-padding: 0.5rem 1rem;
+font-weight: bold;
+padding: 0.5rem 0.5rem;
 border-radius: 0.5rem;
 box-shadow: 0 2px 4px var(--shadow-color);
 z-index: 500;
@@ -114,7 +122,7 @@ flex-direction: column;
 .header {
 position: fixed;
 top: 0;
-left: 10rem;
+left: 8rem;
 right: 0;
 height: 4rem;
 background-color: var(--secondary-color);
@@ -144,4 +152,9 @@ border: none;
 cursor: pointer;
 color: var(--text-color);
 font-weight: bold;
+}
+
+.page-content {
+margin-top: 4rem;
+margin-left: 2rem;
 }

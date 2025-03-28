@@ -108,8 +108,11 @@ function Dashboard() {
   };
 
   const statusMap = {
+    PENDING: "En attente",
+    RELANCE1: "Il faut relancer",
+    ENTRETIEN: "Entretien décroché",
+    RELANCE2: "Il faut relancer ",
     ON: "Acceptée",
-    PENDING: "En attente de réponse",
     OFF: "Refusée"
   };
 
@@ -168,26 +171,23 @@ function Dashboard() {
 
   return (
     <div>
-      <div className="top-bar">
-        <div className="objectives">
-          {/* <h3>Objectif de la semaine :</h3> */}
-        </div>
-        <div className="search-input-container">
-          <span className="search-icon">🔍</span>
-          <input
-            type="text"
-            placeholder="Rechercher une candidature"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="search-input"
-          />
-        </div>
-      </div>
-
-      <div className="dashboard-filter-buttons">
+      <div className="dashboard-filter-container">
         <div className="filter-checkbox-group">
-          {Object.values(statusMap).map(status => (
-            <label key={status} className="filter-checkbox">
+          {Object.entries(statusMap).map(([key, status]) => (
+            <label
+              key={status}
+              className={`filter-checkbox ${(() => {
+                switch (key) {
+                  case 'PENDING': return 'status-pending';
+                  case 'RELANCE1': return 'status-relance1';
+                  case 'RELANCE2': return 'status-relance2';
+                  case 'ENTRETIEN': return 'status-entretien';
+                  case 'ON': return 'status-on';
+                  case 'OFF': return 'status-off';
+                  default: return '';
+                }
+              })()}`}
+            >
               <input
                 type="checkbox"
                 checked={selectedStatuses.has(status)}
@@ -198,12 +198,24 @@ function Dashboard() {
             </label>
           ))}
         </div>
+
         <div className="sort-options">
           <label htmlFor="sort-select">Trier par : </label>
           <select id="sort-select" value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
             <option value="date">Date</option>
             <option value="status">Statut</option>
           </select>
+        </div>
+        
+        <div className="search-input-container">
+          <span className="search-icon">🔍</span>
+          <input
+            type="text"
+            placeholder="Rechercher une candidature"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="search-input"
+          />
         </div>
 
         <div className="view-toggle">
@@ -220,11 +232,12 @@ function Dashboard() {
             Liste
           </button>
         </div>
+
         <div className="add-button">
           <button className="add-application" onClick={openAddPopup}>
             Ajouter une candidature
           </button>
-        </div>
+        </div>        
       </div>
 
       {viewMode === 'list' && (
@@ -244,7 +257,7 @@ function Dashboard() {
                     Statut : <span className={`status-text ${application.status.toLowerCase()}`}>
                       {statusMap[application.status.trim().toUpperCase()] || " Statut inconnu"}
                     </span>
-                  </p>                
+                  </p>            
                   <p className="dashboard-list-date">Date de candidature : {new Date(application.createdAt).toLocaleDateString('fr-FR') || " Date inconnue"}</p>
                   <button className="dashboard-list-details" onClick={() => openDetailsPopup(application)}>Voir les détails</button>
                 </div>
@@ -289,9 +302,20 @@ function Dashboard() {
                 <div className="dashboard-grid-content">
                   <div className="dashboard-grid-company-name">{application.company || "Entreprise inconnue"}</div>
                   <h4>{application.title || "Poste inconnu"}</h4>
-                  <p className="dashboard-list-status">
-                    Statut : <span className={`status-text ${application.status.toLowerCase()}`}>
-                      {statusMap[application.status.trim().toUpperCase()] || " Statut inconnu"}
+                  <p className="dashboard-grid-status">
+                    Statut :
+                    <span className={`status-text ${(() => {
+                      switch (application.status.trim().toUpperCase()) {
+                        case 'PENDING': return 'status-pending';
+                        case 'RELANCE1': return 'status-relance1';
+                        case 'RELANCE2': return 'status-relance2';
+                        case 'ENTRETIEN': return 'status-entretien';
+                        case 'ON': return 'status-on';
+                        case 'OFF': return 'status-off';
+                        default: return '';
+                      }
+                    })()}`}>
+                      {statusMap[application.status.trim().toUpperCase()] || "Statut inconnu"}
                     </span>
                   </p>
                   <p>Date de candidature : {new Date(application.createdAt).toLocaleDateString('fr-FR') || " Date inconnue"}</p>
