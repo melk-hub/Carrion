@@ -1,5 +1,4 @@
 import React from 'react';
-import "../styles/LoginPage.css";
 
 const GoogleLoginButton = () => {
     const GOOGLE_ID = process.env.REACT_APP_GOOGLE_CLIENT_ID;

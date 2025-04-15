@@ -1,0 +1,165 @@
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.auth-modal {
+  background: #fff;
+  border-radius: 24px;
+  padding: 3rem;
+  width: 600px;
+  height: 600px;
+  max-width: 90%;
+  position: relative;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+  position: relative;
+  overflow: hidden;
+}
+
+.close-button {
+  position: absolute;
+  top: 12px;
+  right: 16px;
+  background: none;
+  border: none;
+  font-size: 28px;
+  cursor: pointer;
+}
+
+.auth-modal h1 {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.tabs {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+.tabs button {
+  background: none;
+  border: none;
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  transition: all 0.2s ease;
+}
+
+.tabs button.active {
+  border-color: #ff9800;
+  cursor: default;
+}
+
+.auth-modal form {
+  display: flex;
+  flex-direction: column;
+}
+
+.auth-modal label {
+  margin-top: 25px;
+}
+
+.auth-modal input {
+  padding: 0.75rem 1rem;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  font-size: 1rem;
+  margin-top: 5px;
+}
+
+.options {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.9rem;
+}
+
+.forgot-btn {
+  background: none;
+  border: none;
+  color: #555;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.primary-btn {
+  background: #132238;
+  color: #fff;
+  padding: 0.75rem;
+  border: none;
+  border-radius: 12px;
+  font-size: 1rem;
+  cursor: pointer;
+  margin: 25px auto;
+  width: 50%;
+}
+
+.social-buttons {
+  display: flex;
+  flex-direction: row;
+  gap: 0.75rem;
+  margin-top: 2rem;
+}
+
+.social-buttons button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-size: 1rem;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.google-login-button {
+  background-color: var(--secondary-color);
+  border: 1px solid #d1d1d1;
+  color: var(--text-color);
+  margin-left: 0 !important;
+}
+
+.google-login-button img {
+  width: 20px;
+}
+
+.outlook-btn {
+  background: #0078d4;
+  color: #fff;
+  border: none;
+}
+
+.outlook-btn img {
+  height: 20px;
+}
+
+.row-inputs {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 20px;
+}
+
+.row-inputs div {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.social-buttons button,
+.social-buttons > * {
+  flex: 1;
+}
+
+.error-message {
+  color: red;
+  font-size: 0.9rem;
+}
