@@ -1,24 +1,38 @@
-import React from "react";
+import React, { useState } from "react";
 import "../styles/Navbar.css";
 
 function Navbar() {
+  const [isCollapsed, setIsCollapsed] = useState(false);
+  
     return (
-      <div className="sidebar">
-        <div className="logo">
-          <span className="icon">🌀</span>
-          <span className="text">CARRION</span>
+      <div className="layout">
+        <div className="topbar">
+          <div className="logo right">
+            <span className="icon">🌀</span>
+            <span className="text">CARRION</span>
+          </div>
+          <div className="notifications">
+            <span className="bell">🔔</span>
+          </div>
+          <div className="user-profile">
+            <img alt="User" className="avatar" />
+            <span className="username">Jeremy</span>
+          </div>
         </div>
-        <ul className="menu">
-          <li>
-            <span>🏠</span>‎ ‎ ‎Accueil
-          </li>
-          <li>
-            <span>📄</span>‎ ‎ ‎Candidatures
-          </li>
-          <li>
-            <span>📊</span>‎ ‎ ‎Données
-          </li>
-        </ul>
+  
+        <div className={`sidebar ${isCollapsed ? "collapsed" : ""}`}>
+          <ul className="menu">
+            <li>
+              <span>🏠</span> {!isCollapsed && "Accueil"}
+            </li>
+            <li>
+              <span>📄</span> {!isCollapsed && "Candidatures"}
+            </li>
+            <li>
+              <span>📊</span> {!isCollapsed && "Données"}
+            </li>
+          </ul>
+        </div>
       </div>
     );
 };
