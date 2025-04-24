@@ -8,6 +8,7 @@
   --small-border-radius: 8px;
   --large-border-radius: 20px;
   --font-family: "Roboto", sans-serif;
+  --header-height: 95px;
 }
 
 html,
@@ -38,8 +39,35 @@ body {
 /* HEADER ET NAVBAR */
 
 .landing-header {
+  position: fixed;
+  top: 0;
+  left: 0;
   width: 100%;
   padding: 15px 30px;
+  z-index: 1000;
+  transition: top 0.4s ease-in-out, background-color 0.4s ease-in-out, box-shadow 0.4s ease-in-out;
+  height: var(--header-height);
+  display: flex;
+  align-items: center;
+  background-color: var(--background-color);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.landing-header.hidden {
+  top: calc(-1 * var(--header-height));
+}
+
+.landing-header.visible {
+  top: 0;
+}
+
+.landing-header.header-at-top {
+  background-color: transparent;
+  box-shadow: none;
+}
+
+.landing-main-content {
+  padding-top: var(--header-height);
 }
 
 .landing-header nav {

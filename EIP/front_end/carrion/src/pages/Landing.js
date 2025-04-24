@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import "../styles/Landing.css";
@@ -18,14 +18,15 @@ import lucide_folder_svg from "../assets/svg/folder_lucide.svg";
 function Landing() {
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
+  const [isHeaderVisible, setIsHeaderVisible] = useState(true);
+  const [isAtTop, setIsAtTop] = useState(true);
+  const lastScrollY = useRef(0);
+  const scrollThreshold = 5;
+  const topThreshold = 5;
 
   const handleLoginClick = () => {
     navigate("/login");
   };
-
-  // const handleRegisterToggle = () => {
-  //   navigate('/register');
-  // };
 
   useEffect(() => {
     document.body.classList.add("landing-page");
@@ -36,14 +37,33 @@ function Landing() {
   }, []);
 
   useEffect(() => {
-    // const handleScroll = () => {
-    //   const header = document.querySelector(".fixed-header");
-    //   const scrollPosition = window.scrollY;
-    //   const maxScroll = window.innerHeight;
-    //   const progress = Math.min(scrollPosition / maxScroll, 1);
-    //   header.style.width = `${80 + 20 * progress}%`;
-    //   header.style.left = `${10 - 10 * progress}%`;
-    // };
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      const atTop = currentScrollY <= topThreshold;
+
+      setIsAtTop(atTop);
+
+      if (atTop) {
+        setIsHeaderVisible(true);
+      } else if (currentScrollY < lastScrollY.current - scrollThreshold) {
+        setIsHeaderVisible(true);
+      } else if (currentScrollY > lastScrollY.current + scrollThreshold) {
+        setIsHeaderVisible(false);
+      }
+
+      lastScrollY.current = currentScrollY;
+    };
+
+    const initialScrollY = window.scrollY;
+    lastScrollY.current = initialScrollY;
+    setIsAtTop(initialScrollY <= topThreshold);
+    setIsHeaderVisible(initialScrollY <= topThreshold);
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
   }, []);
 
   useEffect(() => {
@@ -55,7 +75,13 @@ function Landing() {
   return (
     <div className="landing-page">
       {/* Header avec navbar */}
-      <header className="landing-header">
+      <header
+        className={`
+          landing-header
+          ${isHeaderVisible ? "visible" : "hidden"}
+          ${isAtTop ? "header-at-top" : ""}
+        `}
+      >
         <nav aria-label="Navigation principale">
           <div className="logo-container">
             <img src={logo} alt="Carrion logo" />
@@ -72,7 +98,7 @@ function Landing() {
       </header>
 
       {/* Contenu principal */}
-      <main>
+      <main className="landing-main-content">
         {/* Section landing */}
         <section className="hero-section">
           <div className="hero-content">
