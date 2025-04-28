@@ -1,6 +1,7 @@
 import React, { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
+import { useAuth } from "../AuthContext";
 import "../styles/Landing.css";
 import logo from "../assets/carrion_logo.png";
 import globe from "../assets/globe-icon.png";
@@ -8,7 +9,6 @@ import landing_img from "../assets/landing_bg.png";
 import optimize_img from "../assets/optimize_landing.jpg";
 import progression_img from "../assets/progression_landing.png";
 import centralize_img from "../assets/centralize_landing.png";
-import { useAuth } from "../AuthContext";
 import PrimaryButton from "../components/PrimaryButton";
 import lucide_search_svg from "../assets/svg/search_lucide.svg";
 import lucide_calendar_svg from "../assets/svg/calendar_lucide.svg";
@@ -84,15 +84,21 @@ function Landing() {
       >
         <nav aria-label="Navigation principale">
           <div className="logo-container">
-            <img src={logo} alt="Carrion logo" />
-            <a href="/">CARRION</a>
+            <a href="/">
+              <img src={logo} alt="Carrion logo" />
+              CARRION
+            </a>
           </div>
           <div className="navigation-actions">
             <div className="language-button">
               <img src={globe} alt="Icône de la langue" />
               <span>Français</span>
             </div>
-            <PrimaryButton text="Se connecter" onClick={handleLoginClick} />
+            <PrimaryButton
+              text="Se connecter"
+              onClick={handleLoginClick}
+              size="medium"
+            />
           </div>
         </nav>
       </header>
@@ -111,6 +117,7 @@ function Landing() {
               <PrimaryButton
                 text="Démarrer sans attendre"
                 onClick={handleLoginClick}
+                size="large"
               />
             </div>
             <img src={landing_img} alt="Illustration de la page d'accueil" />

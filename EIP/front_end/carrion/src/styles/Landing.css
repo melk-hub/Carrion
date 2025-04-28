@@ -17,7 +17,6 @@ body {
   padding: 0;
   box-sizing: border-box;
   font-family: Arial, Helvetica, sans-serif;
-  user-select: none;
   overscroll-behavior: contain;
 }
 
@@ -45,7 +44,8 @@ body {
   width: 100%;
   padding: 15px 30px;
   z-index: 1000;
-  transition: top 0.4s ease-in-out, background-color 0.4s ease-in-out, box-shadow 0.4s ease-in-out;
+  transition: top 0.4s ease-in-out, background-color 0.4s ease-in-out,
+    box-shadow 0.4s ease-in-out;
   height: var(--header-height);
   display: flex;
   align-items: center;
@@ -54,16 +54,19 @@ body {
 }
 
 .landing-header.hidden {
-  top: calc(-1 * var(--header-height));
+  height: 50px;
+  top: calc(-1 * 50px);
 }
 
 .landing-header.visible {
+  height: 50px;
   top: 0;
 }
 
 .landing-header.header-at-top {
   background-color: transparent;
   box-shadow: none;
+  height: var(--header-height);
 }
 
 .landing-main-content {
@@ -83,6 +86,7 @@ body {
   display: flex;
   flex-direction: row;
   align-items: center;
+  justify-content: center;
 }
 
 .logo-container img {
@@ -90,39 +94,18 @@ body {
   height: 65px;
 }
 
-.logo-container a {
-  color: var(--brand-color-primary);
-  text-decoration: none;
-  font-weight: bold;
-  outline: none;
-  font-size: 18px;
-  font-family: Arial, Helvetica, sans-serif;
-  filter: drop-shadow(0px 4px 4px rgba(0, 0, 0, 0.25));
-}
-
-.logo-container a:visited {
-  color: var(--brand-color-primary);
-  text-decoration: none;
-  font-weight: bold;
-  font-size: 18px;
-  font-family: Arial, Helvetica, sans-serif;
-  filter: drop-shadow(0px 4px 4px rgba(0, 0, 0, 0.25));
-}
-
-.logo-container a:active {
-  color: var(--brand-color-primary);
-  text-decoration: none;
-  font-weight: bold;
-  font-size: 18px;
-  font-family: Arial, Helvetica, sans-serif;
-  filter: drop-shadow(0px 4px 4px rgba(0, 0, 0, 0.25));
-}
-
+.logo-container a,
+.logo-container a:visited,
+.logo-container a:active,
 .logo-container a:focus-visible {
-  box-shadow: 0 0 0 2px var(--background-color, white),
-    0 0 0 4px var(--brand-color-secondary);
-  border-radius: 2px;
-  font-weight: 600;
+  display: flex;
+  flex-direction: row;
+  text-align: center;
+  justify-content: center;
+  align-items: center;
+  color: var(--brand-color-primary);
+  text-decoration: none;
+  font-weight: bold;
   font-size: 18px;
   font-family: Arial, Helvetica, sans-serif;
   filter: drop-shadow(0px 4px 4px rgba(0, 0, 0, 0.25));
@@ -354,7 +337,6 @@ section h2 {
   flex-direction: row-reverse;
 }
 
-
 /* SECTION FEEDBACK UTILISATEUR */
 
 /* .feedback-content {
@@ -380,6 +362,7 @@ footer {
     width: 90%;
     max-width: 550px;
     height: 90%;
+    border-radius: 90px;
   }
 }
 
@@ -392,6 +375,7 @@ footer {
     width: 50%;
     max-width: 550px;
     height: auto;
+    border-radius: 70px;
   }
 
   h1 {
@@ -450,7 +434,7 @@ footer {
     width: 80%;
     max-width: 450px;
     height: auto;
-    border-radius: 60px;
+    border-radius: 50px;
   }
 
   h1 {
@@ -501,9 +485,29 @@ footer {
 
 @media (max-width: 768px) {
   .landing-header nav {
-    padding: 10px 20px;
-    flex-direction: column;
-    gap: 15px;
+    padding: 10px 15px;
+    gap: 10px;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .logo-container img {
+    width: 50px;
+    height: 50px;
+  }
+
+  .logo-container a {
+    font-size: 16px;
+  }
+
+  .navigation-actions {
+    gap: 10px;
+    padding: 0 5px;
+  }
+
+  .language-button img {
+    width: 18px;
+    height: 18px;
   }
 
   h1 {
@@ -570,6 +574,43 @@ footer {
 }
 
 @media (max-width: 576px) {
+  .landing-header {
+    padding: 0;
+  }
+
+  .landing-header nav {
+    padding: 8px 8px;
+    gap: 6px;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .logo-container img {
+    width: 50px;
+    height: 50px;
+  }
+
+  .logo-container a,
+  .logo-container a:focus-visible,
+  .logo-container a:visited,
+  .logo-container a:active {
+    font-size: 14px;
+  }
+
+  .navigation-actions {
+    gap: 8px;
+    padding: 0 3px;
+  }
+
+  .language-button {
+    font-size: 14px;
+  }
+
+  .language-button img {
+    width: 12px;
+    height: 12px;
+  }
+
   h1 {
     font-size: 30px;
   }
@@ -586,7 +627,7 @@ footer {
   .hero-content img {
     width: 90%;
     max-width: 350px;
-    border-radius: 40px;
+    border-radius: 30px;
   }
 
   .service-box {
@@ -617,5 +658,19 @@ footer {
   footer {
     padding: 2.5rem 1rem;
     border-radius: 30px 30px 0 0;
+  }
+}
+
+@media (max-width: 350px) {
+  .logo-container img {
+    width: 40px;
+    height: 40px;
+  }
+
+  .logo-container a,
+  .logo-container a:focus-visible,
+  .logo-container a:visited,
+  .logo-container a:active {
+    font-size: 12px;
   }
 }
