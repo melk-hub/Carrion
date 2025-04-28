@@ -14,6 +14,7 @@ import lucide_search_svg from "../assets/svg/search_lucide.svg";
 import lucide_calendar_svg from "../assets/svg/calendar_lucide.svg";
 import lucide_bar_chart_svg from "../assets/svg/bar_chart_lucide.svg";
 import lucide_folder_svg from "../assets/svg/folder_lucide.svg";
+import Footer from "../components/Footer";
 
 function Landing() {
   const { isAuthenticated } = useAuth();
@@ -255,9 +256,7 @@ function Landing() {
         </section> */}
 
         {/* Footer */}
-        <footer>
-          <h2>Footer TBD</h2>
-        </footer>
+        <Footer />
       </main>
     </div>
   );
