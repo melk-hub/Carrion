@@ -8,21 +8,27 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 function AuthModal({ isOpen, onClose, defaultTab }) {
   const [activeTab, setActiveTab] = useState(defaultTab || 'login');
-  useEffect(() => {
-    setActiveTab(defaultTab || 'login');
-  }, [defaultTab]);
   const [direction, setDirection] = useState(1);
-  const [credentials, setCredentials] = useState({ identifier: '', password: '' });
+  const [credentials, setCredentials] = useState({ identifier: '', password: '', confirmPassword: '', username: '', firstName: 'John', lastName: 'Doe', birthDate: '1995-06-15' });
+  const [personalInfo, setPersonalInfo] = useState({ nom: '', prenom: '', dateNaissance: '', email: '', ecole: '', ville: '', job: '', cv: null, linkedin: '', portfolio: '', description: '', });
   const { setIsAuthenticated } = useAuth();
   const navigate = useNavigate();
   const [errorMessage, setErrorMessage] = useState('');
   const API_URL = process.env.REACT_APP_API_URL;
 
+  useEffect(() => {
+    setActiveTab(defaultTab || 'login');
+  }, [defaultTab]);
+
   if (!isOpen) return null;
 
-  const handleChange = (e) => {
+  const handleChange = (e, isCredential = true) => {
     const { name, value } = e.target;
-    setCredentials({ ...credentials, [name]: value });
+    if (isCredential) {
+      setCredentials({ ...credentials, [name]: value });
+    } else {
+      setPersonalInfo({ ...personalInfo, [name]: value });
+    }
   };
 
   const handleTabChange = (tab) => {
@@ -38,18 +44,9 @@ function AuthModal({ isOpen, onClose, defaultTab }) {
   };
 
   const variants = {
-    enter: (direction) => ({
-      x: direction * 100,
-      opacity: 0
-    }),
-    center: {
-      x: 0,
-      opacity: 1
-    },
-    exit: (direction) => ({
-      x: direction * -100,
-      opacity: 0
-    })
+    enter: (direction) => ({ x: direction * 100, opacity: 0 }),
+    center: { x: 0, opacity: 1 },
+    exit: (direction) => ({ x: direction * -100, opacity: 0 })
   };
 
   const handleSubmit = async (e) => {
@@ -59,16 +56,15 @@ function AuthModal({ isOpen, onClose, defaultTab }) {
         const response = await fetch(`${API_URL}/auth/signin`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(credentials),
+          body: JSON.stringify({ identifier: credentials.identifier, password: credentials.password }),
           credentials: 'include',
         });
 
-        const data = await response;
-
       if (response.ok) {
           setIsAuthenticated(true);
-          navigate('/home');
+          navigate('/dashboard?new=true');
       } else {
+        const data = await response.json();
         setErrorMessage(data.message || 'Identifiants incorrects.');
       }
     } catch (error) {
@@ -86,13 +82,13 @@ function AuthModal({ isOpen, onClose, defaultTab }) {
         const response = await fetch(`${API_URL}/auth/signup`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(credentials),
+          body: JSON.stringify({ username: credentials.email, password: credentials.password, firstName: credentials.firstName, lastName: credentials.lastName, birthDate: credentials.birthDate, email: credentials.email }),
           credentials: 'include',
         });
     
         if (response.ok) {
           setIsAuthenticated(true);
-          navigate('/dashboard');
+          navigate('/dashboard?new=true');
         } else {
           const errorData = await response.json();
           alert(errorData.message || "Erreur lors de l'inscription.");
@@ -110,111 +106,52 @@ function AuthModal({ isOpen, onClose, defaultTab }) {
         <h1>{activeTab === 'login' ? 'Bienvenue !' : 'Nous rejoindre !'}</h1>
 
         <div className="tabs">
-          <button
-            className={activeTab === 'login' ? 'active' : ''}
-            onClick={() => handleTabChange('login')}
-          >
-            Se connecter
-          </button>
-          <button
-            className={activeTab === 'register' ? 'active' : ''}
-            onClick={() => handleTabChange('register')}
-          >
-            Créer un compte
-          </button>
+          <button className={activeTab === 'login' ? 'active' : ''} onClick={() => handleTabChange('login')}>Se connecter</button>
+          <button className={activeTab === 'register' ? 'active' : ''} onClick={() => handleTabChange('register')}>Créer un compte</button>
         </div>
 
         <hr />
 
         <AnimatePresence mode="wait">
           {activeTab === 'login' && (
-            <motion.div 
-              key="login"
-              custom={direction}
-              variants={variants}
-              initial="enter"
-              animate="center"
-              exit="exit"
-              transition={{ duration: 0.25 }}
-            >
+            <motion.div key="login" custom={direction} variants={variants} initial="enter" animate="center" exit="exit" transition={{ duration: 0.25 }}>
               <form onSubmit={handleSubmit}>
-                <label>Adresse email</label>
-                <input
-                  type="text"
-                  name="identifier"
-                  placeholder="Email"
-                  value={credentials.identifier}
-                  onChange={handleChange}
-                  required
-                />
+                <label>Email / Nom d'utilisateur</label>
+                <input type="text" name="identifier" placeholder="Email / Nom d'utilisateur" value={credentials.identifier} onChange={handleChange} required />
                 <label>Mot de passe</label>
-                <input
-                  type="password"
-                  name="password"
-                  placeholder="Mot de passe"
-                  value={credentials.password}
-                  onChange={handleChange}
-                  required
-                />
+                <input type="password" name="password" placeholder="Mot de passe" value={credentials.password} onChange={handleChange} required />
                 {errorMessage && <p className="error-message">{errorMessage}</p>}
-                <div className="options">
-                  <label>
-                    <input type="checkbox" /> Rester connecté
-                  </label>
-                  <button type="button" className="forgot-btn">Mot de passe oublié</button>
-                </div>
-
                 <button type="submit" className="primary-btn">Se connecter</button>
               </form>
             </motion.div>
           )}
 
           {activeTab === 'register' && (
-            <motion.div 
-              key="register"
-              custom={direction}
-              variants={variants}
-              initial="enter"
-              animate="center"
-              exit="exit"
-              transition={{ duration: 0.25 }}
-            >
+            <motion.div key="register" custom={direction} variants={variants} initial="enter" animate="center" exit="exit" transition={{ duration: 0.25 }}>
               <form onSubmit={handleSubmit}>
-            <label>Email</label>
-            <input
-              type="email"
-              name="email"
-              placeholder="Email"
-              value={credentials.identifier}
-              onChange={handleChange}
-              required
-            />
-            <div className="row-inputs">
-              <div>
-                <label>Mot de passe</label>
-                <input
-                  type="password"
-                  name="password"
-                  placeholder="Mot de passe"
-                  value={credentials.password}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-              <div>
-                <label>Confirmer le mot de passe</label>
-                <input
-                  type="password"
-                  name="confirmPassword"
-                  placeholder="Confirmer le mot de passe"
-                  value={credentials.confirmPassword || ''}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-            </div>
-            <button type="submit" className="primary-btn">S’enregistrer</button>
-          </form>
+              <div className="row-inputs">
+                  <div>
+                    <label>Email</label>
+                  <input type="email" name="email" placeholder="Email" value={credentials.email} onChange={handleChange} required />
+                  </div>
+                  <div>
+                    <label>Nom d'utilisateur</label>
+                    <input type="username" name="username" placeholder="Nom d'utilisateur" value={credentials.username} onChange={handleChange} required />
+                  </div>
+                </div>
+
+                <div className="row-inputs">
+                  <div>
+                    <label>Mot de passe</label>
+                    <input type="password" name="password" placeholder="Mot de passe" value={credentials.password} onChange={handleChange} required />
+                  </div>
+                  <div>
+                    <label>Confirmer le mot de passe</label>
+                    <input type="password" name="confirmPassword" placeholder="Confirmer le mot de passe" value={credentials.confirmPassword} onChange={handleChange} required />
+                  </div>
+                </div>
+                <button type="submit" className="primary-btn">S'inscrire</button>
+              </form>
             </motion.div>
           )}
         </AnimatePresence>

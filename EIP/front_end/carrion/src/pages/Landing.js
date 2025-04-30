@@ -260,7 +260,7 @@ function Landing() {
           <h2>Footer TBD</h2>
         </footer>
       </main>
-      <AuthModal 
+      <AuthModal
         isOpen={showAuth} 
         onClose={() => setShowAuth(false)} 
       />

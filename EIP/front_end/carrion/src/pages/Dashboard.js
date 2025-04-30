@@ -3,6 +3,7 @@ import '../styles/Dashboard.css';
 import archiveIcon from '../assets/archiver.png';
 import deleteIcon from '../assets/supprimer.png';
 import editIcon from '../assets/edit-button.png';
+import InfosModal from '../components/InfosModal';
 
 function Dashboard() {
   const [applications, setApplications] = useState([]);
@@ -14,6 +15,17 @@ function Dashboard() {
   const [newApplication, setNewApplication] = useState(null);
   const [popupType, setPopupType] = useState(null);
   const API_URL = process.env.REACT_APP_API_URL;
+  const [showWelcomeModal, setShowWelcomeModal] = useState(false);
+
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const isNew = urlParams.get('new') === 'true';
+
+    if (isNew) {
+      setShowWelcomeModal(true);
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+  }, []);
 
   useEffect(() => {
     const fetchApplications = async () => {
@@ -167,6 +179,7 @@ function Dashboard() {
 
   return (
     <div>
+      <InfosModal isOpen={showWelcomeModal} onClose={() => setShowWelcomeModal(false)} />
       <div className="top-bar">
         <div className="objectives">
           {/* <h3>Objectif de la semaine :</h3> */}
