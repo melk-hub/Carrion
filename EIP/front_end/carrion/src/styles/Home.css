@@ -1,45 +1,10 @@
 /* SuiviCandidatures.css */
-body {
-    margin: 0;
-    font-family: "Segoe UI", sans-serif;
-    background-color: #f9fafb;
-    color: #111;
-  }
+
   
   .container {
     padding: 0;
   }
-  
-  .header {
-    background-color: #111;
-    color: white;
-    text-align: center;
-    padding: 2rem 1rem;
-  }
-  
-  .header h1 {
-    font-size: 2rem;
-    margin-bottom: 0.5rem;
-  }
-  
-  .header-buttons {
-    margin-top: 1rem;
-    display: flex;
-    justify-content: center;
-    gap: 1rem;
-  }
-  
-  .header-buttons button,
-  .header-buttons input {
-    padding: 0.5rem 1rem;
-    border-radius: 6px;
-    border: none;
-  }
-  
-  .header-buttons input {
-    width: 200px;
-  }
-  
+
   .dashboard {
     padding: 2rem;
   }
