@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Route, Routes, useNavigate, useLocation, Navig
 import Header from './components/Header';
 import Landing from './pages/Landing';
 import Dashboard from './pages/Dashboard';
+import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Archives from './pages/Archives';
@@ -42,6 +43,15 @@ function AppLayout({ isAuthenticated, setIsAuthenticated }) {
         <Route path="/" element={<Landing setIsAuthenticated={setIsAuthenticated} />} />        
         <Route path="/login" element={<Login setIsAuthenticated={setIsAuthenticated} />} />        
         <Route path="/register" element={<Register setIsAuthenticated={setIsAuthenticated} />} />
+        <Route path="/home" element={
+            isAuthenticated ? (
+              <Home />
+            ) : (
+              // <Navigate to="/login" replace />
+              <Navigate to="/home" replace />
+            )
+          }
+        />
         <Route
           path="/dashboard"
           element={

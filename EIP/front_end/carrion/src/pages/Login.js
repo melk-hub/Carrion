@@ -30,7 +30,7 @@ function Login({ setIsAuthenticated }) {
 
     //   if (response.ok) {
           setIsAuthenticated(true);
-          navigate('/dashboard');
+          navigate('/home');
     //   } else {
     //     setErrorMessage(data.message || 'Identifiants incorrects.');
     //   }
