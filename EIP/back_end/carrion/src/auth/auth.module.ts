@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { UserService } from 'src/user/user.service';
@@ -17,15 +17,19 @@ import { GoogleStrategy } from './strategies/google.strategy';
 import { PrismaModule } from 'src/prisma/prisma.module';
 import { MicrosoftStrategy } from './strategies/microsoft.strategy';
 import microsoftOauthConfig from './config/microsoft-oauth.config';
+import { UserModule } from 'src/user/user.module';
+import { HttpModule } from '@nestjs/axios';
 
 @Module({
   imports: [
+    forwardRef(() => UserModule),
     PrismaModule,
     JwtModule.registerAsync(jwtConfig.asProvider()),
     ConfigModule.forFeature(jwtConfig),
     ConfigModule.forFeature(refreshJwtConfig),
     ConfigModule.forFeature(googleOauthConfig),
-    ConfigModule.forFeature(microsoftOauthConfig)
+    ConfigModule.forFeature(microsoftOauthConfig),
+    HttpModule,
   ],
   controllers: [AuthController],
   providers: [
@@ -45,5 +49,6 @@ import microsoftOauthConfig from './config/microsoft-oauth.config';
       useClass: RolesGuard,
     },
   ],
+  exports: [AuthService],
 })
 export class AuthModule {}

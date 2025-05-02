@@ -11,55 +11,62 @@ datasource db {
 }
 
 model User {
-  id       Int       @id @default(autoincrement())
-  username String
+  id       String    @id @default(uuid()) @db.Uuid
+  username String    @unique
   firstName String
-  lastName String
+  lastName String?
   email    String    @unique
-  password String
+  password String?
+  birthDate DateTime?
   createdAt DateTime @default(now())
-  role Role @default(USER)
+  role Role @default(VISITOR)
   jobApplies jobApply[] @relation("UserJobApplies")
-  Settings Settings?
-  hashedRefreshToken String?
-  token Token? @relation(fields: [tokenId], references: [id])
-  tokenId Int? @unique
+  Settings Settings? @relation("UserSettings")
+  hashedRefreshToken String? @unique
+  tokens Token[] @relation("UserTokens")
+  historyId       String?
+}
+
+model Token {
+  id                String    @id @default(uuid()) @db.Uuid
+  name              String
+  accessToken       String
+  refreshToken      String
+  tokenTimeValidity DateTime
+  createdAt         DateTime  @default(now())
+  userId            String    @db.Uuid
+  user              User      @relation("UserTokens", fields: [userId], references: [id])
+}
+
+model jobApply {
+  id               String     @id @default(uuid()) @db.Uuid
+  Title            String
+  Company          String
+  Location         String
+  Salary           Int
+  User             User       @relation("UserJobApplies", fields: [UserId], references: [id], onDelete: Cascade)
+  UserId           String     @db.Uuid
+  status           Status
+  imageUrl         String
+  createdAt        DateTime   @default(now())
+}
+
+model Settings {
+  id String     @id @default(uuid()) @db.Uuid
+  user User     @relation("UserSettings", fields: [UserId], references: [id], onDelete: Cascade)
+  UserId String @unique @db.Uuid
+}
+
+enum Status {
+  ON
+  OFF
+  PENDING
 }
 
 enum Role {
   ADMIN
   USER
-  EDITOR
-}
-
-model Token {
-  id                Int       @id @default(autoincrement())
-  Token             String
-  TokenTimeValidity String
-  RefreshToken String
-  createdAt         DateTime  @default(now())
-  user User? @relation
-}
-
-model jobApply {
-  id               Int     @id @default(autoincrement())
-  Company          String
-  Location         String
-  Salary           String
-  User             User?    @relation("UserJobApplies", fields: [UserId], references: [id])
-  UserId           Int?    @unique
-  status           Status
-  imageUrl         String
-  createdAt        DateTime  @default(now())
-}
-
-model Settings {
-  id Int @id @default(autoincrement())
-  user User? @relation(fields: [UserId], references: [id])
-  UserId Int? @unique
-}
-
-enum Status {
-  TRUE
-  FALSE
+  MANAGER
+  DEV
+  VISITOR
 }

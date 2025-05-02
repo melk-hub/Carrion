@@ -1,19 +1,27 @@
-import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
 import { UserModule } from './user/user.module';
 import { PrismaModule } from './prisma/prisma.module';
+import { JobApplyModule } from './jobApply/jobApply.module';
+import { GmailModule } from './webhooks/google/gmail.module';
+import { MailFilterModule } from './services/mailFilter/mailFilter.module';
+import { MailFilterController } from './services/mailFilter/mailFilter.controller';
+import { MailFilterService } from './services/mailFilter/mailFilter.service';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({isGlobal: true,}),
+    ConfigModule.forRoot({ isGlobal: true }),
     AuthModule,
     UserModule,
-    PrismaModule
+    PrismaModule,
+    JobApplyModule,
+    GmailModule,
+    MailFilterModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [AppController, MailFilterController],
+  providers: [AppService, MailFilterService],
 })
-export class AppModule{}
+export class AppModule {}

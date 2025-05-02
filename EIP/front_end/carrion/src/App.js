@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes, useNavigate, useLocation, Navigate } from 'react-router-dom';
 import Header from './components/Header';
 import Landing from './pages/Landing';
@@ -7,26 +7,32 @@ import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Archives from './pages/Archives';
+import { useAuth, AuthProvider } from './AuthContext'; // Import du Context
 
 function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState(() => {
-    return localStorage.getItem('isAuthenticated') === 'true';
-  });
-
   return (
-    <Router>
-      <AppLayout isAuthenticated={isAuthenticated} setIsAuthenticated={setIsAuthenticated} />
-    </Router>
+    <AuthProvider>
+      <Router>
+        <AppLayout />
+      </Router>
+    </AuthProvider>
   );
 }
 
-function AppLayout({ isAuthenticated, setIsAuthenticated }) {
+function AppLayout() {
+  const { isAuthenticated, setIsAuthenticated } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
   useEffect(() => {
     localStorage.setItem('lastPath', location.pathname);
   }, [location]);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/dashboard');
+    }
+  }, [isAuthenticated, navigate]);
 
   useEffect(() => {
     const lastPath = localStorage.getItem('lastPath');
@@ -37,7 +43,9 @@ function AppLayout({ isAuthenticated, setIsAuthenticated }) {
 
   return (
     <div>
-      {location.pathname !== '/' && location.pathname !== '/login' && location.pathname !== '/register' && <Header />}
+      {location.pathname !== '/' && location.pathname !== '/login' && location.pathname !== '/register' && (
+        <Header setIsAuthenticated={setIsAuthenticated} />
+      )}
 
       <Routes>
         <Route path="/" element={<Landing setIsAuthenticated={setIsAuthenticated} />} />        
@@ -47,7 +55,6 @@ function AppLayout({ isAuthenticated, setIsAuthenticated }) {
             isAuthenticated ? (
               <Home />
             ) : (
-              // <Navigate to="/login" replace />
               <Navigate to="/home" replace />
             )
           }
@@ -58,8 +65,7 @@ function AppLayout({ isAuthenticated, setIsAuthenticated }) {
             isAuthenticated ? (
               <Dashboard />
             ) : (
-              // <Navigate to="/login" replace />
-              <Navigate to="/dashboard" replace />
+              <Navigate to="/login" />
             )
           }
         />
@@ -69,8 +75,7 @@ function AppLayout({ isAuthenticated, setIsAuthenticated }) {
             isAuthenticated ? (
               <Archives />
             ) : (
-              // <Navigate to="/login" replace />
-              <Navigate to="/archives" replace />
+              <Navigate to="/login" />
             )
           }
         />

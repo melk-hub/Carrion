@@ -3,8 +3,10 @@ import { useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
 import '../styles/Landing.css';
 import logo from '../assets/carrion_logo.png';
+import { useAuth } from '../AuthContext';
 
 function Landing() {
+  const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
 
   const handleLoginClick = () => {
@@ -14,6 +16,14 @@ function Landing() {
   const handleRegisterToggle = () => {
     navigate('/register');
   };
+  
+  useEffect(() => {
+    document.body.classList.add('landing-page');
+  
+    return () => {
+      document.body.classList.remove('landing-page');
+    };
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -49,13 +59,21 @@ function Landing() {
     };
   }, []);
 
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      window.location.href = '/dashboard';
+    }
+  }, [isAuthenticated]);
+
   return (
     <div>
       <header className="fixed-header">
-        <h1 className="logo"><img src={logo} alt="Carrion"/></h1>
-        <div className="header-buttons">
-          <button onClick={handleLoginClick} className="login-button">Se connecter</button>
-          <button onClick={handleRegisterToggle} className="register-button">S'inscrire</button>
+        <div className="logo"><img src={logo} alt="Carrion"/></div>
+        <div 
+          className="header-buttons">
+            <button onClick={handleLoginClick} className="login-button">Se connecter</button>
+            <button onClick={handleRegisterToggle} className="register-button">S'inscrire</button>
         </div>
       </header>
 
@@ -110,15 +128,15 @@ function Landing() {
       <section className="testimonials-section">
         <h2 className="testimonials-title">Témoignages</h2>
         <div className="testimonials-container">
-          <div className="testimonial testimonial-left">
+          <div className="testimonial">
             <p>"Carrion m'a aidé à suivre mes candidatures de manière organisée et efficace. Je recommande vivement cette plateforme."</p>
             <p className="testimonial-author">Marie L.</p>
           </div>
-          <div className="testimonial testimonial-right">
+          <div className="testimonial">
             <p>"Grâce à Carrion, j'ai pu visualiser mes progrès dans ma recherche d'emploi. Une expérience très positive."</p>
             <p className="testimonial-author">Pierre G.</p>
           </div>
-          <div className="testimonial testimonial-left">
+          <div className="testimonial">
             <p>"La fonction de suivi automatique de Carrion m'a permis de rester motivée et organisée. Merci pour ce service très utile."</p>
             <p className="testimonial-author">Sophie B.</p>
           </div>

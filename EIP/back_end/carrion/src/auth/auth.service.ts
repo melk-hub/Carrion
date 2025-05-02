@@ -1,15 +1,21 @@
-import { ConflictException, Inject, Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  ConflictException,
+  Inject,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { compare } from 'bcrypt';
 import { UserService } from 'src/user/user.service';
 import { AuthJwtPayload } from './types/auth-jwtPayload';
 import refreshJwtConfig from './config/refresh-jwt.config';
 import { ConfigType } from '@nestjs/config';
 import * as argon2 from 'argon2';
 import { CurrentUser } from './types/current-user';
-import { CreateUserDto, LoginDto } from 'src/user/dto/create-user.dto';
+import { CreateUserDto } from 'src/user/dto/create-user.dto';
 import { Role } from './enums/role.enum';
-import * as bcrypt from 'bcrypt'
+import * as bcrypt from 'bcrypt';
+import { PrismaService } from 'src/prisma/prisma.service';
+import { HttpService } from '@nestjs/axios';
 
 @Injectable()
 export class AuthService {
@@ -18,19 +24,22 @@ export class AuthService {
     private jwtService: JwtService,
     @Inject(refreshJwtConfig.KEY)
     private refreshTokenConfig: ConfigType<typeof refreshJwtConfig>,
+    private readonly prisma: PrismaService,
+    private readonly httpService: HttpService,
   ) {}
 
-  async validateUser(email: string, password: string) {
-    const user = await this.userService.findByEmail(email);
-    if (!user) throw new UnauthorizedException('User not found!');
-    const isPasswordMatch = await compare(password, user.password);
-    if (!isPasswordMatch)
-      throw new UnauthorizedException('Invalid credentials');
+  async validateUser(identifier: string, password: string, isEmail: boolean) {
+    const user = await this.userService.findByIdentifier(identifier, isEmail);
 
-    return { id: user.id };
+    if (!user) return null;
+
+    const passwordMatch = await bcrypt.compare(password, user.password);
+    if (!passwordMatch) return null;
+
+    return user;
   }
 
-  async login(userId: number) {
+  async login(userId: string) {
     const { accessToken, refreshToken } = await this.generateTokens(userId);
     const hashedRefreshToken = await argon2.hash(refreshToken);
     await this.userService.updateHashedRefreshToken(userId, hashedRefreshToken);
@@ -42,8 +51,15 @@ export class AuthService {
   }
 
   async signUp(createUserDto: CreateUserDto) {
-    const existingUser = await this.userService.findByEmail(createUserDto.email);
-    if (existingUser)
+    const existingUserByEmail = await this.userService.findByIdentifier(
+      createUserDto.email,
+      true,
+    );
+    const existingUser = await this.userService.findByIdentifier(
+      createUserDto.username,
+      false,
+    );
+    if (existingUserByEmail || existingUser)
       throw new ConflictException('User with this email already exists');
     const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
     const user = await this.userService.create({
@@ -53,7 +69,7 @@ export class AuthService {
     return await this.login(user.id);
   }
 
-  async generateTokens(userId: number) {
+  async generateTokens(userId: string) {
     const payload: AuthJwtPayload = { sub: userId };
     const [accessToken, refreshToken] = await Promise.all([
       this.jwtService.signAsync(payload),
@@ -65,7 +81,7 @@ export class AuthService {
     };
   }
 
-  async refreshToken(userId: number) {
+  async refreshToken(userId: string) {
     const { accessToken, refreshToken } = await this.generateTokens(userId);
     const hashedRefreshToken = await argon2.hash(refreshToken);
     await this.userService.updateHashedRefreshToken(userId, hashedRefreshToken);
@@ -76,26 +92,49 @@ export class AuthService {
     };
   }
 
-  async validateRefreshToken(userId: number, refreshToken: string) {
-    const user = await this.userService.findOne(userId);
-    if (!user || !user.token.RefreshToken)
+  async validateRefreshToken(userId: string, refreshToken: string) {
+    const userToken = await this.prisma.token.findFirst({
+      where: { userId: userId },
+      orderBy: { createdAt: 'desc' },
+    });
+    if (!userToken) {
       throw new UnauthorizedException('Invalid Refresh Token');
-
+    }
     const refreshTokenMatches = await argon2.verify(
-      user.token.RefreshToken,
+      userToken.refreshToken,
       refreshToken,
     );
-    if (!refreshTokenMatches)
+    if (!refreshTokenMatches) {
       throw new UnauthorizedException('Invalid Refresh Token');
-
+    }
     return { id: userId };
   }
 
-  async signOut(userId: number) {
+  async validateCookie(token: string) {
+    try {
+      const decoded = this.jwtService.verify(token);
+
+      if (!decoded || !decoded.sub) {
+        return null;
+      }
+
+      const user = await this.prisma.user.findUnique({
+        where: { id: decoded.sub },
+        select: { id: true, email: true, role: true },
+      });
+
+      return user || null;
+    } catch (error) {
+      console.error('Token validation error:', error);
+      return null;
+    }
+  }
+
+  async signOut(userId: string) {
     await this.userService.updateHashedRefreshToken(userId, null);
   }
 
-  async validateJwtUser(userId: number) {
+  async validateJwtUser(userId: string) {
     const user = await this.userService.findOne(userId);
     if (!user) throw new UnauthorizedException('User not found!');
     const currentUser: CurrentUser = { id: user.id, role: user.role as Role };
@@ -103,8 +142,87 @@ export class AuthService {
   }
 
   async validateOAuthUser(OAuthUser: CreateUserDto) {
-    const user = await this.userService.findByEmail(OAuthUser.email);
+    const user = await this.userService.findByIdentifier(OAuthUser.email, true);
     if (user) return user;
     return await this.userService.create(OAuthUser);
+  }
+
+  async googleLogin(userId: string, refreshToken: string) {
+    let hashedRefreshToken: string;
+    if (refreshToken) {
+      hashedRefreshToken = await argon2.hash(refreshToken);
+      await this.userService.updateHashedRefreshToken(
+        userId,
+        hashedRefreshToken,
+      );
+    }
+  }
+
+  async createGmailWebhook(accessToken: string, userId: string) {
+    const url = 'https://gmail.googleapis.com/gmail/v1/users/me/watch';
+    const payload = {
+      labelIds: ['INBOX'],
+      topicName: `projects/${process.env.GOOGLE_PROJECT_ID}/topics/${process.env.GOOGLE_PROJECT_WEBHOOK}`,
+    };
+
+    try {
+      const response = await this.httpService
+        .post(url, payload, {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            'Content-Type': 'application/json',
+          },
+        })
+        .toPromise();
+      this.userService.updateHistoryIdOfUser(
+        userId,
+        response.data['historyId'],
+      );
+    } catch (error) {
+      console.error('Erreur lors de la création du webhook Gmail:', error);
+      throw new Error('Failed to set up Gmail webhook');
+    }
+  }
+
+  calculateTokenExpiration(days: number): Date {
+    const expirationTime = new Date();
+    expirationTime.setHours(expirationTime.getDate() + days);
+    return expirationTime;
+  }
+
+  async saveTokens(
+    userId: string,
+    accessToken: string,
+    refreshToken: string,
+    days: number,
+    name: string,
+  ): Promise<void> {
+    const expirationTime = this.calculateTokenExpiration(days);
+    const existingToken = await this.prisma.token.findFirst({
+      where: {
+        userId,
+        name,
+      },
+    });
+    if (existingToken) {
+      await this.prisma.token.update({
+        where: { id: existingToken.id },
+        data: {
+          accessToken,
+          refreshToken,
+          tokenTimeValidity: expirationTime,
+        },
+      });
+    } else {
+      await this.prisma.token.create({
+        data: {
+          name: name,
+          accessToken,
+          refreshToken,
+          tokenTimeValidity: expirationTime,
+          userId,
+        },
+      });
+    }
   }
 }

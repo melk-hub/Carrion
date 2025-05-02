@@ -1,142 +1,118 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
-import MicrosoftLogin from 'react-microsoft-login';
+// import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
+// import MicrosoftLogin from 'react-microsoft-login';
 import outlookIcon from '../assets/outlook-logo.png';
+import "../styles/LoginPage.css";
+import GoogleLoginButton from '../components/GoogleLoginBtn';
+import logo from '../assets/carrion_logo.png';
+import { useAuth } from '../AuthContext';
 
-function Login({ setIsAuthenticated }) {
+function Login() {
+  const { setIsAuthenticated } = useAuth();
   const navigate = useNavigate();
-  const [credentials, setCredentials] = useState({ username: '', password: '' });
+  const [credentials, setCredentials] = useState({ identifier: '', password: '' });
   const [errorMessage, setErrorMessage] = useState('');
+  const API_URL = process.env.REACT_APP_API_URL;
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setCredentials({ ...credentials, [name]: value });
   };
 
+  useEffect(() => {
+      document.body.classList.add('login-page-bg');
+    
+      return () => {
+        document.body.classList.remove('login-page-bg');
+      };
+    }, []);
+
   const handleLogin = async (e) => {
     e.preventDefault();
 
-    // try {
-    //   const response = await fetch('http://localhost:8080/auth/signin', {
-    //     method: 'POST',
-    //     headers: {
-    //       'Content-Type': 'application/json',
-    //     },
-    //     body: JSON.stringify(credentials),
-    //   });
+    try {
+      const response = await fetch(`${API_URL}/auth/signin`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(credentials),
+        credentials: 'include',
+      });
 
-    //   const data = await response.json();
+      const data = await response;
 
-    //   if (response.ok) {
+      if (response.ok) {
           setIsAuthenticated(true);
-          navigate('/home');
-    //   } else {
-    //     setErrorMessage(data.message || 'Identifiants incorrects.');
-    //   }
-    // } catch (error) {
-    //   console.error('Error during login:', error);
-    //   setErrorMessage('Une erreur est survenue. Veuillez réessayer plus tard.');
-    // }
+          navigate('/dashboard');
+      } else {
+        setErrorMessage(data.message || 'Identifiants incorrects.');
+      }
+    } catch (error) {
+      console.error('Error during login:', error);
+      setErrorMessage('Une erreur est survenue. Veuillez réessayer plus tard.');
+    }
   };
 
-  const handleGoogleLoginSuccess = (response) => {
-    console.log('Google Login Success:', response);
+  const handleLoginSuccess = () => {
     setIsAuthenticated(true);
     navigate('/dashboard');
   };
 
-  const handleGoogleLoginFailure = (error) => {
-    console.error('Google Login Failure:', error);
-  };
-
-  const handleMicrosoftLoginSuccess = (response) => {
-    console.log('Microsoft Login Success:', response);
-    setIsAuthenticated(true);
-    navigate('/dashboard');
-  };
-
-  const handleMicrosoftLoginFailure = (error) => {
-    console.error('Microsoft Login Failure:', error);
-  };
-
-  const handleRegisterRedirect = (response) => {
+  const handleRegisterRedirect = () => {
     navigate('/register');
-  }
+  };
 
   return (
-    <GoogleOAuthProvider clientId="YOUR_GOOGLE_CLIENT_ID">
-        <div className="login-page">
-            <h2>Connexion</h2>
-            <form onSubmit={handleLogin}>
-                <div>
-                    <label>Nom d'utilisateur:</label>
-                    <input
-                        type="text"
-                        name="username"
-                        value={credentials.username}
-                        onChange={handleChange}
-                        placeholder="Entrez votre nom d'utilisateur"
-                        //required
-                    />
-                </div>
-                <div>
-                    <label>Mot de passe:</label>
-                    <input
-                        type="password"
-                        name="password"
-                        value={credentials.password}
-                        onChange={handleChange}
-                        placeholder="Entrez votre mot de passe"
-                        //required
-                    />
-                </div>
-                {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>}
-                <button type="submit">Se connecter</button>
-                <button onClick={handleRegisterRedirect}>S'enregistrer</button>
-            </form>
-            <div>
-                <GoogleLogin
-                    onSuccess={handleGoogleLoginSuccess}
-                    onFailure={handleGoogleLoginFailure}
+    <div className="login-page">
+      <img src={logo} className="logo-home" onClick={() => navigate("/")} alt="Logo"/>
+      <div className="login-container">
+        <h2>Connexion</h2>
+        <form onSubmit={handleLogin}>
+          <div className="form-content">
+            <div className="input-fields">
+              <div className="input-group">
+                <label>Nom d'utilisateur:</label>
+                <input
+                  type="text"
+                  name="identifier"
+                  value={credentials.identifier}
+                  onChange={handleChange}
+                  placeholder="Entrez votre nom d'utilisateur"
+                  required
                 />
-                {/* <MicrosoftLogin
-                    clientId="YOUR_MICROSOFT_CLIENT_ID"
-                    buttonText="Se connecter avec Outlook"
-                    authCallback={handleMicrosoftLoginSuccess}
-                    onFailure={handleMicrosoftLoginFailure}
-                    redirectUri="http://localhost:3000"
-                    render={(renderProps) => (
-                        <button
-                        onClick={renderProps.onClick}
-                        style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            backgroundColor: '#0078D4',
-                            color: '#fff',
-                            padding: '10px 20px',
-                            border: 'none',
-                            borderRadius: '5px',
-                            cursor: 'pointer',
-                            marginTop: '10px',
-                        }}
-                        >
-                        <img
-                            src={outlookIcon}
-                            alt="Outlook"
-                            style={{ width: '20px', marginRight: '8px' }}
-                        />
-                        Se connecter avec Outlook
-                        </button>
-                    )}
-                /> */}
-                <button onClick={handleMicrosoftLoginSuccess} style={{ display: 'flex', alignItems: 'center' }}>
-                <img src={outlookIcon} alt="Outlook" style={{ width: '20px', marginRight: '8px' }} />
-                Se connecter avec Outlook
-                </button>
+              </div>
+              <div className="input-group">
+                <label>Mot de passe:</label>
+                <input
+                  type="password"
+                  name="password"
+                  value={credentials.password}
+                  onChange={handleChange}
+                  placeholder="Entrez votre mot de passe"
+                  required
+                />
+              </div>
+              {errorMessage && <p className="error-message">{errorMessage}</p>}
             </div>
-        </div>
-    </GoogleOAuthProvider>
+            <div className="button-group">
+              <button type="submit" className="login-button">Se connecter</button>
+              <button type="button" onClick={handleRegisterRedirect} className="register-button">
+                Pas de compte? S'enregistrer
+              </button>
+            </div>
+          </div>
+          <div className="social-login">
+            <GoogleLoginButton />
+            <button type="button" onClick={handleLoginSuccess} className="outlook-button">
+            <img src={outlookIcon} alt="Outlook" />
+              Se connecter avec Outlook
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
   );
 }
 
