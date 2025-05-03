@@ -1,12 +1,17 @@
-import React from 'react';
+import React, {useState} from 'react';
 import { useNavigate } from 'react-router-dom';
-import '../styles/Header.css';
+import "../styles/Navbar.css";
+// import '../styles/Header.css';
 import logo from '../assets/carrion_logo.png';
 import axios from 'axios';
+import Home from '../pages/Home';
+import Dashboard from '../pages/Dashboard';
+import Archives from '../pages/Archives';
 
 function Header({ setIsAuthenticated }) {
   const navigate = useNavigate();
   const API_URL = process.env.REACT_APP_API_URL;
+  const [activeSection, setActiveSection] = useState("Accueil");
 
   const handleLogout = async () => {
     try {
@@ -23,9 +28,8 @@ function Header({ setIsAuthenticated }) {
   <h1 onClick={() => navigate('/dashboard')} className="logo-button">
     <img src={logo} alt="Carrion" />
   </h1>
-
+*/
   {/* Conteneur pour centrer la navigation */}
-
   <div className="navigation-container">
     <div className="navigation-buttons">
       <button onClick={() => navigate('/dashboard')} className='applications-button'>Candidatures</button>
