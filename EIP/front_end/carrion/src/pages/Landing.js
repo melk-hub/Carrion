@@ -1,143 +1,264 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useEffect } from 'react';
-import '../styles/Landing.css';
-import logo from '../assets/carrion_logo.png';
-import { useAuth } from '../AuthContext';
+import React, { useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
+import { useAuth } from "../AuthContext";
+import "../styles/Landing.css";
+import logo from "../assets/carrion_logo.png";
+import globe from "../assets/globe-icon.png";
+import landing_img from "../assets/landing_bg.png";
+import optimize_img from "../assets/optimize_landing.jpg";
+import progression_img from "../assets/progression_landing.png";
+import centralize_img from "../assets/centralize_landing.png";
+import PrimaryButton from "../components/PrimaryButton";
+import lucide_search_svg from "../assets/svg/search_lucide.svg";
+import lucide_calendar_svg from "../assets/svg/calendar_lucide.svg";
+import lucide_bar_chart_svg from "../assets/svg/bar_chart_lucide.svg";
+import lucide_folder_svg from "../assets/svg/folder_lucide.svg";
 
 function Landing() {
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
+  const [isHeaderVisible, setIsHeaderVisible] = useState(true);
+  const [isAtTop, setIsAtTop] = useState(true);
+  const lastScrollY = useRef(0);
+  const scrollThreshold = 5;
+  const topThreshold = 5;
 
   const handleLoginClick = () => {
-    navigate('/login');
+    navigate("/login");
   };
 
-  const handleRegisterToggle = () => {
-    navigate('/register');
-  };
-  
   useEffect(() => {
-    document.body.classList.add('landing-page');
-  
+    document.body.classList.add("landing-page");
+
     return () => {
-      document.body.classList.remove('landing-page');
+      document.body.classList.remove("landing-page");
     };
   }, []);
 
   useEffect(() => {
     const handleScroll = () => {
-      const header = document.querySelector(".fixed-header");
-      const scrollPosition = window.scrollY;
-      const maxScroll = window.innerHeight;
-      const progress = Math.min(scrollPosition / maxScroll, 1);
-  
-      header.style.width = `${80 + 20 * progress}%`;
-      header.style.left = `${10 - 10 * progress}%`;
+      const currentScrollY = window.scrollY;
+      const atTop = currentScrollY <= topThreshold;
+
+      setIsAtTop(atTop);
+
+      if (atTop) {
+        setIsHeaderVisible(true);
+      } else if (currentScrollY < lastScrollY.current - scrollThreshold) {
+        setIsHeaderVisible(true);
+      } else if (currentScrollY > lastScrollY.current + scrollThreshold) {
+        setIsHeaderVisible(false);
+      }
+
+      lastScrollY.current = currentScrollY;
     };
-  
-    const handleButtonClick = () => {
-      const currentScroll = window.scrollY;
-      const viewportHeight = window.innerHeight;
-      const nextPageScroll = currentScroll === 0 ? viewportHeight : Math.ceil(currentScroll / viewportHeight) * viewportHeight;
-  
-      window.scrollTo({top: nextPageScroll, behavior: "smooth",});
-    };
-  
-    window.addEventListener("scroll", handleScroll);
-  
-    const button = document.querySelector(".scroll-button");
-    if (button) {
-      button.addEventListener("click", handleButtonClick);
-    }
-  
+
+    const initialScrollY = window.scrollY;
+    lastScrollY.current = initialScrollY;
+    setIsAtTop(initialScrollY <= topThreshold);
+    setIsHeaderVisible(initialScrollY <= topThreshold);
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+
     return () => {
       window.removeEventListener("scroll", handleScroll);
-      if (button) {
-        button.removeEventListener("click", handleButtonClick);
-      }
     };
   }, []);
 
-
   useEffect(() => {
     if (isAuthenticated) {
-      window.location.href = '/dashboard';
+      window.location.href = "/dashboard";
     }
   }, [isAuthenticated]);
 
   return (
-    <div>
-      <header className="fixed-header">
-        <div className="logo"><img src={logo} alt="Carrion"/></div>
-        <div 
-          className="header-buttons">
-            <button onClick={handleLoginClick} className="login-button">Se connecter</button>
-            <button onClick={handleRegisterToggle} className="register-button">S'inscrire</button>
-        </div>
+    <div className="landing-page">
+      {/* Header avec navbar */}
+      <header
+        className={`
+          landing-header
+          ${isHeaderVisible ? "visible" : "hidden"}
+          ${isAtTop ? "header-at-top" : ""}
+        `}
+      >
+        <nav aria-label="Navigation principale">
+          <div className="logo-container">
+            <a href="/">
+              <img src={logo} alt="Carrion logo" />
+              CARRION
+            </a>
+          </div>
+          <div className="navigation-actions">
+            <div className="language-button">
+              <img src={globe} alt="Icône de la langue" />
+              <span>Français</span>
+            </div>
+            <PrimaryButton
+              text="Se connecter"
+              onClick={handleLoginClick}
+              size="medium"
+            />
+          </div>
+        </nav>
       </header>
 
-      <div className="intro-section">
-        <h1>La plateforme idéale pour gérer ses candidatures</h1>
-        <p>Simplifiez votre recherche d'emploi grâce a Carrion</p>
-      </div>
-      
-      <div className="landing-background">
-        <button className="scroll-button">
-          <span className="arrow">↓</span>
-        </button>
-      </div>
+      {/* Contenu principal */}
+      <main className="landing-main-content">
+        {/* Section landing */}
+        <section className="hero-section">
+          <div className="hero-content">
+            <div className="hero-description">
+              <h1>La plateforme idéale pour gérer ses candidatures</h1>
+              <p>
+                Simplifiez votre recherche d'emploi
+                <br /> grâce à Carrion
+              </p>
+              <PrimaryButton
+                text="Démarrer sans attendre"
+                onClick={handleLoginClick}
+                size="large"
+              />
+            </div>
+            <img src={landing_img} alt="Illustration de la page d'accueil" />
+          </div>
+        </section>
 
-      <section className="services-section">
-        <h2 className="services-title">Nos services</h2>
-        <div className="services-container">
-          <div className="service-card">
-            <h3>Suivi de vos candidatures personnelles</h3>
-            <p>Gérez facilement toutes vos candidatures depuis un tableau de bord intuitif. Suivez les statuts, ajoutez des notes, et ne manquez aucune opportunité</p>
-          </div>
-          <div className="service-card">
-            <h3>Suivi des objectifs de candidature</h3>
-            <p>Définissez et suivez vos objectifs personnels dans votre recherche d'emploi. Vous recevez des conseils pour vous assurer de rester sur la bonne voie et atteindre vos objectifs en temps voulu</p>
-          </div>
-          <div className="service-card">
-            <h3>Rappels et notifications personnalisés</h3>
-            <p>Recevez des rappels automatiques pour vos candidatures en attente de réponse ou vos entretiens à venir. Restez organisé et proactif.</p>
-          </div>
-          <div className="service-card">
-            <h3>Espace documents professionels</h3>
-            <p>Centralisez et gérez tous vos documents importants, tels que CV, lettres de motivation, et portfolios. Accédez-y facilement à tout moment pour simplifier vos démarches</p>
-          </div>
-        </div>
-      </section>
+        {/* Section des services */}
+        <section className="services-section">
+          <h2 className="sections-title">Nos Services</h2>
 
-      <section className="how-it-works-section">
-        <div className="how-it-works-container">
-          <div className="how-it-works-image"></div>
-          <div className="how-it-works-text">
-            <h2>Comment Ça Marche ?</h2>
-            <h3>Simplicité et Efficacité</h3>
-            <p>Carrion simplifie la recherche d'emploi en offrant un suivi automatisé des candidatures. Notre plateforme aide les travailleurs à évaluer leur progression dans leur quête de stages ou d'emplois, leur permettant ainsi d'optimiser leurs chances de succès.</p>
-          </div>
-        </div>
-      </section>
+          <div className="services-content">
+            <div className="service-box">
+              <img src={lucide_search_svg} alt="Icône de recherche" />
+              <h3>Suivi de vos candidatures personnelles</h3>
+              <ul>
+                <li>
+                  Gérez toutes vos candidatures via un tableau de bord intuitif.
+                </li>
+                <li>
+                  Suivez facilement les statuts et ajoutez des notes clés.
+                </li>
+                <li>Ne manquez plus jamais une opportunité importante.</li>
+              </ul>
+            </div>
 
-      <section className="testimonials-section">
-        <h2 className="testimonials-title">Témoignages</h2>
-        <div className="testimonials-container">
-          <div className="testimonial">
-            <p>"Carrion m'a aidé à suivre mes candidatures de manière organisée et efficace. Je recommande vivement cette plateforme."</p>
-            <p className="testimonial-author">Marie L.</p>
+            <div className="service-box">
+              <img src={lucide_calendar_svg} alt="Icône de calendrier" />
+              <h3>Suivi des objectifs de candidature</h3>
+              <ul>
+                <li>
+                  Définissez et suivez vos objectifs de recherche d'emploi.
+                </li>
+                <li>
+                  Recevez des conseils ciblés pour rester sur la bonne voie.
+                </li>
+                <li>
+                  Atteignez vos objectifs professionnels dans les temps voulus.
+                </li>
+              </ul>
+            </div>
+
+            <div className="service-box">
+              <img
+                src={lucide_bar_chart_svg}
+                alt="Icône de graphique en barre"
+              />
+              <h3>Rappels et notifications personnalisés</h3>
+              <ul>
+                <li>
+                  Recevez des rappels automatiques (suivis, entretiens...).
+                </li>
+                <li>Soyez alerté(e) des prochaines étapes importantes.</li>
+                <li>Restez parfaitement organisé(e) et proactif(ve).</li>
+              </ul>
+            </div>
+
+            <div className="service-box">
+              <img src={lucide_folder_svg} alt="Icône de recherche" />
+              <h3>Espace documents professionnels</h3>
+              <ul>
+                <li>
+                  Centralisez tout vos documents clés (CV, lettres,
+                  portfolios...)
+                </li>
+                <li>Gérez et retrouvez facilement vos fichiez importants</li>
+                <li>
+                  Accédez à tout, partout, pour tout simplifier vos démarche
+                </li>
+              </ul>
+            </div>
           </div>
-          <div className="testimonial">
-            <p>"Grâce à Carrion, j'ai pu visualiser mes progrès dans ma recherche d'emploi. Une expérience très positive."</p>
-            <p className="testimonial-author">Pierre G.</p>
+        </section>
+
+        {/* Section des tutoriel */}
+        <section className="tutorial-sections">
+          <h2>Comment ça marche ?</h2>
+
+          <div className="tutorial-content">
+            <div className="tutorial-box">
+              <div className="tutorial-image-container">
+                <img
+                  src={centralize_img}
+                  alt="Centralisation facile des candidatures"
+                />
+              </div>
+              <div className="text-box">
+                <h3>Centralisez Facilement</h3>
+                <p>
+                  Ajoutez vos candidatures (stages ou emplois) et documents
+                  essentiels. Carrion simplifie votre organisation dès le
+                  départ.
+                </p>
+              </div>
+            </div>
+
+            <div className="tutorial-box">
+              <div className="tutorial-image-container">
+                <img
+                  src={progression_img}
+                  alt="Suivi de la progression des candidatures"
+                />
+              </div>
+              <div className="text-box">
+                <h3>Suivez Votre Progression</h3>
+                <p>
+                  Visualisez l'avancement de chaque démarche grâce à notre suivi
+                  automatisé. Évaluez où vous en êtes en un coup d'oeil.{" "}
+                </p>
+              </div>
+            </div>
+
+            <div className="tutorial-box">
+              <div className="tutorial-image-container">
+                <img
+                  src={optimize_img}
+                  alt="Optimisation pour réussir la recherche"
+                />
+              </div>
+              <div className="text-box">
+                <h3>Optimisez Pour Réussir</h3>
+                <p>
+                  Utilisez les informations de suivi pour ajuster votre approche
+                  et maximiser vos chances de succès dans votre recherche.
+                </p>
+              </div>
+            </div>
           </div>
-          <div className="testimonial">
-            <p>"La fonction de suivi automatique de Carrion m'a permis de rester motivée et organisée. Merci pour ce service très utile."</p>
-            <p className="testimonial-author">Sophie B.</p>
-          </div>
-        </div>
-      </section>
+        </section>
+
+        {/* Section des témoignages/avis */}
+        {/* <section className="feedback-sections">
+          <h2>Témoignages</h2>
+
+          <div className="feedback-content"></div>
+        </section> */}
+
+        {/* Footer */}
+        <footer>
+          <h2>Footer TBD</h2>
+        </footer>
+      </main>
     </div>
   );
 }
