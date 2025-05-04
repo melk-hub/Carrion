@@ -214,7 +214,7 @@ function InfosModal({ isOpen, onClose }) {
                       />
                     </div>
                     {personalInfo.cv && (
-                      <button type="button" className="delete-btn" onClick={handleDeleteCV}>
+                      <button type="button" className="delete-btn" style={{ visibility: personalInfo.cv ? 'visible' : 'hidden' }} onClick={handleDeleteCV}>
                         Supprimer mon CV
                       </button>
                     )}
