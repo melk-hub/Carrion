@@ -1,0 +1,168 @@
+/* SuiviCandidatures.css */
+body {
+    margin: 0;
+    font-family: "Segoe UI", sans-serif;
+    background-color: #fff7ed;
+    color: #111;
+  }
+  
+  .dashboard-container {
+    padding: 2rem;
+  }
+  
+  .top-cards {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+  
+  .highlight {
+    border: 2px solid #e0e2e3;
+  }
+  
+  .rank {
+    font-size: 1.5rem;
+    color: #f97316;
+  }
+  
+  .ranking-list {
+    list-style: none;
+    padding: 0;
+    margin: 1rem 0 0 0;
+  }
+  
+  .ranking-list li {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.2rem 0;
+    font-size: 0.9rem;
+  }
+  
+  .up {
+    color: #16a34a;
+  }
+  
+  .down {
+    color: #dc2626;
+  }
+  
+  .bottom-section {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+    flex-wrap: wrap;
+  }
+  
+  .recent-activity,
+  .quick-access {
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 1rem;
+    flex: 1;
+    min-width: 300px;
+  }
+  
+  .empty-state {
+    text-align: center;
+    margin-top: 1rem;
+  }
+  
+  .note {
+    font-size: 0.8rem;
+    color: #555;
+    margin-bottom: 0.5rem;
+  }
+  
+  .emoji {
+    font-size: 4rem;
+  }
+  
+  .see-all {
+    margin-top: 1rem;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    background: #fafafa;
+    cursor: pointer;
+  }
+  
+  .quick-access button {
+    display: block;
+    width: 100%;
+    margin: 0.5rem 0;
+    padding: 0.6rem;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    background: white;
+    cursor: pointer;
+    text-align: left;
+  }
+
+  .card {
+    background: white;
+    border-radius: 10px;
+    border: 1px solid #ddd;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    padding: 1.5rem;
+    flex: 1;
+    min-width: 250px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  
+  .card h3 {
+    margin-bottom: 0.5rem;
+  }
+  
+  .job-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 0.5rem;
+  }
+  
+  .job-info img {
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
+  }
+  
+  button {
+    background-color: #f3f4f6;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    padding: 0.4rem 0.8rem;
+    cursor: pointer;
+    font-weight: 500;
+    margin-top: 0.5rem;
+  }
+  
+  .timestamp {
+    font-size: 0.8rem;
+    color: #888;
+    margin-top: 0.5rem;
+  }
+  
+  .emoji {
+    font-size: 3rem;
+    margin: 1rem 0;
+  }
+  
+  .ranking-list li {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.3rem 0;
+    font-weight: bold;
+  }
+
+  .ranking-list li span.name {
+    font-size: 0.95rem;
+    font-weight: 600;
+  }
+  
+  .bottom-section {
+    gap: 2rem;
+  }
+  

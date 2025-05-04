@@ -20,7 +20,7 @@ html, body {
 .layout-body {
   display: flex;
   flex: 1;
-  height: calc(100vh - 60px);
+  height: 50vh;
 }
 
 .main-content {
@@ -31,7 +31,9 @@ html, body {
 }
 .sidebar {
   position: fixed;
-  height: calc(100vh - 60px);
+  top: 0;
+  left: 0;
+  height: 100vh;
   width: 220px;
   background-color: #0c1f3d;
   color: white;
@@ -44,15 +46,19 @@ html, body {
 
 .logo {
   display: flex;
+  justify-content: center;
   align-items: center;
-  margin-bottom: 40px;
-  font-weight: bold;
-  font-size: 18px;
+  margin-bottom: 30px;
+}
+.logo-img {
+  width: 10px;
+  height: 30px;
+  object-fit: contain;
 }
 
 .logo .icon {
   font-size: 24px;
-  margin-right: 10px;
+  margin-right: 0px;
 }
 
 .menu {
@@ -108,7 +114,7 @@ html, body {
   color: white;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-end;
   padding: 0 20px;
   border-bottom: 1px solid #1f3554;
 }
@@ -123,7 +129,7 @@ html, body {
 }
 
 .logo.right .icon {
-  font-size: 15px;
+  font-size: 10px;
   margin-right: 10px;
 }
 
