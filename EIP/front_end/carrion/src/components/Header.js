@@ -4,9 +4,10 @@ import "../styles/Navbar.css";
 // import '../styles/Header.css';
 import logo from '../assets/carrion_logo.png';
 import axios from 'axios';
-import Home from '../pages/Home';
+
 import Dashboard from '../pages/Dashboard';
 import Archives from '../pages/Archives';
+import Acceuil from '../pages/Accueil';
 
 function Header({ setIsAuthenticated }) {
   const navigate = useNavigate();
