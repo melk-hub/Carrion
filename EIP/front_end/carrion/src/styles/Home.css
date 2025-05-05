@@ -200,9 +200,9 @@ body {
     flex: 1;
     padding: 20px;
     margin-left: 220px;
-    
     background: #FFF9F0;
   }
+
   .sidebar {
     position: fixed;
     top: 0;
