@@ -8,6 +8,7 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Archives from './pages/Archives';
 import { useAuth, AuthProvider } from './AuthContext'; // Import du Context
+import Navbar from './pages/Navbar';
 
 function App() {
   return (
@@ -49,6 +50,9 @@ function AppLayout() {
         <Route path="/" element={<Landing setIsAuthenticated={setIsAuthenticated} />} />        
         <Route path="/login" element={<Login setIsAuthenticated={setIsAuthenticated} />} />        
         <Route path="/register" element={<Register setIsAuthenticated={setIsAuthenticated} />} />
+        <Route path="/bar" element={
+              <Navbar />
+        }/>
         <Route path="/home" element={
               <Home />
         }/>
