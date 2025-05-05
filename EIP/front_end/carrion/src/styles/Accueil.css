@@ -1,13 +1,13 @@
-/* SuiviCandidatures.css */
 body {
     margin: 0;
     font-family: "Segoe UI", sans-serif;
     background-color: #fff7ed;
-    color: #111;
+    color: #000000;
   }
   
   .dashboard-container {
-    padding: 2rem;
+    margin-top: 0.5rem;
+    margin-bottom: 1.5rem;
   }
   
   .top-cards {
@@ -77,15 +77,7 @@ body {
   .emoji {
     font-size: 4rem;
   }
-  
-  .see-all {
-    margin-top: 1rem;
-    padding: 0.5rem 1rem;
-    border-radius: 6px;
-    border: 1px solid #ccc;
-    background: #fafafa;
-    cursor: pointer;
-  }
+
   
   .quick-access button {
     display: block;
@@ -130,7 +122,7 @@ body {
   }
   
   button {
-    background-color: #f3f4f6;
+    background-color: #ffffff;
     border: 1px solid #ccc;
     border-radius: 6px;
     padding: 0.4rem 0.8rem;
@@ -139,6 +131,13 @@ body {
     margin-top: 0.5rem;
   }
   
+  button:hover {
+    background-color: #ffffff;
+    color: rgb(0, 0, 0);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  }
+
   .timestamp {
     font-size: 0.8rem;
     color: #888;
@@ -165,4 +164,223 @@ body {
   .bottom-section {
     gap: 2rem;
   }
+
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  html, body {
+    width: 100%;
+    height: 100%;
+    overflow-x: hidden;
+  }
+  
+  .layout {
+    display: flex;
+    flex-direction: column;
+    height: 90%;
+  }
+  
+  .layout-body {
+    display: flex;
+    flex: 1;
+    height: 50vh;
+  }
+  
+  .main-content {
+    flex: 1;
+    padding: 20px;
+    margin-left: 220px;
+    
+    background: #FFF9F0;
+  }
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    width: 220px;
+    background-color: #0c1f3d;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    transition: width 0.3s ease;
+    overflow: hidden;
+  }
+  
+  .logo {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 30px;
+  }
+  .logo-img {
+    width: 10px;
+    height: 30px;
+    object-fit: contain;
+  }
+  
+  .logo .icon {
+    font-size: 24px;
+    margin-right: 0px;
+  }
+  
+  .menu {
+    list-style: none;
+    padding: 0;
+  }
+  
+  .menu li {
+    display: flex;
+    align-items: center;
+    padding: 10px 0;
+    cursor: pointer;
+    transition: 0.2s;
+  }
+  .menu li span:first-child {
+    margin-right: 10px;
+  }
+  
+  .menu li:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    padding-left: 10px;
+  }
+  
+  .sidebar.collapsed {
+    width: 70px;
+  }
+  
+  .sidebar.collapsed .text {
+    display: none;
+  }
+  
+  .sidebar.collapsed .menu li {
+    justify-content: center;
+  }
+  
+  @media screen and (max-width: 768px) {
+    .sidebar {
+      width: 70px;
+    }
+  
+    .sidebar .text {
+      display: none;
+    }
+  
+    .menu li {
+      justify-content: center;
+    }
+  }
+  .topbar {
+    height: 60px;
+    background-color: #0c1f3d;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding: 0 20px;
+    border-bottom: 1px solid #1f3554;
+  }
+  
+  .logo.right {
+    display: flex;
+    align-items: center;
+    font-weight: bold;
+    font-size: 18px;
+    margin-right: auto;
+    margin-top: 40px;
+  }
+  
+  .logo.right .icon {
+    font-size: 10px;
+    margin-right: 10px;
+  }
+  
+  .notifications {
+    margin-right: 20px;
+    font-size: 20px;
+    cursor: pointer;
+  }
+  
+  .user-profile {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+  
+  .username {
+    font-weight: 500;
+  }
+  
+  .content-wrapper {
+    display: flex;
+    flex: 1;
+  }
+  .card h3 {
+    margin-bottom: 0.8rem;
+    font-size: 1.1rem;
+    color: #111827;
+  }
+  
+  .rank {
+    font-size: 1.2rem;
+    color: #f97316;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+  }
+  
+  .ranking-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .ranking-list li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.4rem 0;
+    font-size: 0.85rem;
+    border-bottom: 1px solid #f3f4f6;
+  }
+  
+  .ranking-list li:last-child {
+    border-bottom: none;
+  }
+  
+  .ranking-list .name {
+    font-weight: 500;
+    color: #374151;
+    font-size: 0.85rem;
+  }
+  
+  .ranking-list .up {
+    color: #16a34a;
+    font-size: 0.75rem;
+    margin-right: 4px;
+  }
+  
+  .ranking-list .down {
+    color: #dc2626;
+    font-size: 0.75rem;
+    margin-right: 4px;
+  }
+  
+  .ranking-list strong {
+    color: #6b7280;
+    font-size: 0.8rem;
+    font-weight: 500;
+  }
+  
   
