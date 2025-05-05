@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes, useNavigate, useLocation, Navigate } from 'react-router-dom';
-import Header from './components/Header';
+
 import Landing from './pages/Landing';
 import Dashboard from './pages/Dashboard';
 import Home from './pages/Home';
@@ -8,6 +8,7 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Archives from './pages/Archives';
 import { useAuth, AuthProvider } from './AuthContext'; // Import du Context
+import Accueil from './pages/Accueil';
 
 function App() {
   return (
@@ -43,9 +44,7 @@ function AppLayout() {
 
   return (
     <div>
-      {location.pathname !== '/' && location.pathname !== '/login' && location.pathname !== '/register' && (
-        <Header setIsAuthenticated={setIsAuthenticated} />
-      )}
+
 
       <Routes>
         <Route path="/" element={<Landing setIsAuthenticated={setIsAuthenticated} />} />        
@@ -58,6 +57,8 @@ function AppLayout() {
               <Navigate to="/home" replace />
             )
           }
+        />
+        <Route path="/accueil" element={<Accueil />}
         />
         <Route
           path="/dashboard"
