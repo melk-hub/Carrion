@@ -53,7 +53,7 @@ function AppLayout() {
             isAuthenticated ? (
               <Dashboard />
             ) : (
-              <Navigate to="/dashboard" />
+              <Navigate to="/login" />
             )
           }
         />
@@ -63,7 +63,7 @@ function AppLayout() {
             isAuthenticated ? (
               <Archives />
             ) : (
-              <Navigate to="/archives" />
+              <Navigate to="/login" />
             )
           }
         />
