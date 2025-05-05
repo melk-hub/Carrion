@@ -5,6 +5,7 @@ import Landing from './pages/Landing';
 import Dashboard from './pages/Dashboard';
 import Archives from './pages/Archives';
 import { useAuth, AuthProvider } from './AuthContext'; // Import du Context
+import Navbar from './pages/Navbar';
 
 function App() {
   return (

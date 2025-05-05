@@ -13,8 +13,7 @@ html, body {
 .layout {
   display: flex;
   flex-direction: column;
-  height: 100vh;
-  width: 100vw;
+  height: 90%;
 }
 
 .layout-body {
@@ -29,6 +28,7 @@ html, body {
   margin-left: 220px;
   background: #FFF9F0;
 }
+
 .sidebar {
   position: fixed;
   top: 0;
@@ -44,21 +44,28 @@ html, body {
   overflow: hidden;
 }
 
+.title {
+  font-size: xx-large;
+}
+
 .logo {
   display: flex;
-  justify-content: center;
   align-items: center;
   margin-bottom: 30px;
+  justify-content: flex-start;
+  cursor: pointer;
 }
+
 .logo-img {
-  width: 10px;
-  height: 30px;
+  width: 40px;
   object-fit: contain;
 }
 
 .logo .icon {
-  font-size: 24px;
-  margin-right: 0px;
+  font-size: 23px;
+  margin-right: 5px;
+  margin-bottom: 10px;
+  height: 30px;
 }
 
 .menu {
@@ -130,7 +137,15 @@ html, body {
 
 .logo.right .icon {
   font-size: 10px;
-  margin-right: 10px;
+  gap: 8px;
+}
+
+.logo-text {
+  font-size: 30px;
+  margin-left: 8px;
+  color: white;
+  position: relative;
+  top: -9px;
 }
 
 .notifications {
@@ -160,4 +175,3 @@ html, body {
   display: flex;
   flex: 1;
 }
-
