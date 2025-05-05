@@ -8,7 +8,6 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Archives from './pages/Archives';
 import { useAuth, AuthProvider } from './AuthContext'; // Import du Context
-import Accueil from './pages/Accueil';
 
 function App() {
   return (
@@ -51,22 +50,15 @@ function AppLayout() {
         <Route path="/login" element={<Login setIsAuthenticated={setIsAuthenticated} />} />        
         <Route path="/register" element={<Register setIsAuthenticated={setIsAuthenticated} />} />
         <Route path="/home" element={
-            isAuthenticated ? (
               <Home />
-            ) : (
-              <Navigate to="/home" replace />
-            )
-          }
-        />
-        <Route path="/accueil" element={<Accueil />}
-        />
+        }/>
         <Route
           path="/dashboard"
           element={
             isAuthenticated ? (
               <Dashboard />
             ) : (
-              <Navigate to="/dashboard" />
+              <Navigate to="/login" />
             )
           }
         />
@@ -76,7 +68,7 @@ function AppLayout() {
             isAuthenticated ? (
               <Archives />
             ) : (
-              <Navigate to="/archives" />
+              <Navigate to="/login" />
             )
           }
         />
