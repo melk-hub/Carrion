@@ -40,6 +40,10 @@ html, body {
   font-size: xx-large;
 }
 
+.title {
+  font-size: xx-large;
+}
+
 .logo {
   display: flex;
   align-items: center;
