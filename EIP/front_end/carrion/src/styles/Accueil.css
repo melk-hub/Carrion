@@ -53,7 +53,16 @@ body {
     flex-wrap: wrap;
   }
   
-  .recent-activity,
+  .recent-activit{
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 1rem;
+    flex: 1;
+    min-width: 300px;
+    height: 500px;
+  }
+
   .quick-access {
     background: white;
     border: 1px solid #ddd;
@@ -210,22 +219,29 @@ body {
     transition: width 0.3s ease;
     overflow: hidden;
   }
+
+  .title {
+    font-size: xx-large;
+  }
   
   .logo {
     display: flex;
-    justify-content: center;
     align-items: center;
     margin-bottom: 30px;
+    justify-content: flex-start;
+    cursor: pointer;
   }
+
   .logo-img {
-    width: 10px;
-    height: 30px;
+    width: 40px;
     object-fit: contain;
   }
   
   .logo .icon {
-    font-size: 24px;
-    margin-right: 0px;
+    font-size: 23px;
+    margin-right: 5px;
+    margin-bottom: 10px;
+    height: 30px;
   }
   
   .menu {
@@ -297,7 +313,15 @@ body {
   
   .logo.right .icon {
     font-size: 10px;
-    margin-right: 10px;
+    gap: 8px;
+  }
+
+  .logo-text {
+    font-size: 30px;
+    margin-left: 8px;
+    color: white;
+    position: relative;
+    top: -9px;
   }
   
   .notifications {

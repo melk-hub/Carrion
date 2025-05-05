@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import "../styles/Accueil.css";
-import logo from '../assets/carrion_logo.png';
+import logo from '../assets/carrion_logo_crop.png';
 
 export default function Accueil() {
     const navigate = useNavigate();
@@ -23,6 +23,7 @@ export default function Accueil() {
         <div className="logo">
           <span className="icon" onClick={() => navigate('/home')}>
             <img src={logo} alt="Carrion" className="logo-img"/>
+            <span className="logo-text">CARRION</span>
           </span>
         </div>
           <ul className="menu">
@@ -40,7 +41,7 @@ export default function Accueil() {
       </div>
         <main className="main-content">
             <div className="dashboard-container">
-            <h1>Tableau de bord</h1>
+            <h1 className="title">Tableau de bord</h1>
             <div className="top-cards">
                 <div className="card highlight">
                 <h3>Dernière candidature</h3>
