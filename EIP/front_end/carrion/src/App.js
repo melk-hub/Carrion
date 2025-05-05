@@ -1,10 +1,11 @@
 import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes, useNavigate, useLocation, Navigate } from 'react-router-dom';
-import Header from './components/Header';
+
 import Landing from './pages/Landing';
 import Dashboard from './pages/Dashboard';
 import Archives from './pages/Archives';
 import { useAuth, AuthProvider } from './AuthContext'; // Import du Context
+import Accueil from './pages/Accueil';
 
 function App() {
   return (
