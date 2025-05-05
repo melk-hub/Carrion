@@ -5,7 +5,6 @@ import Landing from './pages/Landing';
 import Dashboard from './pages/Dashboard';
 import Archives from './pages/Archives';
 import { useAuth, AuthProvider } from './AuthContext'; // Import du Context
-import Accueil from './pages/Accueil';
 
 function App() {
   return (
@@ -53,7 +52,7 @@ function AppLayout() {
             isAuthenticated ? (
               <Dashboard />
             ) : (
-              <Navigate to="/dashboard" />
+              <Navigate to="/login" />
             )
           }
         />
@@ -63,7 +62,7 @@ function AppLayout() {
             isAuthenticated ? (
               <Archives />
             ) : (
-              <Navigate to="/archives" />
+              <Navigate to="/login" />
             )
           }
         />

@@ -1,51 +1,127 @@
 import React from 'react';
-import '../styles/Home.css';
+import { useNavigate } from 'react-router-dom';
+import "../styles/Home.css";
+import logo from '../assets/carrion_logo_crop.png';
 
-function Home() {
-return (
-    <div className="container">
-        <main className="dashboard">
-        <section className="overview">
-          <h2>Aperçu de vos candidatures</h2>
-          <div className="cards">
-            <div className="card">
-              <p>Total</p>
-              <span>0</span>
-            </div>
-            <div className="card waiting">
-              <p>En attente</p>
-              <span>0</span>
-            </div>
-            <div className="card accepted">
-              <p>Acceptées</p>
-              <span>0</span>
-            </div>
-            <div className="card refused">
-              <p>Refusées</p>
-              <span>0</span>
-            </div>
-          </div>
-        </section>
+export default function Home() {
+    const navigate = useNavigate();
 
-        <section className="activity-tools">
-          <div className="recent-activity">
-            <h3>Activité récente</h3>
-            <p>Vos 5 dernières candidatures</p>
-            <p className="empty">Aucune candidature trouvée</p>
-            <button>Voir toutes les candidatures</button>
-          </div>
+    return (
+      <div className="layout">
+      <header className="topbar">
+        <div className="notifications">
+          <span className="bell">🔔</span>
+        </div>
+        <div className="user-profile" onClick={() => navigate('/parameters')}>
+          <img alt="User" className="avatar" />
+          <span className="username">Jeremy</span>
+        </div>
+      </header>
+  
+      <div className="layout-body">
+        <nav className={`sidebar`}>
+        <div className="logo">
+          <span className="icon" onClick={() => navigate('/home')}>
+            <img src={logo} alt="Carrion" className="logo-img"/>
+            <span className="logo-text">CARRION</span>
+          </span>
+        </div>
+          <ul className="menu">
+            <li onClick={() => navigate('/accueil')}>
+              <span>🏠</span> {"Accueil"}
+            </li>
+            <li onClick={() => navigate('/dashboard')}>
+              <span>📄</span> {"Candidatures"}
+            </li>
+            <li onClick={() => navigate('/archives')}>
+              <span>📊</span> {"Archives"}
+            </li>
+          </ul>
+        </nav>
+      </div>
+        <main className="main-content">
+            <div className="dashboard-container">
+            <h1 className="title">Tableau de bord</h1>
+            <div className="top-cards">
+                <div className="card highlight">
+                <h3>Dernière candidature</h3>
+                <div className="job-info">
+                    <img
+                    src="https://cdn.shopify.com/assets/images/logos/shopify-bag.png"
+                    alt="Shopify"
+                    />
+                    <div>
+                    <strong>Shopify</strong>
+                    <p>Stage - Product Owner</p>
+                    </div>
+                </div>
+                <p className="timestamp">Il y a 17h</p>
+                </div>
 
-          <div className="quick-tools">
-            <h3>Outils rapides</h3>
-            <p>Accédez rapidement aux fonctionnalités</p>
-            <button>Tableau de bord</button>
-            <button>Nouvelle candidature</button>
-            <button>Statistiques</button>
-          </div>
-        </section>
-      </main>
+                <div className="card">
+                <h3>Changement de statut récent</h3>
+                <div className="job-info">
+                    <img
+                    src="https://upload.wikimedia.org/wikipedia/commons/6/6a/Boursorama_Logo_2021.png"
+                    alt="Boursorama"
+                    />
+                    <div>
+                    <strong>Boursorama</strong>
+                    <p>CDD - Développeur Full Stack Junior</p>
+                    </div>
+                </div>
+                <p className="timestamp">Il y a 5h</p>
+                </div>
+
+                <div className="card">
+                <h3>Classement</h3>
+                <p className="rank">#37</p>
+                <ul className="ranking-list">
+                    <li>
+                        <span className="name">Joe MAIREIN</span>
+                        <span className="up">▲14</span>{" "}
+                    <strong>#34</strong>
+                    </li>
+                    <li>
+                    <span className="name">Vanessa WELLE</span> <span className="down">▼4</span>{" "}
+                    <strong>#35</strong>
+                    </li>
+                    <li>
+                    <span className="name">Sabrina PADLE</span> <span className="up">▲1</span>{" "}
+                    <strong>#36</strong>
+                    </li>
+                    <li>
+                    <span className="name">Jeremy Dupont</span> <span className="up">▲2</span>{" "}
+                    <strong>#37</strong>
+                    </li>
+                </ul>
+                </div>
+            </div>
+
+            <div className="bottom-section">
+                <div className="recent-activity">
+                <h3>Activité récente</h3>
+                <p>Dernière modifications</p>
+                <div className="empty-state">
+                    <button>Click to change view</button>
+                    <div className="emoji">🤔</div>
+                    <p>Il n’y a pas un chat...</p>
+                    <button className="see-all">Voir toutes les candidatures</button>
+                </div>
+                </div>
+
+                <div className="quick-access">
+                <h3>Accès rapide</h3>
+                <p>Accédez rapidement aux fonctionnalités</p>
+                <button>Mes candidatures</button>
+                <button>Nouvelles candidatures</button>
+                <button>Statistiques</button>
+                <button>Mes informations</button>
+                </div>
+            </div>
+            </div>
+        </main>
     </div>
-  );
-}
-
-export default Home;
+    
+    );
+  }
