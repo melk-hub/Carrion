@@ -98,31 +98,31 @@ function InfosModal({ isOpen, onClose }) {
                 <div className="row-inputs">
                   <div>
                     <label>Nom*</label>
-                    <input type="text" name="nom" value={personalInfo.nom} onChange={handleChange} required />
+                    <input type="text" name="nom" value={personalInfo.nom} onChange={handleChange} />
                   </div>
                   <div>
                     <label>Prénom*</label>
-                    <input type="text" name="prenom" value={personalInfo.prenom} onChange={handleChange} required />
+                    <input type="text" name="prenom" value={personalInfo.prenom} onChange={handleChange} />
                   </div>
                 </div>
                 <div className="row-inputs">
                   <div>
                     <label>Date de naissance*</label>
-                    <input type="date" name="dateNaissance" value={personalInfo.dateNaissance} onChange={handleChange} required />
+                    <input type="date" name="dateNaissance" value={personalInfo.dateNaissance} onChange={handleChange} />
                   </div>
                   <div>
                     <label>Email*</label>
-                    <input type="email" name="email" value={personalInfo.email} onChange={handleChange} required />
+                    <input type="email" name="email" value={personalInfo.email} onChange={handleChange} />
                   </div>
                 </div>
                 <div className="row-inputs">
                   <div>
                     <label>Ecole / Université*</label>
-                    <input type="text" name="ecole" value={personalInfo.ecole} onChange={handleChange} required />
+                    <input type="text" name="ecole" value={personalInfo.ecole} onChange={handleChange} />
                   </div>
                   <div>
                     <label>Ville*</label>
-                    <input type="text" name="ville" value={personalInfo.ville} onChange={handleChange} required />
+                    <input type="text" name="ville" value={personalInfo.ville} onChange={handleChange} />
                   </div>
                 </div>
                 <div className="button-group">
@@ -146,11 +146,11 @@ function InfosModal({ isOpen, onClose }) {
                 <div className="row-inputs">
                   <div>
                     <label>Emploi recherché</label>
-                    <input type="text" name="job" value={personalInfo.job} onChange={handleChange} required />
+                    <input type="text" name="job" value={personalInfo.job} onChange={handleChange} />
                   </div>
                   <div>
                     <label>Disponibilités</label>
-                    <input type="date" name="availability" value={personalInfo.availability} onChange={handleChange} required />
+                    <input type="date" name="availability" value={personalInfo.availability} onChange={handleChange} />
                   </div>
                 </div>
 
@@ -173,11 +173,11 @@ function InfosModal({ isOpen, onClose }) {
                 <div className="row-inputs">
                   <div>
                     <label>Domaine d’intérêt</label>
-                    <input type="text" name="domain" value={personalInfo.domain} onChange={handleChange} required />
+                    <input type="text" name="domain" value={personalInfo.domain} onChange={handleChange} />
                   </div>
                   <div>
                     <label>Localisation souhaitée</label>
-                    <input type="text" name="location" value={personalInfo.location} onChange={handleChange} required />
+                    <input type="text" name="location" value={personalInfo.location} onChange={handleChange} />
                   </div>
                 </div>
 
