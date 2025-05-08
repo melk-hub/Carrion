@@ -10,6 +10,7 @@ import { GmailModule } from './webhooks/google/gmail.module';
 import { MailFilterModule } from './services/mailFilter/mailFilter.module';
 import { MailFilterController } from './services/mailFilter/mailFilter.controller';
 import { MailFilterService } from './services/mailFilter/mailFilter.service';
+import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { MailFilterService } from './services/mailFilter/mailFilter.service';
     JobApplyModule,
     GmailModule,
     MailFilterModule,
+    UsersModule,
   ],
   controllers: [AppController, MailFilterController],
   providers: [AppService, MailFilterService],

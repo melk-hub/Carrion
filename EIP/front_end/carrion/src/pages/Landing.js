@@ -1,5 +1,4 @@
 import React, { useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import { useAuth } from "../AuthContext";
 import "../styles/Landing.css";
@@ -14,10 +13,10 @@ import lucide_search_svg from "../assets/svg/search_lucide.svg";
 import lucide_calendar_svg from "../assets/svg/calendar_lucide.svg";
 import lucide_bar_chart_svg from "../assets/svg/bar_chart_lucide.svg";
 import lucide_folder_svg from "../assets/svg/folder_lucide.svg";
+import AuthModal from '../components/AuthModal';
 
 function Landing() {
   const { isAuthenticated } = useAuth();
-  const navigate = useNavigate();
   const [isHeaderVisible, setIsHeaderVisible] = useState(true);
   const [isAtTop, setIsAtTop] = useState(true);
   const lastScrollY = useRef(0);
@@ -25,8 +24,10 @@ function Landing() {
   const topThreshold = 5;
 
   const handleLoginClick = () => {
-    navigate("/login");
+    setShowAuth(true);
   };
+
+  const [showAuth, setShowAuth] = useState(false);
 
   useEffect(() => {
     document.body.classList.add("landing-page");
@@ -259,6 +260,10 @@ function Landing() {
           <h2>Footer TBD</h2>
         </footer>
       </main>
+      <AuthModal
+        isOpen={showAuth} 
+        onClose={() => setShowAuth(false)} 
+      />
     </div>
   );
 }
