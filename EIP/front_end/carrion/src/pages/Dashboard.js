@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import '../styles/Dashboard.css';
+import '../styles/Navbar.css';
 import archiveIcon from '../assets/archiver.png';
 import deleteIcon from '../assets/supprimer.png';
 import editIcon from '../assets/edit-button.png';
@@ -449,6 +450,8 @@ function Dashboard() {
         </div>
       )}
     </div>
+            </main>
+            </div>
   );
 }
 

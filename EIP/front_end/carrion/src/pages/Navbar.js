@@ -26,7 +26,7 @@ function Navbar() {
           </span>
         </div>
           <ul className="menu">
-            <li onClick={() => navigate('/accueil')}>
+            <li onClick={() => navigate('/home')}>
               <span>🏠</span> {"Accueil"}
             </li>
             <li onClick={() => navigate('/dashboard')}>
