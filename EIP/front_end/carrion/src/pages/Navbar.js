@@ -39,6 +39,7 @@ function Navbar() {
         </nav>
       </div>
         <main className="main-content">
+          // mettre page ici
         </main>
         </div>
     );
