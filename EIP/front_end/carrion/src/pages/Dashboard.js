@@ -1,8 +1,11 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import '../styles/Dashboard.css';
+import '../styles/Navbar.css';
 import archiveIcon from '../assets/archiver.png';
 import deleteIcon from '../assets/supprimer.png';
 import editIcon from '../assets/edit-button.png';
+import { useNavigate } from 'react-router-dom';
+import logo from '../assets/carrion_logo_crop.png';
 
 function Dashboard() {
   const [applications, setApplications] = useState([]);
@@ -14,6 +17,7 @@ function Dashboard() {
   const [newApplication, setNewApplication] = useState(null);
   const [popupType, setPopupType] = useState(null);
   const API_URL = process.env.REACT_APP_API_URL;
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchApplications = async () => {
@@ -166,7 +170,40 @@ function Dashboard() {
   };
 
   return (
-    <div>
+          <div className="layout">
+          <header className="topbar">
+            <div className="notifications">
+              <span className="bell">🔔</span>
+            </div>
+            <div className="user-profile" onClick={() => navigate('/parameters')}>
+              <img alt="User" className="avatar" />
+              <span className="username">Jeremy</span>
+            </div>
+          </header>
+      
+          <div className="layout-body">
+            <nav className={`sidebar`}>
+            <div className="logo">
+              <span className="icon" onClick={() => navigate('/home')}>
+                <img src={logo} alt="Carrion" className="logo-img"/>
+                <span className="logo-text">CARRION</span>
+              </span>
+            </div>
+              <ul className="menu">
+                <li onClick={() => navigate('/home')}>
+                  <span>🏠</span> {"Accueil"}
+                </li>
+                <li onClick={() => navigate('/dashboard')}>
+                  <span>📄</span> {"Candidatures"}
+                </li>
+                <li onClick={() => navigate('/archives')}>
+                  <span>📊</span> {"Archives"}
+                </li>
+              </ul>
+            </nav>
+          </div>
+            <main className="main-content">
+<div>
       <div className="top-bar">
         <div className="objectives">
           {/* <h3>Objectif de la semaine :</h3> */}
@@ -428,6 +465,8 @@ function Dashboard() {
         </div>
       )}
     </div>
+            </main>
+            </div>
   );
 }
 
