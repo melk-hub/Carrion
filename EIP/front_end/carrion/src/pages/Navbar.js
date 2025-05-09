@@ -39,7 +39,7 @@ function Navbar() {
         </nav>
       </div>
         <main className="main-content">
-          // mettre page ici
+          {/* mettre page ici*/}
         </main>
         </div>
     );

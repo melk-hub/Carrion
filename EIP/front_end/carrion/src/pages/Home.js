@@ -76,11 +76,12 @@ export default function Home() {
 
                 <div className="card">
                 <h3>Classement</h3>
+                <ul className="ranking-list">Vous êtes premier ! Enfin je crois...</ul>
+                {/*
                 <p className="rank">#37</p>
                 <ul className="ranking-list">
                     <li>
-                        <span className="name">Joe MAIREIN</span>
-                        <span className="up">▲14</span>{" "}
+                    <span className="name">Joe MAIREIN</span> <span className="up">▲14</span>{" "}
                     <strong>#34</strong>
                     </li>
                     <li>
@@ -96,6 +97,7 @@ export default function Home() {
                     <strong>#37</strong>
                     </li>
                 </ul>
+                */}
                 </div>
             </div>
 
@@ -104,20 +106,19 @@ export default function Home() {
                 <h3>Activité récente</h3>
                 <p>Dernière modifications</p>
                 <div className="empty-state">
-                    <button>Click to change view</button>
                     <div className="emoji">🤔</div>
                     <p>Il n’y a pas un chat...</p>
-                    <button className="see-all">Voir toutes les candidatures</button>
+                    <button className="see-all" onClick={() => navigate('/dashboard')}>Voir toutes les candidatures</button>
                 </div>
                 </div>
 
                 <div className="quick-access">
                 <h3>Accès rapide</h3>
                 <p>Accédez rapidement aux fonctionnalités</p>
-                <button>Mes candidatures</button>
+                <button onClick={() => navigate('/dashboard')}>Mes candidatures</button>
                 <button>Nouvelles candidatures</button>
-                <button>Statistiques</button>
-                <button>Mes informations</button>
+                <button onClick={() => navigate('/Archives')}>Statistiques</button>
+                <button onClick={() => navigate('/Paramaters')}>Mes informations</button>
                 </div>
             </div>
             </div>
