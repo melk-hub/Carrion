@@ -90,21 +90,9 @@ html, body {
   padding-left: 10px;
 }
 
-.sidebar.collapsed {
-  width: 70px;
-}
-
-.sidebar.collapsed .text {
-  display: none;
-}
-
-.sidebar.collapsed .menu li {
-  justify-content: center;
-}
-
 @media screen and (max-width: 768px) {
   .sidebar {
-    width: 70px;
+    width: 140px;
   }
 
   .sidebar .text {
@@ -114,7 +102,16 @@ html, body {
   .menu li {
     justify-content: center;
   }
+
+  .logo-text {
+    display: none;
+  }
+
+  .logo-img {
+    margin-left: 30px;
+  }
 }
+
 .topbar {
   height: 60px;
   background-color: #0c1f3d;
@@ -141,11 +138,11 @@ html, body {
 }
 
 .logo-text {
-  font-size: 30px;
-  margin-left: 8px;
+  font-size: 25px;
+  margin-left: 15px;
   color: white;
   position: relative;
-  top: -9px;
+  top: -12px;
 }
 
 .notifications {

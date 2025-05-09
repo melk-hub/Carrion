@@ -53,8 +53,13 @@ function AppLayout() {
         <Route path="/bar" element={
               <Navbar />
         }/>
-        <Route path="/home" element={
+        <Route path="/home"          
+            element={
+            isAuthenticated ? (
               <Home />
+            ) : (
+              <Navigate to="/login" />
+            )
         }/>
         <Route
           path="/dashboard"
