@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import "../styles/Home.css";
+import "../styles/Navbar.css";
 import logo from '../assets/carrion_logo_crop.png';
 
 export default function Home() {
@@ -27,7 +28,7 @@ export default function Home() {
           </span>
         </div>
           <ul className="menu">
-            <li onClick={() => navigate('/accueil')}>
+            <li onClick={() => navigate('/home')}>
               <span>🏠</span> {"Accueil"}
             </li>
             <li onClick={() => navigate('/dashboard')}>
