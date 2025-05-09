@@ -48,7 +48,7 @@ function Register({ setIsAuthenticated }) {
         const data = await response;
         if (response.ok) {
           setIsAuthenticated(true);
-          navigate('/dashboard');
+          navigate('/home');
         } else {
           setError(data.message || 'Erreur lors de l\'inscription');
         }
