@@ -155,6 +155,7 @@ html, body {
   display: flex;
   align-items: center;
   gap: 10px;
+  cursor: pointer;
 }
 
 .avatar {
@@ -166,6 +167,7 @@ html, body {
 
 .username {
   font-weight: 500;
+  cursor: pointer;
 }
 
 .content-wrapper {
