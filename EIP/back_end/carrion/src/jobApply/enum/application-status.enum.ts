@@ -1,4 +1,5 @@
 export enum ApplicationStatus {
+<<<<<<< HEAD
   APPLIED = 'APPLIED',
   PENDING = 'PENDING',
   INTERVIEW_SCHEDULED = 'INTERVIEW_SCHEDULED',
@@ -10,4 +11,9 @@ export enum ApplicationStatus {
   REJECTED_BY_COMPANY = 'REJECTED_BY_COMPANY',
   OFFER_DECLINED = 'OFFER_DECLINED',
   APPLICATION_WITHDRAWN = 'APPLICATION_WITHDRAWN',
+=======
+  ON = 'ON',
+  OFF = 'OFF',
+  PENDING = 'PENDING',
+>>>>>>> b271cfe ([Feat]: Adding jobApply status and infos update)
 }

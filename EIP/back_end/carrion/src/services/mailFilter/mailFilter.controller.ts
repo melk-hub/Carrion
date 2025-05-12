@@ -34,6 +34,12 @@ export class MailFilterController {
     status: 201,
     description:
       'Information extracted and job application created successfully.',
+    type: JobApplyDto,
+  })
+  @ApiResponse({
+    status: 201,
+    description:
+      'Information extracted and job application created successfully.',
     type: String,
   })
   @ApiResponse({
