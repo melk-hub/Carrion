@@ -2,8 +2,7 @@ import React from 'react';
 
 const GoogleLoginButton = () => {
     const GOOGLE_ID = process.env.REACT_APP_GOOGLE_CLIENT_ID;
-    const API_URL = process.env.REACT_APP_API_URL;
-    const redirectUri = `${API_URL}/auth/google/callback`; 
+    const redirectUri = process.env.REACT_APP_GOOGLE_REDIRECT_URI;
     const googleAuthUrl = `https://accounts.google.com/o/oauth2/v2/auth?response_type=code&client_id=${GOOGLE_ID}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=email%20profile%20https://www.googleapis.com/auth/gmail.readonly%20https://www.googleapis.com/auth/gmail.modify%20https://www.googleapis.com/auth/gmail.labels`;
     const handleGoogleLogin = () => {
       window.location.href = googleAuthUrl;

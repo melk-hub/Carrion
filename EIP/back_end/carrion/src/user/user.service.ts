@@ -41,6 +41,10 @@ export class UserService {
       where: { id },
       select: {
         id: true,
+        username: true,
+        email: true,
+        firstName: true,
+        lastName: true,
         hashedRefreshToken: true,
         role: true,
       },
