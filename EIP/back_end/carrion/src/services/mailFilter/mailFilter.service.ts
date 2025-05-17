@@ -1,19 +1,19 @@
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import OpenAI from 'openai';
 import { CreateJobApplyDto } from 'src/jobApply/dto/jobApply.dto';
-import {
-  JobApplyParams,
-  JobApplyService,
-  UpdateJobApply,
-} from 'src/jobApply/jobApply.service';
+import { JobApplyService } from 'src/jobApply/jobApply.service';
 import { ApplicationStatus } from 'src/jobApply/enum/application-status.enum';
 import { ExtractedJobDataDto } from './dto/extracted-job-data.dto';
+import { convert } from 'html-to-text';
 import {
   GmailMessage,
   GmailMessagePart,
   GmailHeader,
 } from 'src/webhooks/gmail/gmail.types';
-import { convert } from 'html-to-text';
+import {
+  JobApplyParams,
+  UpdateJobApply,
+} from 'src/jobApply/interface/jobApply.interface';
 
 function extractJsonFromString(str: string): any | null {
   if (!str) return null;
@@ -285,16 +285,11 @@ export class MailFilterService {
         );
 
         const updateJobApply: UpdateJobApply = {
-          ...(parsedData.location ? { Location: parsedData.location } : {}),
-          ...(parsedData.salary
-            ? { salary: Number.parseInt(parsedData.salary) }
-            : {}),
-          ...(parsedData.status !== existingJobApply.status
-            ? { status: parsedData.status }
-            : {}),
-          ...(parsedData.interviewDate
-            ? { interviewDate: new Date(parsedData.interviewDate) }
-            : {}),
+          location: parsedData.location,
+          salary: Number.parseInt(parsedData.salary),
+          status: parsedData.status,
+          interviewDate: new Date(parsedData.interviewDate),
+          contractType: parsedData.contractType,
         };
 
         await this.jobApplyService.updateJobApplyByMail(
