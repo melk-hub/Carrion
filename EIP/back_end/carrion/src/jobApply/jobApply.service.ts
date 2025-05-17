@@ -6,24 +6,7 @@ import {
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateJobApplyDto, JobApplyDto } from './dto/jobApply.dto';
 import { ApplicationStatus } from './enum/application-status.enum';
-
-export interface JobApplyParams {
-  title: string;
-  company: string;
-  contractType: string;
-  location?: string;
-}
-
-export interface UpdateJobApply {
-  title?: string;
-  company?: string;
-  location?: string;
-  salary?: number;
-  imageUrl?: string;
-  status?: ApplicationStatus;
-  contractType?: string;
-  interviewDate?: Date;
-}
+import { JobApplyParams, UpdateJobApply } from './interface/jobApply.interface';
 
 @Injectable()
 export class JobApplyService {
@@ -64,10 +47,11 @@ export class JobApplyService {
       const jobApply = await this.prisma.jobApply.findFirst({
         where: {
           UserId: userId,
-          contractType: jobApplyParams.contractType,
           Title: jobApplyParams.title,
           Company: jobApplyParams.company,
-          ...(jobApplyParams.location && { Location: jobApplyParams.location }),
+          // Location and contractType are optional, but prisma should take care of empty data and won't take care of it if there's no data
+          Location: jobApplyParams.location,
+          contractType: jobApplyParams.contractType,
         },
         include: {
           User: true,
@@ -207,14 +191,11 @@ export class JobApplyService {
       await this.prisma.jobApply.update({
         where: { id: jobApplyId },
         data: {
-          ...(updateJobApply.location
-            ? { Location: updateJobApply.location }
-            : {}),
-          ...(updateJobApply.salary ? { Salary: updateJobApply.salary } : {}),
-          ...(updateJobApply.status ? { status: updateJobApply.status } : {}),
-          ...(updateJobApply.interviewDate
-            ? { interviewDate: new Date(updateJobApply.interviewDate) }
-            : {}),
+          Location: updateJobApply.location,
+          Salary: updateJobApply.salary,
+          status: updateJobApply.status,
+          interviewDate: updateJobApply.interviewDate,
+          contractType: updateJobApply.contractType,
         },
       });
       return `Job offer: ${jobApplyId} for user: ${userId} updated successfully`;
