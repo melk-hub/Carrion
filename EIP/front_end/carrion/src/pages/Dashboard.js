@@ -261,6 +261,29 @@ function Dashboard() {
                 <button className="add-button" onClick={openAddPopup}>
                   AJOUTER UNE CANDIDATURE
                 </button>
+                <div className="dashboard-grid-actions">
+                  <button
+                    className="action-button edit-button"
+                    onClick={() => openEditPopup(application)}
+                  >
+                    <img src={editIcon} alt="Modifier" />
+                    <span className="grid-tooltip">Modifier</span>
+                  </button>
+                  <button className="action-button archive-button">
+                    <img src={archiveIcon} alt="Archiver" />
+                    <span className="grid-tooltip">Archiver</span>
+                  </button>
+                  <button
+                    className="action-button delete-button"
+                    onClick={() => handleDeleteApplication(application.id)}
+                  >
+                    <img src={deleteIcon} alt="Supprimer" />
+                    <span className="grid-tooltip">Supprimer</span>
+                  </button>
+                </div>
+                <div
+                  className={`dashboard-grid-status-banner ${application.status.toLowerCase()}`}
+                ></div>
               </div>
             )}
           </div>
