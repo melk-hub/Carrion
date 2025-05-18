@@ -21,7 +21,11 @@ function extractJsonFromString(str: string): any | null {
     const parsed = JSON.parse(str);
     if (typeof parsed === 'object' && parsed !== null) return parsed;
   } catch (e) {
-    return `Failed to parse JSON directly: ${e.message}`;
+    Logger.warn(
+      `Failed to parse JSON directly: ${e.message}`,
+      'MailFilterService-JSONUtil',
+    );
+    return null;
   }
   const match = str.match(/```json\s*([\s\S]*?)\s*```/);
   if (match && match[1]) {
@@ -63,7 +67,7 @@ export class MailFilterService {
       return Buffer.from(base64, 'base64').toString('utf-8');
     } catch (error) {
       this.logger.error('Failed to decode Base64URL string:', error);
-      return `[Erreur de décodage: ${encoded.substring(0, 20)}...]`;
+      return `[Decoding error:: ${encoded.substring(0, 20)}...]`;
     }
   }
 
