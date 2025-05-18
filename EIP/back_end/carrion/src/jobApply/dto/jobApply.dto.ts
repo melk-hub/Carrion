@@ -48,7 +48,7 @@ export class JobApplyDto {
   @MaxLength(255)
   interviewDate?: Date;
 
-  @IsNotEmpty()
+  @IsOptional()
   @MaxLength(255)
   contractType: string;
 
@@ -127,7 +127,7 @@ export class CreateJobApplyDto {
     type: 'string',
     example: 'Internship',
   })
-  @IsNotEmpty()
+  @IsOptional()
   @MaxLength(255)
   contractType: string;
 

@@ -19,6 +19,7 @@ import {
 import { JobApplyService } from './jobApply.service';
 import { CreateJobApplyDto, JobApplyDto } from './dto/jobApply.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt/jwt-auth.guard';
+import { ApplicationStatus } from './enum/application-status.enum';
 
 @ApiTags('jobApply')
 @ApiBearerAuth()
@@ -76,7 +77,7 @@ export class JobApplyController {
   @ApiResponse({ status: 404, description: 'Job application not found' })
   async updateJobStatus(
     @Param('id') jobApplyId: string,
-    @Body('status') newStatus: 'ON' | 'OFF' | 'PENDING',
+    @Body('status') newStatus: ApplicationStatus,
     @Request() req,
   ) {
     return this.jobApplyService.updateJobApplyStatus(

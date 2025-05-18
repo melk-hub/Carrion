@@ -48,7 +48,7 @@ model jobApply {
   UserId        String   @db.Uuid
   status        Status
   imageUrl      String?
-  contractType  String
+  contractType  String?
   interviewDate DateTime?
   createdAt     DateTime @default(now())
 }
@@ -60,9 +60,17 @@ model Settings {
 }
 
 enum Status {
-  ON
-  OFF
+  APPLIED
   PENDING
+  INTERVIEW_SCHEDULED
+  TECHNICAL_TEST
+  AWAITING_DECISION
+  OFFER_RECEIVED
+  NEGOTIATION
+  OFFER_ACCEPTED
+  REJECTED_BY_COMPANY
+  OFFER_DECLINED
+  APPLICATION_WITHDRAWN
 }
 
 enum Role {

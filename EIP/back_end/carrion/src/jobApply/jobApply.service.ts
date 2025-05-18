@@ -143,7 +143,7 @@ export class JobApplyService {
   async updateJobApplyStatus(
     jobApplyId: string,
     userId: string,
-    newStatus: 'ON' | 'OFF' | 'PENDING',
+    newStatus: ApplicationStatus,
   ): Promise<JobApplyDto> {
     try {
       const jobApply = await this.prisma.jobApply.findUnique({
