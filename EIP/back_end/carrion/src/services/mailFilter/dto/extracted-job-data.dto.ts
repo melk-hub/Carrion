@@ -8,5 +8,4 @@ export class ExtractedJobDataDto {
   contractType: string;
   status: ApplicationStatus;
   interviewDate?: string;
-  offerReference?: string;
 }

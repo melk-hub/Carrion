@@ -21,7 +21,7 @@ function extractJsonFromString(str: string): any | null {
     const parsed = JSON.parse(str);
     if (typeof parsed === 'object' && parsed !== null) return parsed;
   } catch (e) {
-    throw new Error(`Failed to parse JSON directly: ${e.message}`);
+    return `Failed to parse JSON directly: ${e.message}`;
   }
   const match = str.match(/```json\s*([\s\S]*?)\s*```/);
   if (match && match[1]) {
@@ -153,12 +153,20 @@ export class MailFilterService {
       );
     }
 
-    return this.processEmailWithExtractedData(
-      bodyText,
-      userId,
-      subject,
-      sender,
-    );
+    try {
+      return this.processEmailWithExtractedData(
+        bodyText,
+        userId,
+        subject,
+        sender,
+      );
+    } catch (error) {
+      this.logger.error(
+        `Erreur avec l'API OpenAI ou lors du traitement: ${error.message}`,
+        error.stack,
+      );
+      return error.message;
+    }
   }
 
   private async processEmailWithExtractedData(
@@ -187,32 +195,29 @@ export class MailFilterService {
           {
             role: 'system',
             content: `Tu es un assistant expert en recrutement et en analyse d'emails de candidature.
-    Ta tâche est d'extraire des informations précises d'un email lié à une candidature d'emploi et de déterminer le statut actuel de cette candidature.
+    **La toute première tâches que tu dois faire et que tu dois valider avant pouvoir faire la prochaines étapes, c'est de t'affirmer que le contenu que je t'envoies est bien une conversation de recrutement, si ce n'est pas le cas renvoies moi directement un objet null.**
+    **Si tu considère que le mail n'est pas un mail professionel de procédure de recrutement, renvoie null.**
+    **FAIS BIEN ATTENTION AU MAIL LINKEDIN, SI CE N'EST PAS UNE PROCÉDURE DE RECRUTEMENT, NE TRAITE PAS LES MAILS DE LINKEDIN QUI PARLE DE RELATIONS, DE POSTULATIONS A LEUR PAGE D'EMPLOIE, IL FAUT BIEN QUE CE SOIT UN PROCESSUS DE RECRUTEMENT ET NON PAS AUTRE CHOSE.**
+    SI LES TROIS CONDITIONS AU DESSUS SONT VALIDÉES ET SEULEMENT SI ELLES SONT VALIDÉES ta tâches devient: Extraire des informations précises d'un email lié à une candidature d'emploi et de déterminer le statut actuel de cette candidature.
     Réponds IMPÉRATIVEMENT au format JSON structuré comme suit :
     {
-      "company": "Nom de l'entreprise (string), tu peux potentiellement le trouver dans l'envoie du mail ou dans le footer ou dans l'objet",
-      "title": "Intitulé du poste (string)",
+      "company": "Nom de l'entreprise (string, mandatory)",
+      "title": "Intitulé du poste (string, mandatory)",
       "location": "Lieu du poste, le plus précis possible (string, optionnel)",
       "salary": "Salaire proposé (string, ex: '50000 EUR annuel' ou '3000 EUR mensuel', optionnel)",
-      "contractType": "Type de contrat (ex: 'CDI', 'CDD', 'Stage', 'Alternance', 'Temps plein', 'Temps partiel', 'Freelance')",
+      "contractType": "Type de contrat (ex: 'CDI', 'CDD', 'Stage', 'Alternance', 'Temps plein', 'Temps partiel', 'Freelance', optionnel)",
       "status": "Statut de la candidature parmi (${Object.values(ApplicationStatus).join(', ')}). Choisis le statut le plus pertinent.",
       "interviewDate": "Date et heure de l'entretien au format ISO 8601 (YYYY-MM-DDTHH:mm:ssZ) si mentionnée (string, optionnel)",
-      "offerReference": "Numéro de référence de l'offre ou ID de candidature si présent (string, optionnel)"
     }
-    Si une information n'est pas présente, mets la valeur à null ou ne l'inclus pas si optionnel (sauf pour 'status' qui est obligatoires).
-    Analyse attentivement le sujet, l'expéditeur, le corps du mail, les signatures, l'objet aussi, regarder aussi si c'est une réponse à un mail.
+    **SI TU NE TROUVES PAS DE DATA N'ESSAYES PAS DE COMBLER L'OBJETS, IL FAUT QUE LES TITLES SOIENT DES TRUCS QUI EXISTES DÉJÀ PAS DES MOTS COMME "JOB APPLICATION" OU D'AUTRE SOTTISE, SI TU N'EN TROUVE PAS RENVOIE MOI NULL. VERIFIE BIEN QUE LE MAIL ET LES PROPOSITIONS SONT POUR L'UTILISATEUR ET NON LES INFORMATIONS DU SENDER. PAR EXEMPLE SI LE RECRUTEUR SE PRÉSENTE NE FAIT PAS L'ERREUR DE RÉCUPERER SES INFORMATIONS POUR ME LES RENVOYER ET DE FAIRE EN SORTE QUE CES INFORMATIONS SOIT DONNÉES À L'UTILISATEUR.**
+    **Analyse bien le corps du mail, le sujet, l'objet, le mail de l'expéditeur, le footer, il faut que tu t'assures que ce soit bien une conversation de recrutement, il ne faut pas que tu tombes dans les pièges des mails commerciaux, de spam, de mails sociaux de linkedin, analyse bien, si cela parle de plusieurs personnes en même temps, pour vendre quelques choses, de spam, il faut que tu sois sur que c'est bien une conversation de recrutement.**
+    Sur le json que tu me renvoies je veux les informations en anglais: le type de contrat et le title.
+    **Il faut obligatoirement que tu me trouves la société, le title et le status. dans le fil d'actualités des messages, dans l'objets, dans le footer, le corps, ou encore d'autre type de metadata que je te renvoies comme le mail de l'expéditeur, on peut souvent retrouver le nom la société.**
+    Si tu n'arrives pas à trouver la société,**N'HÉSITE PAS À FAIRE DES RECHERCHES, CELA PEUT ÊTRE UNE ÉCOLE, UNE SOCIÉTÉ, UNE ASSOCIATION, etc. MAIS FAIS BIEN ATTENTION FAIS DES RECHERCHES SUR INTERNET POUR VOIR SI CELA EXISTE, JE NE VEUX PAS DE MOT ALÉATOIRE POUR COMBLER L'OBJET JSON** CEPENDANT FAIS BIEN ATTENTION, EST IL NÉCESSAIRE DE METTRES DES BRANCHES DE LA SOCIÉTÉ DANS LE TITLE ?
+    Si une information n'est pas présente, mets la valeur à null ou ne l'inclus pas si optionnel (sauf pour 'company, title et status' qui sont obligatoires).
+    Analyse attentivement le sujet, le mail de l'expéditeur, le corps du mail, les signatures, l'objet aussi, regarder aussi si c'est une réponse à un mail.
     Si tu considère que le mail n'est pas un mail professionel de procédure de recrutement, renvoie null.
-    Pour ce qui est des informations que tu me renvoies renvoies moi le contractType et le title en anglais, avec le bon titre, il faut que tu me renvoies toujours la même choses alors essaye de suivre un patterne ou une convention de titre.
-
-    Guide pour déterminer 'status' (ON, OFF, PENDING):
-    - PENDING: La candidature a été envoyée ou est en cours d'examen initial, mais aucune décision claire ou étape majeure (comme un entretien) n'est encore confirmée.
-      Mots-clés typiques: 'candidature', 'postuler', 'CV' (envoi initial par l'utilisateur), 'remerciement de candidature', 'bien reçu', 'examinons votre profil', 'accusé de réception', 'test technique' (avant résultat), 'reviendrons vers vous', 'en cours d'évaluation après entretien/test'.
-    - ON: Il y a une progression positive claire et active dans le processus.
-      Mots-clés typiques: 'entretien planifié', 'interview', 'rendez-vous confirmé', 'invitation à un entretien', 'offre d'emploi', 'proposition de contrat', 'félicitations nous vous offrons', 'rejoindre notre équipe', 'j'accepte votre offre' (réponse du candidat à une offre), 'négociation en cours'.
-    - OFF: La candidature est terminée, soit par un refus, soit par un retrait.
-      Mots-clés typiques: 'ne donnerons pas suite', 'malheureusement', 'pas retenu', 'regrettons de vous informer', 'décline votre offre' (réponse du candidat), 'retire ma candidature' (par le candidat).
-    Si l'email est une réponse (Re:, TR:), considère le contexte. Si le poste ou l'entreprise ne sont pas dans cet email spécifique mais étaient clairement établis dans un email précédent auquel celui-ci répond, essaie de les inférer si possible ou laisse les champs vides.
-    L'information la plus importante est 'status'. Sois précis.
+    Pour ce qui est des informations, renvoies moi le contractType et le title en anglais, il faut que tu me renvoies toujours la même choses alors essaye de suivre un patterne ou une convention de titre de LinkedIn, **Ne me rajoutes pas le type de contrat dans le titre, CE QUI VEUT DIRE NE ME RAJOUTE PAS DES CHOSES COMME: "Full-Time", "Internship" DANS LE TITLE. CEPENDANT TU PEUX METTRE LE POSTE "INTERN" "APPRENTICE"**
     `,
           },
           {
@@ -229,7 +234,6 @@ export class MailFilterService {
         this.logger.error('OpenAI returned an empty response content.');
         throw new Error('OpenAI returned an empty response.');
       }
-      this.logger.debug(`OpenAI raw response: ${rawResponse}`);
 
       const parsedData: ExtractedJobDataDto | null =
         extractJsonFromString(rawResponse);
@@ -242,18 +246,17 @@ export class MailFilterService {
       //   contractType: 'CDI',
       //   status: ApplicationStatus.ON,
       //   interviewDate: null,
-      //   offerReference: null,
       // };
 
       if (!parsedData) {
-        this.logger.error(
-          'Failed to parse JSON from OpenAI response.',
-          rawResponse,
+        this.logger.error('Failed to parse JSON from OpenAI response.');
+        return 'Erreur lors du parsing du JSON de la réponse OpenAI.';
+      } else if (!parsedData.title || !parsedData.company) {
+        this.logger.warn(
+          `Didn't create jobApply for this mail: ${emailSender + ' ' + emailSubject}`,
         );
-        throw new Error('Erreur lors du parsing du JSON de la réponse OpenAI.');
+        return;
       }
-
-      this.logger.debug(`OpenAI parsed data: ${JSON.stringify(parsedData)}`);
 
       if (
         !parsedData.status ||
@@ -270,7 +273,9 @@ export class MailFilterService {
       const jobApplyParam: JobApplyParams = {
         title: parsedData.title,
         company: parsedData.company,
-        contractType: parsedData.contractType,
+        contractType: parsedData.contractType
+          ? parsedData.contractType
+          : undefined,
         location: parsedData.location ? parsedData.location : undefined,
       };
 
@@ -306,7 +311,7 @@ export class MailFilterService {
         `Erreur avec l'API OpenAI ou lors du traitement: ${error.message}`,
         error.stack,
       );
-      throw new Error(`Erreur lors de l'analyse de l'email: ${error.message}`);
+      return error.message;
     }
   }
 
@@ -322,13 +327,12 @@ export class MailFilterService {
         ? Number.parseInt(parsedData.salary.replace(/\s/g, ''))
         : undefined,
       status: parsedData.status as ApplicationStatus,
-      contractType: parsedData.contractType,
+      contractType: parsedData.contractType
+        ? parsedData.contractType
+        : undefined,
       interviewDate: parsedData.interviewDate
         ? new Date(parsedData.interviewDate)
         : undefined,
-      ...(parsedData.offerReference && {
-        offerReference: parsedData.offerReference,
-      }),
     };
 
     this.logger.log(

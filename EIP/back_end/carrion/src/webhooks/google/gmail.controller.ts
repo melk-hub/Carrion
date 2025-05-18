@@ -47,6 +47,10 @@ export class GmailController {
       this.logger.warn('No historyId found in notification.');
       return;
     }
-    await this.gmailService.processHistoryUpdate(emailAddress, historyId);
+    try {
+      await this.gmailService.processHistoryUpdate(emailAddress, historyId);
+    } catch (error) {
+      this.logger.error('Failed to process history update: ' + error.message);
+    }
   }
 }
