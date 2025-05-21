@@ -1,0 +1,127 @@
+.application-list-item {
+  background-color: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+  transition: box-shadow 0.3s;
+  border-left: 4px solid transparent;
+}
+
+.application-list-item:hover {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.application-list-item.status-accepted {
+  border-left-color: #10b981;
+}
+
+.application-list-item.status-pending {
+  border-left-color: #f59e0b;
+}
+
+.application-list-item.status-refused {
+  border-left-color: #ef4444;
+}
+
+.list-item-content {
+  padding: 1rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
+}
+
+@media (min-width: 768px) {
+  .list-item-content {
+    flex-wrap: nowrap;
+  }
+}
+
+.list-item-logo {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 0.375rem;
+  background-color: #f3f4f6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.company-logo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.logo-placeholder {
+  font-size: 1.5rem;
+  color: #9ca3af;
+}
+
+.list-item-info {
+  flex: 1;
+}
+
+.list-item-details {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
+  margin-left: 4rem;
+}
+
+@media (min-width: 768px) {
+  .list-item-details {
+    margin-left: 0;
+  }
+}
+
+.detail-item {
+  display: flex;
+  align-items: center;
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.detail-icon {
+  margin-right: 0.5rem;
+}
+
+.list-item-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-left: 4rem;
+}
+
+@media (min-width: 768px) {
+  .list-item-actions {
+    margin-left: 0;
+  }
+}
+
+.action-button {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
+  background-color: white;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.action-button:hover {
+  background-color: #f3f4f6;
+}
+
+.action-button.edit {
+  color: #4b5563;
+}
+
+.action-button.delete {
+  color: #ef4444;
+}
+
+.action-button.delete:hover {
+  background-color: rgba(239, 68, 68, 0.05);
+}
