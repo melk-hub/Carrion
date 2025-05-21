@@ -9,8 +9,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 function AuthModal({ isOpen, onClose, defaultTab }) {
   const [activeTab, setActiveTab] = useState(defaultTab || 'login');
   const [direction, setDirection] = useState(1);
-  const [credentials, setCredentials] = useState({ identifier: '', password: '', confirmPassword: '', username: '', firstName: 'John', lastName: 'Doe', birthDate: '1995-06-15' });
-  const [personalInfo, setPersonalInfo] = useState({ nom: '', prenom: '', dateNaissance: '', email: '', ecole: '', ville: '', job: '', cv: null, linkedin: '', portfolio: '', description: '', });
+  const [credentials, setCredentials] = useState({ identifier: '', password: '', confirmPassword: '', username: '', firstName: '', lastName: '', birthDate: '1995-06-15', rememberMe: false });
   const { setIsAuthenticated } = useAuth();
   const navigate = useNavigate();
   const [errorMessage, setErrorMessage] = useState('');
@@ -22,13 +21,12 @@ function AuthModal({ isOpen, onClose, defaultTab }) {
 
   if (!isOpen) return null;
 
-  const handleChange = (e, isCredential = true) => {
-    const { name, value } = e.target;
-    if (isCredential) {
-      setCredentials({ ...credentials, [name]: value });
-    } else {
-      setPersonalInfo({ ...personalInfo, [name]: value });
-    }
+  const handleChange = (e) => {
+    const { name, value, type, checked } = e.target;
+
+    const newValue = type === 'checkbox' ? checked : value;
+
+    setCredentials(prevCredentials => ({...prevCredentials, [name]: newValue}));
   };
 
   const handleTabChange = (tab) => {
@@ -52,11 +50,12 @@ function AuthModal({ isOpen, onClose, defaultTab }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (activeTab === 'login') {
+      setErrorMessage('');
       try {
         const response = await fetch(`${API_URL}/auth/signin`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ identifier: credentials.identifier, password: credentials.password }),
+          body: JSON.stringify({ identifier: credentials.identifier, password: credentials.password, rememberMe: credentials.rememberMe }),
           credentials: 'include',
         });
 
@@ -82,7 +81,7 @@ function AuthModal({ isOpen, onClose, defaultTab }) {
         const response = await fetch(`${API_URL}/auth/signup`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ username: credentials.email, password: credentials.password, firstName: credentials.firstName, lastName: credentials.lastName, birthDate: credentials.birthDate, email: credentials.email }),
+          body: JSON.stringify({ username: credentials.username, password: credentials.password, firstName: credentials.firstName, lastName: credentials.lastName, birthDate: credentials.birthDate, email: credentials.email }),
           credentials: 'include',
         });
     
@@ -121,6 +120,10 @@ function AuthModal({ isOpen, onClose, defaultTab }) {
                 <label>Mot de passe</label>
                 <input type="password" name="password" placeholder="Mot de passe" value={credentials.password} onChange={handleChange} required />
                 {errorMessage && <p className="error-message">{errorMessage}</p>}
+                <div>
+                  <input type='checkbox' id="rememberMe" name='rememberMe' value={credentials.rememberMe} onClick={handleChange} />
+                  <label htmlFor="remember">Se souvenir de moi</label>
+                </div>
                 <button type="submit" className="primary-btn">Se connecter</button>
               </form>
             </motion.div>

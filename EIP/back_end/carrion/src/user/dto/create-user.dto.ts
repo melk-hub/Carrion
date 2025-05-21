@@ -1,4 +1,5 @@
 import {
+  IsBoolean,
   IsDateString,
   IsEmail,
   IsNotEmpty,
@@ -87,4 +88,13 @@ export class LoginDto {
   @IsString()
   @IsNotEmpty()
   password: string;
+
+  @ApiProperty({
+    name: 'rememberMe',
+    description: 'remember the user variable',
+    type: 'boolean',
+    example: true,
+  })
+  @IsBoolean()
+  rememberMe: boolean;
 }

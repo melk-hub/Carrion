@@ -19,32 +19,43 @@ function App() {
 }
 
 function AppLayout() {
-  const { isAuthenticated, setIsAuthenticated } = useAuth();
+  const { isAuthenticated, setIsAuthenticated, loadingAuth } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
   useEffect(() => {
-    localStorage.setItem('lastPath', location.pathname);
-  }, [location]);
+    if (!loadingAuth) {
+      localStorage.setItem("lastPath", location.pathname);
+    }
+  }, [location, loadingAuth]);
 
   useEffect(() => {
+    if (loadingAuth) {
+      console.log("Loading authentication...");
+      return;
+    }
+
     if (isAuthenticated) {
-      navigate('/home');
+      const lastPath = localStorage.getItem("lastPath");
+      if (location.pathname === "/") {
+        navigate(lastPath && lastPath !== "/" ? lastPath : "/dashboard", {
+          replace: true,
+        });
+      } else if (lastPath && lastPath === "/") {
+        navigate("/dashboard", { replace: true });
+      }
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, loadingAuth, navigate, location.pathname]);
 
-  useEffect(() => {
-    const lastPath = localStorage.getItem('lastPath');
-    if (lastPath && location.pathname === '/') {
-      navigate(lastPath);
-    }
-  }, [navigate, location.pathname]);
+  if (loadingAuth) {
+    return <div>Loading authentication...</div>;
+  }
 
   return (
     <div>
       {location.pathname !== '/' && (
         <Navbar setIsAuthenticated={setIsAuthenticated} />
-      )}
+      )}{" "}
 
       <Routes>
         <Route path="/" element={<Landing />} />
@@ -64,7 +75,7 @@ function AppLayout() {
             isAuthenticated ? (
               <Dashboard />
             ) : (
-              <Navigate to="/" />
+              <Navigate to="/" replace state={{ from: location }} />
             )
           }
         />
@@ -74,7 +85,7 @@ function AppLayout() {
             isAuthenticated ? (
               <Archives />
             ) : (
-              <Navigate to="/" />
+              <Navigate to="/" replace state={{ from: location }} />
             )
           }
         />
