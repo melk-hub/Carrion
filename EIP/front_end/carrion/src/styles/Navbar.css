@@ -11,37 +11,29 @@ html, body {
 }
 
 .layout {
+  height: 100vh;
   display: flex;
   flex-direction: column;
-  height: 90%;
 }
 
 .layout-body {
   display: flex;
   flex: 1;
-  height: 50vh;
-}
-
-.main-content {
-  flex: 1;
-  padding: 20px;
-  margin-left: 220px;
-  background: #FFF9F0;
+  height: auto;
 }
 
 .sidebar {
-  position: fixed;
-  top: 0;
-  left: 0;
-  height: 100vh;
   width: 220px;
   background-color: #0c1f3d;
   color: white;
+  height: 100%;
+  padding: 20px;
   display: flex;
   flex-direction: column;
-  padding: 20px;
-  transition: width 0.3s ease;
-  overflow: hidden;
+  position: fixed; /* fixe sur l'écran */
+  left: 0;
+  top: 0;
+  z-index: 1;
 }
 
 .title {
@@ -112,10 +104,11 @@ html, body {
   }
 }
 
-.topbar {
+.topbar-right {
+  margin-left: 220px;
   height: 60px;
+  width: calc(100% - 220px);
   background-color: #0c1f3d;
-  color: white;
   display: flex;
   align-items: center;
   justify-content: flex-end;
@@ -142,7 +135,6 @@ html, body {
   margin-left: 15px;
   color: white;
   position: relative;
-  top: -12px;
 }
 
 .notifications {
@@ -156,6 +148,7 @@ html, body {
   align-items: center;
   gap: 10px;
   cursor: pointer;
+  color: white;
 }
 
 .avatar {

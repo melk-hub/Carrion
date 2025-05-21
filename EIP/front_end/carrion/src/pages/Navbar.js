@@ -6,42 +6,33 @@ import "../styles/Navbar.css";
 function Navbar() {
     const navigate = useNavigate();
   return (
-      <div className="layout">
       <header className="topbar">
-        <div className="notifications">
-          <span className="bell">🔔</span>
-        </div>
-        <div className="user-profile" onClick={() => navigate('/parameters')}>
-          <img alt="User" className="avatar" />
-          <span className="username">Jeremy</span>
-        </div>
-      </header>
-  
-      <div className="layout-body">
-        <nav className={`sidebar`}>
-        <div className="logo">
-          <span className="icon" onClick={() => navigate('/home')}>
+        <div className="sidebar">
+          <div className="logo" onClick={() => navigate('/home')}>
             <img src={logo} alt="Carrion" className="logo-img"/>
             <span className="logo-text">CARRION</span>
-          </span>
-        </div>
+          </div>
           <ul className="menu">
             <li onClick={() => navigate('/home')}>
-              <span>🏠</span> {"Accueil"}
+              <span>🏠</span> Accueil
             </li>
             <li onClick={() => navigate('/dashboard')}>
-              <span>📄</span> {"Candidatures"}
+              <span>📄</span> Candidatures
             </li>
             <li onClick={() => navigate('/archives')}>
-              <span>📊</span> {"Archives"}
+              <span>📊</span> Archives
             </li>
           </ul>
-        </nav>
-      </div>
-        <main className="main-content">
-          {/* mettre page ici*/}
-        </main>
         </div>
+
+        <div className="topbar-right">
+          <div className="notifications">🔔</div>
+          <div className="user-profile" onClick={() => navigate('/parameters')}>
+            <img alt="User" className="avatar" src="/path/to/avatar.jpg" />
+            <span className="username">Jeremy</span>
+          </div>
+        </div>
+      </header>
     );
 }
 
