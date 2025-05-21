@@ -1,46 +1,15 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import "../styles/Home.css";
-import "../styles/Navbar.css";
-import logo from '../assets/carrion_logo_crop.png';
+import Navbar from './Navbar';
+
 
 export default function Home() {
-    const navigate = useNavigate();
-
+  const navigate = useNavigate();
     return (
-      <div className="layout">
-      <header className="topbar">
-        <div className="notifications">
-          <span className="bell">🔔</span>
-        </div>
-        <div className="user-profile" onClick={() => navigate('/parameters')}>
-          <img alt="User" className="avatar" />
-          <span className="username">Jeremy</span>
-        </div>
-      </header>
-  
-      <div className="layout-body">
-        <nav className={`sidebar`}>
-        <div className="logo">
-          <span className="icon" onClick={() => navigate('/home')}>
-            <img src={logo} alt="Carrion" className="logo-img"/>
-            <span className="logo-text">CARRION</span>
-          </span>
-        </div>
-          <ul className="menu">
-            <li onClick={() => navigate('/home')}>
-              <span>🏠</span> {"Accueil"}
-            </li>
-            <li onClick={() => navigate('/dashboard')}>
-              <span>📄</span> {"Candidatures"}
-            </li>
-            <li onClick={() => navigate('/archives')}>
-              <span>📊</span> {"Archives"}
-            </li>
-          </ul>
-        </nav>
-      </div>
-        <main className="main-content">
+      <div>
+      <Navbar/>
+      <div className="main-content">
             <div className="dashboard-container">
             <h1 className="title">Tableau de bord</h1>
             <div className="top-cards">
@@ -122,8 +91,7 @@ export default function Home() {
                 </div>
             </div>
             </div>
-        </main>
-    </div>
-    
+            </div>
+            </div>
     );
   }
