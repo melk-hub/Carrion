@@ -199,3 +199,10 @@ body {
     color: #111827;
   }
   
+  .main-content {
+  margin-left: 220px;
+  margin-top: 60px;
+  padding: 20px;
+  background: #FFF9F0;
+  min-height: calc(100vh - 60px);
+}
