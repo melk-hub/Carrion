@@ -1,11 +1,18 @@
-import React, { useEffect } from 'react';
-import { BrowserRouter as Router, Route, Routes, useNavigate, useLocation, Navigate } from 'react-router-dom';
-// import Header from './components/Header';
-import Landing from './pages/Landing';
-import Dashboard from './pages/Dashboard';
+import React, { useEffect } from "react";
+import {
+  BrowserRouter as Router,
+  Route,
+  Routes,
+  useNavigate,
+  useLocation,
+  Navigate,
+} from "react-router-dom";
+// import Header from "./components/Header";
+import Landing from "./pages/Landing";
+import Dashboard from "./pages/Dashboard";
 import Home from './pages/Home';
-import Archives from './pages/Archives';
-import { useAuth, AuthProvider } from './AuthContext'; // Import du Context
+import Archives from "./pages/Archives";
+import { useAuth, AuthProvider } from "./AuthContext";
 import Navbar from './pages/Navbar';
 
 function App() {
@@ -35,14 +42,15 @@ function AppLayout() {
       return;
     }
 
+
     if (isAuthenticated) {
       const lastPath = localStorage.getItem("lastPath");
       if (location.pathname === "/") {
-        navigate(lastPath && lastPath !== "/" ? lastPath : "/dashboard", {
+        navigate(lastPath && lastPath !== "/" ? lastPath : "/home", {
           replace: true,
         });
       } else if (lastPath && lastPath === "/") {
-        navigate("/dashboard", { replace: true });
+        navigate("/home", { replace: true });
       }
     }
   }, [isAuthenticated, loadingAuth, navigate, location.pathname]);
@@ -53,7 +61,7 @@ function AppLayout() {
 
   return (
     <div>
-      {location.pathname !== '/' && (
+      {location.pathname !== "/" && (
         <Navbar setIsAuthenticated={setIsAuthenticated} />
       )}{" "}
 
