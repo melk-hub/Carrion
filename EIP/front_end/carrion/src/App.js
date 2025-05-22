@@ -5,6 +5,7 @@ import Landing from './pages/Landing';
 import Dashboard from './pages/Dashboard';
 import Home from './pages/Home';
 import Archives from './pages/Archives';
+import Profile from './pages/Profile';
 import { useAuth, AuthProvider } from './AuthContext'; // Import du Context
 import Navbar from './pages/Navbar';
 
@@ -75,6 +76,16 @@ function AppLayout() {
               <Archives />
             ) : (
               <Navigate to="/" />
+            )
+          }
+        />
+        <Route
+          path="/profile"
+          element={
+            isAuthenticated ? (
+              <Profile />
+            ) : (
+              <Navigate to="/login" />
             )
           }
         />
