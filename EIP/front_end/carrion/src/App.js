@@ -89,6 +89,16 @@ function AppLayout() {
             )
           }
         />
+        <Route
+          path="/profile"
+          element={
+            isAuthenticated ? (
+              <Profile />
+            ) : (
+              <Navigate to="/login" />
+            )
+          }
+        />
       </Routes>
     </div>
   );
