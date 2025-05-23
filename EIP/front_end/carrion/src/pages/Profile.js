@@ -1,5 +1,5 @@
-import React, { useState } from "react"
-import { Upload, Eye, Trash } from "lucide-react";
+import React, { useState, useRef } from "react"
+import { Upload, Eye, Trash, CircleUserRound, Pencil } from "lucide-react";
 import "../styles/Profile.css"
 
 function Profile() {
@@ -57,6 +57,21 @@ function Profile() {
     const handleDocumentClick = (doc) => {
         if (doc.name.endsWith(".pdf")) {
             window.open(doc.url, "_blank");
+        }
+    };
+
+    const [hover, setHover] = useState(false);
+    const [uploadedImage, setUploadedImage] = useState(null);
+    const fileInputRef = useRef(null);
+
+    const handleImageUpload = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+            setUploadedImage(reader.result);
+            };
+            reader.readAsDataURL(file);
         }
     };
 
@@ -237,8 +252,36 @@ function Profile() {
                 </div>
                 <div className="profile-right-column">
                     <div className="profile-picture">
-                        <div className="image-wrapper">
-                            <img src="https://via.placeholder.com/150" alt="Profile-picture" />
+                        <div className="image-wrapper"
+                            onMouseEnter={() => setHover(true)} 
+                            onMouseLeave={() => setHover(false)}
+                        >
+                            {uploadedImage ? (
+                                <img src={uploadedImage} alt="Profile" className="profile-img" />
+                            ) : (
+                                <CircleUserRound size={200} strokeWidth="0.5px" />
+                            )}
+                            
+                            {hover && (
+                                <div className="edit-actions">
+                                    <div className="edit-icon" onClick={() => fileInputRef.current.click()}>
+                                        <Pencil size={24} />
+                                    </div>
+                                    {uploadedImage && (
+                                        <div className="delete-icon" onClick={() => setUploadedImage(null)}>
+                                            <Trash size={24} />
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+
+                            <input
+                                type="file"
+                                ref={fileInputRef}
+                                accept="image/*"
+                                style={{ display: "none" }}
+                                onChange={handleImageUpload}
+                            />
                         </div>
                         <h2>{personalInfo.prenom} {personalInfo.nom}</h2>
                     </div>
