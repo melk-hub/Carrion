@@ -1,8 +1,9 @@
 import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes, useNavigate, useLocation, Navigate } from 'react-router-dom';
-
+// import Header from './components/Header';
 import Landing from './pages/Landing';
 import Dashboard from './pages/Dashboard';
+import Home from './pages/Home';
 import Archives from './pages/Archives';
 import { useAuth, AuthProvider } from './AuthContext'; // Import du Context
 import Navbar from './pages/Navbar';
@@ -28,7 +29,7 @@ function AppLayout() {
 
   useEffect(() => {
     if (isAuthenticated) {
-      navigate('/dashboard');
+      navigate('/home');
     }
   }, [isAuthenticated]);
 
@@ -42,24 +43,21 @@ function AppLayout() {
   return (
     <div>
       {location.pathname !== '/' && (
-        <Header setIsAuthenticated={setIsAuthenticated} />
+        <Navbar setIsAuthenticated={setIsAuthenticated} />
       )}
 
       <Routes>
-        <Route path="/" element={<Landing setIsAuthenticated={setIsAuthenticated} />} />        
-        <Route path="/login" element={<Login setIsAuthenticated={setIsAuthenticated} />} />        
-        <Route path="/register" element={<Register setIsAuthenticated={setIsAuthenticated} />} />
-        <Route path="/bar" element={
-              <Navbar />
-        }/>
-        <Route path="/home"          
-            element={
+        <Route path="/" element={<Landing />} />
+        <Route
+          path="/home"
+          element={
             isAuthenticated ? (
               <Home />
             ) : (
               <Navigate to="/login" />
             )
-        }/>
+          }
+        />
         <Route
           path="/dashboard"
           element={

@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import '../styles/Archives.css';
-import Navbar from './Navbar';
 
 
 // function Archives() {
@@ -246,7 +245,6 @@ function Archives() {
   return (
     
     <div>
-      <Navbar/>
       <div className="main-content">
       <div className="top-bar">
         <div className='archives-title'>

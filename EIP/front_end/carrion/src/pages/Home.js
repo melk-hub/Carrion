@@ -1,14 +1,12 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import "../styles/Home.css";
-import Navbar from './Navbar';
 
 
 export default function Home() {
     const navigate = useNavigate();
     return (
         <div>
-            <Navbar />
             <div className="main-content">
                 <div className="dashboard-container">
                     <h1 className="title">Tableau de bord</h1>

@@ -7,7 +7,6 @@ import ApplicationList from "../components/DashboardList.js"
 import AddApplicationModal from "../components/AddApplicationModal.js"
 import EditApplicationModal from "../components/EditApplicationModal.js"
 import DetailsModal from "../components/DetailsModal.js"
-import Navbar from './Navbar';
 
 function Dashboard() {
   const [applications, setApplications] = useState([])
@@ -147,7 +146,6 @@ function Dashboard() {
 
   return (
     <div>
-    <Navbar/>
     <div className="main-content">
     <div className="dashboard">
       <div className="container">
