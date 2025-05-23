@@ -47,9 +47,16 @@ export class GmailService {
     return oauth2Client;
   }
 
-  isTokenExpired(tokenExpiration: Date): boolean {
-    return new Date() > tokenExpiration;
+  async isAccessTokenValid(accessToken: string): Promise<boolean> {
+    const response = await fetch(
+      'https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=' +
+        accessToken,
+    );
+    const data = await response.json();
+    if (data.error) return false;
+    return data.expires_in > 0;
   }
+
   async getTokenForUser(emailAddress: string): Promise<Token> {
     return await this.prisma.token.findFirst({
       where: { user: { email: emailAddress }, name: 'Google_oauth2' },
@@ -117,13 +124,14 @@ export class GmailService {
     }
     let accessToken = token.accessToken;
     if (token.refreshToken != null && token.refreshToken != '') {
-      const isAccessTokenExpired = this.isTokenExpired(token.tokenTimeValidity);
+      const isAccessTokenValid = await this.isAccessTokenValid(accessToken);
 
-      if (isAccessTokenExpired) {
+      if (!isAccessTokenValid) {
         accessToken = await this.refreshAccessToken(token.refreshToken);
         await this.updateAccessToken(emailAddress, accessToken);
       }
     }
+
     const auth = await this.getOAuth2Client(accessToken);
     const gmail = google.gmail({ version: 'v1', auth });
     try {

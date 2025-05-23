@@ -25,8 +25,8 @@ export class JobApplyDto {
   @MaxLength(80)
   company: string;
 
-  @IsString()
   @IsOptional()
+  @IsString()
   @MaxLength(80)
   location: string;
 
@@ -35,20 +35,20 @@ export class JobApplyDto {
   @MaxLength(20)
   salary: number;
 
-  @IsString()
   @IsOptional()
+  @IsString()
   @MaxLength(255)
   imageUrl?: string;
 
   @IsEnum(ApplicationStatus)
   status: ApplicationStatus;
 
-  @IsString()
   @IsOptional()
+  @IsString()
   @MaxLength(255)
   interviewDate?: Date;
 
-  @IsOptional()
+  @IsNotEmpty()
   @MaxLength(255)
   contractType: string;
 
@@ -127,7 +127,7 @@ export class CreateJobApplyDto {
     type: 'string',
     example: 'Internship',
   })
-  @IsOptional()
+  @IsNotEmpty()
   @MaxLength(255)
   contractType: string;
 
