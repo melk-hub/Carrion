@@ -49,9 +49,6 @@ export class JobApplyService {
         status: jobApply.status as ApplicationStatus,
         contractType: jobApply.contractType,
         interviewDate: jobApply.interviewDate,
-        status: jobApply.status as ApplicationStatus,
-        contractType: jobApply.contractType,
-        interviewDate: jobApply.interviewDate,
         createdAt: jobApply.createdAt,
       }));
     } catch (error) {
@@ -111,8 +108,6 @@ export class JobApplyService {
           status: createJobApplyDto.status,
           contractType: createJobApplyDto.contractType,
           interviewDate: createJobApplyDto.interviewDate,
-          contractType: createJobApplyDto.contractType,
-          interviewDate: createJobApplyDto.interviewDate,
           Title: createJobApplyDto.title,
         },
       });
@@ -124,9 +119,6 @@ export class JobApplyService {
         location: jobApply.Location,
         salary: jobApply.Salary,
         imageUrl: jobApply.imageUrl,
-        status: jobApply.status as ApplicationStatus,
-        contractType: jobApply.contractType,
-        interviewDate: jobApply.interviewDate,
         status: jobApply.status as ApplicationStatus,
         contractType: jobApply.contractType,
         interviewDate: jobApply.interviewDate,
@@ -194,9 +186,6 @@ export class JobApplyService {
         location: updatedJobApply.Location,
         salary: updatedJobApply.Salary,
         imageUrl: updatedJobApply.imageUrl,
-        status: updatedJobApply.status as ApplicationStatus,
-        contractType: updatedJobApply.contractType,
-        interviewDate: updatedJobApply.interviewDate,
         status: updatedJobApply.status as ApplicationStatus,
         contractType: updatedJobApply.contractType,
         interviewDate: updatedJobApply.interviewDate,

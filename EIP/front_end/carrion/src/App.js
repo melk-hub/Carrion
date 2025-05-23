@@ -63,7 +63,7 @@ function AppLayout() {
     <div>
       {location.pathname !== "/" && (
         <Navbar setIsAuthenticated={setIsAuthenticated} />
-      )}{" "}
+      )}
 
       <Routes>
         <Route path="/" element={<Landing />} />
