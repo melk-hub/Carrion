@@ -22,45 +22,22 @@ function Dashboard() {
   useEffect(() => {
     const fetchApplications = async () => {
       try {
-        const mockData = [
-          {
-            id: 1,
-            company: "Acme Inc",
-            title: "Développeur Frontend",
-            status: "PENDING",
-            location: "Paris, France",
-            salary: "45000",
-            imageUrl: "https://via.placeholder.com/100",
-            createdAt: new Date(2023, 4, 15).toISOString(),
-          },
-          {
-            id: 2,
-            company: "Tech Solutions",
-            title: "UX Designer",
-            status: "ON",
-            location: "Lyon, France",
-            salary: "52000",
-            imageUrl: "https://via.placeholder.com/100",
-            createdAt: new Date(2023, 4, 10).toISOString(),
-          },
-          {
-            id: 3,
-            company: "Startup XYZ",
-            title: "Développeur Full Stack",
-            status: "OFF",
-            location: "Bordeaux, France",
-            salary: "48000",
-            imageUrl: "https://via.placeholder.com/100",
-            createdAt: new Date(2023, 4, 5).toISOString(),
-          },
-        ]
-        setApplications(mockData)
+        const response = await fetch(`${API_URL}/job_applies/get_jobApply`, {
+          method: "GET",
+          credentials: "include",
+        });
+        if (!response.ok) {
+          throw new Error(`Erreur HTTP: ${response.status}`);
+        }
+        const data = await response.json();
+        setApplications(Array.isArray(data) ? data : []);
       } catch (error) {
-        console.error("Erreur lors de la récupération des données:", error)
+        console.error("Erreur lors de la récupération des données:", error);
       }
-    }
-    fetchApplications()
-  }, [API_URL])
+    };
+    fetchApplications();
+  }, [API_URL]);
+
 
 
   const handleUpdateApplication = async () => {
