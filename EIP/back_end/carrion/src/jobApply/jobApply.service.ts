@@ -42,7 +42,7 @@ export class JobApplyService {
   async getJobApplyByParam(
     userId: string,
     jobApplyParams: JobApplyParams,
-  ): Promise<JobApplyDto> {
+  ): Promise<JobApplyDto | null> {
     try {
       const jobApply = await this.prisma.jobApply.findFirst({
         where: {

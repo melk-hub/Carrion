@@ -29,7 +29,7 @@ export class UserController {
   @UseGuards(JwtAuthGuard)
   @Get('profile')
   async getProfile(@Req() req) {
-    return await this.userService.findOne(req.user.id);
+    return this.userService.findOne(req.user.id);
   }
 
   @Patch(':id')

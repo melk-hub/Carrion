@@ -51,6 +51,10 @@ export class GmailController {
       await this.gmailService.processHistoryUpdate(emailAddress, historyId);
     } catch (error) {
       this.logger.error('Failed to process history update: ' + error.message);
+      return {
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+        message: 'An error occurred while processing the history update.',
+      };
     }
   }
 }
