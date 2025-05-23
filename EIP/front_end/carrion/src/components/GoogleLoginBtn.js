@@ -6,7 +6,15 @@ const GoogleLoginButton = () => {
     if (!redirectUri) {
         throw new Error("Environment variable REACT_APP_GOOGLE_REDIRECT_URI is required but not defined.");
     }
-    const googleAuthUrl = `https://accounts.google.com/o/oauth2/v2/auth?response_type=code&client_id=${GOOGLE_ID}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=email%20profile%20https://www.googleapis.com/auth/gmail.readonly%20https://www.googleapis.com/auth/gmail.modify%20https://www.googleapis.com/auth/gmail.labels`;
+    const scopes = [
+      'https://www.googleapis.com/auth/userinfo.email',
+      'https://www.googleapis.com/auth/userinfo.profile',
+      'https://www.googleapis.com/auth/gmail.readonly',
+      'https://www.googleapis.com/auth/gmail.modify',
+      'https://www.googleapis.com/auth/gmail.labels'
+    ].join('%20');
+    // TODO: When pushing to production, and we'll mostly have refreshToken for every user, remove the "&prompt=consent" so it doesn't ask the user to accept things everytime he logs in.
+    const googleAuthUrl = `https://accounts.google.com/o/oauth2/v2/auth?response_type=code&client_id=${GOOGLE_ID}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${scopes}&access_type=offline&prompt=consent`;
     const handleGoogleLogin = () => {
       window.location.href = googleAuthUrl;
     }
