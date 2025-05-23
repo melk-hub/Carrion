@@ -33,7 +33,7 @@ function AppLayout() {
     if (isAuthenticated) {
       navigate('/dashboard');
     }
-  }, [isAuthenticated, navigate]);
+  }, [isAuthenticated]);
 
   useEffect(() => {
     const lastPath = localStorage.getItem('lastPath');

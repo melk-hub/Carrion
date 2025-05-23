@@ -20,6 +20,11 @@ function Login() {
     setCredentials({ ...credentials, [name]: value });
   };
 
+  const handleLoginSuccess = () => {
+    setIsAuthenticated(true);
+    navigate('/home');
+  };
+
   useEffect(() => {
       document.body.classList.add('login-page-bg');
     
@@ -44,8 +49,7 @@ function Login() {
       const data = await response;
 
       if (response.ok) {
-          setIsAuthenticated(true);
-          navigate('/home');
+        handleLoginSuccess();
       } else {
         setErrorMessage(data.message || 'Identifiants incorrects.');
       }
@@ -53,11 +57,6 @@ function Login() {
       console.error('Error during login:', error);
       setErrorMessage('Une erreur est survenue. Veuillez réessayer plus tard.');
     }
-  };
-
-  const handleLoginSuccess = () => {
-    setIsAuthenticated(true);
-    navigate('/home');
   };
 
   const handleRegisterRedirect = () => {
