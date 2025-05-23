@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import '../styles/Archives.css';
 
+
 // function Archives() {
 //   const fakeDatabase = [
 //     {
@@ -166,6 +167,7 @@ import '../styles/Archives.css';
 // }
 
 function Archives() {
+
   const fakeDatabase = useMemo(() => [
     {
       id: 1,
@@ -241,7 +243,9 @@ function Archives() {
   });
 
   return (
+    
     <div>
+      <div className="main-content">
       <div className="top-bar">
         <div className='archives-title'>
           <h1>Mes Archives</h1>
@@ -325,6 +329,7 @@ function Archives() {
           )}
         </div>
       )}
+      </div>
     </div>
   );
 }

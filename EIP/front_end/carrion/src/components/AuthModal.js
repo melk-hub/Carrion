@@ -62,7 +62,7 @@ function AuthModal({ isOpen, onClose, defaultTab }) {
 
       if (response.ok) {
           setIsAuthenticated(true);
-          navigate('/dashboard?new=true');
+          navigate('/home?new=true');
       } else {
         const data = await response.json();
         setErrorMessage(data.message || 'Identifiants incorrects.');
@@ -88,7 +88,7 @@ function AuthModal({ isOpen, onClose, defaultTab }) {
     
         if (response.ok) {
           setIsAuthenticated(true);
-          navigate('/dashboard?new=true');
+          navigate('/home?new=true');
         } else {
           const errorData = await response.json();
           alert(errorData.message || "Erreur lors de l'inscription.");
@@ -160,7 +160,7 @@ function AuthModal({ isOpen, onClose, defaultTab }) {
 
         <div className="social-buttons">
           <GoogleLoginButton />
-          <button className="outlook-btn" onClick={() => navigate('/dashboard')}>
+          <button className="outlook-btn" onClick={() => navigate('/home')}>
             <img src={outlookIcon} alt="Outlook" /> Se connecter avec Outlook
           </button>
         </div>

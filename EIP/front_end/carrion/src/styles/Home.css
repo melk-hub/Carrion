@@ -1,0 +1,208 @@
+body {
+    margin: 0;
+    font-family: "Segoe UI", sans-serif;
+    background-color: #fff7ed;
+    color: #000000;
+  }
+  
+  .dashboard-container {
+    margin-top: 0.5rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .top-cards {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+  
+  .highlight {
+    border: 2px solid #e0e2e3;
+  }
+
+  .up {
+    color: #16a34a;
+  }
+  
+  .down {
+    color: #dc2626;
+  }
+  
+  .bottom-section {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+    flex-wrap: wrap;
+  }
+  
+  .recent-activity{
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 1rem;
+    flex: 1;
+    height: 300px;
+  }
+
+  .quick-access {
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 2rem;
+    width: 33%;
+  }
+  
+  .empty-state {
+    text-align: center;
+    margin-top: 1rem;
+  }
+  
+  .note {
+    font-size: 0.8rem;
+    color: #555;
+    margin-bottom: 0.5rem;
+  }
+  
+  .emoji {
+    font-size: 4rem;
+  }
+
+  
+  .quick-access button {
+    display: block;
+    width: 100%;
+    margin: 0.5rem 0;
+    padding: 0.6rem;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    background: white;
+    cursor: pointer;
+    text-align: left;
+  }
+
+  .card {
+    background: white;
+    border-radius: 10px;
+    border: 1px solid #ddd;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    padding: 1.5rem;
+    flex: 1;
+    min-width: 250px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  
+  .job-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 0.5rem;
+  }
+  
+  .job-info img {
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
+  }
+  
+  button {
+    background-color: #ffffff;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    padding: 0.4rem 0.8rem;
+    cursor: pointer;
+    font-weight: 500;
+    margin-top: 0.5rem;
+  }
+  
+  button:hover {
+    background-color: #ffffff;
+    color: rgb(0, 0, 0);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  }
+
+  .timestamp {
+    font-size: 0.8rem;
+    color: #888;
+    margin-top: 0.5rem;
+  }
+  
+  .emoji {
+    font-size: 3rem;
+    margin: 1rem 0;
+  }
+  
+  .bottom-section {
+    gap: 2rem;
+  }
+  
+  .rank {
+    font-size: 1.2rem;
+    color: #f97316;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+  }
+  
+  .ranking-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .ranking-list li span.name {
+    font-size: 0.95rem;
+    font-weight: 600;
+  }
+  
+  .ranking-list li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.4rem 0;
+    font-size: 0.85rem;
+    border-bottom: 1px solid #f3f4f6;
+  }
+  
+  .ranking-list li:last-child {
+    border-bottom: none;
+  }
+  
+  .ranking-list .name {
+    font-weight: 500;
+    color: #374151;
+    font-size: 0.85rem;
+  }
+  
+  .ranking-list .up {
+    color: #16a34a;
+    font-size: 0.75rem;
+    margin-right: 4px;
+  }
+  
+  .ranking-list .down {
+    color: #dc2626;
+    font-size: 0.75rem;
+    margin-right: 4px;
+  }
+  
+  .ranking-list strong {
+    color: #6b7280;
+    font-size: 0.8rem;
+    font-weight: 500;
+  }
+
+  .card h3 {
+    margin-bottom: 0.8rem;
+    font-size: 1.1rem;
+    color: #111827;
+  }
+  
+  .main-content {
+  margin-left: 220px;
+  margin-top: 60px;
+  padding: 20px;
+  background: #FFF9F0;
+  min-height: calc(100vh - 60px);
+}

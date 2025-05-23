@@ -1,10 +1,12 @@
 import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes, useNavigate, useLocation, Navigate } from 'react-router-dom';
-import Header from './components/Header';
+// import Header from './components/Header';
 import Landing from './pages/Landing';
 import Dashboard from './pages/Dashboard';
+import Home from './pages/Home';
 import Archives from './pages/Archives';
 import { useAuth, AuthProvider } from './AuthContext'; // Import du Context
+import Navbar from './pages/Navbar';
 
 function App() {
   return (
@@ -27,9 +29,9 @@ function AppLayout() {
 
   useEffect(() => {
     if (isAuthenticated) {
-      navigate('/dashboard');
+      navigate('/home');
     }
-  }, [isAuthenticated, navigate]);
+  }, [isAuthenticated]);
 
   useEffect(() => {
     const lastPath = localStorage.getItem('lastPath');
@@ -41,18 +43,28 @@ function AppLayout() {
   return (
     <div>
       {location.pathname !== '/' && (
-        <Header setIsAuthenticated={setIsAuthenticated} />
+        <Navbar setIsAuthenticated={setIsAuthenticated} />
       )}
 
       <Routes>
         <Route path="/" element={<Landing />} />
+        <Route
+          path="/home"
+          element={
+            isAuthenticated ? (
+              <Home />
+            ) : (
+              <Navigate to="/" />
+            )
+          }
+        />
         <Route
           path="/dashboard"
           element={
             isAuthenticated ? (
               <Dashboard />
             ) : (
-              <Navigate to="/login" />
+              <Navigate to="/" />
             )
           }
         />
@@ -62,7 +74,7 @@ function AppLayout() {
             isAuthenticated ? (
               <Archives />
             ) : (
-              <Navigate to="/login" />
+              <Navigate to="/" />
             )
           }
         />

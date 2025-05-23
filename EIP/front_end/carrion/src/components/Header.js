@@ -19,24 +19,25 @@ function Header({ setIsAuthenticated }) {
   };
 
   return (
-    <header className="header">
+<header className="header">
   <h1 onClick={() => navigate('/dashboard')} className="logo-button">
     <img src={logo} alt="Carrion" />
   </h1>
 
   {/* Conteneur pour centrer la navigation */}
+
   <div className="navigation-container">
     <div className="navigation-buttons">
       <button onClick={() => navigate('/dashboard')} className='applications-button'>Candidatures</button>
-      <button onClick={() => navigate('/archives')} className='archives-button'>Archives</button>
-      <button onClick={() => navigate('/objectives')} className='objectives-button'>Objectifs</button>
-      <button onClick={() => navigate('/parameters')} className='parameters-button'>Profil</button>
+      {/* <button onClick={() => navigate('/archives')} className='archives-button'>Archives</button> */}
+      {/* <button onClick={() => navigate('/objectives')} className='objectives-button'>Objectifs</button> */}
+      {/* <button onClick={() => navigate('/parameters')} className='parameters-button'>Profil</button> */}
     </div>
   </div>
 
   <button onClick={handleLogout} className="logout-button">Déconnexion</button>
 </header>
-
+  
   );
 }
 
