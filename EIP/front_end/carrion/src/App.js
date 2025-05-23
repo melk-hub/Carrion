@@ -58,20 +58,17 @@ function AppLayout() {
       )}{" "}
 
       <Routes>
-        <Route path="/" element={<Landing setIsAuthenticated={setIsAuthenticated} />} />        
-        <Route path="/login" element={<Login setIsAuthenticated={setIsAuthenticated} />} />        
-        <Route path="/register" element={<Register setIsAuthenticated={setIsAuthenticated} />} />
-        <Route path="/bar" element={
-              <Navbar />
-        }/>
-        <Route path="/home"          
-            element={
+        <Route path="/" element={<Landing />} />
+        <Route
+          path="/home"
+          element={
             isAuthenticated ? (
               <Home />
             ) : (
               <Navigate to="/login" />
             )
-        }/>
+          }
+        />
         <Route
           path="/home"
           element={
