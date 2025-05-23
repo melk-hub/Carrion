@@ -73,7 +73,7 @@ function Dashboard() {
   }
 
   const statusMap = {
-    ON: "Acceptée",
+    APPLIED: "Postulée",
     PENDING: "En attente de réponse",
     OFF: "Refusée",
   }

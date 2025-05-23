@@ -7,6 +7,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { Token } from '@prisma/client';
 import { UserService } from 'src/user/user.service';
 import { MailFilterService } from 'src/services/mailFilter/mailFilter.service';
+import { GmailMessage } from '../gmail/gmail.types';
 
 @Injectable()
 export class GmailService {
@@ -65,12 +66,55 @@ export class GmailService {
     });
   }
 
+  mapToGmailMessage(sourceData: any): GmailMessage {
+    if (!sourceData?.id || !sourceData?.payload) {
+      console.error(
+        "Source message data is missing essential 'id' or 'payload'.",
+        sourceData,
+      );
+      throw new Error('Invalid message structure received from API.');
+    }
+
+    const sourcePayload = sourceData.payload;
+
+    const gmailMessage: GmailMessage = {
+      id: sourceData.id,
+      threadId: sourceData.threadId ?? '',
+      snippet: sourceData.snippet ?? '',
+
+      payload: {
+        partId: sourcePayload.partId ?? '',
+        mimeType: sourcePayload.mimeType ?? 'application/octet-stream',
+        filename: sourcePayload.filename ?? '',
+
+        headers: (sourcePayload.headers ?? []).map((header: any) => ({
+          name: header.name ?? 'Unknown-Header',
+          value: header.value ?? '',
+        })),
+
+        body: {
+          size: sourcePayload.body?.size ?? 0,
+          data: sourcePayload.body?.data,
+          attachmentId: sourcePayload.body?.attachmentId,
+        },
+
+        parts: sourcePayload.parts ? sourcePayload.parts : undefined,
+      },
+    };
+
+    return gmailMessage;
+  }
+
   async processHistoryUpdate(
     emailAddress: string,
     historyId: string,
   ): Promise<void> {
     const token = await this.getTokenForUser(emailAddress);
     const user = await this.userService.findByIdentifier(emailAddress, true);
+    if (token == null) {
+      this.logger.error(`No access token found for ${emailAddress}`);
+      return;
+    }
     let accessToken = token.accessToken;
     if (token.refreshToken != null && token.refreshToken != '') {
       const isAccessTokenExpired = this.isTokenExpired(token.tokenTimeValidity);
@@ -92,7 +136,6 @@ export class GmailService {
         this.logger.log(`No new history records since ${historyId}.`);
         return;
       }
-
       for (const record of history) {
         if (record.messagesAdded) {
           for (const messageRecord of record.messagesAdded) {
@@ -104,13 +147,9 @@ export class GmailService {
               format: 'full',
             });
             const message = messageRes.data;
-            const headers = message.payload.headers;
-            const subjectHeader = headers.find(
-              (h) => h.name.toLowerCase() === 'subject',
-            );
-            const subject = subjectHeader ? subjectHeader.value : 'No Subject';
-            this.mailFilter.getInformationFromText(
-              `${subject}   ${message.snippet}`,
+            const gmailMessage: GmailMessage = this.mapToGmailMessage(message);
+            this.mailFilter.processEmailAndCreateJobApplyFromGmail(
+              gmailMessage,
               user.id,
             );
 

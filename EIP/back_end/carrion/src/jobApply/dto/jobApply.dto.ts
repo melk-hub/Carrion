@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { ApplicationStatus } from '../enum/application-status.enum';
 import {
   IsNotEmpty,
   IsString,
@@ -24,23 +25,32 @@ export class JobApplyDto {
   @MaxLength(80)
   company: string;
 
-  @IsNotEmpty()
   @IsString()
+  @IsOptional()
   @MaxLength(80)
   location: string;
 
-  @IsNotEmpty()
   @IsNumber()
+  @IsOptional()
   @MaxLength(20)
   salary: number;
 
-  @IsOptional()
   @IsString()
+  @IsOptional()
   @MaxLength(255)
   imageUrl?: string;
 
-  @IsEnum(['ON', 'OFF', 'PENDING'])
-  status: 'ON' | 'OFF' | 'PENDING';
+  @IsEnum(ApplicationStatus)
+  status: ApplicationStatus;
+
+  @IsString()
+  @IsOptional()
+  @MaxLength(255)
+  interviewDate?: Date;
+
+  @IsOptional()
+  @MaxLength(255)
+  contractType: string;
 
   @IsNotEmpty()
   @IsDate()
@@ -76,8 +86,8 @@ export class CreateJobApplyDto {
     type: 'string',
     example: 'Paris',
   })
-  @IsNotEmpty()
   @IsString()
+  @IsOptional()
   @MaxLength(40)
   location: string;
 
@@ -87,7 +97,7 @@ export class CreateJobApplyDto {
     type: 'number',
     example: '10000',
   })
-  @IsNotEmpty()
+  @IsOptional()
   @IsNumber()
   salary: number;
 
@@ -108,6 +118,27 @@ export class CreateJobApplyDto {
     type: 'string',
     example: 'PENDING',
   })
-  @IsEnum(['ON', 'OFF', 'PENDING'])
-  status: 'ON' | 'OFF' | 'PENDING';
+  @IsEnum(ApplicationStatus)
+  status: ApplicationStatus;
+
+  @ApiProperty({
+    name: 'Contract Type',
+    description: 'Contract Type of job',
+    type: 'string',
+    example: 'Internship',
+  })
+  @IsOptional()
+  @MaxLength(255)
+  contractType: string;
+
+  @ApiProperty({
+    name: 'Interview Date',
+    description: 'Interview Date of job',
+    type: Date,
+    example: '2021-01-01',
+  })
+  @IsOptional()
+  @IsDate()
+  @MaxLength(255)
+  interviewDate?: Date;
 }
