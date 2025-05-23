@@ -16,12 +16,12 @@
   color: #333;
 }
 
-.search-input-container {
-margin-right: 5%;
-position: relative;
-display: flex;
-align-items: center;
-width: 350px;
+/* Stats Cards */
+.stats-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
 }
 
 .stat-card {

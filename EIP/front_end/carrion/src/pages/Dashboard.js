@@ -1,40 +1,24 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import '../styles/Dashboard.css';
-import '../styles/Navbar.css';
-import archiveIcon from '../assets/archiver.png';
-import deleteIcon from '../assets/supprimer.png';
-import editIcon from '../assets/edit-button.png';
-import InfosModal from '../components/InfosModal';
+"use client"
+
+import React, { useState, useEffect, useMemo } from "react"
+import "../styles/Dashboard.css"
+import ApplicationCard from "../components/Dashboardcard.js"
+import ApplicationList from "../components/DashboardList.js"
+import AddApplicationModal from "../components/AddApplicationModal.js"
+import EditApplicationModal from "../components/EditApplicationModal.js"
+import DetailsModal from "../components/DetailsModal.js"
+import Navbar from './Navbar';
 
 function Dashboard() {
-  const [applications, setApplications] = useState([]);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [viewMode, setViewMode] = useState('grid');
-  const [sortBy, setSortBy] = useState('date');
-  const [selectedStatuses, setSelectedStatuses] = useState(new Set());
-  const [selectedApplication, setSelectedApplication] = useState(null);
-  const [newApplication, setNewApplication] = useState(null);
-  const [popupType, setPopupType] = useState(null);
-  const API_URL = process.env.REACT_APP_API_URL;
-  const [showWelcomeModal, setShowWelcomeModal] = useState(false);
-
-  useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const isNew = urlParams.get('new') === 'true';
-
-    if (isNew) {
-      setShowWelcomeModal(true);
-      window.history.replaceState({}, document.title, window.location.pathname);
-    }
-  }, []);
-
-  const handleStatusChange = (status) => {
-    setSelectedStatuses((prev) => {
-        const newSet = new Set(prev);
-        newSet.has(status) ? newSet.delete(status) : newSet.add(status);
-        return newSet;
-    });
-  };
+  const [applications, setApplications] = useState([])
+  const [searchTerm, setSearchTerm] = useState("")
+  const [viewMode, setViewMode] = useState("grid")
+  const [sortBy, setSortBy] = useState("date")
+  const [selectedStatuses, setSelectedStatuses] = useState(new Set())
+  const [selectedApplication, setSelectedApplication] = useState(null)
+  const [newApplication, setNewApplication] = useState(null)
+  const [popupType, setPopupType] = useState(null)
+  const API_URL = process.env.REACT_APP_API_URL || "https://api.example.com"
 
   useEffect(() => {
     const fetchApplications = async () => {
@@ -164,43 +148,29 @@ function Dashboard() {
 
   return (
     <div>
-      <InfosModal isOpen={showWelcomeModal} onClose={() => setShowWelcomeModal(false)} />
-      <div className="top-bar">
-        <div className="objectives">
-          {/* <h3>Objectif de la semaine :</h3> */}
-        </div>
-        <div className="search-input-container">
-          <span className="search-icon">🔍</span>
-          <input
-            type="text"
-            placeholder="Rechercher une candidature"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="search-input"
-          />
-        </div>
-      </div>
+    <Navbar/>
+    <div className="main-content">
+    <div className="dashboard">
+      <div className="container">
+        <h1 className="dashboard-title">Aperçu de vos candidatures</h1>
 
-      <div className="dashboard-filter-buttons">
-        <div className="filter-checkbox-group">
-          {Object.values(statusMap).map(status => (
-            <label key={status} className="filter-checkbox">
-              <input
-                type="checkbox"
-                checked={selectedStatuses.has(status)}
-                onChange={() => handleStatusChange(status)}
-              />
-              <span className="custom-checkbox"></span>
-              {status}
-            </label>
-          ))}
-        </div>
-        <div className="sort-options">
-          <label htmlFor="sort-select">Trier par : </label>
-          <select id="sort-select" value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
-            <option value="date">Date</option>
-            <option value="status">Statut</option>
-          </select>
+        <div className="stats-container">
+          <div className="stat-card">
+            <h3 className="stat-title">Total</h3>
+            <p className="stat-value">{stats.total}</p>
+          </div>
+          <div className="stat-card pending">
+            <h3 className="stat-title">En attente</h3>
+            <p className="stat-value">{stats.pending}</p>
+          </div>
+          <div className="stat-card accepted">
+            <h3 className="stat-title">Acceptées</h3>
+            <p className="stat-value">{stats.accepted}</p>
+          </div>
+          <div className="stat-card refused">
+            <h3 className="stat-title">Refusées</h3>
+            <p className="stat-value">{stats.refused}</p>
+          </div>
         </div>
 
         <div className="banner">
