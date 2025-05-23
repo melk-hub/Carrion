@@ -29,9 +29,9 @@ function Header({ setIsAuthenticated }) {
   <div className="navigation-container">
     <div className="navigation-buttons">
       <button onClick={() => navigate('/dashboard')} className='applications-button'>Candidatures</button>
-      <button onClick={() => navigate('/archives')} className='archives-button'>Archives</button>
-      <button onClick={() => navigate('/objectives')} className='objectives-button'>Objectifs</button>
-      <button onClick={() => navigate('/parameters')} className='parameters-button'>Profil</button>
+      {/* <button onClick={() => navigate('/archives')} className='archives-button'>Archives</button> */}
+      {/* <button onClick={() => navigate('/objectives')} className='objectives-button'>Objectifs</button> */}
+      {/* <button onClick={() => navigate('/parameters')} className='parameters-button'>Profil</button> */}
     </div>
   </div>
 
