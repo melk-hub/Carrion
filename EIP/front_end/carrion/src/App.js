@@ -1,11 +1,18 @@
-import React, { useEffect } from 'react';
-import { BrowserRouter as Router, Route, Routes, useNavigate, useLocation, Navigate } from 'react-router-dom';
-// import Header from './components/Header';
-import Landing from './pages/Landing';
-import Dashboard from './pages/Dashboard';
+import React, { useEffect } from "react";
+import {
+  BrowserRouter as Router,
+  Route,
+  Routes,
+  useNavigate,
+  useLocation,
+  Navigate,
+} from "react-router-dom";
+// import Header from "./components/Header";
+import Landing from "./pages/Landing";
+import Dashboard from "./pages/Dashboard";
 import Home from './pages/Home';
-import Archives from './pages/Archives';
-import { useAuth, AuthProvider } from './AuthContext'; // Import du Context
+import Archives from "./pages/Archives";
+import { useAuth, AuthProvider } from "./AuthContext";
 import Navbar from './pages/Navbar';
 
 function App() {
@@ -19,30 +26,42 @@ function App() {
 }
 
 function AppLayout() {
-  const { isAuthenticated, setIsAuthenticated } = useAuth();
+  const { isAuthenticated, setIsAuthenticated, loadingAuth } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
   useEffect(() => {
-    localStorage.setItem('lastPath', location.pathname);
-  }, [location]);
+    if (!loadingAuth) {
+      localStorage.setItem("lastPath", location.pathname);
+    }
+  }, [location, loadingAuth]);
 
   useEffect(() => {
+    if (loadingAuth) {
+      console.log("Loading authentication...");
+      return;
+    }
+
+
     if (isAuthenticated) {
-      navigate('/home');
+      const lastPath = localStorage.getItem("lastPath");
+      if (location.pathname === "/") {
+        navigate(lastPath && lastPath !== "/" ? lastPath : "/home", {
+          replace: true,
+        });
+      } else if (lastPath && lastPath === "/") {
+        navigate("/home", { replace: true });
+      }
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, loadingAuth, navigate, location.pathname]);
 
-  useEffect(() => {
-    const lastPath = localStorage.getItem('lastPath');
-    if (lastPath && location.pathname === '/') {
-      navigate(lastPath);
-    }
-  }, [navigate, location.pathname]);
+  if (loadingAuth) {
+    return <div>Loading authentication...</div>;
+  }
 
   return (
     <div>
-      {location.pathname !== '/' && (
+      {location.pathname !== "/" && (
         <Navbar setIsAuthenticated={setIsAuthenticated} />
       )}
 
@@ -59,12 +78,22 @@ function AppLayout() {
           }
         />
         <Route
+          path="/home"
+          element={
+            isAuthenticated ? (
+              <Home />
+            ) : (
+              <Navigate to="/" />
+            )
+          }
+        />
+        <Route
           path="/dashboard"
           element={
             isAuthenticated ? (
               <Dashboard />
             ) : (
-              <Navigate to="/" />
+              <Navigate to="/" replace state={{ from: location }} />
             )
           }
         />
@@ -74,7 +103,7 @@ function AppLayout() {
             isAuthenticated ? (
               <Archives />
             ) : (
-              <Navigate to="/" />
+              <Navigate to="/" replace state={{ from: location }} />
             )
           }
         />

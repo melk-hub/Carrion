@@ -3,6 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import '../styles/Header.css';
 import logo from '../assets/carrion_logo.png';
 import axios from 'axios';
+import Home from '../pages/Home';
+import Dashboard from '../pages/Dashboard';
+import Archives from '../pages/Archives';
 
 function Header({ setIsAuthenticated }) {
   const navigate = useNavigate();
@@ -25,7 +28,6 @@ function Header({ setIsAuthenticated }) {
   </h1>
 
   {/* Conteneur pour centrer la navigation */}
-
   <div className="navigation-container">
     <div className="navigation-buttons">
       <button onClick={() => navigate('/dashboard')} className='applications-button'>Candidatures</button>

@@ -39,6 +39,7 @@ function Dashboard() {
   }, [API_URL]);
 
 
+
   const handleUpdateApplication = async () => {
     try {
       setApplications((prevApps) =>

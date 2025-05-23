@@ -47,12 +47,17 @@ export class AuthController {
   @ApiResponse({ status: 403, description: 'Forbidden' })
   async login(@Request() req, @Res() res) {
     const token = await this.authService.login(req.user.id);
+    const body = req.body;
+    // Stay 15 days if rememberMe is true, otherwise 1 day
+    const tokenTime = body.rememberMe
+      ? 1000 * 60 * 60 * 24 * 15
+      : 1000 * 60 * 60 * 24;
 
     res.cookie('access_token', token.accessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'Strict',
-      maxAge: 1000 * 60 * 60 * 24,
+      maxAge: tokenTime,
     });
     return res.status(HttpStatus.OK).send();
   }
@@ -154,7 +159,7 @@ export class AuthController {
         maxAge: 1000 * 60 * 60 * 24,
       });
 
-      res.redirect(`${process.env.FRONT}/login`);
+      res.redirect(`${process.env.FRONT}`);
     } catch (error) {
       res
         .status(400)
