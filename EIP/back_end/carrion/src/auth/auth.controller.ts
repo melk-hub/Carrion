@@ -127,7 +127,7 @@ export class AuthController {
   @ApiOperation({ summary: 'Google login with authorization code' })
   @ApiResponse({
     status: 200,
-    description: 'Returns access token',
+    description: 'Returns Google access token',
     schema: {
       example: {
         accessToken: 'string',
@@ -169,34 +169,49 @@ export class AuthController {
 
   @Public()
   @UseGuards(MicrosoftAuthGuard)
-  @Get('microsoft/login')
-  @ApiOperation({ summary: 'Microsoft login initiation' })
+  @Get('microsoft/callback')
+  @ApiOperation({ summary: 'Microsoft login with authorization code' })
   @ApiResponse({
     status: 200,
-    description: 'Redirects to Microsoft login page',
+    description: 'Returns Microsoft access token',
+    schema: {
+      example: {
+        accessToken: 'string',
+      },
+    },
   })
   @ApiResponse({ status: 400, description: 'Bad request' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiResponse({ status: 403, description: 'Forbidden' })
-  microsoftLogin() {}
+  async microsoftLogin(@Body() code, @Req() req, @Res() res) {
+    try {
+      const user = req.user;
+      const tokens = await this.authService.login(user.id);
 
-  // @Public()
-  // @UseGuards(MicrosoftAuthGuard)
-  // @Get('microsoft/callback')
-  // @ApiOperation({ summary: 'Microsoft login callback' })
-  // @ApiResponse({
-  //   status: 200,
-  //   description: 'Successfully logged in with Microsoft',
-  //   schema: {
-  //     example: {
-  //       accessToken: 'string',
-  //     },
-  //   },
-  // })
-  // async microsoftCallback(@Req() req, @Res() res) {
-  //   const response = await this.authService.login(req.user.id);
-  //res.redirect(`${process.env.FRONT}?token=${response.accessToken}`);
-  // }
+      await this.authService.saveTokens(
+        user.id,
+        user.accessToken,
+        user.refreshToken || '',
+        7,
+        'Microsoft_oauth2',
+      );
+      await this.authService.createOutlookWebhook(user.accessToken, user.id);
+
+      res.cookie('access_token', tokens.accessToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict',
+        maxAge: 1000 * 60 * 60 * 24,
+      });
+
+      res.redirect(`${process.env.FRONT}/login`);
+    } catch (error) {
+      res
+        .status(400)
+        .json({ message: `Failed to authenticate with Microsoft ${error}` });
+    }
+  }
+
   @Public()
   @Get('logout')
   @ApiOperation({ summary: 'Logout' })

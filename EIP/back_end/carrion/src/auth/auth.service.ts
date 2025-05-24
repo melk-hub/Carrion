@@ -3,12 +3,14 @@ import {
   Inject,
   Injectable,
   UnauthorizedException,
+  HttpStatus,
+  HttpException
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UserService } from 'src/user/user.service';
 import { AuthJwtPayload } from './types/auth-jwtPayload';
 import refreshJwtConfig from './config/refresh-jwt.config';
-import { ConfigType } from '@nestjs/config';
+import { ConfigService, ConfigType } from '@nestjs/config';
 import * as argon2 from 'argon2';
 import { CurrentUser } from './types/current-user';
 import { CreateUserDto } from 'src/user/dto/create-user.dto';
@@ -16,6 +18,7 @@ import { Role } from './enums/role.enum';
 import * as bcrypt from 'bcrypt';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { HttpService } from '@nestjs/axios';
+import { firstValueFrom } from 'rxjs';
 
 @Injectable()
 export class AuthService {
@@ -181,6 +184,56 @@ export class AuthService {
     } catch (error) {
       console.error('Erreur lors de la création du webhook Gmail:', error);
       throw new Error('Failed to set up Gmail webhook');
+    }
+  }
+
+  async createOutlookWebhook(accessToken: string, userId: string) {
+
+  const url = 'https://graph.microsoft.com/v1.0/subscriptions';
+  const headers = { Authorization: `Bearer ${accessToken}` };
+
+  const response = await fetch(url, { headers });
+  const data = await response.json();
+
+  const existing = data.value.find(sub =>
+    sub.resource === "me/mailFolders('inbox')/messages" &&
+    sub.notificationUrl === `${process.env.BACK}/webhook/outlook`
+  );
+
+  if (existing) {
+    console.log('Subscription already exists:', existing.id);
+    return;
+  }
+
+    const expiration = new Date(Date.now() + 60 * 60 * 1000 * 3);
+    const expirationDateTime = expiration.toISOString();
+
+    const body = {
+      changeType: 'created',
+      notificationUrl: `${process.env.BACK}/webhook/outlook`,
+      resource: "me/mailFolders('inbox')/messages",
+      expirationDateTime,
+      clientState: 'mySecretValidationToken',
+    };
+
+    try {
+      const response$ = this.httpService.post(url, body, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      const response = await firstValueFrom(response$);
+      this.userService.updateHistoryIdOfUser(
+        userId,
+        response.data['id'],
+      );
+      console.log('Outlook mail subscription created');
+    } catch (error: any) {
+      const msg = error?.response?.data || error?.message || 'Unknown error';
+      console.error('Error creating Outlook subscription:', msg);
+      throw new HttpException('Failed to create Outlook subscription', HttpStatus.BAD_REQUEST);
     }
   }
 
