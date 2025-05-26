@@ -11,10 +11,10 @@ import {
 import Landing from "./pages/Landing";
 import Dashboard from "./pages/Dashboard";
 import Home from './pages/Home';
-import Archives from './pages/Archives';
-import Profile from './pages/Profile';
-import { useAuth, AuthProvider } from './AuthContext'; // Import du Context
+import Archives from "./pages/Archives";
+import { useAuth, AuthProvider } from "./AuthContext";
 import Navbar from './pages/Navbar';
+import Profile from './pages/Profile';
 
 function App() {
   return (
@@ -114,7 +114,7 @@ function AppLayout() {
             isAuthenticated ? (
               <Profile />
             ) : (
-              <Navigate to="/login" />
+              <Navigate to="/" replace state={{ from: location }} />
             )
           }
         />

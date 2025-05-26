@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react"
+import React, { useState, useRef, useEffect } from "react"
 import { Upload, Eye, Trash, CircleUserRound, Pencil } from "lucide-react";
 import "../styles/Profile.css"
 
@@ -14,6 +14,7 @@ function Profile() {
     const [editedName, setEditedName] = useState('');
     const [services, setServices] = useState([]);
     const [showMenu, setShowMenu] = useState(false);
+    const dropdownRef = useRef(null);
     const AVAILABLE_SERVICES = [
         { name: "LinkedIn", icon: "/icons/linkedin.png" },
         { name: "Outlook", icon: "/icons/outlook.png" },
@@ -29,6 +30,19 @@ function Profile() {
     const remainingServices = AVAILABLE_SERVICES.filter(
         (s) => !services.some((added) => added.name === s.name)
     );
+
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+                setShowMenu(false);
+            }
+        };
+
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, []);
 
     const handleCvSelect = (event) => {
         const file = event.target.files[0];
@@ -148,7 +162,7 @@ function Profile() {
                 </span>
                 )}
 
-                <button className="delete-button" onClick={() => onDelete(doc.id)}>
+                <button className="delete-document" onClick={() => onDelete(doc.id)}>
                 <Trash size={20} />
                 </button>
             </div>
@@ -296,18 +310,18 @@ function Profile() {
                             ))}
 
                             {remainingServices.length > 0 && (
-                            <div className="service-item add-service" style={{ position: "relative" }}>
+                            <div className="service-item add-service" style={{ position: "relative" }} ref={dropdownRef}>
                                 <button onClick={() => setShowMenu(!showMenu)}>+</button>
 
                                 {showMenu && (
-                                <ul className="service-dropdown">
+                                 <ul className="service-dropdown">
                                     {remainingServices.map((service) => (
-                                    <li key={service.name} onClick={() => handleAddService(service)}>
-                                        <img src={service.icon} alt={service.name} />
-                                        {service.name}
-                                    </li>
-                                    ))}
-                                </ul>
+                                        <li key={service.name} onClick={() => handleAddService(service)}>
+                                            <img src={service.icon} alt={service.name} />
+                                            {service.name}
+                                        </li>
+                                        ))}
+                                    </ul>
                                 )}
                             </div>
                             )}

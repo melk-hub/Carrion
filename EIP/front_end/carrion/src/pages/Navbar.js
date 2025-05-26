@@ -1,6 +1,7 @@
 import React from "react";
 import { useNavigate } from 'react-router-dom';
 import logo from '../assets/carrion_logo_crop.png';
+import { CircleUserRound } from "lucide-react";
 import "../styles/Navbar.css";
 import axios from 'axios';
 
@@ -34,6 +35,10 @@ function Navbar({ setIsAuthenticated }) {
             <li onClick={() => navigate('/archives')}>
               <span>📊</span> Archives
             </li>
+            <li onClick={() => navigate('/profile')}>
+              <span><CircleUserRound size={20} strokeWidth="2px" /></span>
+              Profil
+            </li>
           </ul>
         </div>
 
@@ -41,7 +46,7 @@ function Navbar({ setIsAuthenticated }) {
           <div className="notifications">🔔</div>
           {/* <div className="user-profile" onClick={() => navigate('/parameters')}> */}
           <div className="user-profile" onClick={() => handleLogout()}>
-          <img alt="User" className="avatar" src="/path/to/avatar.jpg" />
+            <img alt="User" className="avatar" src="/path/to/avatar.jpg" />
             <span className="username">Jeremy</span>
           </div>
         </div>
