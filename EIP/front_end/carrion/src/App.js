@@ -7,7 +7,6 @@ import {
   useLocation,
   Navigate,
 } from "react-router-dom";
-// import Header from "./components/Header";
 import Landing from "./pages/Landing";
 import Dashboard from "./pages/Dashboard";
 import Home from './pages/Home';
@@ -42,7 +41,6 @@ function AppLayout() {
       return;
     }
 
-
     if (isAuthenticated) {
       const lastPath = localStorage.getItem("lastPath");
       if (location.pathname === "/") {
@@ -67,16 +65,6 @@ function AppLayout() {
 
       <Routes>
         <Route path="/" element={<Landing />} />
-        <Route
-          path="/home"
-          element={
-            isAuthenticated ? (
-              <Home />
-            ) : (
-              <Navigate to="/" />
-            )
-          }
-        />
         <Route
           path="/home"
           element={
