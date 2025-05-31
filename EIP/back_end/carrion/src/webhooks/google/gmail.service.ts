@@ -63,6 +63,7 @@ export class GmailService {
       orderBy: { createdAt: 'desc' },
     });
   }
+
   async updateAccessToken(
     emailAddress: string,
     newAccessToken: string,

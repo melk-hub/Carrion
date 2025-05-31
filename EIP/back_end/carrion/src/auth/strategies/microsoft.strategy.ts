@@ -16,19 +16,24 @@ export class MicrosoftStrategy extends PassportStrategy(Strategy, 'microsoft') {
       clientID: microsoftConfig.clientID,
       clientSecret: microsoftConfig.clientSecret,
       callbackURL: microsoftConfig.callbackURL,
-      scope: ['user.read'],
+      scope: ['openid', 'profile', 'offline_access', 'User.Read', 'Mail.Read'],
     });
   }
 
   async validate(accessToken: string, refreshToken: string, profile: Profile) {
-    const user = await this.authService.validateOAuthUser({
-      firstName: profile.name.givenName,
-      lastName: profile.name.familyName,
-      username: profile.name.givenName,
-      email: profile.emails[0].value,
-      birthDate: '',
-      password: '',
-    });
-    return user;
+    try {
+      const user = await this.authService.validateOAuthUser({
+        firstName: profile.name.givenName,
+        lastName: profile.name.familyName,
+        username: profile.username ?? profile.name.givenName,
+        email: profile.emails[0].value,
+        birthDate: '',
+        password: '',
+      });
+      return { ...user, accessToken, refreshToken };
+    } catch (error) {
+      console.error('erreur:', error);
+      return;
+    }
   }
 }
