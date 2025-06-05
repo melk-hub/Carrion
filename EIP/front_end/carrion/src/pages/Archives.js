@@ -245,7 +245,6 @@ function Archives() {
   return (
     
     <div>
-      <div className="main-content">
       <div className="top-bar">
         <div className='archives-title'>
           <h1>Mes Archives</h1>
@@ -329,7 +328,6 @@ function Archives() {
           )}
         </div>
       )}
-      </div>
     </div>
   );
 }

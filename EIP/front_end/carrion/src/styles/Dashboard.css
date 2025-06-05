@@ -288,13 +288,3 @@
   max-width: 24rem;
   margin-bottom: 1.5rem;
 }
-
-.main-content {
-  margin-left: 220px;
-  margin-top: 60px;
-  padding: 20px;
-  background: #FFF9F0;
-  min-height: calc(100vh - 60px);
-  z-index: 0;
-}
-

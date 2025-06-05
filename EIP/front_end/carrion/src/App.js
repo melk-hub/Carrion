@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   BrowserRouter as Router,
   Route,
@@ -28,6 +28,7 @@ function AppLayout() {
   const { isAuthenticated, setIsAuthenticated, loadingAuth } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   useEffect(() => {
     if (!loadingAuth) {
@@ -60,42 +61,44 @@ function AppLayout() {
   return (
     <div>
       {location.pathname !== "/" && (
-        <Navbar setIsAuthenticated={setIsAuthenticated} />
+        <Navbar sidebarCollapsed={sidebarCollapsed} setSidebarCollapsed={setSidebarCollapsed} setIsAuthenticated={setIsAuthenticated} />
       )}
 
-      <Routes>
-        <Route path="/" element={<Landing />} />
-        <Route
-          path="/home"
-          element={
-            isAuthenticated ? (
-              <Home />
-            ) : (
-              <Navigate to="/" />
-            )
-          }
-        />
-        <Route
-          path="/dashboard"
-          element={
-            isAuthenticated ? (
-              <Dashboard />
-            ) : (
-              <Navigate to="/" replace state={{ from: location }} />
-            )
-          }
-        />
-        <Route
-          path="/archives"
-          element={
-            isAuthenticated ? (
-              <Archives />
-            ) : (
-              <Navigate to="/" replace state={{ from: location }} />
-            )
-          }
-        />
-      </Routes>
+      <main className={sidebarCollapsed ? "main-content collapsed" : "main-content"}>
+        <Routes>
+          <Route path="/" element={<Landing />} />
+          <Route
+            path="/home"
+            element={
+              isAuthenticated ? (
+                <Home sidebarCollapsed={sidebarCollapsed} />
+              ) : (
+                <Navigate to="/" />
+              )
+            }
+          />
+          <Route
+            path="/dashboard"
+            element={
+              isAuthenticated ? (
+                <Dashboard sidebarCollapsed={sidebarCollapsed}/>
+              ) : (
+                <Navigate to="/" replace state={{ from: location }} />
+              )
+            }
+          />
+          <Route
+            path="/archives"
+            element={
+              isAuthenticated ? (
+                <Archives sidebarCollapsed={sidebarCollapsed}/>
+              ) : (
+                <Navigate to="/" replace state={{ from: location }} />
+              )
+            }
+          />
+        </Routes>
+      </main>
     </div>
   );
 }

@@ -146,8 +146,6 @@ function Dashboard() {
   }
 
   return (
-    <div>
-    <div className="main-content">
     <div className="dashboard">
       <div className="container">
         <h1 className="dashboard-title">Aperçu de vos candidatures</h1>
@@ -317,8 +315,6 @@ function Dashboard() {
       {popupType === "details" && selectedApplication && (
         <DetailsModal application={selectedApplication} onClose={closePopup} statusMap={statusMap} />
       )}
-    </div>
-    </div>
     </div>
   )
 }

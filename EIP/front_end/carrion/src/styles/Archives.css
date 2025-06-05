@@ -213,12 +213,3 @@ background: linear-gradient(90deg, var(--primary-color), #fc8f02);
 .archives-grid-status-banner.refusée {
 background: linear-gradient(90deg, var(--primary-color), #fa0202);
 }
-
-  .main-content {
-  margin-left: 220px;
-  margin-top: 60px;
-  padding: 20px;
-  background: #FFF9F0;
-  min-height: calc(100vh - 60px);
-  z-index: 0;
-}
