@@ -10,21 +10,21 @@ export class S3Controller {
   @UseGuards(JwtAuthGuard)
   @Post('upload')
   async getUploadUrl(
-    @Req() req: Request,
+    @Req() req,
     @Query('filename') filename: string,
     @Query('contentType') contentType: string,
   ) {
-    const userId = req.user['id'];
+    const userId = req.user.id;
     return this.s3Service.getSignedUploadUrl(userId, filename, contentType);
   }
 
   @UseGuards(JwtAuthGuard)
   @Get('download')
   async getDownloadUrl(
-    @Req() req: Request,
+    @Req() req,
     @Query('filename') filename: string,
   ) {
-    const userId = req.user['id'];
+    const userId = req.user.id;
     return this.s3Service.getSignedDownloadUrl(userId, filename);
   }
 }

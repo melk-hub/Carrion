@@ -35,6 +35,7 @@ export class S3Service {
       ContentType: contentType,
     });
 
+    await this.userService.addDocument(userId, filename);
     const signedUrl = await getSignedUrl(this.s3, command, { expiresIn: 300 });
     return { signedUrl, key };
   }
