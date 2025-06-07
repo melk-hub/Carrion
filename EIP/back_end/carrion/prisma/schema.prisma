@@ -10,7 +10,7 @@ datasource db {
 }
 
 model User {
-  id                 String     @id @default(uuid()) @db.Uuid
+  id                 String     @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
   username           String     @unique
   firstName          String
   lastName           String?
@@ -24,11 +24,10 @@ model User {
   Settings           Settings?  @relation("UserSettings")
   tokens             Token[]    @relation("UserTokens")
   jobApplies         jobApply[] @relation("UserJobApplies")
-  documents          String[]
 }
 
 model Token {
-  id                String   @id @default(uuid()) @db.Uuid
+  id                String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
   name              String
   accessToken       String
   refreshToken      String
@@ -39,7 +38,7 @@ model Token {
 }
 
 model jobApply {
-  id            String    @id @default(uuid()) @db.Uuid
+  id            String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
   Title         String
   Company       String
   Location      String?
@@ -54,9 +53,11 @@ model jobApply {
 }
 
 model Settings {
-  id     String @id @default(uuid()) @db.Uuid
-  UserId String @unique @db.Uuid
-  user   User   @relation("UserSettings", fields: [UserId], references: [id], onDelete: Cascade)
+  id       String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  UserId   String   @unique @db.Uuid
+  document String[]
+  imageUrl String?
+  user     User     @relation("UserSettings", fields: [UserId], references: [id], onDelete: Cascade)
 }
 
 enum Status {
@@ -71,8 +72,6 @@ enum Status {
   REJECTED_BY_COMPANY
   OFFER_DECLINED
   APPLICATION_WITHDRAWN
-  ON
-  OFF
 }
 
 enum Role {

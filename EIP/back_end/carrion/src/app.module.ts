@@ -13,8 +13,6 @@ import { MailFilterService } from './services/mailFilter/mailFilter.service';
 import { UsersModule } from './users/users.module';
 import { OutlookModule } from './webhooks/microsoft/outlook.module';
 import { S3Module } from './aws/s3.module';
-import { OutlookModule } from './webhooks/microsoft/outlook.module';
-import { S3Module } from './aws/s3.module';
 
 @Module({
   imports: [
