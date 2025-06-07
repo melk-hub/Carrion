@@ -120,6 +120,78 @@ body {
   gap: 20px;
 }
 
+button {
+  border: none;
+  background-color: transparent;
+  margin-top: 0px;
+}
+
+button .login-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 8px 16px;
+  color: white;
+  text-shadow: 2px 2px rgb(116, 116, 116);
+  text-transform: uppercase;
+  cursor: pointer;
+  border: solid 2px black;
+  letter-spacing: 1px;
+  font-weight: 600;
+  font-size: 17px;
+  background-color: hsl(49deg 98% 60%);
+  border-radius: 50px;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.5s ease;
+  min-height: 40px;
+  width: 100%;
+}
+
+button:active .login-btn {
+  transform: scale(0.9);
+  transition: all 100ms ease;
+}
+
+button .carrion-logo {
+  width: 24px;
+  height: 24px;
+  transition: all 0.2s ease;
+  z-index: 2;
+  border-radius: 50%;
+}
+
+.text-button {
+  transition: all 0.1s ease;
+  transition-delay: 300ms;
+}
+
+button:hover .carrion-logo {
+  transform: scale(2.5) translate(60%);
+}
+
+.hover-text-button {
+  position: absolute;
+  left: 0%;
+  transform: translateX(-100%);
+  transition: all 0s ease;
+  z-index: 2;
+  white-space: nowrap;
+  font-weight: 600;
+  font-size: 16px;
+}
+
+button:hover .hover-text-button {
+  transform: translateX(15px);
+  transition-delay: 300ms;
+}
+
+button:hover .text-button {
+  transform: translateX(350%);
+  transition-delay: 300ms;
+}
+
 .language-button {
   display: flex;
   flex-direction: row;
@@ -176,7 +248,7 @@ body {
 }
 
 h1 {
-  font-size: 50px;
+  font-size: 40px;
   font-family: Arial, Helvetica, sans-serif;
   margin: 0;
   padding-top: 20px;

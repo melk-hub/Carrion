@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   BrowserRouter as Router,
   Route,
@@ -7,28 +7,33 @@ import {
   useLocation,
   Navigate,
 } from "react-router-dom";
-// import Header from "./components/Header";
 import Landing from "./pages/Landing";
 import Dashboard from "./pages/Dashboard";
 import Home from './pages/Home';
 import Archives from "./pages/Archives";
 import { useAuth, AuthProvider } from "./AuthContext";
+import { LanguageProvider } from "./contexts/LanguageContext";
+import { useLanguage } from "./contexts/LanguageContext";
 import Navbar from './pages/Navbar';
 
 function App() {
   return (
     <AuthProvider>
-      <Router>
-        <AppLayout />
-      </Router>
+      <LanguageProvider>
+        <Router>
+          <AppLayout />
+        </Router>
+      </LanguageProvider>
     </AuthProvider>
   );
 }
 
 function AppLayout() {
   const { isAuthenticated, setIsAuthenticated, loadingAuth } = useAuth();
+  const { t } = useLanguage();
   const navigate = useNavigate();
   const location = useLocation();
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   useEffect(() => {
     if (!loadingAuth) {
@@ -41,7 +46,6 @@ function AppLayout() {
       console.log("Loading authentication...");
       return;
     }
-
 
     if (isAuthenticated) {
       const lastPath = localStorage.getItem("lastPath");
@@ -56,58 +60,50 @@ function AppLayout() {
   }, [isAuthenticated, loadingAuth, navigate, location.pathname]);
 
   if (loadingAuth) {
-    return <div>Loading authentication...</div>;
+    return <div>{t('common.loadingAuth')}</div>;
   }
 
   return (
     <div>
       {location.pathname !== "/" && (
-        <Navbar setIsAuthenticated={setIsAuthenticated} />
+        <Navbar sidebarCollapsed={sidebarCollapsed} setSidebarCollapsed={setSidebarCollapsed} setIsAuthenticated={setIsAuthenticated} />
       )}
 
-      <Routes>
-        <Route path="/" element={<Landing />} />
-        <Route
-          path="/home"
-          element={
-            isAuthenticated ? (
-              <Home />
-            ) : (
-              <Navigate to="/" />
-            )
-          }
-        />
-        <Route
-          path="/home"
-          element={
-            isAuthenticated ? (
-              <Home />
-            ) : (
-              <Navigate to="/" />
-            )
-          }
-        />
-        <Route
-          path="/dashboard"
-          element={
-            isAuthenticated ? (
-              <Dashboard />
-            ) : (
-              <Navigate to="/" replace state={{ from: location }} />
-            )
-          }
-        />
-        <Route
-          path="/archives"
-          element={
-            isAuthenticated ? (
-              <Archives />
-            ) : (
-              <Navigate to="/" replace state={{ from: location }} />
-            )
-          }
-        />
-      </Routes>
+      <main className={location.pathname !== "/" ? (sidebarCollapsed ? "navbar-content collapsed" : "navbar-content") : ""}>
+        <Routes>
+          <Route path="/" element={<Landing />} />
+          <Route
+            path="/home"
+            element={
+              isAuthenticated ? (
+                <Home sidebarCollapsed={sidebarCollapsed} />
+              ) : (
+                <Navigate to="/" />
+              )
+            }
+          />
+          <Route
+            path="/dashboard"
+            element={
+              isAuthenticated ? (
+                <Dashboard sidebarCollapsed={sidebarCollapsed}/>
+              ) : (
+                <Navigate to="/" replace state={{ from: location }} />
+              )
+            }
+          />
+          <Route
+            path="/archives"
+            element={
+              isAuthenticated ? (
+                <Archives sidebarCollapsed={sidebarCollapsed}/>
+              ) : (
+                <Navigate to="/" replace state={{ from: location }} />
+              )
+            }
+          />
+        </Routes>
+      </main>
     </div>
   );
 }

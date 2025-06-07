@@ -1,0 +1,253 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "add": "Add",
+    "close": "Close",
+    "confirm": "Confirm",
+    "yes": "Yes",
+    "no": "No",
+    "search": "Search",
+    "filter": "Filter",
+    "sort": "Sort",
+    "date": "Date",
+    "status": "Status",
+    "actions": "Actions",
+    "details": "Details",
+    "loadingAuth": "Loading authentication...",
+    "hello": "Hello"
+  },
+  "navbar": {
+    "home": "Home",
+    "applications": "Applications",
+    "archives": "Archives",
+    "profile": "My Profile",
+    "settings": "Settings",
+    "logout": "Logout",
+    "reduceAnimations": "Reduce animations"
+  },
+  "landing": {
+    "title": "The ideal platform to manage your applications",
+    "subtitle": "Simplify your job search with Carrion",
+    "getStarted": "Get started now",
+    "login": "Sign in",
+    "language": "English",
+    "services": {
+      "title": "Our Services",
+      "tracking": {
+        "title": "Track your personal applications",
+        "points": [
+          "Manage all your applications through an intuitive dashboard.",
+          "Easily track statuses and add key notes.",
+          "Never miss an important opportunity again."
+        ]
+      },
+      "goals": {
+        "title": "Application goal tracking",
+        "points": [
+          "Set and track your job search goals.",
+          "Receive targeted advice to stay on track.",
+          "Achieve your professional goals on time."
+        ]
+      },
+      "reminders": {
+        "title": "Personalized reminders and notifications",
+        "points": [
+          "Receive automatic reminders (follow-ups, interviews...).",
+          "Be alerted to important next steps.",
+          "Stay perfectly organized and proactive."
+        ]
+      },
+      "documents": {
+        "title": "Professional documents space",
+        "points": [
+          "Centralize all your key documents (CV, letters, portfolios...)",
+          "Easily manage and find your important files",
+          "Access everything, everywhere, to simplify all your steps"
+        ]
+      }
+    },
+    "howItWorks": {
+      "title": "How does it work?",
+      "centralize": {
+        "title": "Centralize Easily",
+        "description": "Add your applications (internships or jobs) and essential documents. Carrion simplifies your organization from the start."
+      },
+      "track": {
+        "title": "Track Your Progress",
+        "description": "Visualize the progress of each step thanks to our automated tracking. Assess where you are at a glance."
+      },
+      "optimize": {
+        "title": "Optimize to Succeed",
+        "description": "Use tracking information to adjust your approach and maximize your chances of success in your search."
+      }
+    },
+    "footer": "Footer TBD"
+  },
+  "auth": {
+    "login": "Login",
+    "register": "Register",
+    "email": "Email",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "firstName": "First Name",
+    "lastName": "Last Name",
+    "username": "Username",
+    "birthDate": "Birth Date",
+    "forgotPassword": "Forgot Password?",
+    "dontHaveAccount": "Don't have an account yet?",
+    "alreadyHaveAccount": "Already have an account?",
+    "loginWithGoogle": "Sign in with Google",
+    "registerWithGoogle": "Register with Google",
+    "loginWithOutlook": "Sign in with Outlook",
+    "welcomeBack": "Welcome back!",
+    "joinUs": "Join us!",
+    "emailOrUsername": "Email / Username",
+    "rememberMe": "Remember me",
+    "loginError": "Invalid credentials.",
+    "genericError": "An error occurred. Please try again later.",
+    "passwordMismatch": "Passwords do not match!",
+    "registerError": "Registration error."
+  },
+  "dashboard": {
+    "title": "Overview of your applications",
+    "addApplication": "ADD AN APPLICATION",
+    "myApplications": "My applications",
+    "filters": {
+      "all": "All",
+      "pending": "Waiting for response",
+      "accepted": "Accepted",
+      "rejected": "Rejected"
+    },
+    "applicationForm": {
+      "company": "Company",
+      "position": "Position",
+      "location": "Location",
+      "applicationDate": "Application date",
+      "status": "Status",
+      "notes": "Notes",
+      "selectStatus": "Select a status"
+    },
+    "statuses": {
+      "PENDING": "Waiting for response",
+      "APPLIED": "Applied",
+      "ACCEPTED": "Accepted", 
+      "REJECTED": "Rejected",
+      "INTERVIEW": "Interview",
+      "OFF": "Rejected",
+      "ON": "Accepted"
+    },
+    "stats": {
+      "total": "Total",
+      "pending": "Pending",
+      "accepted": "Accepted",
+      "refused": "Rejected"
+    },
+    "banner": {
+      "title": "Find your ideal job",
+      "description": "Track your applications and maximize your chances of success",
+      "text": "Track your applications and maximize your chances of success"
+    },
+    "search": {
+      "placeholder": "Search an application"
+    },
+    "sorting": {
+      "label": "SORT BY:",
+      "date": "Date",
+      "status": "Status"
+    },
+    "sort": {
+      "label": "SORT BY",
+      "date": "Date",
+      "status": "Status"
+    },
+    "viewModes": {
+      "grid": "GRID",
+      "list": "LIST"
+    },
+    "view": {
+      "grid": "GRID",
+      "list": "LIST"
+    },
+    "add": {
+      "button": "ADD AN APPLICATION"
+    },
+    "emptyState": {
+      "title": "No applications found",
+      "description": "Start tracking your job applications by adding your first application"
+    },
+    "empty": {
+      "title": "No applications found",
+      "text": "Start tracking your job applications by adding your first application"
+    },
+    "errors": {
+      "fetchError": "Error while fetching data:",
+      "updateError": "Error while updating application:",
+      "addError": "Error while adding application:",
+      "deleteError": "Error:"
+    }
+  },
+  "home": {
+    "welcome": "Welcome to Carrion!",
+    "description": "Your application management platform",
+    "getStarted": "Get Started",
+    "recentApplications": "Latest Application",
+    "quickStats": "Quick Stats",
+    "totalApplications": "Total Applications",
+    "pendingApplications": "Pending",
+    "acceptedApplications": "Accepted",
+    "recentStatusChange": "Recent Status Change",
+    "ranking": "Ranking",
+    "rankingMessage": "You're first! Well, I think...",
+    "recentActivity": "Recent Activity",
+    "lastModifications": "Last modifications",
+    "noActivity": "Nothing to see here...",
+    "seeAllApplications": "See all applications",
+    "quickAccess": "Quick Access",
+    "quickAccessDescription": "Quickly access features",
+    "myApplications": "My Applications",
+    "newApplications": "New Applications",
+    "statistics": "Statistics",
+    "myInformation": "My Information",
+    "timeAgo": {
+      "hours": "{{count}}h ago",
+      "days": "{{count}}d ago"
+    }
+  },
+  "archives": {
+    "title": "My Archives",
+    "description": "View your old applications",
+    "noArchives": "No applications found",
+    "restoreApplication": "Restore application",
+    "search": {
+      "placeholder": "Search an application"
+    },
+    "viewModes": {
+      "list": "List view",
+      "grid": "Grid view"
+    },
+    "details": {
+      "status": "Status:",
+      "applicationDate": "Application date:",
+      "seeDetails": "See details"
+    },
+    "fakeData": {
+      "companyA": "Company A",
+      "companyB": "Company B", 
+      "companyC": "Company C",
+      "companyD": "Company D",
+      "companyE": "Company E",
+      "companyF": "Company F",
+      "frontendDeveloper": "Frontend Developer",
+      "backendEngineer": "Backend Engineer",
+      "uiuxDesigner": "UI/UX Designer",
+      "backendDeveloper": "Backend Developer",
+      "itProjectManager": "IT Project Manager",
+      "devopsConsultant": "DevOps Consultant",
+      "today": "Today"
+    }
+  }
+} 

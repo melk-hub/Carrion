@@ -30,6 +30,8 @@
   border: none;
   font-size: 28px;
   cursor: pointer;
+  width: 40px;
+  height: 40px;
 }
 
 .auth-modal h1 {
@@ -144,4 +146,71 @@
 .error-message {
   color: red;
   font-size: 0.9rem;
+}
+
+/* Fixed button sizes */
+.auth-modal button {
+  min-width: 40px;
+  min-height: 40px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  box-sizing: border-box;
+}
+
+.auth-modal .tabs button {
+  min-width: 140px;
+  padding: 8px 16px;
+  margin: 0 5px;
+  max-width: 45%;
+  flex: 1;
+}
+
+.auth-modal .primary-btn {
+  max-width: 50%;
+  min-width: 50%;
+  width: 100%;
+  min-height: 45px;
+}
+
+.auth-modal .outlook-btn {
+  max-width: 50%;
+  min-width: 50%;
+  width: 100%;
+  min-height: 45px;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .auth-modal button {
+    min-height: 36px;
+    font-size: 14px;
+  }
+  
+  .auth-modal .tabs button {
+    min-width: 100px;
+    padding: 6px 12px;
+  }
+  
+  .auth-modal .primary-btn,
+  .auth-modal .outlook-btn {
+    min-height: 40px;
+  }
+}
+
+@media (max-width: 480px) {
+  .auth-modal button {
+    min-height: 32px;
+    font-size: 12px;
+  }
+  
+  .auth-modal .tabs button {
+    min-width: 80px;
+    padding: 4px 8px;
+  }
+  
+  .auth-modal .primary-btn,
+  .auth-modal .outlook-btn {
+    min-height: 36px;
+  }
 }

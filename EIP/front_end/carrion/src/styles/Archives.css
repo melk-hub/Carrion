@@ -214,11 +214,55 @@ background: linear-gradient(90deg, var(--primary-color), #fc8f02);
 background: linear-gradient(90deg, var(--primary-color), #fa0202);
 }
 
-  .main-content {
-  margin-left: 220px;
-  margin-top: 60px;
-  padding: 20px;
-  background: #FFF9F0;
-  min-height: calc(100vh - 60px);
-  z-index: 0;
+/* Fixed button sizes */
+button {
+  min-width: fit-content;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  box-sizing: border-box;
+}
+
+.toggle-button,
+.archives-list-button,
+.archives-grid-button {
+  min-height: 40px;
+  padding: 8px 16px;
+  min-width: 120px;
+}
+
+.search-input {
+  min-height: 40px;
+  box-sizing: border-box;
+}
+
+/* Responsive button sizes */
+@media (max-width: 768px) {
+  .toggle-button,
+  .archives-list-button,
+  .archives-grid-button {
+    min-height: 36px;
+    padding: 6px 12px;
+    font-size: 14px;
+    min-width: 100px;
+  }
+  
+  .search-input {
+    min-height: 36px;
+  }
+}
+
+@media (max-width: 480px) {
+  .toggle-button,
+  .archives-list-button,
+  .archives-grid-button {
+    min-height: 32px;
+    padding: 4px 8px;
+    font-size: 12px;
+    min-width: 80px;
+  }
+  
+  .search-input {
+    min-height: 32px;
+  }
 }

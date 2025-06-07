@@ -1,11 +1,4 @@
-body {
-    margin: 0;
-    font-family: "Segoe UI", sans-serif;
-    background-color: #fff7ed;
-    color: #000000;
-  }
-  
-  .dashboard-container {
+.dashboard-container {
     margin-top: 0.5rem;
     margin-bottom: 1.5rem;
   }
@@ -198,11 +191,3 @@ body {
     font-size: 1.1rem;
     color: #111827;
   }
-  
-  .main-content {
-  margin-left: 220px;
-  margin-top: 60px;
-  padding: 20px;
-  background: #FFF9F0;
-  min-height: calc(100vh - 60px);
-}
