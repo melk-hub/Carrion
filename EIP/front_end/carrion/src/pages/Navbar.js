@@ -1,17 +1,30 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useNavigate, useLocation } from 'react-router-dom';
-import { House, FileUser, Archive, Bell, ChevronRight, ChevronLeft } from "lucide-react";
+import { useLanguage } from '../contexts/LanguageContext';
+import LanguageDropdown from '../components/LanguageDropdown';
+import ToggleSwitch from '../components/ToogleSwitch';
 import logo from '../assets/carrion_logo_crop.png';
 import "../styles/Navbar.css";
 import axios from 'axios';
+import home from '../assets/home-button.png';
+import candidature from '../assets/candidate-profile.png';
+import archives from '../assets/archives.png';
+import bell  from "../assets/bell.png";
+import avatar from "../assets/avatar.png";
+import notification_icon from "../assets/notification.png";
+// import ReduceMotionToggle from '../components/ToogleSwitch';
 
-function Navbar({ sidebarCollapsed, setSidebarCollapsed, setIsAuthenticated }) {  const navigate = useNavigate();
+function Navbar({ sidebarCollapsed, setSidebarCollapsed, setIsAuthenticated }) {
+  const navigate = useNavigate();
   const location = useLocation();
+  const { t } = useLanguage();
   const API_URL = process.env.REACT_APP_API_URL;
 
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [reduceMotion, setReduceMotion] = useState(false);
+  const [notification, setNotification] = useState(false);
   const dropdownRef = useRef(null);
-  
+
   const handleLogout = async () => {
     try {
       await axios.get(`${API_URL}/auth/logout`, { withCredentials: true });
@@ -44,6 +57,10 @@ function Navbar({ sidebarCollapsed, setSidebarCollapsed, setIsAuthenticated }) {
     setSidebarCollapsed(prev => !prev);
   };
 
+  useEffect(() => {
+    toggleSidebar();
+  }, [reduceMotion]);
+
   return (
       <header className="navbar">
         <div className={`sidebar ${sidebarCollapsed ? 'collapsed' : ''}`}>
@@ -53,45 +70,54 @@ function Navbar({ sidebarCollapsed, setSidebarCollapsed, setIsAuthenticated }) {
           </div>
           <ul className="navbar-menu">
             <li onClick={() => navigate('/home')} className={isActive('/home') ? 'active' : ''}>
-              <House />
-              <span className="menu-text">Accueil</span>
+              <img src={home} alt="Home" className="menu-icon" style={{width: '20px', height: '20px'}}/>
+              <span className="menu-text">{t('navbar.home')}</span>
             </li>
             <li onClick={() => navigate('/dashboard')} className={isActive('/dashboard') ? 'active' : ''}>
-              <FileUser />
-              <span className="menu-text">Candidatures</span>
+              <img src={candidature} alt="Candidature" className="menu-icon" style={{width: '20px', height: '20px'}}/>
+              <span className="menu-text">{t('navbar.applications')}</span>
             </li>
             <li onClick={() => navigate('/archives')} className={isActive('/archives') ? 'active' : ''}>
-              <Archive />
-              <span className="menu-text">Archives</span>
+              <img src={archives} alt="Archives" className="menu-icon" style={{width: '20px', height: '20px'}}/>
+              <span className="menu-text">{t('navbar.archives')}</span>
             </li>
           </ul>
-          <button className="sidebar-toggle-btn" onClick={toggleSidebar} aria-label="Toggle sidebar">
-            {sidebarCollapsed ? (
-              <ChevronRight size={24} color="white" />
-            ) : (
-              <ChevronLeft size={24} color="white" />
-            )}
-          </button>
+          <div className="motion-toggle">
+              <ToggleSwitch 
+                isChecked={reduceMotion}
+                setIsChecked={setReduceMotion}
+              />
+
+            </div>
         </div>
 
         <div className="corner-bg" />
         <div className="corner-curve" />
 
         <div className="topbar">
-          <div className="notifications"><Bell /></div>
-
-          <div className="user-profile" ref={dropdownRef} onClick={handleToggleDropdown}>
-            <img alt="User" className="avatar" src="/path/to/avatar.jpg" />
-            <span className="username">Jeremy</span>
-
-          {isDropdownOpen && (
-            <ul className="dropdown-menu">
-              <li onClick={() => { navigate('/profile'); setIsDropdownOpen(false); }}>Mon profil</li>
-              <li onClick={() => { navigate('/settings'); setIsDropdownOpen(false); }}>Paramètres</li>
-              <li onClick={() => { handleLogout(); setIsDropdownOpen(false); }} style={{color: 'red'}}>Se déconnecter</li>
-            </ul>
-          )}
-        </div>
+          <div className="topbar-left">
+          </div>
+          <span className="username">{t('common.hello')} Jeremy Smith</span>
+          <div className="topbar-right">
+            <LanguageDropdown className="dark-theme" style={{color: 'white'}}/>
+            <img 
+              src={notification ? notification_icon : bell} 
+              alt={notification ? "Notification" : "Bell"} 
+              className="menu-icon notifications" 
+              style={{width: '30px', height: '30px'}} 
+              onClick={() => setNotification(!notification)}
+            />
+            <div className="user-profile" ref={dropdownRef} onClick={handleToggleDropdown}>
+              <img src={avatar} alt="User" className="avatar" />
+            {isDropdownOpen && (
+              <ul className="dropdown-menu">
+                <li onClick={() => { navigate('/profile'); setIsDropdownOpen(false); }}>{t('navbar.profile')}</li>
+                <li onClick={() => { navigate('/settings'); setIsDropdownOpen(false); }}>{t('navbar.settings')}</li>
+                <li onClick={() => { handleLogout(); setIsDropdownOpen(false); }} style={{color: 'red'}}>{t('navbar.logout')}</li>
+              </ul>
+            )}
+          </div>
+          </div>
         </div>
       </header>
     );

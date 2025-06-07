@@ -75,7 +75,7 @@
   align-items: center;
   gap: 12px;
   padding: 8px 12px;
-  font-size: 1.2rem;
+  font-size: 1rem;
   border-radius: 8px;
   cursor: pointer;
   transition: background 0.2s ease;
@@ -169,7 +169,7 @@
   color: white;
   display: flex;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: space-between;
   padding: 0 20px;
   position: fixed;
   top: 0;
@@ -183,8 +183,53 @@
   width: calc(100% - 60px);
 }
 
+.topbar-left,
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+/* Fixed button sizes */
+button {
+  min-width: fit-content;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top: 0px;
+}
+
+.toggle-button,
+.add-button,
+.primary-btn,
+.language-dropdown-button {
+  min-height: 40px;
+  padding: 8px 16px;
+  box-sizing: border-box;
+}
+
+/* Responsive button sizes */
+@media (max-width: 768px) {
+  .toggle-button,
+  .add-button,
+  .primary-btn {
+    min-height: 36px;
+    padding: 6px 12px;
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .toggle-button,
+  .add-button,
+  .primary-btn {
+    min-height: 32px;
+    padding: 4px 8px;
+    font-size: 12px;
+  }
+}
+
 .notifications {
-  margin-right: 20px;
   font-size: 20px;
   cursor: pointer;
   display: flex;
@@ -240,7 +285,7 @@
   background-color: #324566;
 }
 
-.main-content {
+.navbar-content {
   margin-left: 220px;
   margin-top: 60px;
   background: #FFF9F0;
@@ -248,6 +293,55 @@
   padding: 20px;
 }
 
-.main-content.collapsed {
+.navbar-content.collapsed {
   margin-left: 60px;
+}
+
+/* Motion toggle styles */
+.motion-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  margin: 1rem 0;
+}
+
+.sidebar .motion-toggle {
+  justify-content: center;
+  padding: 0 1rem;
+}
+
+.sidebar.collapsed .motion-toggle {
+  padding: 0 0.5rem;
+}
+
+.toggle-label {
+  color: white;
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.motion-toggle .reduceMotionToggle {
+  width: 3em;
+  color: #fbb75f;
+}
+
+/* Reduce motion class for global animation control */
+.reduce-motion * {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+}
+
+/* Responsive motion toggle */
+@media (max-width: 768px) {
+  .toggle-label {
+    font-size: 12px;
+  }
+  
+  .motion-toggle .reduceMotionToggle {
+    width: 2.5em;
+  }
 }
