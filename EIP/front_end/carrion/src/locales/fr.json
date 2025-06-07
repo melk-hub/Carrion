@@ -1,0 +1,253 @@
+{
+  "common": {
+    "loading": "Chargement...",
+    "cancel": "Annuler",
+    "save": "Sauvegarder",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "add": "Ajouter",
+    "close": "Fermer",
+    "confirm": "Confirmer",
+    "yes": "Oui",
+    "no": "Non",
+    "search": "Rechercher",
+    "filter": "Filtrer",
+    "sort": "Trier",
+    "date": "Date",
+    "status": "Statut",
+    "actions": "Actions",
+    "details": "Détails",
+    "loadingAuth": "Chargement de l'authentification...",
+    "hello": "Bonjour"
+  },
+  "navbar": {
+    "home": "Accueil",
+    "applications": "Candidatures", 
+    "archives": "Archives",
+    "profile": "Mon profil",
+    "settings": "Paramètres",
+    "logout": "Se déconnecter",
+    "reduceAnimations": "Réduire animations"
+  },
+  "landing": {
+    "title": "La plateforme idéale pour gérer ses candidatures",
+    "subtitle": "Simplifiez votre recherche d'emploi grâce à Carrion",
+    "getStarted": "Démarrer sans attendre",
+    "login": "Se connecter",
+    "language": "Français",
+    "services": {
+      "title": "Nos Services",
+      "tracking": {
+        "title": "Suivi de vos candidatures personnelles",
+        "points": [
+          "Gérez toutes vos candidatures via un tableau de bord intuitif.",
+          "Suivez facilement les statuts et ajoutez des notes clés.",
+          "Ne manquez plus jamais une opportunité importante."
+        ]
+      },
+      "goals": {
+        "title": "Suivi des objectifs de candidature",
+        "points": [
+          "Définissez et suivez vos objectifs de recherche d'emploi.",
+          "Recevez des conseils ciblés pour rester sur la bonne voie.",
+          "Atteignez vos objectifs professionnels dans les temps voulus."
+        ]
+      },
+      "reminders": {
+        "title": "Rappels et notifications personnalisés", 
+        "points": [
+          "Recevez des rappels automatiques (suivis, entretiens...).",
+          "Soyez alerté(e) des prochaines étapes importantes.",
+          "Restez parfaitement organisé(e) et proactif(ve)."
+        ]
+      },
+      "documents": {
+        "title": "Espace documents professionnels",
+        "points": [
+          "Centralisez tout vos documents clés (CV, lettres, portfolios...)",
+          "Gérez et retrouvez facilement vos fichiez importants",
+          "Accédez à tout, partout, pour tout simplifier vos démarche"
+        ]
+      }
+    },
+    "howItWorks": {
+      "title": "Comment ça marche ?",
+      "centralize": {
+        "title": "Centralisez Facilement",
+        "description": "Ajoutez vos candidatures (stages ou emplois) et documents essentiels. Carrion simplifie votre organisation dès le départ."
+      },
+      "track": {
+        "title": "Suivez Votre Progression",
+        "description": "Visualisez l'avancement de chaque démarche grâce à notre suivi automatisé. Évaluez où vous en êtes en un coup d'oeil."
+      },
+      "optimize": {
+        "title": "Optimisez Pour Réussir",
+        "description": "Utilisez les informations de suivi pour ajuster votre approche et maximiser vos chances de succès dans votre recherche."
+      }
+    },
+    "footer": "Footer TBD"
+  },
+  "auth": {
+    "login": "Connexion",
+    "register": "Inscription",
+    "email": "Email",
+    "password": "Mot de passe",
+    "confirmPassword": "Confirmer le mot de passe",
+    "firstName": "Prénom",
+    "lastName": "Nom",
+    "username": "Nom d'utilisateur",
+    "birthDate": "Date de naissance",
+    "forgotPassword": "Mot de passe oublié ?",
+    "dontHaveAccount": "Pas encore de compte ?",
+    "alreadyHaveAccount": "Déjà un compte ?",
+    "loginWithGoogle": "Se connecter avec Google",
+    "registerWithGoogle": "S'inscrire avec Google",
+    "loginWithOutlook": "Se connecter avec Outlook",
+    "welcomeBack": "Bienvenue !",
+    "joinUs": "Nous rejoindre !",
+    "emailOrUsername": "Email / Nom d'utilisateur",
+    "rememberMe": "Se souvenir de moi",
+    "loginError": "Identifiants incorrects.",
+    "genericError": "Une erreur est survenue. Veuillez réessayer plus tard.",
+    "passwordMismatch": "Les mots de passe ne correspondent pas !",
+    "registerError": "Erreur lors de l'inscription."
+  },
+  "dashboard": {
+    "title": "Aperçu de vos candidatures",
+    "addApplication": "AJOUTER UNE CANDIDATURE",
+    "myApplications": "Mes candidatures",
+    "filters": {
+      "all": "Toutes",
+      "pending": "En attente de réponse",
+      "accepted": "Acceptée",
+      "rejected": "Refusée"
+    },
+    "applicationForm": {
+      "company": "Entreprise",
+      "position": "Poste",
+      "location": "Lieu",
+      "applicationDate": "Date de candidature",
+      "status": "Statut",
+      "notes": "Notes",
+      "selectStatus": "Sélectionner un statut"
+    },
+    "statuses": {
+      "PENDING": "En attente de réponse",
+      "APPLIED": "Postulée",
+      "ACCEPTED": "Acceptée", 
+      "REJECTED": "Refusée",
+      "INTERVIEW": "Entretien",
+      "OFF": "Refusée",
+      "ON": "Acceptée"
+    },
+    "stats": {
+      "total": "Total",
+      "pending": "En attente",
+      "accepted": "Acceptées",
+      "refused": "Refusées"
+    },
+    "banner": {
+      "title": "Trouvez votre emploi idéal",
+      "description": "Suivez vos candidatures et maximisez vos chances de succès",
+      "text": "Suivez vos candidatures et maximisez vos chances de succès"
+    },
+    "search": {
+      "placeholder": "Rechercher une candidature"
+    },
+    "sorting": {
+      "label": "TRIER PAR :",
+      "date": "Date",
+      "status": "Statut"
+    },
+    "sort": {
+      "label": "TRIER PAR",
+      "date": "Date",
+      "status": "Statut"
+    },
+    "viewModes": {
+      "grid": "GRILLE",
+      "list": "LISTE"
+    },
+    "view": {
+      "grid": "GRILLE",
+      "list": "LISTE"
+    },
+    "add": {
+      "button": "AJOUTER UNE CANDIDATURE"
+    },
+    "emptyState": {
+      "title": "Aucune candidature trouvée",
+      "description": "Commencez à suivre vos candidatures d'emploi en ajoutant votre première candidature"
+    },
+    "empty": {
+      "title": "Aucune candidature trouvée",
+      "text": "Commencez à suivre vos candidatures d'emploi en ajoutant votre première candidature"
+    },
+    "errors": {
+      "fetchError": "Erreur lors de la récupération des données:",
+      "updateError": "Erreur lors de la mise à jour de la candidature:",
+      "addError": "Erreur lors de l'ajout de la candidature:",
+      "deleteError": "Erreur :"
+    }
+  },
+  "home": {
+    "welcome": "Bienvenue sur Carrion !",
+    "description": "Votre plateforme de gestion de candidatures",
+    "getStarted": "Commencer",
+    "recentApplications": "Dernière candidature",
+    "quickStats": "Statistiques rapides",
+    "totalApplications": "Total des candidatures",
+    "pendingApplications": "En attente",
+    "acceptedApplications": "Acceptées",
+    "recentStatusChange": "Changement de statut récent",
+    "ranking": "Classement",
+    "rankingMessage": "Vous êtes premier ! Enfin je crois...",
+    "recentActivity": "Activité récente",
+    "lastModifications": "Dernière modifications",
+    "noActivity": "Il n'y a pas un chat...",
+    "seeAllApplications": "Voir toutes les candidatures",
+    "quickAccess": "Accès rapide",
+    "quickAccessDescription": "Accédez rapidement aux fonctionnalités",
+    "myApplications": "Mes candidatures",
+    "newApplications": "Nouvelles candidatures",
+    "statistics": "Statistiques",
+    "myInformation": "Mes informations",
+    "timeAgo": {
+      "hours": "Il y a {{count}}h",
+      "days": "Il y a {{count}}j"
+    }
+  },
+  "archives": {
+    "title": "Mes Archives",
+    "description": "Consultez vos anciennes candidatures",
+    "noArchives": "Aucune candidature trouvée",
+    "restoreApplication": "Restaurer la candidature",
+    "search": {
+      "placeholder": "Rechercher une candidature"
+    },
+    "viewModes": {
+      "list": "Voir liste",
+      "grid": "Voir grille"
+    },
+    "details": {
+      "status": "Statut :",
+      "applicationDate": "Date de candidature :",
+      "seeDetails": "Voir les détails"
+    },
+    "fakeData": {
+      "companyA": "Entreprise A",
+      "companyB": "Entreprise B", 
+      "companyC": "Entreprise C",
+      "companyD": "Entreprise D",
+      "companyE": "Entreprise E",
+      "companyF": "Entreprise F",
+      "frontendDeveloper": "Développeur Frontend",
+      "backendEngineer": "Ingénieur Backend",
+      "uiuxDesigner": "Designer UI/UX",
+      "backendDeveloper": "Développeur Backend",
+      "itProjectManager": "Chef de Projet IT",
+      "devopsConsultant": "Consultant DevOps",
+      "today": "Aujourd'hui"
+    }
+  }
+} 

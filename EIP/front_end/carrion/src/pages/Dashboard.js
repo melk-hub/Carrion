@@ -1,6 +1,7 @@
 "use client"
 
 import React, { useState, useEffect, useMemo } from "react"
+import { useLanguage } from "../contexts/LanguageContext"
 import "../styles/Dashboard.css"
 import ApplicationCard from "../components/Dashboardcard.js"
 import ApplicationList from "../components/DashboardList.js"
@@ -9,6 +10,7 @@ import EditApplicationModal from "../components/EditApplicationModal.js"
 import DetailsModal from "../components/DetailsModal.js"
 
 function Dashboard() {
+  const { t } = useLanguage()
   const [applications, setApplications] = useState([])
   const [searchTerm, setSearchTerm] = useState("")
   const [viewMode, setViewMode] = useState("grid")
@@ -27,18 +29,16 @@ function Dashboard() {
           credentials: "include",
         });
         if (!response.ok) {
-          throw new Error(`Erreur HTTP: ${response.status}`);
+          throw new Error(`${t('dashboard.errors.fetchError')} ${response.status}`);
         }
         const data = await response.json();
         setApplications(Array.isArray(data) ? data : []);
       } catch (error) {
-        console.error("Erreur lors de la récupération des données:", error);
+        console.error(t('dashboard.errors.fetchError'), error);
       }
     };
     fetchApplications();
-  }, [API_URL]);
-
-
+  }, [API_URL, t]);
 
   const handleUpdateApplication = async () => {
     try {
@@ -47,7 +47,7 @@ function Dashboard() {
       )
       closePopup()
     } catch (error) {
-      console.error("Erreur lors de la mise à jour de la candidature:", error)
+      console.error(t('dashboard.errors.updateError'), error)
     }
   }
 
@@ -61,7 +61,7 @@ function Dashboard() {
       setApplications((prevApps) => [...prevApps, newApp])
       closeAddPopup()
     } catch (error) {
-      console.error("Erreur lors de l'ajout de la candidature:", error)
+      console.error(t('dashboard.errors.addError'), error)
     }
   }
 
@@ -69,14 +69,14 @@ function Dashboard() {
     try {
       setApplications(applications.filter((app) => app.id !== id))
     } catch (error) {
-      console.error("Erreur :", error)
+      console.error(t('dashboard.errors.deleteError'), error)
     }
   }
 
   const statusMap = {
-    APPLIED: "Postulée",
-    PENDING: "En attente de réponse",
-    OFF: "Refusée",
+    APPLIED: t('dashboard.statuses.APPLIED'),
+    PENDING: t('dashboard.statuses.PENDING'),
+    OFF: t('dashboard.statuses.OFF'),
   }
 
   const handleStatusChange = (status) => {
@@ -148,37 +148,37 @@ function Dashboard() {
   return (
     <div className="dashboard">
       <div className="container">
-        <h1 className="dashboard-title">Aperçu de vos candidatures</h1>
+        <h1 className="dashboard-title">{t('dashboard.title')}</h1>
 
         <div className="stats-container">
           <div className="stat-card">
-            <h3 className="stat-title">Total</h3>
+            <h3 className="stat-title">{t('dashboard.stats.total')}</h3>
             <p className="stat-value">{stats.total}</p>
           </div>
           <div className="stat-card pending">
-            <h3 className="stat-title">En attente</h3>
+            <h3 className="stat-title">{t('dashboard.stats.pending')}</h3>
             <p className="stat-value">{stats.pending}</p>
           </div>
           <div className="stat-card accepted">
-            <h3 className="stat-title">Acceptées</h3>
+            <h3 className="stat-title">{t('dashboard.stats.accepted')}</h3>
             <p className="stat-value">{stats.accepted}</p>
           </div>
           <div className="stat-card refused">
-            <h3 className="stat-title">Refusées</h3>
+            <h3 className="stat-title">{t('dashboard.stats.refused')}</h3>
             <p className="stat-value">{stats.refused}</p>
           </div>
         </div>
 
         <div className="banner">
           <div className="banner-content">
-            <h2 className="banner-title">Trouvez votre emploi idéal</h2>
-            <p className="banner-text">Suivez vos candidatures et maximisez vos chances de succès</p>
+            <h2 className="banner-title">{t('dashboard.banner.title')}</h2>
+            <p className="banner-text">{t('dashboard.banner.text')}</p>
           </div>
           <div className="search-container">
             <input
               type="text"
               className="search-input"
-              placeholder="Rechercher une candidature"
+              placeholder={t('dashboard.search.placeholder')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -203,7 +203,7 @@ function Dashboard() {
           <div className="controls-right">
             <div className="sort-container">
               <label htmlFor="sort-select" className="sort-label">
-                TRIER PAR :
+                {t('dashboard.sort.label')} :
               </label>
               <select
                 id="sort-select"
@@ -211,8 +211,8 @@ function Dashboard() {
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
               >
-                <option value="date">Date</option>
-                <option value="status">Statut</option>
+                <option value="date">{t('dashboard.sort.date')}</option>
+                <option value="status">{t('dashboard.sort.status')}</option>
               </select>
             </div>
 
@@ -221,18 +221,18 @@ function Dashboard() {
                 className={`toggle-button ${viewMode === "grid" ? "active" : ""}`}
                 onClick={() => setViewMode("grid")}
               >
-                GRILLE
+                {t('dashboard.view.grid')}
               </button>
               <button
                 className={`toggle-button ${viewMode === "list" ? "active" : ""}`}
                 onClick={() => setViewMode("list")}
               >
-                LISTE
+                {t('dashboard.view.list')}
               </button>
             </div>
 
             <button className="add-button" onClick={openAddPopup}>
-              AJOUTER UNE CANDIDATURE
+              {t('dashboard.add.button')}
             </button>
           </div>
         </div>
@@ -253,12 +253,12 @@ function Dashboard() {
             ) : (
               <div className="empty-state">
                 <div className="empty-icon">📄</div>
-                <h3 className="empty-title">Aucune candidature trouvée</h3>
+                <h3 className="empty-title">{t('dashboard.empty.title')}</h3>
                 <p className="empty-text">
-                  Commencez à suivre vos candidatures d'emploi en ajoutant votre première candidature
+                  {t('dashboard.empty.text')}
                 </p>
                 <button className="add-button" onClick={openAddPopup}>
-                  AJOUTER UNE CANDIDATURE
+                  {t('dashboard.add.button')}
                 </button>
               </div>
             )}
@@ -279,12 +279,12 @@ function Dashboard() {
             ) : (
               <div className="empty-state">
                 <div className="empty-icon">📄</div>
-                <h3 className="empty-title">Aucune candidature trouvée</h3>
+                <h3 className="empty-title">{t('dashboard.empty.title')}</h3>
                 <p className="empty-text">
-                  Commencez à suivre vos candidatures d'emploi en ajoutant votre première candidature
+                  {t('dashboard.empty.text')}
                 </p>
                 <button className="add-button" onClick={openAddPopup}>
-                  AJOUTER UNE CANDIDATURE
+                  {t('dashboard.add.button')}
                 </button>
               </div>
             )}

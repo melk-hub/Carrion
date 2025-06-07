@@ -12,20 +12,25 @@ import Dashboard from "./pages/Dashboard";
 import Home from './pages/Home';
 import Archives from "./pages/Archives";
 import { useAuth, AuthProvider } from "./AuthContext";
+import { LanguageProvider } from "./contexts/LanguageContext";
+import { useLanguage } from "./contexts/LanguageContext";
 import Navbar from './pages/Navbar';
 
 function App() {
   return (
     <AuthProvider>
-      <Router>
-        <AppLayout />
-      </Router>
+      <LanguageProvider>
+        <Router>
+          <AppLayout />
+        </Router>
+      </LanguageProvider>
     </AuthProvider>
   );
 }
 
 function AppLayout() {
   const { isAuthenticated, setIsAuthenticated, loadingAuth } = useAuth();
+  const { t } = useLanguage();
   const navigate = useNavigate();
   const location = useLocation();
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
@@ -55,7 +60,7 @@ function AppLayout() {
   }, [isAuthenticated, loadingAuth, navigate, location.pathname]);
 
   if (loadingAuth) {
-    return <div>Loading authentication...</div>;
+    return <div>{t('common.loadingAuth')}</div>;
   }
 
   return (
@@ -64,7 +69,7 @@ function AppLayout() {
         <Navbar sidebarCollapsed={sidebarCollapsed} setSidebarCollapsed={setSidebarCollapsed} setIsAuthenticated={setIsAuthenticated} />
       )}
 
-      <main className={sidebarCollapsed ? "main-content collapsed" : "main-content"}>
+      <main className={location.pathname !== "/" ? (sidebarCollapsed ? "navbar-content collapsed" : "navbar-content") : ""}>
         <Routes>
           <Route path="/" element={<Landing />} />
           <Route

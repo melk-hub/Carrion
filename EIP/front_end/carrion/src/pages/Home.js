@@ -1,16 +1,19 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useLanguage } from '../contexts/LanguageContext';
 import "../styles/Home.css";
 
 export default function Home() {
     const navigate = useNavigate();
+    const { t } = useLanguage();
+    
     return (
         <div>
             <div className="dashboard-container">
-                <h1 className="title">Tableau de bord</h1>
+                <h1 className="title">{t('home.welcome')}</h1>
                 <div className="top-cards">
                     <div className="card highlight">
-                        <h3>Dernière candidature</h3>
+                        <h3>{t('home.recentApplications')}</h3>
                         <div className="job-info">
                             <img
                                 src="https://cdn.shopify.com/assets/images/logos/shopify-bag.png"
@@ -25,7 +28,7 @@ export default function Home() {
                     </div>
 
                     <div className="card">
-                        <h3>Changement de statut récent</h3>
+                        <h3>{t('home.recentStatusChange')}</h3>
                         <div className="job-info">
                             <img
                                 src="https://upload.wikimedia.org/wikipedia/commons/6/6a/Boursorama_Logo_2021.png"
@@ -40,8 +43,8 @@ export default function Home() {
                     </div>
 
                     <div className="card">
-                        <h3>Classement</h3>
-                        <ul className="ranking-list">Vous êtes premier ! Enfin je crois...</ul>
+                        <h3>{t('home.ranking')}</h3>
+                        <ul className="ranking-list">{t('home.rankingMessage')}</ul>
                         {/*
             <p className="rank">#37</p>
             <ul className="ranking-list">
@@ -68,22 +71,22 @@ export default function Home() {
 
                 <div className="bottom-section">
                     <div className="recent-activity">
-                        <h3>Activité récente</h3>
-                        <p>Dernière modifications</p>
+                        <h3>{t('home.recentActivity')}</h3>
+                        <p>{t('home.lastModifications')}</p>
                         <div className="empty-state">
                             <div className="emoji">🤔</div>
-                            <p>Il n’y a pas un chat...</p>
-                            <button className="see-all" onClick={() => navigate('/dashboard')}>Voir toutes les candidatures</button>
+                            <p>{t('home.noActivity')}</p>
+                            <button className="see-all" onClick={() => navigate('/dashboard')}>{t('home.seeAllApplications')}</button>
                         </div>
                     </div>
 
                     <div className="quick-access">
-                        <h3>Accès rapide</h3>
-                        <p>Accédez rapidement aux fonctionnalités</p>
-                        <button onClick={() => navigate('/dashboard')}>Mes candidatures</button>
-                        <button>Nouvelles candidatures</button>
-                        <button onClick={() => navigate('/Archives')}>Statistiques</button>
-                        <button onClick={() => navigate('/Paramaters')}>Mes informations</button>
+                        <h3>{t('home.quickAccess')}</h3>
+                        <p>{t('home.quickAccessDescription')}</p>
+                        <button onClick={() => navigate('/dashboard')}>{t('home.myApplications')}</button>
+                        <button>{t('home.newApplications')}</button>
+                        <button onClick={() => navigate('/Archives')}>{t('home.statistics')}</button>
+                        <button onClick={() => navigate('/Paramaters')}>{t('home.myInformation')}</button>
                     </div>
                 </div>
             </div>
