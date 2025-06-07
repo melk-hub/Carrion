@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../AuthContext';
+import { useLanguage } from '../contexts/LanguageContext';
 import '../styles/AuthModal.css';
 import GoogleLoginButton from './GoogleLoginBtn';
 import outlookIcon from '../assets/outlook-logo.png';
@@ -11,6 +12,7 @@ function AuthModal({ isOpen, onClose, defaultTab }) {
   const [direction, setDirection] = useState(1);
   const [credentials, setCredentials] = useState({ identifier: '', password: '', confirmPassword: '', username: '', firstName: '', lastName: '', birthDate: '1995-06-15', rememberMe: false });
   const { setIsAuthenticated } = useAuth();
+  const { t } = useLanguage();
   const navigate = useNavigate();
   const [errorMessage, setErrorMessage] = useState('');
   const API_URL = process.env.REACT_APP_API_URL;
@@ -64,16 +66,16 @@ function AuthModal({ isOpen, onClose, defaultTab }) {
           navigate('/home?new=true');
       } else {
         const data = await response.json();
-        setErrorMessage(data.message || 'Identifiants incorrects.');
+        setErrorMessage(data.message || t('auth.loginError'));
       }
     } catch (error) {
       console.error('Error during login:', error);
-      setErrorMessage('Une erreur est survenue. Veuillez réessayer plus tard.');
+      setErrorMessage(t('auth.genericError'));
     }
     }
     if (activeTab === 'register') {
       if (credentials.password !== credentials.confirmPassword) {
-        alert("Les mots de passe ne correspondent pas !");
+        alert(t('auth.passwordMismatch'));
         return;
       }
     
@@ -90,7 +92,7 @@ function AuthModal({ isOpen, onClose, defaultTab }) {
           navigate('/home?new=true');
         } else {
           const errorData = await response.json();
-          alert(errorData.message || "Erreur lors de l'inscription.");
+          alert(errorData.message || t('auth.registerError'));
         }
       } catch (err) {
         console.error(err);
@@ -102,11 +104,10 @@ function AuthModal({ isOpen, onClose, defaultTab }) {
     <div className="modal-overlay">
       <div className="auth-modal">
         <button className="close-button" onClick={handleClose}>×</button>
-        <h1>{activeTab === 'login' ? 'Bienvenue !' : 'Nous rejoindre !'}</h1>
-
+        <h1>{activeTab === 'login' ? t('auth.welcomeBack') : t('auth.joinUs')}</h1>
         <div className="tabs">
-          <button className={activeTab === 'login' ? 'active' : ''} onClick={() => handleTabChange('login')}>Se connecter</button>
-          <button className={activeTab === 'register' ? 'active' : ''} onClick={() => handleTabChange('register')}>Créer un compte</button>
+          <button className={activeTab === 'login' ? 'active' : ''} onClick={() => handleTabChange('login')}>{t('auth.login')}</button>
+          <button className={activeTab === 'register' ? 'active' : ''} onClick={() => handleTabChange('register')}>{t('auth.register')}</button>
         </div>
 
         <hr />
@@ -115,16 +116,16 @@ function AuthModal({ isOpen, onClose, defaultTab }) {
           {activeTab === 'login' && (
             <motion.div key="login" custom={direction} variants={variants} initial="enter" animate="center" exit="exit" transition={{ duration: 0.25 }}>
               <form onSubmit={handleSubmit}>
-                <label>Email / Nom d'utilisateur</label>
-                <input type="text" name="identifier" placeholder="Email / Nom d'utilisateur" value={credentials.identifier} onChange={handleChange} required />
-                <label>Mot de passe</label>
-                <input type="password" name="password" placeholder="Mot de passe" value={credentials.password} onChange={handleChange} required />
+                <label>{t('auth.emailOrUsername')}</label>
+                <input type="text" name="identifier" placeholder={t('auth.emailOrUsername')} value={credentials.identifier} onChange={handleChange} required />
+                <label>{t('auth.password')}</label>
+                <input type="password" name="password" placeholder={t('auth.password')} value={credentials.password} onChange={handleChange} required />
                 {errorMessage && <p className="error-message">{errorMessage}</p>}
                 <div>
                   <input type='checkbox' id="rememberMe" name='rememberMe' value={credentials.rememberMe} onClick={handleChange} />
-                  <label htmlFor="remember">Se souvenir de moi</label>
+                  <label htmlFor="remember">{t('auth.rememberMe')}</label>
                 </div>
-                <button type="submit" className="primary-btn">Se connecter</button>
+                <button type="submit" className="primary-btn">{t('auth.login')}</button>
               </form>
             </motion.div>
           )}
@@ -134,26 +135,26 @@ function AuthModal({ isOpen, onClose, defaultTab }) {
               <form onSubmit={handleSubmit}>
               <div className="row-inputs">
                   <div>
-                    <label>Email</label>
-                  <input type="email" name="email" placeholder="Email" value={credentials.email} onChange={handleChange} required />
+                    <label>{t('auth.email')}</label>
+                  <input type="email" name="email" placeholder={t('auth.email')} value={credentials.email} onChange={handleChange} required />
                   </div>
                   <div>
-                    <label>Nom d'utilisateur</label>
-                    <input type="username" name="username" placeholder="Nom d'utilisateur" value={credentials.username} onChange={handleChange} required />
+                    <label>{t('auth.username')}</label>
+                    <input type="username" name="username" placeholder={t('auth.username')} value={credentials.username} onChange={handleChange} required />
                   </div>
                 </div>
 
                 <div className="row-inputs">
                   <div>
-                    <label>Mot de passe</label>
-                    <input type="password" name="password" placeholder="Mot de passe" value={credentials.password} onChange={handleChange} required />
+                    <label>{t('auth.password')}</label>
+                    <input type="password" name="password" placeholder={t('auth.password')} value={credentials.password} onChange={handleChange} required />
                   </div>
                   <div>
-                    <label>Confirmer le mot de passe</label>
-                    <input type="password" name="confirmPassword" placeholder="Confirmer le mot de passe" value={credentials.confirmPassword} onChange={handleChange} required />
+                    <label>{t('auth.confirmPassword')}</label>
+                    <input type="password" name="confirmPassword" placeholder={t('auth.confirmPassword')} value={credentials.confirmPassword} onChange={handleChange} required />
                   </div>
                 </div>
-                <button type="submit" className="primary-btn">S'inscrire</button>
+                <button type="submit" className="primary-btn">{t('auth.register')}</button>
               </form>
             </motion.div>
           )}
@@ -164,7 +165,7 @@ function AuthModal({ isOpen, onClose, defaultTab }) {
         <div className="social-buttons">
           <GoogleLoginButton />
           <button className="outlook-btn" onClick={() => navigate('/home')}>
-            <img src={outlookIcon} alt="Outlook" /> Se connecter avec Outlook
+            <img src={outlookIcon} alt="Outlook" /> {t('auth.loginWithOutlook')}
           </button>
         </div>
       </div>
