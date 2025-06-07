@@ -188,22 +188,21 @@ export class AuthService {
   }
 
   async createOutlookWebhook(accessToken: string, userId: string) {
+    const url = 'https://graph.microsoft.com/v1.0/subscriptions';
+    const headers = { Authorization: `Bearer ${accessToken}` };
 
-  const url = 'https://graph.microsoft.com/v1.0/subscriptions';
-  const headers = { Authorization: `Bearer ${accessToken}` };
+    const response = await fetch(url, { headers });
+    const data = await response.json();
+    const existing = data.value.find(
+      (sub) =>
+        sub.resource === "me/mailFolders('inbox')/messages" &&
+        sub.notificationUrl === `${process.env.BACK}/webhook/outlook`,
+    );
 
-  const response = await fetch(url, { headers });
-  const data = await response.json();
-
-  const existing = data.value.find(sub =>
-    sub.resource === "me/mailFolders('inbox')/messages" &&
-    sub.notificationUrl === `${process.env.BACK}/webhook/outlook`
-  );
-
-  if (existing) {
-    console.log('Subscription already exists:', existing.id);
-    return;
-  }
+    if (existing) {
+      console.log('Subscription already exists:', existing.id);
+      return;
+    }
 
     const expiration = new Date(Date.now() + 60 * 60 * 1000 * 3);
     const expirationDateTime = expiration.toISOString();
@@ -213,7 +212,7 @@ export class AuthService {
       notificationUrl: `${process.env.BACK}/webhook/outlook`,
       resource: "me/mailFolders('inbox')/messages",
       expirationDateTime,
-      clientState: 'mySecretValidationToken',
+      clientState: `${process.env.WEBHOOK_VALIDATION_TOKEN}`,
     };
 
     try {
@@ -225,15 +224,15 @@ export class AuthService {
       });
 
       const response = await firstValueFrom(response$);
-      this.userService.updateHistoryIdOfUser(
-        userId,
-        response.data['id'],
-      );
+      this.userService.updateHistoryIdOfUser(userId, response.data['id']);
       console.log('Outlook mail subscription created');
     } catch (error: any) {
       const msg = error?.response?.data || error?.message || 'Unknown error';
       console.error('Error creating Outlook subscription:', msg);
-      throw new HttpException('Failed to create Outlook subscription', HttpStatus.BAD_REQUEST);
+      throw new HttpException(
+        'Failed to create Outlook subscription',
+        HttpStatus.BAD_REQUEST,
+      );
     }
   }
 

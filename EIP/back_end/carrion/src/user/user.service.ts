@@ -80,4 +80,19 @@ export class UserService {
       console.error('Error updating historyId:', error);
     }
   }
+
+async addDocument(userId: string, newDocument: string) {
+  const user = await this.prisma.user.findUnique({
+    where: { id: userId },
+    select: { documents: true },
+  });
+
+  const updatedDocuments = [...user.documents, newDocument];
+
+  return this.prisma.user.update({
+    where: { id: userId },
+    data: { documents: updatedDocuments },
+  });
+}
+
 }
