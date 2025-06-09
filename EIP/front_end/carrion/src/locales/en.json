@@ -1,11 +1,15 @@
 {
   "common": {
     "loading": "Loading...",
+    "loadingAuth": "Loading authentication...",
+    "processing": "Processing...",
+    "redirecting": "Redirecting...",
     "cancel": "Cancel",
     "save": "Save",
     "delete": "Delete",
     "edit": "Edit",
     "add": "Add",
+    "update": "Update",
     "close": "Close",
     "confirm": "Confirm",
     "yes": "Yes",
@@ -17,8 +21,8 @@
     "status": "Status",
     "actions": "Actions",
     "details": "Details",
-    "loadingAuth": "Loading authentication...",
-    "hello": "Hello"
+    "hello": "Hello",
+    "required": "This field is required"
   },
   "navbar": {
     "home": "Home",
@@ -35,6 +39,7 @@
     "getStarted": "Get started now",
     "login": "Sign in",
     "language": "English",
+    "footer": "Footer TBD",
     "services": {
       "title": "Our Services",
       "tracking": {
@@ -84,8 +89,7 @@
         "title": "Optimize to Succeed",
         "description": "Use tracking information to adjust your approach and maximize your chances of success in your search."
       }
-    },
-    "footer": "Footer TBD"
+    }
   },
   "auth": {
     "signIn": "Sign In",
@@ -98,100 +102,20 @@
     "username": "Username",
     "birthDate": "Birth Date",
     "rememberMe": "Remember Me",
-    "loginWithGoogle": "Login with Google",
-    "loginWithOutlook": "Login with Outlook",
-    "processing": "Processing...",
-    "authenticationFailed": "Authentication Failed",
-    "authenticationSuccess": "Authentication Successful",
-    "redirecting": "Redirecting...",
-    "backToLogin": "Back to Login",
     "forgotPassword": "Forgot Password?",
     "dontHaveAccount": "Don't have an account yet?",
     "alreadyHaveAccount": "Already have an account?",
+    "loginWithGoogle": "Login with Google",
+    "loginWithOutlook": "Login with Outlook",
+    "authenticationFailed": "Authentication Failed",
+    "authenticationSuccess": "Authentication Successful",
+    "backToLogin": "Back to Login",
     "joinUs": "Join us!",
     "emailOrUsername": "Email / Username",
     "loginError": "Invalid credentials.",
     "genericError": "An error occurred. Please try again later.",
     "passwordMismatch": "Passwords do not match!",
     "registerError": "Registration error."
-  },
-  "dashboard": {
-    "title": "Overview of your applications",
-    "addApplication": "ADD AN APPLICATION",
-    "myApplications": "My applications",
-    "filters": {
-      "all": "All",
-      "pending": "Waiting for response",
-      "accepted": "Accepted",
-      "rejected": "Rejected"
-    },
-    "applicationForm": {
-      "company": "Company",
-      "position": "Position",
-      "location": "Location",
-      "applicationDate": "Application date",
-      "status": "Status",
-      "notes": "Notes",
-      "selectStatus": "Select a status"
-    },
-    "statuses": {
-      "PENDING": "Waiting for response",
-      "APPLIED": "Applied",
-      "ACCEPTED": "Accepted", 
-      "REJECTED": "Rejected",
-      "INTERVIEW": "Interview",
-      "OFF": "Rejected",
-      "ON": "Accepted"
-    },
-    "stats": {
-      "total": "Total",
-      "pending": "Pending",
-      "accepted": "Accepted",
-      "refused": "Rejected"
-    },
-    "banner": {
-      "title": "Find your ideal job",
-      "description": "Track your applications and maximize your chances of success",
-      "text": "Track your applications and maximize your chances of success"
-    },
-    "search": {
-      "placeholder": "Search an application"
-    },
-    "sorting": {
-      "label": "SORT BY:",
-      "date": "Date",
-      "status": "Status"
-    },
-    "sort": {
-      "label": "SORT BY",
-      "date": "Date",
-      "status": "Status"
-    },
-    "viewModes": {
-      "grid": "GRID",
-      "list": "LIST"
-    },
-    "view": {
-      "grid": "GRID",
-      "list": "LIST"
-    },
-    "add": {
-      "button": "ADD AN APPLICATION"
-    },
-    "emptyState": {
-      "title": "No applications found",
-      "description": "Start tracking your job applications by adding your first application"
-    },
-    "empty": {
-      "title": "No applications found",
-      "text": "Start tracking your job applications by adding your first application"
-    },
-    "errors": {
-      "fetchError": "Error while fetching data:",
-      "updateError": "Error while updating application:",
-      "addError": "Error while adding application:",
-      "deleteError": "Error:"
-    }
   },
   "home": {
     "welcome": "Welcome to Carrion!",
@@ -218,6 +142,85 @@
     "timeAgo": {
       "hours": "{{count}}h ago",
       "days": "{{count}}d ago"
+    }
+  },
+  "dashboard": {
+    "title": "Overview of your applications",
+    "addApplication": "ADD AN APPLICATION",
+    "myApplications": "My applications",
+    "unknownCompany": "Unknown company",
+    "unknownPosition": "Unknown position",
+    "unknownStatus": "Unknown status",
+    "addButton": "Add an application",
+    "label": "SORT BY",
+    "date": "Date",
+    "status": "Status",
+    "viewGrid": "View in grid",
+    "viewList": "View in list",
+    "empty": {
+        "title": "No applications found",
+        "description": "Track your applications and maximize your chances of success",
+        "text": "Track your applications and maximize your chances of success",
+        "button": "Add an application"
+    },
+    "filters": {
+      "all": "All",
+      "pending": "Waiting for response",
+      "accepted": "Accepted",
+      "rejected": "Rejected"
+    },
+    "applicationForm": {
+      "company": "Company",
+      "position": "Position",
+      "location": "Location",
+      "applicationDate": "Application date",
+      "status": "Status",
+      "notes": "Notes",
+      "selectStatus": "Select a status",
+      "salary": "Salary",
+      "interviewDate": "Interview date"
+    },
+    "statuses": {
+      "PENDING": "Waiting for response",
+      "APPLIED": "Applied",
+      "ACCEPTED": "Accepted", 
+      "REJECTED": "Rejected",
+      "INTERVIEW": "Interview",
+      "REJECTED_BY_COMPANY": "Rejected",
+      "ON": "Accepted",
+      "OFFER": "Offer received"
+    },
+    "stats": {
+      "total": "Total",
+      "pending": "Pending",
+      "accepted": "Accepted",
+      "refused": "Rejected"
+    },
+    "banner": {
+      "title": "Find your ideal job",
+      "description": "Track your applications and maximize your chances of success"
+    },
+    "search": {
+      "placeholder": "Search an application"
+    },
+    "sorting": {
+      "label": "SORT BY:",
+      "date": "Date",
+      "status": "Status"
+    },
+    "viewModes": {
+      "grid": "GRID",
+      "list": "LIST"
+    },
+    "emptyState": {
+      "title": "No applications found",
+      "description": "Start tracking your job applications by adding your first application"
+    },
+    "errors": {
+      "fetchError": "Error while fetching data:",
+      "updateError": "Error while updating application:",
+      "addError": "Error while adding application:",
+      "deleteError": "Error:"
     }
   },
   "archives": {
@@ -252,5 +255,51 @@
       "devopsConsultant": "DevOps Consultant",
       "today": "Today"
     }
+  },
+  "modal": {
+    "add": {
+      "title": "Add an application",
+      "company": "Company", 
+      "title_job": "Job title",
+      "status": "Status",
+      "location": "Location",
+      "salary": "Salary",
+      "logo_url": "Logo URL",
+      "contract_type": "Contract type",
+      "website": "Website",
+      "interview_date": "Interview date",
+      "placeholders": {
+        "company": "Enter the company name",
+        "title": "Enter the job title",
+        "location": "City or workplace",
+        "salary": "Salary offered",
+        "logo_url": "https://example.com",
+        "website": "Company website URL",
+        "interviewDateTime": "Select date and time",
+        "interviewDate": "Interview date"
+      }
+    },
+    "edit": {
+      "title": "Edit the application"
+    }
+  },
+  "contractTypes": {
+    "CDI": "CDI (Indeterminate contract)",
+    "CDD": "CDD (Determinate contract)",
+    "FREELANCE": "Freelance / Independent",
+    "INTERNSHIP": "Internship",
+    "APPRENTICESHIP": "Apprenticeship / Training",
+    "TEMPORARY": "Temporary mission",
+    "PART_TIME": "Part-time",
+    "FULL_TIME": "Full-time"
+  },
+  "validation": {
+    "companyRequired": "The company name is required",
+    "positionRequired": "The job title is required",
+    "statusRequired": "The status is required",
+    "contractTypeRequired": "The contract type is required",
+    "invalidUrl": "Invalid URL",
+    "invalidDate": "Invalid date",
+    "invalidSalary": "Invalid salary"
   }
 } 

@@ -8,6 +8,7 @@ import ApplicationList from "../components/DashboardList.js"
 import AddApplicationModal from "../components/AddApplicationModal.js"
 import EditApplicationModal from "../components/EditApplicationModal.js"
 import DetailsModal from "../components/DetailsModal.js"
+import apiService from "../services/api.js"
 
 function Dashboard() {
   const { t } = useLanguage()
@@ -19,15 +20,11 @@ function Dashboard() {
   const [selectedApplication, setSelectedApplication] = useState(null)
   const [newApplication, setNewApplication] = useState(null)
   const [popupType, setPopupType] = useState(null)
-  const API_URL = process.env.REACT_APP_API_URL || "https://api.example.com"
 
   useEffect(() => {
     const fetchApplications = async () => {
       try {
-        const response = await fetch(`${API_URL}/job_applies/get_jobApply`, {
-          method: "GET",
-          credentials: "include",
-        });
+        const response = await apiService.get('/job_applies/get_jobApply');
         if (!response.ok) {
           throw new Error(`${t('dashboard.errors.fetchError')} ${response.status}`);
         }
@@ -38,12 +35,29 @@ function Dashboard() {
       }
     };
     fetchApplications();
-  }, [API_URL, t]);
+  }, [t]);
 
   const handleUpdateApplication = async () => {
     try {
+      const response = await apiService.put(`/job_applies/${selectedApplication.id}/status`, {
+        title: selectedApplication.title,
+        company: selectedApplication.company,
+        status: selectedApplication.status,
+        location: selectedApplication.location || undefined,
+        salary: selectedApplication.salary ? parseInt(selectedApplication.salary) : undefined,
+        contractType: selectedApplication.contractType || "Full-time",
+        interviewDate: selectedApplication.interviewDate ? new Date(selectedApplication.interviewDate).toISOString() : undefined,
+        imageUrl: selectedApplication.imageUrl || undefined,
+      });
+
+      if (!response.ok) {
+        throw new Error(`${t('dashboard.errors.updateError')} ${response.status}`);
+      }
+
+      const updatedApplication = await response.json();
+      
       setApplications((prevApps) =>
-        prevApps.map((app) => (app.id === selectedApplication.id ? { ...app, ...selectedApplication } : app)),
+        prevApps.map((app) => (app.id === selectedApplication.id ? { ...app, ...updatedApplication } : app)),
       )
       closePopup()
     } catch (error) {
@@ -53,12 +67,24 @@ function Dashboard() {
 
   const handleAddApplication = async () => {
     try {
-      const newApp = {
-        ...newApplication,
-        id: applications.length + 1,
-        createdAt: new Date().toISOString(),
+      const response = await apiService.post('/job_applies/add_jobApply', {
+        title: newApplication.title,
+        company: newApplication.company,
+        status: newApplication.status,
+        location: newApplication.location || undefined,
+        salary: newApplication.salary ? parseInt(newApplication.salary) : undefined,
+        contractType: newApplication.contractType || "Full-time",
+        interviewDate: newApplication.interviewDate ? new Date(newApplication.interviewDate).toISOString() : undefined,
+        imageUrl: newApplication.imageUrl || undefined,
+      });
+
+      if (!response.ok) {
+        throw new Error(`${t('dashboard.errors.addError')} ${response.status}`);
       }
-      setApplications((prevApps) => [...prevApps, newApp])
+
+      const createdApplication = await response.json();
+      
+      setApplications((prevApps) => [...prevApps, createdApplication])
       closeAddPopup()
     } catch (error) {
       console.error(t('dashboard.errors.addError'), error)
@@ -67,6 +93,12 @@ function Dashboard() {
 
   const handleDeleteApplication = async (id) => {
     try {
+      const response = await apiService.delete(`/job_applies/${id}`);
+
+      if (!response.ok) {
+        throw new Error(`${t('dashboard.errors.deleteError')} ${response.status}`);
+      }
+
       setApplications(applications.filter((app) => app.id !== id))
     } catch (error) {
       console.error(t('dashboard.errors.deleteError'), error)
@@ -76,7 +108,7 @@ function Dashboard() {
   const statusMap = {
     APPLIED: t('dashboard.statuses.APPLIED'),
     PENDING: t('dashboard.statuses.PENDING'),
-    OFF: t('dashboard.statuses.OFF'),
+    REJECTED_BY_COMPANY: t('dashboard.statuses.REJECTED_BY_COMPANY'),
   }
 
   const handleStatusChange = (status) => {
@@ -127,6 +159,8 @@ function Dashboard() {
       status: "PENDING",
       location: "",
       salary: "",
+      contractType: "Full-time",
+      interviewDate: "",
       imageUrl: "https://via.placeholder.com/100",
     })
     setPopupType("add")
@@ -141,8 +175,8 @@ function Dashboard() {
   const stats = {
     total: applications.length,
     pending: applications.filter((app) => app.status === "PENDING").length,
-    accepted: applications.filter((app) => app.status === "ON").length,
-    refused: applications.filter((app) => app.status === "OFF").length,
+    accepted: applications.filter((app) => app.status === "APPLIED").length,
+    refused: applications.filter((app) => app.status === "REJECTED_BY_COMPANY").length,
   }
 
   return (
@@ -203,7 +237,7 @@ function Dashboard() {
           <div className="controls-right">
             <div className="sort-container">
               <label htmlFor="sort-select" className="sort-label">
-                {t('dashboard.sort.label')} :
+                {t('dashboard.label')} :
               </label>
               <select
                 id="sort-select"
@@ -211,8 +245,8 @@ function Dashboard() {
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
               >
-                <option value="date">{t('dashboard.sort.date')}</option>
-                <option value="status">{t('dashboard.sort.status')}</option>
+                <option value="date">{t('dashboard.date')}</option>
+                <option value="status">{t('dashboard.status')}</option>
               </select>
             </div>
 
@@ -221,18 +255,18 @@ function Dashboard() {
                 className={`toggle-button ${viewMode === "grid" ? "active" : ""}`}
                 onClick={() => setViewMode("grid")}
               >
-                {t('dashboard.view.grid')}
+                {t('dashboard.viewGrid')}
               </button>
               <button
                 className={`toggle-button ${viewMode === "list" ? "active" : ""}`}
                 onClick={() => setViewMode("list")}
               >
-                {t('dashboard.view.list')}
+                {t('dashboard.viewList')}
               </button>
             </div>
 
             <button className="add-button" onClick={openAddPopup}>
-              {t('dashboard.add.button')}
+              {t('dashboard.addButton')}
             </button>
           </div>
         </div>
@@ -258,7 +292,7 @@ function Dashboard() {
                   {t('dashboard.empty.text')}
                 </p>
                 <button className="add-button" onClick={openAddPopup}>
-                  {t('dashboard.add.button')}
+                  {t('dashboard.addButton')}
                 </button>
               </div>
             )}
@@ -284,7 +318,7 @@ function Dashboard() {
                   {t('dashboard.empty.text')}
                 </p>
                 <button className="add-button" onClick={openAddPopup}>
-                  {t('dashboard.add.button')}
+                  {t('dashboard.addButton')}
                 </button>
               </div>
             )}

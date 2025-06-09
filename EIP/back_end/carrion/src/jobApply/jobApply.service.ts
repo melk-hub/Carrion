@@ -4,7 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { CreateJobApplyDto, JobApplyDto } from './dto/jobApply.dto';
+import { CreateJobApplyDto, JobApplyDto, UpdateJobApplyDto } from './dto/jobApply.dto';
 import { ApplicationStatus } from './enum/application-status.enum';
 
 export interface JobApplyParams {
@@ -192,7 +192,7 @@ export class JobApplyService {
   async updateJobApplyStatus(
     jobApplyId: string,
     userId: string,
-    newStatus: ApplicationStatus,
+    UpdateJobApplyDto: UpdateJobApplyDto,
   ): Promise<JobApplyDto> {
     try {
       const jobApply = await this.prisma.jobApply.findUnique({
@@ -210,7 +210,7 @@ export class JobApplyService {
       }
       const updatedJobApply = await this.prisma.jobApply.update({
         where: { id: jobApplyId },
-        data: { status: newStatus },
+        data: { ...UpdateJobApplyDto },
       });
       return {
         id: updatedJobApply.id,
@@ -261,6 +261,66 @@ export class JobApplyService {
       throw new Error(
         `Error updating job application status: ${error.message}`,
       );
+    }
+  }
+
+  async remove(id: string, userId: string): Promise<void> {
+    await this.deleteJobApply(id, userId);
+  }
+
+  async updateJobApplyByData(
+    jobApplyId: string,
+    userId: string,
+    updateJobApplyDto: UpdateJobApplyDto,
+  ): Promise<JobApplyDto> {
+    try {
+      const jobApply = await this.prisma.jobApply.findUnique({
+        where: { id: jobApplyId },
+      });
+
+      if (!jobApply) {
+        throw new NotFoundException(
+          `Job application with ID ${jobApplyId} not found.`,
+        );
+      }
+
+      if (jobApply.UserId !== userId) {
+        throw new ForbiddenException(
+          "You don't have permission to update this job application.",
+        );
+      }
+
+      const updatedJobApply = await this.prisma.jobApply.update({
+        where: { id: jobApplyId },
+        data: {
+          ...(updateJobApplyDto.title ? { Title: updateJobApplyDto.title } : {}),
+          ...(updateJobApplyDto.company ? { Company: updateJobApplyDto.company } : {}),
+          ...(updateJobApplyDto.location ? { Location: updateJobApplyDto.location } : {}),
+          ...(updateJobApplyDto.salary !== undefined ? { Salary: updateJobApplyDto.salary } : {}),
+          ...(updateJobApplyDto.imageUrl ? { imageUrl: updateJobApplyDto.imageUrl } : {}),
+          ...(updateJobApplyDto.status ? { status: updateJobApplyDto.status } : {}),
+          ...(updateJobApplyDto.contractType ? { contractType: updateJobApplyDto.contractType } : {}),
+          ...(updateJobApplyDto.interviewDate ? { interviewDate: updateJobApplyDto.interviewDate } : {}),
+        },
+      });
+
+      return {
+        id: updatedJobApply.id,
+        title: updatedJobApply.Title,
+        company: updatedJobApply.Company,
+        location: updatedJobApply.Location,
+        salary: updatedJobApply.Salary,
+        imageUrl: updatedJobApply.imageUrl,
+        status: updatedJobApply.status as ApplicationStatus,
+        contractType: updatedJobApply.contractType,
+        interviewDate: updatedJobApply.interviewDate,
+        createdAt: updatedJobApply.createdAt,
+      };
+    } catch (error) {
+      if (error instanceof NotFoundException || error instanceof ForbiddenException) {
+        throw error;
+      }
+      throw new Error(`Error updating job application: ${error.message}`);
     }
   }
 }

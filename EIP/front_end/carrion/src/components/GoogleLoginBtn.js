@@ -1,4 +1,5 @@
 import React from 'react';
+import googleLogo from '../assets/google-logo.png';
 
 const GoogleLoginButton = () => {
     const GOOGLE_ID = process.env.REACT_APP_GOOGLE_CLIENT_ID;
@@ -13,7 +14,6 @@ const GoogleLoginButton = () => {
       'https://www.googleapis.com/auth/gmail.modify',
       'https://www.googleapis.com/auth/gmail.labels'
     ].join('%20');
-    // TODO: When pushing to production, and we'll mostly have refreshToken for every user, remove the "&prompt=consent" so it doesn't ask the user to accept things everytime he logs in.
     const googleAuthUrl = `https://accounts.google.com/o/oauth2/v2/auth?response_type=code&client_id=${GOOGLE_ID}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${scopes}&access_type=offline&prompt=consent`;
     const handleGoogleLogin = () => {
       window.location.href = googleAuthUrl;
@@ -21,7 +21,7 @@ const GoogleLoginButton = () => {
 
     return (
         <button type="button" className="google-login-button" onClick={handleGoogleLogin} style={{marginTop: "0", marginLeft: "3.5em", height: "2.5em"}}>
-        <img src="https://developers.google.com/identity/images/g-logo.png" alt="Google Logo" />
+        <img src={googleLogo} alt="Google Logo" />
         Se connecter avec Google
         </button>
     );

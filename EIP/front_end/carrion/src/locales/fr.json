@@ -1,11 +1,15 @@
 {
   "common": {
     "loading": "Chargement...",
+    "loadingAuth": "Chargement de l'authentification...",
+    "processing": "Traitement en cours...",
+    "redirecting": "Redirection en cours...",
     "cancel": "Annuler",
     "save": "Sauvegarder",
     "delete": "Supprimer",
     "edit": "Modifier",
     "add": "Ajouter",
+    "update": "Modifier",
     "close": "Fermer",
     "confirm": "Confirmer",
     "yes": "Oui",
@@ -17,8 +21,8 @@
     "status": "Statut",
     "actions": "Actions",
     "details": "Détails",
-    "loadingAuth": "Chargement de l'authentification...",
-    "hello": "Bonjour"
+    "hello": "Bonjour",
+    "required": "Ce champ est requis"
   },
   "navbar": {
     "home": "Accueil",
@@ -35,6 +39,7 @@
     "getStarted": "Démarrer sans attendre",
     "login": "Se connecter",
     "language": "Français",
+    "footer": "Footer TBD",
     "services": {
       "title": "Nos Services",
       "tracking": {
@@ -84,8 +89,7 @@
         "title": "Optimisez Pour Réussir",
         "description": "Utilisez les informations de suivi pour ajuster votre approche et maximiser vos chances de succès dans votre recherche."
       }
-    },
-    "footer": "Footer TBD"
+    }
   },
   "auth": {
     "signIn": "Se connecter",
@@ -103,10 +107,8 @@
     "alreadyHaveAccount": "Déjà un compte ?",
     "loginWithGoogle": "Se connecter avec Google",
     "loginWithOutlook": "Se connecter avec Outlook",
-    "processing": "Traitement en cours...",
     "authenticationFailed": "Échec de l'authentification",
     "authenticationSuccess": "Authentification réussie",
-    "redirecting": "Redirection en cours...",
     "backToLogin": "Retour à la connexion",
     "emailOrUsername": "Email / Nom d'utilisateur",
     "loginError": "Identifiants incorrects.",
@@ -114,84 +116,6 @@
     "passwordMismatch": "Les mots de passe ne correspondent pas !",
     "registerError": "Erreur lors de l'inscription.",
     "joinUs": "Nous rejoindre !"
-  },
-  "dashboard": {
-    "title": "Aperçu de vos candidatures",
-    "addApplication": "AJOUTER UNE CANDIDATURE",
-    "myApplications": "Mes candidatures",
-    "filters": {
-      "all": "Toutes",
-      "pending": "En attente de réponse",
-      "accepted": "Acceptée",
-      "rejected": "Refusée"
-    },
-    "applicationForm": {
-      "company": "Entreprise",
-      "position": "Poste",
-      "location": "Lieu",
-      "applicationDate": "Date de candidature",
-      "status": "Statut",
-      "notes": "Notes",
-      "selectStatus": "Sélectionner un statut"
-    },
-    "statuses": {
-      "PENDING": "En attente de réponse",
-      "APPLIED": "Postulée",
-      "ACCEPTED": "Acceptée", 
-      "REJECTED": "Refusée",
-      "INTERVIEW": "Entretien",
-      "OFF": "Refusée",
-      "ON": "Acceptée"
-    },
-    "stats": {
-      "total": "Total",
-      "pending": "En attente",
-      "accepted": "Acceptées",
-      "refused": "Refusées"
-    },
-    "banner": {
-      "title": "Trouvez votre emploi idéal",
-      "description": "Suivez vos candidatures et maximisez vos chances de succès",
-      "text": "Suivez vos candidatures et maximisez vos chances de succès"
-    },
-    "search": {
-      "placeholder": "Rechercher une candidature"
-    },
-    "sorting": {
-      "label": "TRIER PAR :",
-      "date": "Date",
-      "status": "Statut"
-    },
-    "sort": {
-      "label": "TRIER PAR",
-      "date": "Date",
-      "status": "Statut"
-    },
-    "viewModes": {
-      "grid": "GRILLE",
-      "list": "LISTE"
-    },
-    "view": {
-      "grid": "GRILLE",
-      "list": "LISTE"
-    },
-    "add": {
-      "button": "AJOUTER UNE CANDIDATURE"
-    },
-    "emptyState": {
-      "title": "Aucune candidature trouvée",
-      "description": "Commencez à suivre vos candidatures d'emploi en ajoutant votre première candidature"
-    },
-    "empty": {
-      "title": "Aucune candidature trouvée",
-      "text": "Commencez à suivre vos candidatures d'emploi en ajoutant votre première candidature"
-    },
-    "errors": {
-      "fetchError": "Erreur lors de la récupération des données:",
-      "updateError": "Erreur lors de la mise à jour de la candidature:",
-      "addError": "Erreur lors de l'ajout de la candidature:",
-      "deleteError": "Erreur :"
-    }
   },
   "home": {
     "welcome": "Bienvenue sur Carrion !",
@@ -218,6 +142,85 @@
     "timeAgo": {
       "hours": "Il y a {{count}}h",
       "days": "Il y a {{count}}j"
+    }
+  },
+  "dashboard": {
+    "title": "Aperçu de vos candidatures",
+    "addApplication": "AJOUTER UNE CANDIDATURE",
+    "myApplications": "Mes candidatures",
+    "unknownCompany": "Entreprise inconnue",
+    "unknownPosition": "Poste inconnu", 
+    "unknownStatus": "Statut inconnu",
+    "addButton": "Ajouter une candidature",
+    "label": "TRIER PAR",
+    "date": "Date",
+    "status": "Statut",
+    "viewGrid": "Voir en grille",
+    "viewList": "Voir en liste",
+    "empty": {
+      "title": "Aucune candidature trouvée",
+      "description": "Suivez vos candidatures et maximisez vos chances de succès",
+      "text": "Suivez vos candidatures et maximisez vos chances de succès",
+      "button": "Ajouter une candidature"
+    },
+    "filters": {
+      "all": "Toutes",
+      "pending": "En attente de réponse",
+      "accepted": "Acceptée",
+      "rejected": "Refusée"
+    },
+    "applicationForm": {
+      "company": "Entreprise",
+      "position": "Poste",
+      "location": "Lieu",
+      "applicationDate": "Date de candidature",
+      "status": "Statut",
+      "notes": "Notes",
+      "selectStatus": "Sélectionner un statut",
+      "salary": "Salaire",
+      "interviewDate": "Date d'entretien"
+    },
+    "statuses": {
+      "PENDING": "En attente de réponse",
+      "APPLIED": "Postulée",
+      "ACCEPTED": "Acceptée", 
+      "REJECTED": "Refusée",
+      "INTERVIEW": "Entretien",
+      "REJECTED_BY_COMPANY": "Refusée",
+      "ON": "Acceptée",
+      "OFFER": "Offre reçue"
+    },
+    "stats": {
+      "total": "Total",
+      "pending": "En attente",
+      "accepted": "Acceptées",
+      "refused": "Refusées"
+    },
+    "banner": {
+      "title": "Trouvez votre emploi idéal",
+      "description": "Suivez vos candidatures et maximisez vos chances de succès"
+    },
+    "search": {
+      "placeholder": "Rechercher une candidature"
+    },
+    "sorting": {
+      "label": "TRIER PAR :",
+      "date": "Date",
+      "status": "Statut"
+    },
+    "viewModes": {
+      "grid": "GRILLE",
+      "list": "LISTE"
+    },
+    "emptyState": {
+      "title": "Aucune candidature trouvée",
+      "description": "Commencez à suivre vos candidatures d'emploi en ajoutant votre première candidature"
+    },
+    "errors": {
+      "fetchError": "Erreur lors de la récupération des données:",
+      "updateError": "Erreur lors de la mise à jour de la candidature:",
+      "addError": "Erreur lors de l'ajout de la candidature:",
+      "deleteError": "Erreur :"
     }
   },
   "archives": {
@@ -252,5 +255,51 @@
       "devopsConsultant": "Consultant DevOps",
       "today": "Aujourd'hui"
     }
+  },
+  "modal": {
+    "add": {
+      "title": "Ajouter une candidature",
+      "company": "Entreprise", 
+      "title_job": "Poste",
+      "status": "Statut",
+      "contract_type": "Type de contrat",
+      "location": "Lieu",
+      "salary": "Salaire",
+      "interview_date": "Date d'entretien",
+      "logo_url": "Logo URL",
+      "website": "Site web",
+      "placeholders": {
+        "company": "Saisissez le nom de l'entreprise",
+        "title": "Saisissez l'intitulé du poste",
+        "location": "Ville, région ou télétravail",
+        "salary": "Montant en €",
+        "logo_url": "https://exemple.com",
+        "website": "URL du site web de l'entreprise",
+        "interviewDateTime": "Sélectionnez la date et l'heure",
+        "interviewDate": "Date prévue pour l'entretien"
+      }
+    },
+    "edit": {
+      "title": "Modifier la candidature"
+    }
+  },
+  "contractTypes": {
+    "CDI": "CDI (Contrat à Durée Indéterminée)",
+    "CDD": "CDD (Contrat à Durée Déterminée)",
+    "FREELANCE": "Freelance / Indépendant",
+    "INTERNSHIP": "Stage",
+    "APPRENTICESHIP": "Alternance / Apprentissage",
+    "TEMPORARY": "Mission Temporaire",
+    "PART_TIME": "Temps Partiel",
+    "FULL_TIME": "Temps Plein"
+  },
+  "validation": {
+    "companyRequired": "Le nom de l'entreprise est requis",
+    "positionRequired": "L'intitulé du poste est requis",
+    "statusRequired": "Le statut est requis",
+    "contractTypeRequired": "Le type de contrat est requis",
+    "invalidUrl": "URL invalide",
+    "invalidDate": "Date invalide",
+    "invalidSalary": "Salaire invalide"
   }
 } 

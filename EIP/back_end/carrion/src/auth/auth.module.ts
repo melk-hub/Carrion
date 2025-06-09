@@ -1,4 +1,4 @@
-import { Module, forwardRef } from '@nestjs/common';
+import { Module, forwardRef, Global } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { UserService } from 'src/user/user.service';
@@ -21,6 +21,7 @@ import { UserModule } from 'src/user/user.module';
 import { HttpModule } from '@nestjs/axios';
 import { CustomLoggingService } from 'src/common/services/logging.service';
 
+@Global()
 @Module({
   imports: [
     forwardRef(() => UserModule),

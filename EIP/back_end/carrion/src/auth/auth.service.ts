@@ -226,6 +226,54 @@ export class AuthService {
     };
   }
 
+  async refreshTokens(refreshToken: string): Promise<{ accessToken: string; refreshToken?: string; userId: string } | null> {
+    try {
+      // Decode the refresh token to get user ID
+      const decoded = this.jwtService.verify(refreshToken, {
+        secret: this.refreshTokenConfig.secret,
+      });
+
+      if (!decoded || !decoded.sub) {
+        return null;
+      }
+
+      const userId = decoded.sub;
+
+      // Validate the refresh token
+      const userToken = await this.prisma.token.findFirst({
+        where: { userId: userId },
+        orderBy: { createdAt: 'desc' },
+      });
+
+      if (!userToken || !userToken.refreshToken) {
+        return null;
+      }
+
+      const refreshTokenMatches = await argon2.verify(
+        userToken.refreshToken,
+        refreshToken,
+      );
+
+      if (!refreshTokenMatches) {
+        return null;
+      }
+
+      // Generate new tokens
+      const tokens = await this.generateTokens(userId);
+      const hashedRefreshToken = await argon2.hash(tokens.refreshToken);
+      await this.userService.updateHashedRefreshToken(userId, hashedRefreshToken);
+
+      return {
+        accessToken: tokens.accessToken,
+        refreshToken: tokens.refreshToken,
+        userId: userId,
+      };
+    } catch (error) {
+      this.logger.error('Refresh token validation failed', undefined, LogCategory.AUTH, { error: error.message });
+      return null;
+    }
+  }
+
   async validateRefreshToken(userId: string, refreshToken: string) {
     const userToken = await this.prisma.token.findFirst({
       where: { userId: userId },
@@ -1018,29 +1066,51 @@ export class AuthService {
    */
   async monitorWebhookHealth(): Promise<void> {
     try {
-      // Get all users with Microsoft tokens
-      const usersWithMicrosoftTokens = await this.prisma.token.findMany({
-        where: { name: 'Microsoft_oauth2' },
-        include: { user: true },
-      });
+      // Get all users with Microsoft tokens with a timeout
+      const usersWithMicrosoftTokens = await Promise.race([
+        this.prisma.token.findMany({
+          where: { name: 'Microsoft_oauth2' },
+          include: { user: true },
+          take: 10, // Limit to process max 10 at a time
+        }),
+        new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Database query timeout')), 5000)
+        )
+      ]) as any[];
 
-      for (const tokenRecord of usersWithMicrosoftTokens) {
-        if (tokenRecord.externalId) {
-          // Check if the webhook subscription is still active
-          const isActive = await this.checkWebhookSubscription(tokenRecord);
-          if (!isActive) {
-            this.logger.logAuthEvent(
-              'Webhook subscription is inactive, attempting to recreate',
-              tokenRecord.userId,
-              { subscriptionId: tokenRecord.externalId },
-            );
+      // Process tokens one by one to avoid overwhelming the connection pool
+      for (let i = 0; i < usersWithMicrosoftTokens.length; i++) {
+        const tokenRecord = usersWithMicrosoftTokens[i];
+        try {
+          if (tokenRecord.externalId) {
+            // Check if the webhook subscription is still active
+            const isActive = await this.checkWebhookSubscription(tokenRecord);
+            if (!isActive) {
+              this.logger.logAuthEvent(
+                'Webhook subscription is inactive, attempting to recreate',
+                tokenRecord.userId,
+                { subscriptionId: tokenRecord.externalId },
+              );
 
-            // Try to recreate the webhook
-            const validToken = await this.getValidToken(tokenRecord.userId, 'Microsoft_oauth2');
-            if (validToken) {
-              await this.createOutlookWebhook(validToken, tokenRecord.userId);
+              // Try to recreate the webhook
+              const validToken = await this.getValidToken(tokenRecord.userId, 'Microsoft_oauth2');
+              if (validToken) {
+                await this.createOutlookWebhook(validToken, tokenRecord.userId);
+              }
             }
           }
+          
+          // Add small delay between processing to prevent overwhelming
+          if (i < usersWithMicrosoftTokens.length - 1) {
+            await new Promise(resolve => setTimeout(resolve, 100));
+          }
+        } catch (tokenError) {
+          this.logger.warn(
+            'Error processing individual token in webhook monitoring',
+            LogCategory.WEBHOOK,
+            { userId: tokenRecord.userId, error: tokenError.message },
+          );
+          continue; // Continue with next token
         }
       }
     } catch (error) {
@@ -1133,35 +1203,64 @@ export class AuthService {
    */
   async cleanupInvalidTokens(): Promise<void> {
     try {
-      const microsoftTokens = await this.prisma.token.findMany({
-        where: { name: 'Microsoft_oauth2' },
-      });
+      // Get tokens with timeout and limit
+      const microsoftTokens = await Promise.race([
+        this.prisma.token.findMany({
+          where: { name: 'Microsoft_oauth2' },
+          take: 20, // Limit to process max 20 at a time
+        }),
+        new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Database query timeout')), 5000)
+        )
+      ]) as any[];
 
       let cleanedCount = 0;
-      for (const token of microsoftTokens) {
-        // Check if both access and refresh tokens are invalid
-        const hasValidAccess = token.accessToken && this.isValidJwtFormat(token.accessToken);
-        const hasValidRefresh = token.refreshToken && token.refreshToken.trim() !== '';
+      const tokensToDelete = [];
 
-        if (!hasValidAccess && !hasValidRefresh) {
-          await this.prisma.token.delete({
-            where: { id: token.id },
-          });
-          cleanedCount++;
-          
-          this.logger.log(
-            'Removed invalid Microsoft token',
+      // First pass: identify tokens to delete
+      for (const token of microsoftTokens) {
+        try {
+          // Check if both access and refresh tokens are invalid
+          const hasValidAccess = token.accessToken && this.isValidJwtFormat(token.accessToken);
+          const hasValidRefresh = token.refreshToken && token.refreshToken.trim() !== '';
+
+          if (!hasValidAccess && !hasValidRefresh) {
+            tokensToDelete.push(token.id);
+          }
+        } catch (tokenError) {
+          this.logger.warn(
+            'Error validating token during cleanup',
             LogCategory.AUTH,
-            { userId: token.userId, reason: 'invalid_jwt_no_refresh' },
+            { tokenId: token.id, error: tokenError.message },
           );
         }
       }
 
-      if (cleanedCount > 0) {
-        this.logger.log(
-          `Cleaned up ${cleanedCount} invalid Microsoft tokens`,
-          LogCategory.AUTH,
-        );
+      // Second pass: delete invalid tokens in batches
+      if (tokensToDelete.length > 0) {
+        try {
+          await this.prisma.token.deleteMany({
+            where: {
+              id: {
+                in: tokensToDelete
+              }
+            }
+          });
+          
+          cleanedCount = tokensToDelete.length;
+          
+          this.logger.log(
+            `Cleaned up ${cleanedCount} invalid Microsoft tokens`,
+            LogCategory.AUTH,
+          );
+        } catch (deleteError) {
+          this.logger.error(
+            'Error deleting invalid tokens',
+            undefined,
+            LogCategory.AUTH,
+            { error: deleteError.message, count: tokensToDelete.length },
+          );
+        }
       }
     } catch (error) {
       this.logger.error(

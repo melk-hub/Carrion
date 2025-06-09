@@ -856,8 +856,8 @@ Extraire des informations d'un email de candidature au format JSON :
       this.logPerformanceMetrics();
     }, 30 * 60 * 1000);
 
-    this.logger.log('📧 MailFilter Service initialized with optimizations enabled');
-    this.logger.log(`🔍 Pre-filter enabled with ${this.JOB_KEYWORDS.length} keywords and ${this.JOB_DOMAINS.length} domains`);
+    this.logger.log('MailFilter Service initialized with optimizations enabled');
+    this.logger.log(`Pre-filter enabled with ${this.JOB_KEYWORDS.length} keywords and ${this.JOB_DOMAINS.length} domains`);
   }
 
   /**
@@ -917,17 +917,15 @@ Extraire des informations d'un email de candidature au format JSON :
    */
   private logPerformanceMetrics(): void {
     const metrics = this.getPerformanceMetrics();
-    this.logger.log(`📊 Performance Metrics:
-      ⏱️  Uptime: ${metrics.uptime}s
-      📧 Processed Emails: ${metrics.processedEmails}
-      🚫 Pre-filtered: ${metrics.preFilteredEmails} (${metrics.preFilterEfficiency}% efficiency)
-      🤖 OpenAI Calls: ${metrics.openaiCalls}
-      💾 Cache Hits: ${metrics.cacheHits} (${metrics.cacheHitRate}% hit rate)
-      🔄 Duplicates Skipped: ${metrics.duplicatesSkipped}
-      ❌ Errors: ${metrics.errors}
-      ⚡ Avg Processing Time: ${metrics.averageProcessingTime}ms
-      📦 Cache Size: ${metrics.cacheSize}
-      🗃️  Processed Queue Size: ${metrics.processedEmailsSize}`
+    this.logger.log(`Performance Metrics:
+  Uptime: ${metrics.uptime}s
+  Processed Emails: ${metrics.processedEmails}
+  Pre-filtered Emails: ${metrics.preFilteredEmails}
+  OpenAI Calls: ${metrics.openaiCalls}
+  Cache Hits: ${metrics.cacheHits} (${metrics.cacheHitRate}% hit rate)
+  Duplicates Skipped: ${metrics.duplicatesSkipped}
+  Errors: ${metrics.errors}
+  Avg Processing Time: ${metrics.averageProcessingTime}ms`
     );
   }
 

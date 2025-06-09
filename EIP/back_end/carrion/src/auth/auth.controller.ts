@@ -99,23 +99,50 @@ export class AuthController {
     return res.status(HttpStatus.OK).send();
   }
 
-  @UseGuards(RefreshAuthGuard)
+  @Public()
   @Post('refresh')
-  @ApiOperation({ summary: 'Refresh JWT token' })
+  @ApiOperation({ summary: 'Refresh JWT token using refresh token' })
   @ApiResponse({
     status: 200,
-    description: 'Successfully refreshed the token',
-    schema: {
-      example: {
-        accessToken: 'string',
-      },
-    },
+    description: 'Token refreshed successfully',
   })
-  @ApiResponse({ status: 400, description: 'Bad request' })
-  @ApiResponse({ status: 401, description: 'Unauthorized' })
-  @ApiResponse({ status: 403, description: 'Forbidden' })
-  refreshToken(@Req() req) {
-    return this.authService.refreshToken(req.user.id);
+  @ApiResponse({ status: 401, description: 'Invalid refresh token' })
+  async refreshAccessToken(@Req() req, @Res() res) {
+    try {
+      const refreshToken = req.cookies?.['refresh_token'];
+      
+      if (!refreshToken) {
+        return res.status(401).json({ message: 'No refresh token provided' });
+      }
+
+      const tokens = await this.authService.refreshTokens(refreshToken);
+      
+      if (!tokens) {
+        return res.status(401).json({ message: 'Invalid refresh token' });
+      }
+
+      // Mettre à jour les cookies avec les nouveaux tokens
+      res.cookie('access_token', tokens.accessToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict',
+        maxAge: 1000 * 60 * 60 * 24 * 7, // 7 jours
+      });
+
+      if (tokens.refreshToken) {
+        res.cookie('refresh_token', tokens.refreshToken, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === 'production',
+          sameSite: 'strict',
+          maxAge: 1000 * 60 * 60 * 24 * 30, // 30 jours
+        });
+      }
+
+      return res.status(200).json({ message: 'Token refreshed successfully' });
+    } catch (error) {
+      this.logger.error('Token refresh error', undefined, LogCategory.AUTH, { error: error.message });
+      return res.status(401).json({ message: 'Token refresh failed' });
+    }
   }
 
   @UseGuards(JwtAuthGuard)
@@ -217,7 +244,14 @@ export class AuthController {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'strict',
-        maxAge: 1000 * 60 * 60 * 24,
+        maxAge: 1000 * 60 * 60 * 24 * 7,
+      });
+
+      res.cookie('refresh_token', tokens.refreshToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict',
+        maxAge: 1000 * 60 * 60 * 24 * 30,
       });
 
       res.redirect(`${process.env.FRONT}/auth/callback?auth=success`);
@@ -391,6 +425,13 @@ export class AuthController {
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'strict',
         maxAge: 1000 * 60 * 60 * 24,
+      });
+
+      res.cookie('refresh_token', tokens.refreshToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict',
+        maxAge: 1000 * 60 * 60 * 24 * 30,
       });
 
       res.redirect(`${process.env.FRONT}/auth/callback?auth=success`);

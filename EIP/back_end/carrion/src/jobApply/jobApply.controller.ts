@@ -7,6 +7,7 @@ import {
   Body,
   Delete,
   Patch,
+  Put,
   Param,
 } from '@nestjs/common';
 import {
@@ -17,7 +18,11 @@ import {
   ApiCookieAuth,
 } from '@nestjs/swagger';
 import { JobApplyService } from './jobApply.service';
-import { CreateJobApplyDto, JobApplyDto } from './dto/jobApply.dto';
+import {
+  CreateJobApplyDto,
+  JobApplyDto,
+  UpdateJobApplyDto,
+} from './dto/jobApply.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt/jwt-auth.guard';
 import { ApplicationStatus } from './enum/application-status.enum';
 
@@ -68,6 +73,25 @@ export class JobApplyController {
     return this.jobApplyService.deleteJobApply(jobApplyId, req.user.id);
   }
 
+  @Put(':id/status')
+  @ApiOperation({ summary: 'Update job application (PUT method)' })
+  @ApiResponse({
+    status: 200,
+    description: 'Job application updated successfully',
+  })
+  @ApiResponse({ status: 404, description: 'Job application not found' })
+  async updateJobApplicationPut(
+    @Param('id') jobApplyId: string,
+    @Body() updateJobApplyDto: UpdateJobApplyDto,
+    @Request() req,
+  ) {
+    return this.jobApplyService.updateJobApplyByData(
+      jobApplyId,
+      req.user.id,
+      updateJobApplyDto,
+    );
+  }
+
   @Patch(':id/status')
   @ApiOperation({ summary: 'Update job application status' })
   @ApiResponse({
@@ -77,13 +101,13 @@ export class JobApplyController {
   @ApiResponse({ status: 404, description: 'Job application not found' })
   async updateJobStatus(
     @Param('id') jobApplyId: string,
-    @Body('status') newStatus: ApplicationStatus,
+    @Body() updateJobApplyDto: UpdateJobApplyDto,
     @Request() req,
   ) {
-    return this.jobApplyService.updateJobApplyStatus(
+    return this.jobApplyService.updateJobApplyByData(
       jobApplyId,
       req.user.id,
-      newStatus,
+      updateJobApplyDto,
     );
   }
 }
