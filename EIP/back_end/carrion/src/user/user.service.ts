@@ -114,35 +114,6 @@ export class UserService {
     }
   }
 
-  async updateHistoryIdOfUser(userId: string, newHistoryId: string) {
-    if (!userId || !newHistoryId) {
-      throw new BadRequestException('User ID and history ID are required');
-    }
-
-    try {
-      const user = await this.prisma.user.findUnique({
-        where: { id: userId },
-      });
-      if (!user) {
-        throw new NotFoundException(`User with id ${userId} not found`);
-      }
-      return await this.prisma.user.update({
-        where: { id: userId },
-        data: { historyId: newHistoryId.toString() },
-      });
-    } catch (error) {
-      if (error instanceof NotFoundException) {
-        throw error;
-      }
-      if (error.code === 'P2025') {
-        throw new NotFoundException(`User with id ${userId} not found`);
-      }
-      throw new BadRequestException(
-        `Failed to update history ID: ${error.message}`,
-      );
-    }
-  }
-
   async addDocument(userId: string, newDocument: string) {
     if (!userId || !newDocument) {
       throw new BadRequestException('User ID and document name are required');

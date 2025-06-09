@@ -61,21 +61,54 @@ export class JobApplyService {
     jobApplyParams: JobApplyParams,
   ): Promise<JobApplyDto> {
     try {
+      // Enhanced logging for debugging duplicate detection
+      console.log(`Searching for job apply with params:`, {
+        userId,
+        title: jobApplyParams.title,
+        company: jobApplyParams.company,
+        contractType: jobApplyParams.contractType,
+        location: jobApplyParams.location,
+      });
+
+      // Build the search criteria
+      const searchCriteria: any = {
+        UserId: userId,
+        Title: jobApplyParams.title,
+        Company: jobApplyParams.company,
+      };
+
+      // Only add contractType to search if it's defined and not null/undefined
+      if (jobApplyParams.contractType) {
+        searchCriteria.contractType = jobApplyParams.contractType;
+      }
+
+      // Only add location to search if it's provided
+      if (jobApplyParams.location) {
+        searchCriteria.Location = jobApplyParams.location;
+      }
+
+      console.log(`Final search criteria:`, searchCriteria);
+
       const jobApply = await this.prisma.jobApply.findFirst({
-        where: {
-          UserId: userId,
-          contractType: jobApplyParams.contractType,
-          Title: jobApplyParams.title,
-          Company: jobApplyParams.company,
-          ...(jobApplyParams.location && { Location: jobApplyParams.location }),
-        },
+        where: searchCriteria,
         include: {
           User: true,
         },
       });
+
       if (!jobApply) {
+        console.log(`No job apply found for criteria`);
         return null;
       }
+
+      console.log(`Found existing job apply:`, {
+        id: jobApply.id,
+        title: jobApply.Title,
+        company: jobApply.Company,
+        contractType: jobApply.contractType,
+        location: jobApply.Location,
+      });
+
       return {
         id: jobApply.id,
         title: jobApply.Title,
@@ -204,6 +237,14 @@ export class JobApplyService {
     updateJobApply: UpdateJobApply,
   ): Promise<string> {
     try {
+      // Validate interview date before using it
+      const validInterviewDate =
+        updateJobApply.interviewDate &&
+        updateJobApply.interviewDate instanceof Date &&
+        !isNaN(updateJobApply.interviewDate.getTime())
+          ? updateJobApply.interviewDate
+          : null;
+
       await this.prisma.jobApply.update({
         where: { id: jobApplyId },
         data: {
@@ -212,9 +253,7 @@ export class JobApplyService {
             : {}),
           ...(updateJobApply.salary ? { Salary: updateJobApply.salary } : {}),
           ...(updateJobApply.status ? { status: updateJobApply.status } : {}),
-          ...(updateJobApply.interviewDate
-            ? { interviewDate: new Date(updateJobApply.interviewDate) }
-            : {}),
+          ...(validInterviewDate ? { interviewDate: validInterviewDate } : {}),
         },
       });
       return `Job offer: ${jobApplyId} for user: ${userId} updated successfully`;

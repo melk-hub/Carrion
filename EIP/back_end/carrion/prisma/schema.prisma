@@ -20,7 +20,6 @@ model User {
   createdAt          DateTime   @default(now())
   role               Role       @default(VISITOR)
   hashedRefreshToken String?    @unique
-  historyId          String?
   Settings           Settings?  @relation("UserSettings")
   tokens             Token[]    @relation("UserTokens")
   jobApplies         jobApply[] @relation("UserJobApplies")
@@ -32,6 +31,7 @@ model Token {
   accessToken       String
   refreshToken      String
   tokenTimeValidity DateTime
+  externalId        String?  // historyId for Gmail, subscriptionId for Outlook
   createdAt         DateTime @default(now())
   userId            String   @db.Uuid
   user              User     @relation("UserTokens", fields: [userId], references: [id])

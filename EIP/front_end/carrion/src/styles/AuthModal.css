@@ -117,14 +117,11 @@
   width: 20px;
 }
 
-.outlook-btn {
-  background: #0078d4;
-  color: #fff;
-  border: none;
-}
-
-.outlook-btn img {
-  height: 20px;
+.outlook-login-button {
+  background-color: var(--secondary-color);
+  border: 1px solid #d1d1d1;
+  color: var(--text-color);
+  margin-left: 0 !important;
 }
 
 .row-inputs {
@@ -146,6 +143,24 @@
 .error-message {
   color: red;
   font-size: 0.9rem;
+  background: #ffebee;
+  border: 1px solid #ffcdd2;
+  border-radius: 8px;
+  padding: 12px;
+  margin: 15px 0;
+  text-align: center;
+}
+
+.oauth-error-message {
+  color: #d32f2f;
+  font-size: 0.9rem;
+  background: #ffebee;
+  border: 1px solid #ffcdd2;
+  border-radius: 8px;
+  padding: 15px;
+  margin: 20px 0;
+  text-align: center;
+  font-weight: 500;
 }
 
 /* Fixed button sizes */
@@ -167,15 +182,8 @@
 }
 
 .auth-modal .primary-btn {
-  max-width: 50%;
-  min-width: 50%;
-  width: 100%;
-  min-height: 45px;
-}
-
-.auth-modal .outlook-btn {
-  max-width: 50%;
-  min-width: 50%;
+  max-width: 40%;
+  min-width: 40%;
   width: 100%;
   min-height: 45px;
 }
@@ -191,11 +199,6 @@
     min-width: 100px;
     padding: 6px 12px;
   }
-  
-  .auth-modal .primary-btn,
-  .auth-modal .outlook-btn {
-    min-height: 40px;
-  }
 }
 
 @media (max-width: 480px) {
@@ -207,10 +210,5 @@
   .auth-modal .tabs button {
     min-width: 80px;
     padding: 4px 8px;
-  }
-  
-  .auth-modal .primary-btn,
-  .auth-modal .outlook-btn {
-    min-height: 36px;
   }
 }

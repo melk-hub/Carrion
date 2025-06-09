@@ -11,6 +11,7 @@ import Landing from "./pages/Landing";
 import Dashboard from "./pages/Dashboard";
 import Home from './pages/Home';
 import Archives from "./pages/Archives";
+import AuthCallback from "./components/AuthCallback";
 import { useAuth, AuthProvider } from "./AuthContext";
 import { LanguageProvider } from "./contexts/LanguageContext";
 import { useLanguage } from "./contexts/LanguageContext";
@@ -72,6 +73,7 @@ function AppLayout() {
       <main className={location.pathname !== "/" ? (sidebarCollapsed ? "navbar-content collapsed" : "navbar-content") : ""}>
         <Routes>
           <Route path="/" element={<Landing />} />
+          <Route path="/auth/callback" element={<AuthCallback />} />
           <Route
             path="/home"
             element={

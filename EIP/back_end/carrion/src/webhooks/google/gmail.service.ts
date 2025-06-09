@@ -7,7 +7,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { Token } from '@prisma/client';
 import { UserService } from 'src/user/user.service';
 import { MailFilterService } from 'src/services/mailFilter/mailFilter.service';
-import { GmailMessage } from '../gmail/gmail.types';
+import { GmailMessage } from '../mail/gmail.types';
 
 @Injectable()
 export class GmailService {
@@ -76,9 +76,13 @@ export class GmailService {
 
   mapToGmailMessage(sourceData: any): GmailMessage {
     if (!sourceData?.id || !sourceData?.payload) {
-      console.error(
-        "Source message data is missing essential 'id' or 'payload'.",
-        sourceData,
+      // console.error(
+      //   "Source message data is missing essential 'id' or 'payload'.",
+      //   sourceData,
+      // );
+      this.logger.error(
+        'Source message data is missing essential "id" or "payload"',
+        JSON.stringify(sourceData),
       );
       throw new Error('Invalid message structure received from API.');
     }
@@ -138,7 +142,7 @@ export class GmailService {
     try {
       const res = await gmail.users.history.list({
         userId: 'me',
-        startHistoryId: user.historyId,
+        startHistoryId: token.externalId,
       });
       const history = res.data.history;
       if (!history) {
@@ -176,7 +180,39 @@ export class GmailService {
     } catch (error) {
       this.logger.error('Error processing history update: ' + error.message);
     }
-    await this.userService.updateHistoryIdOfUser(user.id, historyId);
+    await this.updateGoogleTokenWithHistoryId(user.id, historyId);
+  }
+
+  async updateGoogleTokenWithHistoryId(
+    userId: string,
+    historyId: string,
+  ): Promise<void> {
+    try {
+      // Find the Google token for this user
+      const existingToken = await this.prisma.token.findFirst({
+        where: {
+          userId,
+          name: 'Google_oauth2',
+        },
+      });
+
+      if (existingToken) {
+        // Update the token with the new historyId
+        await this.prisma.token.update({
+          where: { id: existingToken.id },
+          data: {
+            externalId: historyId.toString(),
+          },
+        });
+        this.logger.log(`Updated Google token historyId for user ${userId}`);
+      } else {
+        this.logger.warn(`No Google token found for user ${userId}`);
+      }
+    } catch (error) {
+      this.logger.error(
+        `Failed to update Google token with history ID: ${error.message}`,
+      );
+    }
   }
 
   isJobApplication(message: any): boolean {

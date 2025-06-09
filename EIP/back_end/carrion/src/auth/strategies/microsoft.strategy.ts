@@ -16,7 +16,19 @@ export class MicrosoftStrategy extends PassportStrategy(Strategy, 'microsoft') {
       clientID: microsoftConfig.clientID,
       clientSecret: microsoftConfig.clientSecret,
       callbackURL: microsoftConfig.callbackURL,
-      scope: ['openid', 'profile', 'offline_access', 'User.Read', 'Mail.Read'],
+      scope: [
+        'openid',
+        'profile',
+        'offline_access',
+        'User.Read',
+        'Mail.Read',
+        'https://graph.microsoft.com/Mail.Read',
+        'https://graph.microsoft.com/User.Read',
+      ],
+      prompt: 'consent',
+      accessType: 'offline',
+      responseType: 'code',
+      responseMode: 'query',
     });
   }
 

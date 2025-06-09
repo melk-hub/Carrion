@@ -95,7 +95,7 @@ function Landing() {
           </div>
           <div className="navigation-actions">
             <LanguageDropdown style={{color: 'black'}}/>
-            <div style={{width: '200px', fontSize: '14px', maxHeight: '32px'}}>
+            <div style={{width: '150px', fontSize: '14px', maxHeight: '32px'}}>
               <LoginBtn onClick={handleLoginClick}/>
             </div>
           </div>
@@ -112,7 +112,7 @@ function Landing() {
               <p>
                 {t('landing.subtitle')}
               </p>
-              <div style={{width: '50%'}}>
+              <div style={{width: '37.5%'}}>
                 <PrimaryButton
                     text={t('landing.getStarted')}
                     onClick={handleLoginClick}

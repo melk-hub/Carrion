@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../AuthContext';
 import { useLanguage } from '../contexts/LanguageContext';
 import '../styles/AuthModal.css';
 import GoogleLoginButton from './GoogleLoginBtn';
-import outlookIcon from '../assets/outlook-logo.png';
+import OutlookLoginButton from './OutlookLoginButton';
 import { motion, AnimatePresence } from 'framer-motion';
 
 function AuthModal({ isOpen, onClose, defaultTab }) {
@@ -15,11 +15,20 @@ function AuthModal({ isOpen, onClose, defaultTab }) {
   const { t } = useLanguage();
   const navigate = useNavigate();
   const [errorMessage, setErrorMessage] = useState('');
+  const [searchParams] = useSearchParams();
   const API_URL = process.env.REACT_APP_API_URL;
 
   useEffect(() => {
     setActiveTab(defaultTab || 'login');
-  }, [defaultTab]);
+    
+    // Check for OAuth2 authentication errors in URL parameters
+    const authError = searchParams.get('error');
+    if (authError) {
+      setErrorMessage(decodeURIComponent(authError));
+      // Clear the error from URL without reloading the page
+      navigate(window.location.pathname, { replace: true });
+    }
+  }, [defaultTab, searchParams, navigate]);
 
   if (!isOpen) return null;
 
@@ -104,13 +113,19 @@ function AuthModal({ isOpen, onClose, defaultTab }) {
     <div className="modal-overlay">
       <div className="auth-modal">
         <button className="close-button" onClick={handleClose}>×</button>
-        <h1>{activeTab === 'login' ? t('auth.welcomeBack') : t('auth.joinUs')}</h1>
+        <h1>{activeTab === 'login' ? t('home.welcome') : t('auth.joinUs')}</h1>
         <div className="tabs">
-          <button className={activeTab === 'login' ? 'active' : ''} onClick={() => handleTabChange('login')}>{t('auth.login')}</button>
-          <button className={activeTab === 'register' ? 'active' : ''} onClick={() => handleTabChange('register')}>{t('auth.register')}</button>
+          <button className={activeTab === 'login' ? 'active' : ''} onClick={() => handleTabChange('login')}>{t('auth.signIn')}</button>
+          <button className={activeTab === 'register' ? 'active' : ''} onClick={() => handleTabChange('register')}>{t('auth.signUp')}</button>
         </div>
 
         <hr />
+
+        {errorMessage && (
+          <div className="oauth-error-message">
+            {errorMessage}
+          </div>
+        )}
 
         <AnimatePresence mode="wait">
           {activeTab === 'login' && (
@@ -125,7 +140,7 @@ function AuthModal({ isOpen, onClose, defaultTab }) {
                   <input type='checkbox' id="rememberMe" name='rememberMe' value={credentials.rememberMe} onClick={handleChange} />
                   <label htmlFor="remember">{t('auth.rememberMe')}</label>
                 </div>
-                <button type="submit" className="primary-btn">{t('auth.login')}</button>
+                <button type="submit" className="primary-btn">{t('auth.signIn')}</button>
               </form>
             </motion.div>
           )}
@@ -154,7 +169,7 @@ function AuthModal({ isOpen, onClose, defaultTab }) {
                     <input type="password" name="confirmPassword" placeholder={t('auth.confirmPassword')} value={credentials.confirmPassword} onChange={handleChange} required />
                   </div>
                 </div>
-                <button type="submit" className="primary-btn">{t('auth.register')}</button>
+                <button type="submit" className="primary-btn">{t('auth.signUp')}</button>
               </form>
             </motion.div>
           )}
@@ -164,9 +179,7 @@ function AuthModal({ isOpen, onClose, defaultTab }) {
 
         <div className="social-buttons">
           <GoogleLoginButton />
-          <button className="outlook-btn" onClick={() => navigate('/home')}>
-            <img src={outlookIcon} alt="Outlook" /> {t('auth.loginWithOutlook')}
-          </button>
+          <OutlookLoginButton />
         </div>
       </div>
     </div>

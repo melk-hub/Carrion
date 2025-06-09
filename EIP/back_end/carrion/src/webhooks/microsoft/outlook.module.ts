@@ -5,22 +5,36 @@ import { OutlookService } from './outlook.service';
 import { AuthModule } from 'src/auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
 import microsoftOauthConfig from 'src/auth/config/microsoft-oauth.config';
+import refreshJwtConfig from 'src/auth/config/refresh-jwt.config';
 import { PrismaModule } from 'src/prisma/prisma.module';
 import { UserModule } from 'src/user/user.module';
 import { MailFilterModule } from 'src/services/mailFilter/mailFilter.module';
 import { MicrosoftStrategy } from 'src/auth/strategies/microsoft.strategy';
 import { MailFilterService } from 'src/services/mailFilter/mailFilter.service';
+import { CustomLoggingService } from 'src/common/services/logging.service';
+import { UserService } from 'src/user/user.service';
+import { AuthService } from 'src/auth/auth.service';
+import { JwtModule } from '@nestjs/jwt';
 
 @Module({
   imports: [
     HttpModule,
+    JwtModule,
     AuthModule,
     ConfigModule.forFeature(microsoftOauthConfig),
+    ConfigModule.forFeature(refreshJwtConfig),
     PrismaModule,
     UserModule,
-    MailFilterModule
+    MailFilterModule,
   ],
   controllers: [OutlookController],
-  providers: [OutlookService, MicrosoftStrategy, MailFilterService],
+  providers: [
+    OutlookService,
+    CustomLoggingService,
+    MailFilterService,
+    UserService,
+    AuthService,
+    MicrosoftStrategy,
+  ],
 })
 export class OutlookModule {}

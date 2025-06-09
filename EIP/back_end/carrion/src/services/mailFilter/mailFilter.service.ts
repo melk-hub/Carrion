@@ -9,11 +9,13 @@ import {
   GmailMessage,
   GmailMessagePart,
   GmailHeader,
-} from 'src/webhooks/gmail/gmail.types';
+} from 'src/webhooks/mail/gmail.types';
 import {
   JobApplyParams,
   UpdateJobApply,
 } from 'src/jobApply/interface/jobApply.interface';
+import { OutlookMessage } from 'src/webhooks/mail/outlook.types';
+import { createHash } from 'crypto';
 
 function extractJsonFromString(str: string): any | null {
   if (!str) return null;
@@ -50,11 +52,48 @@ function extractJsonFromString(str: string): any | null {
 export class MailFilterService {
   private readonly logger = new Logger(MailFilterService.name);
   private openai: OpenAI;
+  
+  // Deduplication system
+  private processedEmails = new Set<string>();
+  private readonly EMAIL_CACHE_TTL = 15 * 60 * 1000; // 15 minutes
 
   constructor(private readonly jobApplyService: JobApplyService) {
     this.openai = new OpenAI({
       apiKey: process.env.OPENAI_API_KEY,
     });
+    
+    // Clean up processed emails cache every 20 minutes
+    setInterval(() => {
+      this.processedEmails.clear();
+      this.logger.log('Cleared email deduplication cache');
+    }, 20 * 60 * 1000);
+  }
+
+  /**
+   * Generate a unique hash for email content to detect duplicates
+   */
+  private generateEmailHash(
+    emailText: string,
+    userId: string,
+    emailSubject?: string,
+    emailSender?: string,
+  ): string {
+    const content = `${userId}|${emailSubject || ''}|${emailSender || ''}|${emailText}`;
+    return createHash('sha256').update(content).digest('hex');
+  }
+
+  /**
+   * Check if email has already been processed recently
+   */
+  private isEmailAlreadyProcessed(emailHash: string): boolean {
+    return this.processedEmails.has(emailHash);
+  }
+
+  /**
+   * Mark email as processed
+   */
+  private markEmailAsProcessed(emailHash: string): void {
+    this.processedEmails.add(emailHash);
   }
 
   private decodeBase64Url(encoded?: string): string {
@@ -157,6 +196,20 @@ export class MailFilterService {
       );
     }
 
+    // Generate hash for deduplication
+    const emailHash = this.generateEmailHash(bodyText, userId, subject, sender);
+    
+    // Check if email was already processed
+    if (this.isEmailAlreadyProcessed(emailHash)) {
+      this.logger.warn(
+        `Skipping already processed Gmail email. Subject: "${subject}", Sender: "${sender}", MessageId: ${gmailMessage.id}`,
+      );
+      return 'Email already processed - skipped';
+    }
+
+    // Mark as being processed
+    this.markEmailAsProcessed(emailHash);
+
     try {
       return this.processEmailWithExtractedData(
         bodyText,
@@ -209,10 +262,17 @@ export class MailFilterService {
       "title": "Intitulé du poste (string, mandatory)",
       "location": "Lieu du poste, le plus précis possible (string, optionnel)",
       "salary": "Salaire proposé (string, ex: '50000 EUR annuel' ou '3000 EUR mensuel', optionnel)",
-      "contractType": "Type de contrat (ex: 'CDI', 'CDD', 'Stage', 'Alternance', 'Temps plein', 'Temps partiel', 'Freelance', optionnel)",
+      "contractType": "Type de contrat - UTILISE EXCLUSIVEMENT L'UNE DE CES 5 VALEURS: 'Full-time', 'Part-time', 'Internship', 'Contract', 'Freelance'. SI AUCUNE NE CORRESPOND OU SI NON SPÉCIFIÉ, UTILISE null.",
       "status": "Statut de la candidature parmi (${Object.values(ApplicationStatus).join(', ')}). Choisis le statut le plus pertinent.",
       "interviewDate": "Date et heure de l'entretien au format ISO 8601 (YYYY-MM-DDTHH:mm:ssZ) si mentionnée (string, optionnel)",
     }
+    **TYPES DE CONTRAT AUTORISÉS UNIQUEMENT**: Tu DOIS utiliser EXCLUSIVEMENT ces 5 valeurs pour contractType:
+    - "Full-time" (pour CDI, temps plein, permanent)
+    - "Part-time" (pour temps partiel)
+    - "Internship" (pour stage, alternance, apprentissage)
+    - "Contract" (pour CDD, mission temporaire)
+    - "Freelance" (pour freelance, consultant)
+    **SI LE TYPE DE CONTRAT N'EST PAS CLAIR OU NE CORRESPOND À AUCUNE DE CES 5 CATÉGORIES, UTILISE null.**
     **SI TU NE TROUVES PAS DE DATA N'ESSAYES PAS DE COMBLER L'OBJETS, IL FAUT QUE LES TITLES SOIENT DES TRUCS QUI EXISTES DÉJÀ PAS DES MOTS COMME "JOB APPLICATION" OU D'AUTRE SOTTISE, SI TU N'EN TROUVE PAS RENVOIE MOI NULL. VERIFIE BIEN QUE LE MAIL ET LES PROPOSITIONS SONT POUR L'UTILISATEUR ET NON LES INFORMATIONS DU SENDER. PAR EXEMPLE SI LE RECRUTEUR SE PRÉSENTE NE FAIT PAS L'ERREUR DE RÉCUPERER SES INFORMATIONS POUR ME LES RENVOYER ET DE FAIRE EN SORTE QUE CES INFORMATIONS SOIT DONNÉES À L'UTILISATEUR.**
     **Analyse bien le corps du mail, le sujet, l'objet, le mail de l'expéditeur, le footer, il faut que tu t'assures que ce soit bien une conversation de recrutement, il ne faut pas que tu tombes dans les pièges des mails commerciaux, de spam, de mails sociaux de linkedin, analyse bien, si cela parle de plusieurs personnes en même temps, pour vendre quelques choses, de spam, il faut que tu sois sur que c'est bien une conversation de recrutement.**
     Sur le json que tu me renvoies je veux les informations en anglais: le type de contrat et le title.
@@ -283,6 +343,11 @@ export class MailFilterService {
         location: parsedData.location ? parsedData.location : undefined,
       };
 
+      // Enhanced logging for duplicate detection debugging
+      this.logger.log(
+        `Checking for duplicates with params: ${JSON.stringify(jobApplyParam)}`,
+      );
+
       const existingJobApply = await this.jobApplyService.getJobApplyByParam(
         userId,
         jobApplyParam,
@@ -292,22 +357,40 @@ export class MailFilterService {
         this.logger.warn(
           `Job apply already exists for user ${userId} with title ${parsedData.title} and company ${parsedData.company}. Updating status.`,
         );
+        this.logger.log(
+          `Existing job apply details: ${JSON.stringify({
+            id: existingJobApply.id,
+            title: existingJobApply.title,
+            company: existingJobApply.company,
+            contractType: existingJobApply.contractType,
+            location: existingJobApply.location,
+          })}`,
+        );
 
         const updateJobApply: UpdateJobApply = {
           location: parsedData.location,
           salary: Number.parseInt(parsedData.salary),
           status: parsedData.status,
-          interviewDate: new Date(parsedData.interviewDate),
+          interviewDate:
+            parsedData.interviewDate &&
+            parsedData.interviewDate !== 'null' &&
+            parsedData.interviewDate.trim() !== ''
+              ? new Date(parsedData.interviewDate)
+              : null,
           contractType: parsedData.contractType,
         };
 
         await this.jobApplyService.updateJobApplyByMail(
           existingJobApply.id,
-          parsedData.status,
+          userId,
           updateJobApply,
         );
         return existingJobApply.id;
       }
+
+      this.logger.log(
+        `No existing job apply found. Creating new one with params: ${JSON.stringify(jobApplyParam)}`,
+      );
 
       return this.createJobApply(parsedData, userId);
     } catch (error) {
@@ -334,9 +417,12 @@ export class MailFilterService {
       contractType: parsedData.contractType
         ? parsedData.contractType
         : undefined,
-      interviewDate: parsedData.interviewDate
-        ? new Date(parsedData.interviewDate)
-        : undefined,
+      interviewDate:
+        parsedData.interviewDate &&
+        parsedData.interviewDate !== 'null' &&
+        parsedData.interviewDate.trim() !== ''
+          ? new Date(parsedData.interviewDate)
+          : undefined,
     };
 
     this.logger.log(
@@ -347,5 +433,94 @@ export class MailFilterService {
       jobApplyDto,
     );
     return `Job application processed successfully (ID: ${createdJobApply.id}).`;
+  }
+
+  async processEmailAndCreateJobApplyFromOutlook(
+    outlookMessage: OutlookMessage,
+    userId: string,
+  ): Promise<string> {
+    if (!outlookMessage) {
+      this.logger.error('Received invalid or empty outlookMessage object');
+      throw new BadRequestException('Invalid email data provided.');
+    }
+
+    const subject = outlookMessage.subject || '';
+    const sender = `${outlookMessage.from?.emailAddress?.name || ''} <${outlookMessage.from?.emailAddress?.address || ''}>`;
+
+    // Extract text content from Outlook message body
+    let bodyText = this.extractTextFromOutlookMessage(outlookMessage);
+
+    if (!bodyText && outlookMessage.bodyPreview) {
+      this.logger.warn(
+        `No main body extracted for message ${outlookMessage.id}, using bodyPreview.`,
+      );
+      bodyText = outlookMessage.bodyPreview;
+    }
+
+    if (!bodyText) {
+      this.logger.error(
+        `Could not extract text body for message ${outlookMessage.id}`,
+      );
+      throw new BadRequestException(
+        'Could not extract readable text from the email.',
+      );
+    }
+
+    // Generate hash for deduplication
+    const emailHash = this.generateEmailHash(bodyText, userId, subject, sender);
+    
+    // Check if email was already processed
+    if (this.isEmailAlreadyProcessed(emailHash)) {
+      this.logger.warn(
+        `Skipping already processed Outlook email. Subject: "${subject}", Sender: "${sender}", MessageId: ${outlookMessage.id}`,
+      );
+      return 'Email already processed - skipped';
+    }
+
+    // Mark as being processed
+    this.markEmailAsProcessed(emailHash);
+
+    try {
+      return this.processEmailWithExtractedData(
+        bodyText,
+        userId,
+        subject,
+        sender,
+      );
+    } catch (error) {
+      this.logger.error(
+        `Error with OpenAI API or during processing: ${error.message}`,
+        error.stack,
+      );
+      return error.message;
+    }
+  }
+
+  /**
+   * Extract readable text content from Outlook message
+   */
+  private extractTextFromOutlookMessage(
+    outlookMessage: OutlookMessage,
+  ): string {
+    if (!outlookMessage.body?.content) {
+      return outlookMessage.bodyPreview || '';
+    }
+
+    let content = outlookMessage.body.content;
+
+    // If HTML content, convert to plain text
+    if (outlookMessage.body.contentType === 'html') {
+      content = convert(content, {
+        wordwrap: false,
+        selectors: [
+          { selector: 'a', options: { ignoreHref: true } },
+          { selector: 'img', format: 'skip' },
+          { selector: 'script', format: 'skip' },
+          { selector: 'style', format: 'skip' },
+        ],
+      });
+    }
+
+    return content.trim();
   }
 }
