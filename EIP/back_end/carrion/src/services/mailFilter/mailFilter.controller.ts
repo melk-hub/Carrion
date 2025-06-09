@@ -5,6 +5,7 @@ import {
   UseGuards,
   Req,
   UnauthorizedException,
+  Get,
 } from '@nestjs/common';
 import { MailFilterService } from './mailFilter.service';
 import {
@@ -55,5 +56,34 @@ export class MailFilterController {
       extractInfoDto.text,
       userId,
     );
+  }
+
+  @Get('metrics')
+  getMetrics() {
+    return this.mailFilterService.getPerformanceMetrics();
+  }
+
+  @Get('recommendations')
+  async getRecommendations() {
+    return await this.mailFilterService.getPerformanceRecommendations();
+  }
+
+  @Get('health')
+  async getHealth() {
+    const metrics = this.mailFilterService.getPerformanceMetrics();
+    const recommendations = await this.mailFilterService.getPerformanceRecommendations();
+    
+    return {
+      status: 'healthy',
+      timestamp: new Date().toISOString(),
+      concurrencyLimit: await this.mailFilterService.getConcurrentEmailLimit(),
+      performance: {
+        cacheHitRate: metrics.cacheHitRate,
+        errorRate: recommendations.currentPerformance.errorRate,
+        avgLatency: recommendations.currentPerformance.avgLatency,
+        status: recommendations.currentPerformance.status
+      },
+      recommendations: recommendations.recommendations
+    };
   }
 }

@@ -24,6 +24,7 @@ import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { MicrosoftAuthGuard } from './guards/microsoft/microsoft-auth.guard';
 import { GoogleLoginDto } from 'src/user/dto/google-login.dto';
 import { CustomLoggingService, LogCategory } from 'src/common/services/logging.service';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 @ApiTags('Authentication')
 @Controller('auth')
@@ -31,6 +32,7 @@ export class AuthController {
   constructor(
     private readonly authService: AuthService,
     private logger: CustomLoggingService,
+    private prisma: PrismaService,
   ) {}
 
   @Public()
@@ -395,6 +397,66 @@ export class AuthController {
     } catch (error) {
       this.logger.error('Microsoft authentication error', undefined, LogCategory.AUTH, { error: error.message });
       return res.redirect(`${process.env.FRONT}?error=server_error&errorDescription=Authentication failed`);
+    }
+  }
+
+  @Public()
+  @Get('webhook-health')
+  async getWebhookHealth() {
+    try {
+      // Get all users with Microsoft tokens
+      const usersWithMicrosoftTokens = await this.prisma.token.findMany({
+        where: { name: 'Microsoft_oauth2' },
+        include: { user: true },
+      });
+
+      const webhookStatus = [];
+      
+      for (const tokenRecord of usersWithMicrosoftTokens) {
+        if (tokenRecord.externalId) {
+          const isActive = await this.authService.checkWebhookSubscription(tokenRecord);
+          webhookStatus.push({
+            userId: tokenRecord.userId,
+            userEmail: tokenRecord.user?.email,
+            subscriptionId: tokenRecord.externalId,
+            isActive,
+            lastUpdated: tokenRecord.createdAt,
+          });
+        }
+      }
+
+      return {
+        status: 'success',
+        data: {
+          totalWebhooks: webhookStatus.length,
+          activeWebhooks: webhookStatus.filter(w => w.isActive).length,
+          inactiveWebhooks: webhookStatus.filter(w => !w.isActive).length,
+          webhooks: webhookStatus,
+        },
+      };
+    } catch (error) {
+      return {
+        status: 'error',
+        message: 'Failed to check webhook health',
+        error: error.message,
+      };
+    }
+  }
+
+  @Post('recreate-webhooks')
+  async recreateAllWebhooks() {
+    try {
+      await this.authService.monitorWebhookHealth();
+      return {
+        status: 'success',
+        message: 'Webhook recreation process initiated',
+      };
+    } catch (error) {
+      return {
+        status: 'error',
+        message: 'Failed to recreate webhooks',
+        error: error.message,
+      };
     }
   }
 }

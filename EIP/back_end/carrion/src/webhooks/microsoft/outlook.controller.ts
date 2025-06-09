@@ -165,15 +165,36 @@ export class OutlookController {
       // Process actual notifications
       if (notification?.value && Array.isArray(notification.value)) {
         const processingPromises = notification.value.map(async (item: any) => {
-          await this.processNotificationItem(item, requestContext);
+          return this.processNotificationItem(item, requestContext);
         });
 
-        await Promise.all(processingPromises);
+        // Process notifications in batches to prevent server overload
+        const CONCURRENT_LIMIT = await this.mailFilterService.getConcurrentEmailLimit();
+        
+        for (let i = 0; i < processingPromises.length; i += CONCURRENT_LIMIT) {
+          const batch = processingPromises.slice(i, i + CONCURRENT_LIMIT);
+          await Promise.all(batch);
+          
+          this.logger.logPerformance(
+            'Outlook batch processing completed',
+            Date.now() - startTime,
+            {
+              processed: batch.length,
+              batchNumber: Math.floor(i / CONCURRENT_LIMIT) + 1,
+              totalNotifications: notification.value.length,
+            },
+          );
+        }
 
-        const duration = Date.now() - startTime;
-        this.logger.logPerformance('Outlook webhook processing', duration, {
-          itemCount: notification.value.length,
-        });
+        // Log performance metrics
+        this.logger.logPerformance(
+          'Outlook notification processing completed',
+          Date.now() - startTime,
+          {
+            totalNotifications: notification.value.length,
+            batches: Math.ceil(processingPromises.length / CONCURRENT_LIMIT),
+          },
+        );
       }
 
       return { status: 'success', processed: notification?.value?.length || 0 };

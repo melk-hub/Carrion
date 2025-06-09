@@ -121,66 +121,107 @@ export class GmailService {
     emailAddress: string,
     historyId: string,
   ): Promise<void> {
-    const token = await this.getTokenForUser(emailAddress);
-    const user = await this.userService.findByIdentifier(emailAddress, true);
-    if (token == null) {
-      this.logger.error(`No access token found for ${emailAddress}`);
-      return;
-    }
-    let accessToken = token.accessToken;
-    if (token.refreshToken != null && token.refreshToken != '') {
-      const isAccessTokenValid = await this.isAccessTokenValid(accessToken);
+    this.logger.log(
+      `Processing history update for ${emailAddress} with historyId: ${historyId}`,
+    );
 
-      if (!isAccessTokenValid) {
-        accessToken = await this.refreshAccessToken(token.refreshToken);
-        await this.updateAccessToken(emailAddress, accessToken);
-      }
-    }
+    // Initialize processing metrics
+    const startTime = Date.now();
+    let token;
 
-    const auth = await this.getOAuth2Client(accessToken);
-    const gmail = google.gmail({ version: 'v1', auth });
     try {
-      const res = await gmail.users.history.list({
+      token = await this.getTokenForUser(emailAddress);
+      const oauth2Client = await this.getOAuth2Client(token.accessToken);
+      const gmail = google.gmail({ version: 'v1', auth: oauth2Client });
+
+      // Fetch history changes
+      const history = await gmail.users.history.list({
         userId: 'me',
-        startHistoryId: token.externalId,
+        startHistoryId: historyId,
       });
-      const history = res.data.history;
-      if (!history) {
-        this.logger.log(`No new history records since ${historyId}.`);
+
+      if (!history.data.history) {
+        this.logger.log('No history changes found');
         return;
       }
-      for (const record of history) {
-        if (record.messagesAdded) {
-          for (const messageRecord of record.messagesAdded) {
-            const messageId = messageRecord.message.id;
 
-            const messageRes = await gmail.users.messages.get({
-              userId: 'me',
-              id: messageId,
-              format: 'full',
-            });
-            const message = messageRes.data;
-            const gmailMessage: GmailMessage = this.mapToGmailMessage(message);
-            this.mailFilter.processEmailAndCreateJobApplyFromGmail(
-              gmailMessage,
-              user.id,
-            );
-
-            if (this.isJobApplication(message)) {
-              const jobDescription = this.extractJobDescription(message);
-              await this.saveJobApplication(
-                emailAddress,
-                message,
-                jobDescription,
-              );
-            }
+      // Extract message IDs from history
+      const messageIds = new Set<string>();
+      for (const historyRecord of history.data.history) {
+        if (historyRecord.messages) {
+          for (const message of historyRecord.messages) {
+            messageIds.add(message.id);
           }
         }
+      }
+
+      const uniqueMessageIds = Array.from(messageIds);
+      this.logger.log(
+        `Found ${uniqueMessageIds.length} unique messages to process`,
+      );
+
+      // Create processing promises for all messages
+      const messageProcessingPromises = uniqueMessageIds.map((messageId) =>
+        this.processMessage(gmail, messageId, token.userId, emailAddress),
+      );
+
+      // Process messages in batches with concurrency limit
+      const CONCURRENT_LIMIT = await this.mailFilter.getConcurrentEmailLimit();
+
+      for (
+        let i = 0;
+        i < messageProcessingPromises.length;
+        i += CONCURRENT_LIMIT
+      ) {
+        const batch = messageProcessingPromises.slice(i, i + CONCURRENT_LIMIT);
+        await Promise.all(batch);
+        this.logger.log(`Processed batch of ${batch.length} emails`);
       }
     } catch (error) {
       this.logger.error('Error processing history update: ' + error.message);
     }
-    await this.updateGoogleTokenWithHistoryId(user.id, historyId);
+
+    // Update the token with the new historyId (only if token was successfully retrieved)
+    if (token) {
+      await this.updateGoogleTokenWithHistoryId(token.userId, historyId);
+    }
+  }
+
+  /**
+   * Process individual message with error handling
+   */
+  private async processMessage(
+    gmail: any,
+    messageId: string,
+    userId: string,
+    emailAddress: string
+  ): Promise<void> {
+    try {
+      const messageRes = await gmail.users.messages.get({
+        userId: 'me',
+        id: messageId,
+        format: 'full',
+      });
+      const message = messageRes.data;
+      const gmailMessage: GmailMessage = this.mapToGmailMessage(message);
+      
+      await this.mailFilter.processEmailAndCreateJobApplyFromGmail(
+        gmailMessage,
+        userId,
+      );
+
+      if (this.isJobApplication(message)) {
+        const jobDescription = this.extractJobDescription(message);
+        await this.saveJobApplication(
+          emailAddress,
+          message,
+          jobDescription,
+        );
+      }
+    } catch (error) {
+      this.logger.error(`Error processing message ${messageId}: ${error.message}`);
+      // Continue processing other messages even if one fails
+    }
   }
 
   async updateGoogleTokenWithHistoryId(
