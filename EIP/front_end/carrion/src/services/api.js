@@ -75,7 +75,7 @@ class ApiService {
   redirectToLogin() {
     // Nettoyer le localStorage et rediriger vers login
     localStorage.removeItem('lastPath');
-    window.location.href = '/login';
+    window.location.href = '/';
   }
 
   // Méthodes raccourcies pour les différents types de requêtes

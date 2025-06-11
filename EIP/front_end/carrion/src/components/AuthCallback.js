@@ -85,7 +85,7 @@ const AuthCallback = () => {
         <div className="error-message">
           <h2>{t('auth.authenticationFailed')}</h2>
           <p>{error}</p>
-          <button onClick={() => navigate('/login')}>
+          <button onClick={() => navigate('/')}>
             {t('auth.backToLogin')}
           </button>
         </div>
