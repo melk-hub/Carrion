@@ -3,7 +3,7 @@ import React from 'react';
 import { useLanguage } from "../contexts/LanguageContext";
 import "../styles/ApplicationList.css"
 
-function ApplicationList({ application, statusMap, onEdit, onDelete, onDetails }) {
+function ApplicationList({ application, statusMap, onEdit, onDelete, onDetails, onArchive }) {
   const { t } = useLanguage();
   
   const getStatusClass = (status) => {
@@ -71,7 +71,7 @@ function ApplicationList({ application, statusMap, onEdit, onDelete, onDetails }
           <span className="status-text-list">{statusMap[application.status] || t("dashboard.unknownStatus")}</span>
         </div>
 
-        {/* Details grid */}
+        {/* Details list */}
         <div className="modern-list-details">
           <div className="detail-item-modern">
             <div className="detail-icon-wrapper">
@@ -121,6 +121,13 @@ function ApplicationList({ application, statusMap, onEdit, onDelete, onDetails }
           </button>
           
           <button className="modern-list-button secondary" onClick={() => onEdit(application)} title={t("common.edit")}>
+            <div className="list-button-icon-wrapper">
+              {/* Emplacement pour icône éditer */}
+              <img src="/icons/edit.svg" alt="Edit" className="list-button-icon" />
+            </div>
+          </button>
+          
+          <button className="modern-list-button secondary" onClick={() => onArchive(application)} title={location.pathname.includes("dashboard") ? t("common.archive") : location.pathname.includes("archive") ? t("common.dearchive") : t("common.archive")}>
             <div className="list-button-icon-wrapper">
               {/* Emplacement pour icône éditer */}
               <img src="/icons/edit.svg" alt="Edit" className="list-button-icon" />

@@ -8,7 +8,7 @@ import LocationIcon from "../assets/map.png"
 import InterviewIcon from "../assets/calendar.png"
 import CompanyIcon from "../assets/avatar.png"
 
-function ApplicationCard({ application, statusMap, onEdit, onDelete, onDetails }) {
+function ApplicationCard({ application, statusMap, onEdit, onDelete, onDetails, onArchive }) {
   const { t } = useLanguage();
   
   const getStatusClass = (status) => {
@@ -139,7 +139,17 @@ function ApplicationCard({ application, statusMap, onEdit, onDelete, onDetails }
           <button className="modern-action-button secondary" onClick={() => onEdit(application)}>
             <span>{t("common.edit")}</span>
           </button>
-          
+
+          <button className="modern-action-button secondary" onClick={() => onArchive(application.id)}>
+            <span>
+              {location.pathname.includes("dashboard")
+                ? t("common.archive")
+                : location.pathname.includes("archive")
+                ? t("common.dearchive")
+                : t("common.archive")}
+            </span>
+          </button>
+
           <button className="modern-action-button danger" onClick={() => onDelete(application.id)}>
             <span>{t("common.delete")}</span>
           </button>

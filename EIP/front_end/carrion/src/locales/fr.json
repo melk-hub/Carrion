@@ -8,6 +8,8 @@
     "save": "Sauvegarder",
     "delete": "Supprimer",
     "edit": "Modifier",
+    "archive": "Archiver",
+    "dearchive": "Désarchiver",
     "add": "Ajouter",
     "update": "Modifier",
     "close": "Fermer",
@@ -224,7 +226,7 @@
     }
   },
   "archives": {
-    "title": "Mes Archives",
+    "title": "Aperçu de vos candidatures archivées",
     "description": "Consultez vos anciennes candidatures",
     "noArchives": "Aucune candidature trouvée",
     "restoreApplication": "Restaurer la candidature",
@@ -240,20 +242,24 @@
       "applicationDate": "Date de candidature :",
       "seeDetails": "Voir les détails"
     },
-    "fakeData": {
-      "companyA": "Entreprise A",
-      "companyB": "Entreprise B", 
-      "companyC": "Entreprise C",
-      "companyD": "Entreprise D",
-      "companyE": "Entreprise E",
-      "companyF": "Entreprise F",
-      "frontendDeveloper": "Développeur Frontend",
-      "backendEngineer": "Ingénieur Backend",
-      "uiuxDesigner": "Designer UI/UX",
-      "backendDeveloper": "Développeur Backend",
-      "itProjectManager": "Chef de Projet IT",
-      "devopsConsultant": "Consultant DevOps",
-      "today": "Aujourd'hui"
+    "stats": {
+      "total": "Total",
+      "pending": "En attente",
+      "accepted": "Acceptées",
+      "refused": "Refusées"
+    },
+    "banner": {
+      "title": "Trouvez votre emploi idéal",
+      "description": "Suivez vos candidatures et maximisez vos chances de succès"
+    },
+    "label": "TRIER PAR",
+    "date": "Date",
+    "status": "Statut",
+    "viewGrid": "Voir en grille",
+    "viewList": "Voir en liste",
+    "empty": {
+      "title": "Aucune candidature archivée",
+      "text": "Suivez vos candidatures et maximisez vos chances de succès"
     }
   },
   "modal": {

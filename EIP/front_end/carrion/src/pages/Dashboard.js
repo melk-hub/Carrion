@@ -91,6 +91,21 @@ function Dashboard() {
     }
   }
 
+  const handleArchiveApplication = async (id) => {
+    try {
+      const response = await apiService.delete(`/job_applies/${id}`);
+      // changer la route pour les archives des candidatures
+
+      if (!response.ok) {
+        throw new Error(`${t('dashboard.errors.archiveError')} ${response.status}`);
+      }
+
+      setApplications(applications.filter((app) => app.id !== id))
+    } catch (error) {
+      console.error(t('dashboard.errors.archiveError'), error)
+    }
+  }
+  
   const handleDeleteApplication = async (id) => {
     try {
       const response = await apiService.delete(`/job_applies/${id}`);
@@ -279,6 +294,7 @@ function Dashboard() {
                   application={application}
                   statusMap={statusMap}
                   onEdit={openEditPopup}
+                  onArchive={handleArchiveApplication}
                   onDelete={handleDeleteApplication}
                   onDetails={openDetailsPopup}
                 />
