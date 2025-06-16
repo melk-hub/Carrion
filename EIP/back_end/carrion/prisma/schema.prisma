@@ -10,23 +10,42 @@ datasource db {
 }
 
 model User {
-  id                 String     @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  username           String     @unique
-  firstName          String
-  lastName           String?
-  email              String     @unique
-  password           String?
-  birthDate          DateTime?
-  createdAt          DateTime   @default(now())
-  role               Role       @default(VISITOR)
-  hashedRefreshToken String?    @unique
-  Settings           Settings?  @relation("UserSettings")
-  tokens             Token[]    @relation("UserTokens")
-  jobApplies         jobApply[] @relation("UserJobApplies")
+  id                 String       @id @default(uuid()) @db.Uuid
+  username           String       @unique
+  email              String       @unique
+  password           String
+  hasProfile         Boolean      @default(false)
+  createdAt          DateTime     @default(now())
+  role               Role         @default(VISITOR)
+  jobApplies         jobApply[]   @relation("UserJobApplies")
+  userProfile        UserProfile? @relation("UserProfile")
+  Settings           Settings?    @relation("UserSettings")
+  hashedRefreshToken String?      @unique
+  tokens             Token[]      @relation("UserTokens")
+}
+
+model UserProfile {
+  userId              String    @unique @db.Uuid
+  firstName           String?
+  lastName            String?
+  birthDate           DateTime? @db.Date
+  school              String?
+  city                String?
+  phoneNumber         String?
+  personalDescription String?
+  portfolioLink       String?
+  linkedin            String?
+  goal                String?
+  jobSought           String?
+  contractSought      String[]
+  locationSought      String[]
+  sector              String[]
+  resume              String?
+  user                User      @relation("UserProfile", fields: [userId], references: [id])
 }
 
 model Token {
-  id                String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  id                String   @id @default(uuid()) @db.Uuid
   name              String
   accessToken       String
   refreshToken      String
@@ -38,22 +57,22 @@ model Token {
 }
 
 model jobApply {
-  id            String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  id            String    @id @default(uuid()) @db.Uuid
   Title         String
   Company       String
   Location      String?
   Salary        Int?
+  User          User      @relation("UserJobApplies", fields: [UserId], references: [id], onDelete: Cascade)
   UserId        String    @db.Uuid
   status        Status
   imageUrl      String?
   createdAt     DateTime  @default(now())
   contractType  String?
   interviewDate DateTime?
-  User          User      @relation("UserJobApplies", fields: [UserId], references: [id], onDelete: Cascade)
 }
 
 model Settings {
-  id       String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  id       String   @id @default(uuid()) @db.Uuid
   UserId   String   @unique @db.Uuid
   document String[]
   imageUrl String?

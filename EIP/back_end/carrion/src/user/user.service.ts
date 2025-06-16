@@ -27,24 +27,11 @@ export class UserService {
   }
 
   async create(createUserDto: CreateUserDto) {
-    try {
-      const formattedDate = createUserDto.birthDate
-        ? new Date(createUserDto.birthDate).toISOString()
-        : null;
-      return await this.prisma.user.create({
-        data: {
-          ...createUserDto,
-          birthDate: formattedDate,
-        },
-      });
-    } catch (error) {
-      if (error.code === 'P2002') {
-        throw new ConflictException(
-          'User with this email or username already exists',
-        );
-      }
-      throw error;
-    }
+    return await this.prisma.user.create({
+      data: {
+        ...createUserDto,
+      },
+    });
   }
 
   async findByIdentifier(identifier: string, isEmail: boolean) {
@@ -68,8 +55,6 @@ export class UserService {
         id: true,
         username: true,
         email: true,
-        firstName: true,
-        lastName: true,
         hashedRefreshToken: true,
         role: true,
       },

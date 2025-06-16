@@ -8,10 +8,9 @@ export class UsersService {
   async addUserFullName(firstName: string, lastName: string) {
     const user = await this.prisma.user.create({
       data: {
-        firstName: firstName,
-        lastName: lastName,
         email: `${firstName.toLowerCase()}.${lastName.toLowerCase()}@test.com`,
         username: `${firstName.toLowerCase()}_${lastName.toLowerCase()}`,
+        password: '',
       },
     });
     return user;

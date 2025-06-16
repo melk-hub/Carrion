@@ -37,8 +37,8 @@ export class UserController {
   @ApiResponse({ status: 201, description: 'User created successfully' })
   @ApiResponse({ status: 400, description: 'Bad request' })
   @ApiResponse({ status: 409, description: 'User already exists' })
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.userService.create(createUserDto);
+  create(@Body() createUserInfo: CreateUserDto) {
+    return this.userService.create(createUserInfo);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -85,5 +85,11 @@ export class UserController {
   @ApiResponse({ status: 404, description: 'User not found' })
   remove(@Param('id') id: string) {
     return this.userService.remove(id);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('profile')
+  async updateProfile(@Req() req, @Body() updateUserDto: UpdateUserDto) {
+    return this.userService.update(req.user.id, updateUserDto);
   }
 }

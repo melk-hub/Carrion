@@ -35,7 +35,7 @@ function Dashboard() {
       }
     };
     fetchApplications();
-  }, [t]);
+  }, [API_URL]);
 
   const handleUpdateApplication = async () => {
     try {

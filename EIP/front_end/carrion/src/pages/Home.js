@@ -1,41 +1,34 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import InfosModal from "../components/InfosModal";
 import { useLanguage } from '../contexts/LanguageContext';
 import "../styles/Home.css";
 
 export default function Home() {
+    const [showWelcomeModal, setShowWelcomeModal] = useState(false);
     const navigate = useNavigate();
     const { t } = useLanguage();
+
+    useEffect(() => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const isNew = urlParams.get("new") === "true";
+  
+      if (isNew) {
+        setShowWelcomeModal(true);
+        window.history.replaceState({}, document.title, window.location.pathname);
+      }
+    }, []);
     
     return (
-        <div className="home-container">
-            {/* Welcome Section */}
-            <div className="welcome-section">
-                <div className="welcome-content">
-                    <h1 className="welcome-title">{t('home.welcome')}</h1>
-                    <p className="welcome-subtitle">{t('home.welcomeMessage')}</p>
-                </div>
-                <div className="welcome-stats">
-                    <div className="stat-item">
-                        <span className="stat-number">12</span>
-                        <span className="stat-label">Applications actives</span>
-                    </div>
-                    <div className="stat-item">
-                        <span className="stat-number">3</span>
-                        <span className="stat-label">Entretiens programmés</span>
-                    </div>
-                    <div className="stat-item">
-                        <span className="stat-number">85%</span>
-                        <span className="stat-label">Taux de réponse</span>
-                    </div>
-                </div>
-            </div>
-
-            {/* Main Content Grid */}
-            <div className="main-grid">
-                {/* Recent Applications Card */}
-                <div className="card recent-applications">
-                    <div className="card-header">
+        <div>
+          <InfosModal
+        isOpen={showWelcomeModal}
+        onClose={() => setShowWelcomeModal(false)}
+      />
+            <div className="dashboard-container">
+                <h1 className="title">{t('home.welcome')}</h1>
+                <div className="top-cards">
+                    <div className="card highlight">
                         <h3>{t('home.recentApplications')}</h3>
                         <button className="see-all-btn" onClick={() => navigate('/dashboard')}>
                             Voir tout

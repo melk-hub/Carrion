@@ -5,9 +5,9 @@ import { PrismaModule } from 'src/prisma/prisma.module';
 import { JwtModule, JwtService } from '@nestjs/jwt';
 import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from 'src/auth/auth.module';
-import { AuthService } from 'src/auth/auth.service';
 import { HttpModule } from '@nestjs/axios';
 import { CustomLoggingService } from 'src/common/services/logging.service';
+import { AuthService } from 'src/auth/auth.service';
 
 @Module({
   imports: [

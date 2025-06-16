@@ -33,19 +33,14 @@ export class MicrosoftStrategy extends PassportStrategy(Strategy, 'microsoft') {
   }
 
   async validate(accessToken: string, refreshToken: string, profile: Profile) {
-    try {
-      const user = await this.authService.validateOAuthUser({
-        firstName: profile.name.givenName,
-        lastName: profile.name.familyName,
-        username: profile.username ?? profile.name.givenName,
-        email: profile.emails[0].value,
-        birthDate: '',
-        password: '',
-      });
-      return { ...user, accessToken, refreshToken };
-    } catch (error) {
-      console.error('erreur:', error);
-      return;
-    }
+    const user = await this.authService.validateOAuthUser({
+      firstName: profile.name.givenName,
+      lastName: profile.name.familyName,
+      username: profile.username ?? profile.name.givenName,
+      email: profile.emails[0].value,
+      birthDate: '',
+      password: '',
+    });
+    return user;
   }
 }

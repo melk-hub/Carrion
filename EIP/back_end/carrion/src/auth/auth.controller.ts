@@ -67,7 +67,9 @@ export class AuthController {
       sameSite: 'Strict',
       maxAge: tokenTime,
     });
-    return res.status(HttpStatus.OK).send();
+    return res
+      .status(HttpStatus.OK)
+      .send({ message: 'User logged in successfully' });
   }
 
   @Public()
@@ -87,8 +89,8 @@ export class AuthController {
     status: 409,
     description: 'User with the same email or username',
   })
-  async signUp(@Body() createUserDto: CreateUserDto, @Res() res) {
-    const token = await this.authService.signUp(createUserDto);
+  async signUp(@Body() userInfo: CreateUserDto, @Res() res) {
+    const token = await this.authService.signUp(userInfo);
 
     res.cookie('access_token', token.accessToken, {
       httpOnly: true,
@@ -96,7 +98,9 @@ export class AuthController {
       sameSite: 'Strict',
       maxAge: 1000 * 60 * 60 * 24,
     });
-    return res.status(HttpStatus.OK).send();
+    return res
+      .status(HttpStatus.OK)
+      .send({ message: 'User created successfully' });
   }
 
   @Public()
