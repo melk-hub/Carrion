@@ -4,11 +4,10 @@ import { motion, AnimatePresence } from "framer-motion";
 import InputField from "./InputField";
 import Select from "react-select";
 import AsyncSelect from "react-select/async";
-import debounce from "lodash/debounce";
+import debounce from "lodash.debounce";
 
 function InfosModal({ isOpen, onClose }) {
   const [activeStep, setActiveStep] = useState("step2");
-  const [countryInput, setCountryInput] = useState("");
   const [personalInfo, setPersonalInfo] = useState({
     lastName: "",
     firstName: "",
@@ -30,42 +29,44 @@ function InfosModal({ isOpen, onClose }) {
   const resumeInputRef = useRef(null);
   const API_URL = process.env.REACT_APP_API_URL;
 
-  const fetchedCityOptions = async (inputValue) => {
+  const fetchAndFormatCities = async (inputValue) => {
     if (!inputValue || inputValue.length < 2) return [];
+
     try {
       const response = await fetch(`${API_URL}/utils/countryList`, {
-        body: JSON.stringify({
-          inputValue,
-        }),
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ inputValue }),
         credentials: "include",
       });
+
       if (!response.ok) {
-        console.error("Failed to fetch city suggestions");
         return [];
       }
+
       const data = await response.json();
-      console.log(data);
-      return data;
+
+      return data.map((loc) => ({
+        label: `${loc.city}, ${loc.state}, ${loc.country}`,
+        value: loc,
+      }));
     } catch (error) {
-      console.error("Error fetching city suggestions:", error);
+      console.error(
+        "Error occured while trying to get the cities list:",
+        error
+      );
       return [];
     }
   };
 
-  const debouncedLoadCities = debounce((inputValue, callback) => {
-    return fetchedCityOptions(inputValue)
-      .then((options) => callback(null, options))
-      .catch((error) => callback(error, null));
-  }, 500);
+  const loadOptions = (inputValue, callback) => {
+    fetchAndFormatCities(inputValue).then((options) => {
+      callback(options);
+    });
+  };
 
-  /**
-   * @typedef {Object} ContractOption
-   * @property {string} value
-   * @property {string} label
-   * This is an array of objects to fill out the contract type field
-   */
+  const debouncedLoadCities = debounce(loadOptions, 500);
+
   const contractOptions = [
     { value: "permanent", label: "CDI" },
     { value: "fixedTerm", label: "CDD" },
@@ -103,61 +104,44 @@ function InfosModal({ isOpen, onClose }) {
   const handleNextStep = (e) => {
     e.preventDefault();
     setDirection(1);
-    if (activeStep === "step1") {
-      setActiveStep("step2");
-    } else if (activeStep === "step2") {
-      setActiveStep("step3");
-    }
+    if (activeStep === "step1") setActiveStep("step2");
+    else if (activeStep === "step2") setActiveStep("step3");
   };
 
   const handlePrevStep = () => {
-    if (activeStep === "step2") {
-      setActiveStep("step1");
-    } else if (activeStep === "step3") {
-      setActiveStep("step2");
-    }
+    setDirection(-1);
+    if (activeStep === "step2") setActiveStep("step1");
+    else if (activeStep === "step3") setActiveStep("step2");
   };
 
   const getSelectedOptionObjects = () => {
-    if (!Array.isArray(personalInfo.contractType)) {
-      return [];
-    }
+    if (!Array.isArray(personalInfo.contractType)) return [];
     return personalInfo.contractType
       .map((valueString) =>
         contractOptions.find((option) => option.value === valueString)
       )
-      .filter((option) => option !== undefined);
-  };
-
-  const handleCityChange = (selectedCity) => {
-    if (selectedCity) {
-      setPersonalInfo((prevPersonalInfo) => ({
-        ...prevPersonalInfo,
-        city: selectedCity.label,
-      }));
-    } else {
-      setPersonalInfo((prevPersonalInfo) => ({
-        ...prevPersonalInfo,
-        city: "",
-      }));
-    }
+      .filter(Boolean);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      console.log("personalInfo:", personalInfo);
+      const submissionData = {
+        ...personalInfo,
+        location: personalInfo.location.map((option) => option.value),
+      };
+
       const response = await fetch(`${API_URL}/user-profile/create`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(personalInfo),
+        body: JSON.stringify(submissionData),
         credentials: "include",
       });
       if (response.ok) {
         onClose();
       }
     } catch (error) {
-      console.error("Error during submit:", error);
+      console.error("Erreur lors de la soumission:", error);
     }
   };
 
@@ -172,10 +156,8 @@ function InfosModal({ isOpen, onClose }) {
             ? "2/3"
             : "3/3"}
         </h1>
-
         <hr />
-
-        <AnimatePresence mode="wait">
+        <AnimatePresence mode="wait" custom={direction}>
           {activeStep === "step1" && (
             <motion.div
               key="step1"
@@ -266,21 +248,18 @@ function InfosModal({ isOpen, onClose }) {
                     isMulti
                     options={contractOptions}
                     value={getSelectedOptionObjects()}
-                    onChange={(selectedOptionObjects) => {
-                      let newSelectedValues = [];
-                      if (selectedOptionObjects)
-                        newSelectedValues = selectedOptionObjects.map(
-                          (option) => option.value
-                        );
-                      setPersonalInfo((prevPersonalInfo) => ({
-                        ...prevPersonalInfo,
-                        contractType: newSelectedValues,
+                    onChange={(selectedOptions) => {
+                      const newValues = selectedOptions
+                        ? selectedOptions.map((o) => o.value)
+                        : [];
+                      setPersonalInfo((prev) => ({
+                        ...prev,
+                        contractType: newValues,
                       }));
                     }}
                     placeholder="Sélectionnez..."
                   />
                 </div>
-
                 <p>Quel est ton objectif principal ?</p>
                 <div className="radio-group">
                   <label>
@@ -290,7 +269,7 @@ function InfosModal({ isOpen, onClose }) {
                       value="centralisation"
                       checked={personalInfo.goal === "centralisation"}
                       onChange={handleChange}
-                    />
+                    />{" "}
                     La centralisation des candidatures
                   </label>
                   <label>
@@ -300,7 +279,7 @@ function InfosModal({ isOpen, onClose }) {
                       value="automatisation"
                       checked={personalInfo.goal === "automatisation"}
                       onChange={handleChange}
-                    />
+                    />{" "}
                     Le suivi automatisé
                   </label>
                   <label>
@@ -310,11 +289,10 @@ function InfosModal({ isOpen, onClose }) {
                       value="documents"
                       checked={personalInfo.goal === "documents"}
                       onChange={handleChange}
-                    />
+                    />{" "}
                     L’espace documents
                   </label>
                 </div>
-
                 <div className="row-inputs">
                   <InputField
                     label="Secteur"
@@ -325,20 +303,21 @@ function InfosModal({ isOpen, onClose }) {
                 </div>
                 <div>
                   <label>Localisations souhaitées</label>
+
                   <AsyncSelect
                     cacheOptions
                     className="options-select"
                     classNamePrefix="custom-select"
                     loadOptions={debouncedLoadCities}
-                    defaultOptions
                     isClearable
                     isMulti
                     placeholder="Recherchez une ville..."
-                    value={countryInput}
-                    onChange={() => {
-                      setCountryInput((prevCountryInput, selectedCity) => {
-                        handleCityChange(selectedCity);
-                      });
+                    value={personalInfo.location}
+                    onChange={(selectedOptions) => {
+                      setPersonalInfo((prev) => ({
+                        ...prev,
+                        location: selectedOptions || [],
+                      }));
                     }}
                     loadingMessage={() => "Recherche..."}
                     noOptionsMessage={({ inputValue }) =>
@@ -348,7 +327,6 @@ function InfosModal({ isOpen, onClose }) {
                     }
                   />
                 </div>
-
                 <div className="button-group">
                   <button
                     type="button"
@@ -400,18 +378,12 @@ function InfosModal({ isOpen, onClose }) {
                       <button
                         type="button"
                         className="delete-btn"
-                        style={{
-                          visibility: personalInfo.resume
-                            ? "visible"
-                            : "hidden",
-                        }}
                         onClick={handleDeleteResume}
                       >
                         Supprimer mon CV
                       </button>
                     )}
                   </div>
-
                   <div className="links-section">
                     <InputField
                       label="LinkedIn"
@@ -433,7 +405,6 @@ function InfosModal({ isOpen, onClose }) {
                     />
                   </div>
                 </div>
-
                 <div className="button-group">
                   <button
                     type="button"
@@ -442,11 +413,7 @@ function InfosModal({ isOpen, onClose }) {
                   >
                     Précédent
                   </button>
-                  <button
-                    type="submit"
-                    className="primary-btn"
-                    onClick={handleSubmit}
-                  >
+                  <button type="submit" className="primary-btn">
                     Valider les informations
                   </button>
                 </div>
