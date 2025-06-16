@@ -237,13 +237,7 @@ button:hover .text-button {
   justify-content: center;
   align-items: flex-start;
   height: 100%;
-  max-width: 45%;
-  flex: 1;
-}
-
-.hero-description > div {
-  width: 100% !important;
-  max-width: 280px;
+  max-width: 40%;
 }
 
 .hero-description p {
