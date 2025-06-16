@@ -443,3 +443,13 @@
 .application-card.status-refused {
   border-left-color: #ef4444;
 }
+
+.corner-curve {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 100px;
+  height: 100px;
+  background: radial-gradient(circle at top right, transparent 100%, transparent 100%, #fff 100%, #fff 100%);
+  z-index: 100;
+}

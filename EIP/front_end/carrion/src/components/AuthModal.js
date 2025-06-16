@@ -135,7 +135,6 @@ function AuthModal({ isOpen, onClose, defaultTab }) {
                 <input type="text" name="identifier" placeholder={t('auth.emailOrUsername')} value={credentials.identifier} onChange={handleChange} required />
                 <label>{t('auth.password')}</label>
                 <input type="password" name="password" placeholder={t('auth.password')} value={credentials.password} onChange={handleChange} required />
-                {errorMessage && <p className="error-message">{errorMessage}</p>}
                 <div>
                   <input type='checkbox' id="rememberMe" name='rememberMe' value={credentials.rememberMe} onClick={handleChange} />
                   <label htmlFor="remember">{t('auth.rememberMe')}</label>

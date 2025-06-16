@@ -1,9 +1,9 @@
 .sidebar {
   position: fixed;
-  top: 0;
+  top: 70px;
   left: 0;
   width: 220px;
-  height: 100vh;
+  height: calc(100vh - 70px);
   background-color: #132238;
   color: white;
   display: flex;
@@ -11,6 +11,18 @@
   padding: 1rem;
   z-index: 1000;
   transition: width 0.3s ease;
+}
+
+/* Courbe décorative */
+.sidebar::before {
+  content: '';
+  position: absolute;
+  top: -20px;
+  right: 0;
+  width: 20px;
+  height: 20px;
+  background: radial-gradient(circle at top right, transparent 0%, transparent 70%, #132238 70%, #132238 100%);
+  z-index: 1001;
 }
 
 /* Sidebar réduite */
@@ -44,20 +56,18 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 0 auto;
-  margin-bottom: 4rem;
   cursor: pointer;
   transition: all 0.3s ease;
 }
 
 .logo-img {
-  width: 50px;
-  height: 50px;
-  margin-right: 4px;
+  width: 40px;
+  height: 40px;
+  margin-right: 8px;
 }
 
 .logo-text {
-  font-size: 1.6rem;
+  font-size: 1.4rem;
   font-weight: bold;
   color: white;
 }
@@ -112,75 +122,19 @@
   }
 }
 
-.corner-bg {
-  position: fixed;
-  top: 70px;
-  left: 220px;
-  width: 40px;
-  height: 40px;
-  background-color: #132238;
-  z-index: 1000;
-  transition: left 0.3s ease;
-}
-
-.sidebar.collapsed ~ .corner-bg {
-  left: 60px;
-}
-
-.corner-curve {
-  position: fixed;
-  top: 70px;
-  left: 220px;
-  width: 40px;
-  height: 40px;
-  border-top-left-radius: 40px;
-  background-color: #FFF9F0;
-  z-index: 1001;
-  transition: left 0.3s ease;
-}
-
-.sidebar.collapsed ~ .corner-curve {
-  left: 60px;
-}
-
-.sidebar-toggle-btn {
-  background: transparent;
-  border: none;
-  color: white;
-  cursor: pointer;
-  margin: 2rem auto 2rem auto;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 6px;
-  border-radius: 6px;
-  transition: background-color 0.2s ease;
-}
-
-.sidebar-toggle-btn:hover {
-  background-color: rgba(255, 255, 255, 0.15);
-}
-
 .topbar {
-  margin-left: 220px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
   height: 70px;
-  width: calc(100% - 220px);
   background-color: #132238;
   color: white;
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 0 20px;
-  position: fixed;
-  top: 0;
-  right: 0;
-  z-index: 1000;
-  transition: margin-left 0.3s ease, width 0.3s ease;
-}
-
-.sidebar.collapsed ~ .topbar {
-  margin-left: 60px;
-  width: calc(100% - 60px);
+  z-index: 1001;
 }
 
 .topbar-left,
@@ -287,7 +241,7 @@ button {
 
 .navbar-content {
   margin-left: 220px;
-  margin-top: 60px;
+  margin-top: 70px;
   background: #FFF9F0;
   transition: margin-left 0.3s ease;
   padding: 20px;

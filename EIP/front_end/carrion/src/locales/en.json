@@ -272,7 +272,7 @@
         "company": "Enter the company name",
         "title": "Enter the job title",
         "location": "City or workplace",
-        "salary": "Salary offered",
+        "salary": "Salary offered per month",
         "logo_url": "https://example.com",
         "website": "Company website URL",
         "interviewDateTime": "Select date and time",

@@ -80,7 +80,7 @@ function AddApplicationModal({ newApplication, setNewApplication, onAdd, onClose
                 />
               </div>
 
-              <div className="form-group">
+              {/* <div className="form-group">
                 <label htmlFor="imageUrl">
                   {t('modal.add.logo_url')}
                 </label>
@@ -92,7 +92,7 @@ function AddApplicationModal({ newApplication, setNewApplication, onAdd, onClose
                   value={newApplication.imageUrl || ''}
                   onChange={(e) => setNewApplication({ ...newApplication, imageUrl: e.target.value })}
                 />
-              </div>
+              </div> */}
             </div>
 
             {/* Deuxième colonne */}
@@ -108,7 +108,6 @@ function AddApplicationModal({ newApplication, setNewApplication, onAdd, onClose
                   onChange={(e) => setNewApplication({ ...newApplication, status: e.target.value })}
                   required
                 >
-                  <option value="">{t('modal.add.placeholders.status')}</option>
                   {statusOptions.map((option) => (
                     <option key={option.value} value={option.value}>
                       {option.label}
@@ -154,18 +153,23 @@ function AddApplicationModal({ newApplication, setNewApplication, onAdd, onClose
                 </div>
               </div>
 
-              <div className="form-group">
+              {/* <div className="form-group">
                 <label htmlFor="interviewDate">
                   {t('modal.add.interview_date')}
                 </label>
                 <input
-                  type="date"
+                  type="datetime-local"
                   id="interviewDate"
                   className="modern-input"
                   value={newApplication.interviewDate || ''}
-                  onChange={(e) => setNewApplication({ ...newApplication, interviewDate: e.target.value })}
+                  onChange={(e) => {
+                    console.log(e.target.value);
+                    const dateValue = e.target.value ? e.target.value.replace('T', ' ') + ':00' : '';
+                    console.log(e.target.value);
+                    setNewApplication({ ...newApplication, interviewDate: dateValue });
+                  }}
                 />
-              </div>
+              </div> */}
             </div>
           </div>
         </div>

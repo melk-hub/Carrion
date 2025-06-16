@@ -12,19 +12,24 @@ function EditApplicationModal({ application, setApplication, onUpdate, onClose, 
   }))
 
   const contractTypeOptions = [
-    { value: "Full-time", label: t('contractTypes.FULL_TIME') },
-    { value: "Part-time", label: t('contractTypes.PART_TIME') },
-    { value: "Internship", label: t('contractTypes.INTERNSHIP') },
-    { value: "Contract", label: t('contractTypes.CDI') },
-    { value: "Freelance", label: t('contractTypes.FREELANCE') },
+    { value: "Full-time", label: t('modal.add.contract_types.full_time') },
+    { value: "Part-time", label: t('modal.add.contract_types.part_time') },
+    { value: "Internship", label: t('modal.add.contract_types.internship') },
+    { value: "Contract", label: t('modal.add.contract_types.contract') },
+    { value: "Freelance", label: t('modal.add.contract_types.freelance') },
   ];
 
   // Format date for input field
-  const formatDateForInput = (dateString) => {
-    if (!dateString) return '';
-    const date = new Date(dateString);
-    return date.toISOString().split('T')[0];
-  };
+  // const formatDateForInput = (dateString) => {
+  //   if (!dateString) return '';
+  //   // Si la date est au format "2025-06-09 09:08:22", convertir en "2025-06-09T09:08"
+  //   if (dateString.includes(' ')) {
+  //     return dateString.substring(0, 16).replace(' ', 'T');
+  //   }
+  //   // Si c'est déjà au format ISO, extraire la partie datetime
+  //   const date = new Date(dateString);
+  //   return date.toISOString().substring(0, 16);
+  // };
 
   return (
     <div className="modal-overlay">
@@ -87,7 +92,7 @@ function EditApplicationModal({ application, setApplication, onUpdate, onClose, 
                 />
               </div>
 
-              <div className="form-group">
+              {/* <div className="form-group">
                 <label htmlFor="imageUrl">
                   {t('modal.add.logo_url')}
                 </label>
@@ -99,7 +104,7 @@ function EditApplicationModal({ application, setApplication, onUpdate, onClose, 
                   value={application.imageUrl || ''}
                   onChange={(e) => setApplication({ ...application, imageUrl: e.target.value })}
                 />
-              </div>
+              </div> */}
             </div>
 
             {/* Deuxième colonne */}
@@ -161,18 +166,22 @@ function EditApplicationModal({ application, setApplication, onUpdate, onClose, 
                 </div>
               </div>
 
-              <div className="form-group">
+              {/* <div className="form-group">
                 <label htmlFor="interviewDate">
                   {t('modal.add.interview_date')}
                 </label>
                 <input
-                  type="date"
+                  type="datetime-local"
                   id="interviewDate"
                   className="modern-input"
                   value={formatDateForInput(application.interviewDate)}
-                  onChange={(e) => setApplication({ ...application, interviewDate: e.target.value })}
+                  onChange={(e) => {
+                    // Convertir au format attendu par le backend: "2025-06-09 09:08:22"
+                    const dateValue = e.target.value ? e.target.value.replace('T', ' ') + ':00' : '';
+                    setApplication({ ...application, interviewDate: dateValue });
+                  }}
                 />
-              </div>
+              </div> */}
             </div>
           </div>
         </div>

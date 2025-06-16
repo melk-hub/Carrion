@@ -62,53 +62,26 @@ function Navbar({ sidebarCollapsed, setSidebarCollapsed, setIsAuthenticated }) {
   }, [reduceMotion]);
 
   return (
-      <header className="navbar">
-        <div className={`sidebar ${sidebarCollapsed ? 'collapsed' : ''}`}>
+    <header className="navbar">
+      <div className="topbar">
+        <div className="topbar-left">
           <div className="logo" onClick={() => navigate('/home')}>
             <img src={logo} alt="Carrion" className="logo-img"/>
-            {!sidebarCollapsed && <span className="logo-text">CARRION</span>}
+            <span className="logo-text">CARRION</span>
           </div>
-          <ul className="navbar-menu">
-            <li onClick={() => navigate('/home')} className={isActive('/home') ? 'active' : ''}>
-              <img src={home} alt="Home" className="menu-icon" style={{width: '20px', height: '20px'}}/>
-              <span className="menu-text">{t('navbar.home')}</span>
-            </li>
-            <li onClick={() => navigate('/dashboard')} className={isActive('/dashboard') ? 'active' : ''}>
-              <img src={candidature} alt="Candidature" className="menu-icon" style={{width: '20px', height: '20px'}}/>
-              <span className="menu-text">{t('navbar.applications')}</span>
-            </li>
-            <li onClick={() => navigate('/archives')} className={isActive('/archives') ? 'active' : ''}>
-              <img src={archives} alt="Archives" className="menu-icon" style={{width: '20px', height: '20px'}}/>
-              <span className="menu-text">{t('navbar.archives')}</span>
-            </li>
-          </ul>
-          <div className="motion-toggle">
-              <ToggleSwitch 
-                isChecked={reduceMotion}
-                setIsChecked={setReduceMotion}
-              />
-
-            </div>
         </div>
-
-        <div className="corner-bg" />
-        <div className="corner-curve" />
-
-        <div className="topbar">
-          <div className="topbar-left">
-          </div>
-          <span className="username">{t('common.hello')} Jeremy Smith</span>
-          <div className="topbar-right">
-            <LanguageDropdown className="dark-theme" style={{color: 'white'}}/>
-            <img 
-              src={notification ? notification_icon : bell} 
-              alt={notification ? "Notification" : "Bell"} 
-              className="menu-icon notifications" 
-              style={{width: '30px', height: '30px'}} 
-              onClick={() => setNotification(!notification)}
-            />
-            <div className="user-profile" ref={dropdownRef} onClick={handleToggleDropdown}>
-              <img src={avatar} alt="User" className="avatar" />
+        <span className="username">{t('common.hello')} Jeremy Smith</span>
+        <div className="topbar-right">
+          <LanguageDropdown className="dark-theme" style={{color: 'white'}}/>
+          <img 
+            src={notification ? notification_icon : bell} 
+            alt={notification ? "Notification" : "Bell"} 
+            className="menu-icon notifications" 
+            style={{width: '30px', height: '30px'}} 
+            onClick={() => setNotification(!notification)}
+          />
+          <div className="user-profile" ref={dropdownRef} onClick={handleToggleDropdown}>
+            <img src={avatar} alt="User" className="avatar" />
             {isDropdownOpen && (
               <ul className="dropdown-menu">
                 <li onClick={() => { navigate('/profile'); setIsDropdownOpen(false); }}>{t('navbar.profile')}</li>
@@ -117,10 +90,32 @@ function Navbar({ sidebarCollapsed, setSidebarCollapsed, setIsAuthenticated }) {
               </ul>
             )}
           </div>
-          </div>
         </div>
-      </header>
-    );
+      </div>
+      <div className={`sidebar ${sidebarCollapsed ? 'collapsed' : ''}`}>
+        <ul className="navbar-menu">
+          <li onClick={() => navigate('/home')} className={isActive('/home') ? 'active' : ''}>
+            <img src={home} alt="Home" className="menu-icon" style={{width: '20px', height: '20px'}}/>
+            <span className="menu-text">{t('navbar.home')}</span>
+          </li>
+          <li onClick={() => navigate('/dashboard')} className={isActive('/dashboard') ? 'active' : ''}>
+            <img src={candidature} alt="Candidature" className="menu-icon" style={{width: '20px', height: '20px'}}/>
+            <span className="menu-text">{t('navbar.applications')}</span>
+          </li>
+          <li onClick={() => navigate('/archives')} className={isActive('/archives') ? 'active' : ''}>
+            <img src={archives} alt="Archives" className="menu-icon" style={{width: '20px', height: '20px'}}/>
+            <span className="menu-text">{t('navbar.archives')}</span>
+          </li>
+        </ul>
+        <div className="motion-toggle">
+          <ToggleSwitch 
+            isChecked={reduceMotion}
+            setIsChecked={setReduceMotion}
+          />
+        </div>
+      </div>
+    </header>
+  );
 }
 
 export default Navbar;

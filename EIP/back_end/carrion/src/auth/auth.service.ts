@@ -579,17 +579,17 @@ export class AuthService {
           LogCategory.WEBHOOK,
           { userId, subscriptionId },
         );
-        return;
-      }
+      return;
+    }
 
       // Extend the subscription for another maximum period
       const newExpiration = new Date(Date.now() + 4230 * 60 * 1000);
       const expirationDateTime = newExpiration.toISOString();
 
       const url = `https://graph.microsoft.com/v1.0/subscriptions/${subscriptionId}`;
-      const body = {
-        expirationDateTime,
-      };
+    const body = {
+      expirationDateTime,
+    };
 
       const response$ = this.httpService.patch(url, body, {
         headers: {

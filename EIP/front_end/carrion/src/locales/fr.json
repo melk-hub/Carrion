@@ -272,11 +272,18 @@
         "company": "Saisissez le nom de l'entreprise",
         "title": "Saisissez l'intitulé du poste",
         "location": "Ville, région ou télétravail",
-        "salary": "Montant en €",
+        "salary": "Montant par mois",
         "logo_url": "https://exemple.com",
         "website": "URL du site web de l'entreprise",
         "interviewDateTime": "Sélectionnez la date et l'heure",
-        "interviewDate": "Date prévue pour l'entretien"
+        "interviewDate": "Sélectionnez la date et l'heure de l'entretien"
+      },
+      "contract_types": {
+        "full_time": "Temps plein",
+        "part_time": "Temps partiel",
+        "internship": "Stage",
+        "contract": "Contrat",
+        "freelance": "Freelance"
       }
     },
     "edit": {

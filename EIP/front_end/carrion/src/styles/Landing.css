@@ -231,6 +231,7 @@ button:hover .text-button {
   justify-content: center;
   align-items: flex-start;
   height: 100%;
+  max-width: 40%;
 }
 
 .hero-description p {

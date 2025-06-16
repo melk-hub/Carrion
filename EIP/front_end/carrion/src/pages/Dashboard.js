@@ -74,8 +74,8 @@ function Dashboard() {
         location: newApplication.location || undefined,
         salary: newApplication.salary ? parseInt(newApplication.salary) : undefined,
         contractType: newApplication.contractType || "Full-time",
-        interviewDate: newApplication.interviewDate ? new Date(newApplication.interviewDate).toISOString() : undefined,
-        imageUrl: newApplication.imageUrl || undefined,
+        // interviewDate: newApplication.interviewDate ? new Date(newApplication.interviewDate).toISOString() : undefined,
+        // imageUrl: newApplication.imageUrl || undefined,
       });
 
       if (!response.ok) {
@@ -206,7 +206,7 @@ function Dashboard() {
         <div className="banner">
           <div className="banner-content">
             <h2 className="banner-title">{t('dashboard.banner.title')}</h2>
-            <p className="banner-text">{t('dashboard.banner.text')}</p>
+            <p className="banner-text">{t('dashboard.banner.description')}</p>
           </div>
           <div className="search-container">
             <input
