@@ -10,6 +10,7 @@ import axios from 'axios';
 import home from '../assets/home-button.png';
 import candidature from '../assets/candidate-profile.png';
 import archives from '../assets/archives.png';
+import statistics from '../assets/statistics.jpg';
 import bell  from "../assets/bell.png";
 import avatar from "../assets/avatar.png";
 import notification_icon from "../assets/notification.png";
@@ -127,6 +128,10 @@ function Navbar({ sidebarCollapsed, setSidebarCollapsed, setIsAuthenticated }) {
           <li onClick={() => navigateAndScrollTop('/archives')} className={isActive('/archives') ? 'active' : ''}>
             <img src={archives} alt="Archives" className="menu-icon" style={{width: '20px', height: '20px'}}/>
             <span className="menu-text">{t('navbar.archives')}</span>
+          </li>
+          <li onClick={() => navigate('/statistics')} className={isActive('/statistics') ? 'active' : ''}>
+            <img src={statistics} alt="Statistics" className="menu-icon" style={{width: '20px', height: '20px'}}/>
+            <span className="menu-text">{t('navbar.statistics')}</span>
           </li>
         </ul>
         <div className="motion-toggle">

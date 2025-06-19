@@ -30,6 +30,7 @@
     "home": "Accueil",
     "applications": "Candidatures", 
     "archives": "Archives",
+    "statistics": "Statistiques",
     "profile": "Mon profil",
     "settings": "Paramètres",
     "logout": "Se déconnecter",
@@ -285,6 +286,26 @@
       "title": "Aucune candidature archivée",
       "text": "Suivez vos candidatures et maximisez vos chances de succès"
     }
+  },
+  "statistics": {
+    "title": "Statistiques de vos candidatures",
+    "description": "Analysez vos performances et optimisez votre recherche d'emploi",
+    "kpiCards": {
+      "totalApplications": "Total des candidatures",
+      "acceptedApplications": "Candidatures acceptées",
+      "pendingApplications": "Candidatures en attente",
+      "rejectedApplications": "Candidatures refusées"
+    },
+    "charts": {
+      "applicationsByStatus": "Candidatures par statut",
+      "applicationsByMonth": "Candidatures par mois",
+      "applicationsByCompany": "Candidatures par entreprise"
+    },
+    "noData": {
+      "title": "Aucune donnée disponible",
+      "description": "Aucune candidature trouvée pour afficher les statistiques"
+    },
+    "loading": "Chargement des statistiques..."
   },
   "modal": {
     "add": {

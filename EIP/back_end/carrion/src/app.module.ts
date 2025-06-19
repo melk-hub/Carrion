@@ -14,6 +14,8 @@ import { UsersModule } from './users/users.module';
 import { UtilsModule } from './utils/utils.module';
 import { OutlookModule } from './webhooks/microsoft/outlook.module';
 import { S3Module } from './aws/s3.module';
+import { StatisticsController } from './statistics/statistics.controller';
+import { StatisticsService } from './statistics/statistics.service';
 
 @Module({
   imports: [
@@ -29,7 +31,7 @@ import { S3Module } from './aws/s3.module';
     UtilsModule,
     S3Module,
   ],
-  controllers: [AppController, MailFilterController],
-  providers: [AppService, MailFilterService],
+  controllers: [AppController, MailFilterController, StatisticsController],
+  providers: [AppService, MailFilterService, StatisticsService],
 })
 export class AppModule {}

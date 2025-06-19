@@ -28,6 +28,7 @@
     "home": "Home",
     "applications": "Applications",
     "archives": "Archives",
+    "statistics": "Statistics",
     "profile": "My Profile",
     "settings": "Settings",
     "logout": "Logout",
@@ -284,6 +285,20 @@
       "devopsConsultant": "DevOps Consultant",
       "today": "Today"
     }
+  },
+  "statistics": {
+    "title": "Statistics of your applications",
+    "description": "Visualize your application statistics",
+    "totalApplications": "Total applications",
+    "acceptedApplications": "Accepted applications",
+    "rejectedApplications": "Rejected applications",
+    "pendingApplications": "Pending applications",
+    "applicationsByStatus": "Applications by status",
+    "applicationsByMonth": "Applications by month",
+    "applicationsByCompany": "Applications by company",
+    "applicationsByContractType": "Applications by contract type",
+    "noData": "No data available",
+    "loading": "Loading statistics..."
   },
   "modal": {
     "add": {

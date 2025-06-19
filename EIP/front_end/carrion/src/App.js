@@ -11,6 +11,7 @@ import Landing from "./pages/Landing";
 import Dashboard from "./pages/Dashboard";
 import Home from "./pages/Home";
 import Archives from "./pages/Archives";
+import Statistics from "./pages/Statistics";
 import AuthCallback from "./components/AuthCallback";
 import { useAuth, AuthProvider } from "./AuthContext";
 import { LanguageProvider } from "./contexts/LanguageContext";
@@ -147,6 +148,16 @@ function AppLayout() {
             element={
               isAuthenticated ? (
                 <Profile />
+              ) : (
+                <Navigate to="/" replace state={{ from: location }} />
+              )
+            }
+          />
+          <Route
+            path="/statistics"
+            element={
+              isAuthenticated ? (
+                <Statistics sidebarCollapsed={sidebarCollapsed}/>
               ) : (
                 <Navigate to="/" replace state={{ from: location }} />
               )
