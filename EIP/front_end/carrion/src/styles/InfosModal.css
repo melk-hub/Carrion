@@ -10,16 +10,14 @@
 }
 
 .infos-modal {
-  background: #fff;
-  border-radius: 24px;
-  padding: 3rem;
-  width: 800px;
-  height: 580px;
-  max-width: 90%;
+  background: white;
+  padding: 2rem 2.5rem;
+  border-radius: 16px;
+  width: 90%;
+  max-width: 750px;
   position: relative;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
-  position: relative;
-  overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 .close-button {

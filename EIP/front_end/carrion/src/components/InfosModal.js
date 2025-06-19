@@ -41,6 +41,7 @@ function InfosModal({ isOpen, onClose }) {
       });
 
       if (!response.ok) {
+        console.error("Échec de la récupération des suggestions de villes");
         return [];
       }
 
@@ -51,10 +52,7 @@ function InfosModal({ isOpen, onClose }) {
         value: loc,
       }));
     } catch (error) {
-      console.error(
-        "Error occured while trying to get the cities list:",
-        error
-      );
+      console.error("Erreur lors de la récupération des villes:", error);
       return [];
     }
   };
@@ -78,6 +76,43 @@ function InfosModal({ isOpen, onClose }) {
     { value: "seasonal", label: "Saisonnier" },
     { value: "volunteer", label: "Bénévole" },
     { value: "other", label: "Autres" },
+  ];
+
+  const jobSectors = [
+    {
+      value: "informatique",
+      label: "Informatique / Tech / Services Numériques",
+    },
+    {
+      value: "comptabilite_finance",
+      label: "Comptabilité / Finance / Assurance",
+    },
+    { value: "commerce_vente", label: "Commerce / Vente / Distribution" },
+    { value: "marketing_communication", label: "Marketing / Communication" },
+    { value: "ressources_humaines", label: "Ressources Humaines" },
+    { value: "sante_social", label: "Santé / Social / Services à la personne" },
+    {
+      value: "industrie_production",
+      label: "Industrie / Production / Maintenance",
+    },
+    { value: "btp_construction", label: "BTP / Construction" },
+    { value: "logistique_transport", label: "Logistique / Transport" },
+    {
+      value: "hotellerie_restauration",
+      label: "Hôtellerie / Restauration / Tourisme",
+    },
+    { value: "enseignement_formation", label: "Enseignement / Formation" },
+    { value: "art_culture_design", label: "Art / Culture / Design / Mode" },
+    {
+      value: "administration_service_public",
+      label: "Administration / Service Public",
+    },
+    { value: "conseil_audit", label: "Conseil / Audit" },
+    {
+      value: "agriculture_environnement",
+      label: "Agriculture / Environnement",
+    },
+    { value: "autre", label: "Autre" },
   ];
 
   if (!isOpen) return null;
@@ -114,12 +149,10 @@ function InfosModal({ isOpen, onClose }) {
     else if (activeStep === "step3") setActiveStep("step2");
   };
 
-  const getSelectedOptionObjects = () => {
-    if (!Array.isArray(personalInfo.contractType)) return [];
-    return personalInfo.contractType
-      .map((valueString) =>
-        contractOptions.find((option) => option.value === valueString)
-      )
+  const getSelectedOptionObjects = (options, selectedValues) => {
+    if (!Array.isArray(selectedValues)) return [];
+    return selectedValues
+      .map((value) => options.find((option) => option.value === value))
       .filter(Boolean);
   };
 
@@ -145,17 +178,14 @@ function InfosModal({ isOpen, onClose }) {
     }
   };
 
+  const selectStyles = {
+    menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+  };
+
   return (
     <div className="modal-overlay">
       <div className="infos-modal">
-        <h1>
-          Compléter votre profil{" "}
-          {activeStep === "step1"
-            ? "1/3"
-            : activeStep === "step2"
-            ? "2/3"
-            : "3/3"}
-        </h1>
+        <h1>Compléter votre profil {activeStep.replace("step", "")}/3</h1>
         <hr />
         <AnimatePresence mode="wait" custom={direction}>
           {activeStep === "step1" && (
@@ -247,7 +277,10 @@ function InfosModal({ isOpen, onClose }) {
                     closeMenuOnSelect={false}
                     isMulti
                     options={contractOptions}
-                    value={getSelectedOptionObjects()}
+                    value={getSelectedOptionObjects(
+                      contractOptions,
+                      personalInfo.contractType
+                    )}
                     onChange={(selectedOptions) => {
                       const newValues = selectedOptions
                         ? selectedOptions.map((o) => o.value)
@@ -258,6 +291,8 @@ function InfosModal({ isOpen, onClose }) {
                       }));
                     }}
                     placeholder="Sélectionnez..."
+                    menuPortalTarget={document.body}
+                    styles={selectStyles}
                   />
                 </div>
                 <p>Quel est ton objectif principal ?</p>
@@ -293,17 +328,32 @@ function InfosModal({ isOpen, onClose }) {
                     L’espace documents
                   </label>
                 </div>
-                <div className="row-inputs">
-                  <InputField
-                    label="Secteur"
-                    name="sector"
-                    value={personalInfo.sector}
-                    onChange={handleChange}
+                <div>
+                  <label htmlFor="sectorSelect">Secteur</label>
+                  <Select
+                    inputId="sectorSelect"
+                    className="options-select"
+                    classNamePrefix="custom-select"
+                    closeMenuOnSelect={false}
+                    isMulti
+                    options={jobSectors}
+                    value={getSelectedOptionObjects(
+                      jobSectors,
+                      personalInfo.sector
+                    )}
+                    onChange={(selected) => {
+                      const values = selected
+                        ? selected.map((s) => s.value)
+                        : [];
+                      setPersonalInfo((prev) => ({ ...prev, sector: values }));
+                    }}
+                    placeholder="Sélectionnez un ou plusieurs secteurs..."
+                    menuPortalTarget={document.body}
+                    styles={selectStyles}
                   />
                 </div>
                 <div>
                   <label>Localisations souhaitées</label>
-
                   <AsyncSelect
                     cacheOptions
                     className="options-select"
@@ -325,6 +375,8 @@ function InfosModal({ isOpen, onClose }) {
                         ? "Tapez au moins 2 caractères"
                         : "Aucune ville trouvée"
                     }
+                    menuPortalTarget={document.body}
+                    styles={selectStyles}
                   />
                 </div>
                 <div className="button-group">
