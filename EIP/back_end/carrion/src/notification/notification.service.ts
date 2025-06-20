@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
@@ -42,7 +46,7 @@ export class NotificationService {
 
   async deleteNotification(notificationId: string, userId: string) {
     const notification = await this.prisma.notification.findUnique({
-      where: { id: notificationId},
+      where: { id: notificationId },
     });
 
     if (!notification) {
@@ -56,7 +60,7 @@ export class NotificationService {
     }
 
     await this.prisma.notification.delete({
-      where: { id: notification.id},
+      where: { id: notification.id },
     });
 
     return { success: true };
