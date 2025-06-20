@@ -14,6 +14,7 @@ import { UsersModule } from './users/users.module';
 import { UtilsModule } from './utils/utils.module';
 import { OutlookModule } from './webhooks/microsoft/outlook.module';
 import { S3Module } from './aws/s3.module';
+import { NotificaionModule } from './notification/notification.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { S3Module } from './aws/s3.module';
     UsersModule,
     UtilsModule,
     S3Module,
+    NotificaionModule,
   ],
   controllers: [AppController, MailFilterController],
   providers: [AppService, MailFilterService],
