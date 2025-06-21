@@ -36,7 +36,6 @@ model UserProfile {
   portfolioLink       String?
   linkedin            String?
   goal                String?
-  jobSought           String?
   contractSought      String[]
   locationSought      String[]
   sector              String[]

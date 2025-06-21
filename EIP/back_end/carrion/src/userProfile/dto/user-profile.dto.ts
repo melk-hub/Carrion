@@ -101,16 +101,6 @@ export class UserProfileDto {
   goal?: string;
 
   @ApiProperty({
-    name: 'jobSought',
-    description: 'Job the user is looking for',
-    type: 'array',
-    example: 'Game developer',
-  })
-  @IsOptional()
-  @IsString()
-  jobSought?: string;
-
-  @ApiProperty({
     name: 'locationSought',
     description: 'Location the user want to find work at',
     type: 'array',

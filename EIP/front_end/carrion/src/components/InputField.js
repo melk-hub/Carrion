@@ -2,12 +2,12 @@ import React from 'react';
 
 function InputField({ label, required, ...props }) {
   return (
-    <div>
-      <label htmlFor={props.id}>
+    <div className="form-group">
+      <label htmlFor={props.id || props.name}>
         {label}
-        {required && <span style={{ color: 'red' }}>*</span>}
+        {required && <span style={{ color: '#e53e3e' }}>*</span>}
       </label>
-      <input required={required} {...props} />
+      <input id={props.id || props.name} required={required} {...props} />
     </div>
   );
 }
