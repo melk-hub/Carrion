@@ -4,7 +4,7 @@ import { useAuth } from "../AuthContext";
 import { useLanguage } from "../contexts/LanguageContext";
 import "../styles/Landing.css";
 import logo from "../assets/carrion_logo.png";
-import landing_img from "../assets/landing_bg.png";
+import landing_img from "../assets/landing_bg.jpeg";
 import optimize_img from "../assets/optimize_landing.jpg";
 import progression_img from "../assets/progression_landing.png";
 import centralize_img from "../assets/centralize_landing.png";
@@ -95,7 +95,7 @@ function Landing() {
           </div>
           <div className="navigation-actions">
             <LanguageDropdown style={{color: 'black'}}/>
-            <div style={{width: '150px', fontSize: '14px', maxHeight: '32px'}}>
+            <div style={{width: '10vw', fontSize: '14px', maxHeight: '32px'}}>
               <LoginBtn onClick={handleLoginClick}/>
             </div>
           </div>

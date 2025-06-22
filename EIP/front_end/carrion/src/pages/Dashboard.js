@@ -182,7 +182,6 @@ function Dashboard() {
   return (
     <div className="dashboard">
       <div className="container">
-        <h1 className="dashboard-title">{t('dashboard.title')}</h1>
 
         <div className="stats-container">
           <div className="stat-card">

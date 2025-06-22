@@ -1,3 +1,17 @@
+/* Variables CSS pour la cohérence avec la landing page */
+:root {
+  --background-color: #fff9f0;
+}
+
+/* Application du même background que la landing page */
+body, 
+.archives-page,
+.main-content {
+  background-image: url("../assets/svg/background.svg");
+  background-color: var(--background-color);
+  min-height: 100vh;
+}
+
 /* Top bar */
 
 .archives-title {
