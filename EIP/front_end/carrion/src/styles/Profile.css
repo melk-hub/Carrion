@@ -1,0 +1,337 @@
+.profile-page {
+  margin-left: 220px;
+  padding: 80px 5rem 2rem;
+  box-sizing: border-box;
+}
+
+.profile-header {
+    margin-bottom: 1rem;
+}
+
+.profile-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3rem;
+  justify-content: center;
+}
+
+.profile-left-column,
+.profile-right-column {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.profile-left-column {
+  flex: 1 1 60%;
+  min-width: 300px;
+}
+
+.profile-right-column {
+  flex: 1 1 30%;
+  min-width: 250px;
+}
+
+.profile-personal-info {
+    height: 35vh;
+    overflow: auto;
+}
+
+.profile-professional-info {
+    height: 35vh;
+    overflow: auto;
+;}
+
+.profile-personal-info,
+.profile-professional-info,
+.profile-picture {
+    background-color: white;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 1rem 2rem 0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.profile-personal-info h2,
+.profile-professional-info h2 {
+    margin: 0;
+}
+
+.profile-info label {
+margin-top: 25px;
+}
+
+.profile-info input {
+padding: 0.75rem 1rem;
+border: 1px solid;
+border-radius: 10px;
+font-size: 1rem;
+margin-top: 5px;
+}
+
+.row-inputs-personal {
+display: flex;
+gap: 5rem;
+}
+
+.row-inputs-personal div {
+flex: 1;
+display: flex;
+flex-direction: column;
+}
+
+.primary-btn {
+background: #132238;
+color: #fff;
+border-radius: 45px;
+font-size: 1rem;
+cursor: pointer;
+font-weight: bold;
+width: 30%;
+height: 45px;
+margin: 25px;
+}
+
+.button-wrapper {
+  display: flex;
+  justify-content: center;
+}
+
+.career-container {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    padding: 20px;
+    height: 100%;
+    max-height: 500px;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  
+  .upload-section {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+  .upload-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: #132238;
+    color: #ffffff;
+    font-weight: bold;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.3s;
+  }
+  
+  .upload-button:hover {
+    background: #333333;
+  }
+  
+  .document-list {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .document-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-direction: row;
+    padding: 7px;
+    border-radius: 8px;
+    border: #132238 1px solid;
+  }
+  
+  .delete-document {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: red;
+    transition: transform 0.2s;
+  }
+  
+  .delete-document:hover {
+    transform: scale(1.1);
+  }
+
+  .preview-icon:hover {
+    scale: 1.1;
+  }
+
+  .preview-icon.clickable {
+    cursor: pointer;
+  }
+
+  .row-inputs-professional {
+    display: flex;
+    gap: 2rem;
+}
+
+.row-inputs-professional > .career-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.document-name {
+  font-size: 20px;
+}
+
+.document-name-input {
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 6px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  min-width: 120px;
+  max-width: 60%;
+}
+
+.profile-picture {
+    height: 30vh;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-direction: column;
+    padding: 1rem 0;
+}
+
+.profile-picture .image-wrapper {
+    position: relative;
+    width: 200px;
+    height: 200px;
+}
+
+.edit-actions {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  display: flex;
+  gap: 8px;
+}
+
+.edit-icon,
+.delete-icon {
+  background-color: rgba(255, 255, 255, 0.8);
+  border-radius: 50%;
+  padding: 5px;
+  cursor: pointer;
+  font-size: 1.2rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  transition: background-color 0.2s;
+}
+
+.edit-icon:hover,
+.delete-icon:hover {
+  background-color: #f0f0f0;
+}
+
+.profile-img {
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #132238;
+    display: block;
+}
+
+.profile-picture h2 {
+    position: absolute;
+    bottom: 1rem;
+    left: 50%;
+    transform: translateX(-50%);
+    margin: 0;
+}
+
+.profile-services {
+    margin-top: 1rem;
+}
+
+.profile-services h2 {
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+}
+
+.linked-services {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 3rem;
+}
+
+.service-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    width: 150px;
+    height: 150px;
+    padding: 10px;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+}
+
+.service-item img {
+    width: 50px;
+    height: 50px;
+}
+
+.service-item span {
+    font-size: 1rem;
+    text-align: center;
+}
+
+.add-service button {
+    font-size: 3rem;
+    border-radius: 8px;
+    border: none;
+    background-color: #fff;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.service-dropdown {
+  position: absolute;
+  top: 50px;
+  left: 0;
+  background-color: white;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  list-style: none;
+  padding: 0.5rem 0;
+  margin: 0;
+  z-index: 100;
+  min-width: 140px;
+}
+
+.service-dropdown li {
+  padding: 0.5rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.service-dropdown li:hover {
+  background-color: #f0f0f0;
+}
+
+.service-dropdown img {
+  width: 20px;
+  height: 20px;
+}

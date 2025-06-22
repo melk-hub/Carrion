@@ -15,7 +15,6 @@ import {
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LocalAuthGuard } from './guards/local/local-auth.guard';
-import { RefreshAuthGuard } from './guards/refresh/refresh-auth.guard';
 import { JwtAuthGuard } from './guards/jwt/jwt-auth.guard';
 import { Public } from './decorators/public.decorator';
 import { GoogleAuthGuard } from './guards/google/google-auth.guard';
@@ -440,8 +439,15 @@ export class AuthController {
 
       res.redirect(`${process.env.FRONT}/auth/callback?auth=success`);
     } catch (error) {
-      this.logger.error('Microsoft authentication error', undefined, LogCategory.AUTH, { error: error.message });
-      return res.redirect(`${process.env.FRONT}?error=server_error&errorDescription=Authentication failed`);
+      this.logger.error(
+        'Microsoft authentication error',
+        undefined,
+        LogCategory.AUTH,
+        { error: error.message },
+      );
+      return res.redirect(
+        `${process.env.FRONT}?error=server_error&errorDescription=Authentication failed`,
+      );
     }
   }
 
@@ -456,10 +462,11 @@ export class AuthController {
       });
 
       const webhookStatus = [];
-      
+
       for (const tokenRecord of usersWithMicrosoftTokens) {
         if (tokenRecord.externalId) {
-          const isActive = await this.authService.checkWebhookSubscription(tokenRecord);
+          const isActive =
+            await this.authService.checkWebhookSubscription(tokenRecord);
           webhookStatus.push({
             userId: tokenRecord.userId,
             userEmail: tokenRecord.user?.email,
@@ -474,8 +481,8 @@ export class AuthController {
         status: 'success',
         data: {
           totalWebhooks: webhookStatus.length,
-          activeWebhooks: webhookStatus.filter(w => w.isActive).length,
-          inactiveWebhooks: webhookStatus.filter(w => !w.isActive).length,
+          activeWebhooks: webhookStatus.filter((w) => w.isActive).length,
+          inactiveWebhooks: webhookStatus.filter((w) => !w.isActive).length,
           webhooks: webhookStatus,
         },
       };

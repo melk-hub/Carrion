@@ -34,6 +34,12 @@ export class MailFilterController {
     status: 201,
     description:
       'Information extracted and job application created successfully.',
+    type: JobApplyDto,
+  })
+  @ApiResponse({
+    status: 201,
+    description:
+      'Information extracted and job application created successfully.',
     type: String,
   })
   @ApiResponse({
@@ -71,8 +77,9 @@ export class MailFilterController {
   @Get('health')
   async getHealth() {
     const metrics = this.mailFilterService.getPerformanceMetrics();
-    const recommendations = await this.mailFilterService.getPerformanceRecommendations();
-    
+    const recommendations =
+      await this.mailFilterService.getPerformanceRecommendations();
+
     return {
       status: 'healthy',
       timestamp: new Date().toISOString(),
@@ -81,9 +88,9 @@ export class MailFilterController {
         cacheHitRate: metrics.cacheHitRate,
         errorRate: recommendations.currentPerformance.errorRate,
         avgLatency: recommendations.currentPerformance.avgLatency,
-        status: recommendations.currentPerformance.status
+        status: recommendations.currentPerformance.status,
       },
-      recommendations: recommendations.recommendations
+      recommendations: recommendations.recommendations,
     };
   }
 }

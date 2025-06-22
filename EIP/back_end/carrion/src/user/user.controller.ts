@@ -37,8 +37,8 @@ export class UserController {
   @ApiResponse({ status: 201, description: 'User created successfully' })
   @ApiResponse({ status: 400, description: 'Bad request' })
   @ApiResponse({ status: 409, description: 'User already exists' })
-  create(@Body() createUserInfo: CreateUserDto) {
-    return this.userService.create(createUserInfo);
+  create(@Body() createUserDto: CreateUserDto) {
+    return this.userService.create(createUserDto);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -48,7 +48,7 @@ export class UserController {
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiResponse({ status: 404, description: 'User not found' })
   async getProfile(@Req() req) {
-    return this.userService.findOne(req.user.id);
+    return await this.userService.findOne(req.user.id);
   }
 
   @UseGuards(JwtAuthGuard)

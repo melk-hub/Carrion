@@ -21,8 +21,6 @@ function Dashboard() {
   const [newApplication, setNewApplication] = useState(null)
   const [popupType, setPopupType] = useState(null)
 
-  const API_URL = process.env.REACT_APP_API_URL;
-
   useEffect(() => {
     const fetchApplications = async () => {
       try {
@@ -37,7 +35,7 @@ function Dashboard() {
       }
     };
     fetchApplications();
-  }, [API_URL]);
+  }, [t]);
 
   const handleUpdateApplication = async () => {
     try {

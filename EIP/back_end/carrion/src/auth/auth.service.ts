@@ -344,22 +344,52 @@ export class AuthService {
     return currentUser;
   }
 
-  async validateOAuthUser(OAuthUser: OAuthUserDto) {
-    const user = await this.userService.findByIdentifier(OAuthUser.email, true);
-    if (user) return user;
-    const createOAuthUser: CreateUserDto = {
-      ...OAuthUser,
-      hasProfile: true,
-    };
-    const createdUser = await this.userService.create(createOAuthUser);
-    // await this.userProfileService.createUserProfile(
-    //   {
-    //     firstName: OAuthUser.firstName,
-    //     lastName: OAuthUser.lastName,
-    //   },
-    //   createdUser.id,
-    // );
-    return createdUser;
+  async validateOAuthUser(OAuthUser: CreateUserDto) {
+    // Search by email first
+    const existingUser = await this.userService.findByIdentifier(
+      OAuthUser.email,
+      true,
+    );
+    if (existingUser) {
+      this.logger.logAuthEvent('User found with email', undefined, { email: OAuthUser.email });
+      return existingUser;
+    }
+
+    // If no user with this email, check the username too
+    const existingUserByUsername = await this.userService.findByIdentifier(
+      OAuthUser.username,
+      false,
+    );
+    // If username already exists, generate a unique name
+    let finalUsername = OAuthUser.username;
+    if (existingUserByUsername) {
+      // Generate a unique username by adding a suffix
+      const timestamp = Date.now().toString().slice(-6); // The last 6 digits of the timestamp
+      finalUsername = `${OAuthUser.username}_${timestamp}`;
+      this.logger.logAuthEvent('Username already exists', undefined, { username: OAuthUser.username });
+    }
+
+    try {
+      // Create the user with the potentially changed username
+      const newUser = await this.userService.create({
+        ...OAuthUser,
+        username: finalUsername,
+      });
+      this.logger.logAuthEvent('New OAuth user created', newUser.id, { email: OAuthUser.email, username: finalUsername });
+      return newUser;
+    } catch (error) {
+      this.logger.error('Failed to create OAuth user', undefined, LogCategory.AUTH, { error: error.message });
+      
+      if (error.message?.includes('already exists')) {
+        const uniqueUsername = `${OAuthUser.username}_${Date.now()}`;
+        this.logger.logAuthEvent('Retrying with unique username', undefined, { uniqueUsername });
+        return await this.userService.create({
+          ...OAuthUser,
+          username: uniqueUsername,
+        });
+      }
+      throw error;
+    }
   }
 
   async googleLogin(userId: string, refreshToken: string) {
@@ -389,12 +419,333 @@ export class AuthService {
           },
         })
         .toPromise();
-
+      
       // Store the historyId with the Gmail token
-      await this.updateGoogleTokenWithHistoryId(
-        userId,
-        response.data['historyId'],
+      await this.updateGoogleTokenWithHistoryId(userId, response.data['historyId']);
+    } catch (error) {
+      this.logger.error(
+        'Error creating Gmail webhook subscription',
+        undefined,
+        LogCategory.WEBHOOK,
+        { error: error.message },
       );
+      
+      this.logger.logAuthEvent(
+        'Continuing authentication without Gmail webhook',
+        undefined,
+      );
+    }
+  }
+
+  async createOutlookWebhook(accessToken: string, userId: string, retryCount: number = 0): Promise<void> {
+    const maxRetries = 3;
+    const baseDelay = 2000; // 2 seconds base delay
+
+    try {
+      const webhookUrl = `${process.env.FRONTEND_URL}/webhooks/outlook/handle-notification`;
+      const expirationDateTime = new Date(Date.now() + 4230 * 60 * 1000); // Maximum duration: 4230 minutes
+
+      this.logger.logAuthEvent(
+        'Creating Outlook webhook subscription',
+        userId,
+        {
+          webhookUrl,
+          expirationDateTime: expirationDateTime.toISOString(),
+          attempt: retryCount + 1,
+        },
+      );
+
+      const response$ = this.httpService.post(
+        'https://graph.microsoft.com/v1.0/subscriptions',
+        {
+          changeType: 'created',
+          notificationUrl: webhookUrl,
+          resource: "me/mailFolders('inbox')/messages",
+          expirationDateTime: expirationDateTime.toISOString(),
+          clientState: `${userId}-outlook`,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            'Content-Type': 'application/json',
+          },
+          timeout: 10000, // 10 second timeout
+        },
+      );
+
+      const response = await firstValueFrom(response$);
+      
+      if (response.data?.id) {
+        // Update the Microsoft token with the subscription ID
+        await this.updateMicrosoftTokenWithSubscription(userId, response.data.id);
+
+        // Schedule automatic renewal
+        this.scheduleOutlookWebhookRenewal(userId, response.data.id);
+
+        this.logger.logAuthEvent(
+          'Outlook webhook subscription created successfully',
+          userId,
+          {
+            subscriptionId: response.data.id,
+            expirationDateTime: response.data.expirationDateTime,
+            attempt: retryCount + 1,
+          },
+        );
+      } else {
+        throw new Error('Webhook created but no subscription ID returned');
+      }
+    } catch (error) {
+      const isRetryableError = this.isRetryableWebhookError(error);
+      
+      if (retryCount < maxRetries && isRetryableError) {
+        const delay = baseDelay * Math.pow(2, retryCount); // Exponential backoff
+        
+        this.logger.logAuthEvent(
+          `Outlook webhook creation failed, retrying in ${delay}ms`,
+          userId,
+          {
+            attempt: retryCount + 1,
+            maxRetries,
+            error: error.message,
+            willRetry: true,
+          },
+        );
+
+        setTimeout(async () => {
+          await this.createOutlookWebhook(accessToken, userId, retryCount + 1);
+        }, delay);
+        
+        return;
+      }
+
+      // Enhanced error logging
+      let errorDetails: any = {
+        message: error.message,
+        webhookUrl: `${process.env.FRONTEND_URL}/webhooks/outlook/handle-notification`,
+        userId,
+        attempt: retryCount + 1,
+        finalAttempt: true,
+      };
+
+      // If it's an HTTP error, get more details
+      if (error.response) {
+        errorDetails = {
+          ...errorDetails,
+          status: error.response.status,
+          statusText: error.response.statusText,
+          data: error.response.data,
+          responseHeaders: error.response.headers,
+        };
+      }
+
+      this.logger.error(
+        'Error creating Outlook webhook subscription - all retries exhausted',
+        undefined,
+        LogCategory.WEBHOOK,
+        errorDetails,
+      );
+
+      this.logger.logAuthEvent(
+        'Continuing authentication without Outlook webhook',
+        undefined,
+        { error: error.message, finalAttempt: true },
+      );
+    }
+  }
+
+  /**
+   * Determine if a webhook error is retryable
+   */
+  private isRetryableWebhookError(error: any): boolean {
+    // Retry on network errors, timeouts, and certain HTTP status codes
+    if (!error.response) return true; // Network error
+    
+    const status = error.response.status;
+    const retryableStatuses = [429, 500, 502, 503, 504]; // Rate limit, server errors
+    
+    return retryableStatuses.includes(status);
+  }
+
+  private scheduleOutlookWebhookRenewal(
+    userId: string,
+    subscriptionId: string,
+  ): void {
+    // Schedule renewal 1 hour before expiration (4230 minutes - 60 minutes = 4170 minutes)
+    const renewalTime = 4170 * 60 * 1000;
+
+    setTimeout(async () => {
+      await this.renewOutlookWebhook(userId, subscriptionId);
+    }, renewalTime);
+
+    this.logger.logAuthEvent(
+      'Outlook webhook renewal scheduled',
+      undefined,
+      {
+        subscriptionId,
+        renewalInMinutes: 4170,
+      },
+    );
+  }
+
+  async renewOutlookWebhook(
+    userId: string,
+    subscriptionId: string,
+  ): Promise<void> {
+    try {
+      const validToken = await this.getValidToken(userId, 'Microsoft_oauth2');
+      if (!validToken) {
+        this.logger.error(
+          'Cannot renew Outlook webhook - no valid token',
+          undefined,
+          LogCategory.WEBHOOK,
+          { userId, subscriptionId },
+        );
+      return;
+    }
+
+      // Extend the subscription for another maximum period
+      const newExpiration = new Date(Date.now() + 4230 * 60 * 1000);
+      const expirationDateTime = newExpiration.toISOString();
+
+      const url = `https://graph.microsoft.com/v1.0/subscriptions/${subscriptionId}`;
+    const body = {
+      expirationDateTime,
+    };
+
+      const response$ = this.httpService.patch(url, body, {
+        headers: {
+          Authorization: `Bearer ${validToken}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      await firstValueFrom(response$);
+
+      this.logger.logAuthEvent(
+        'Outlook webhook renewed successfully',
+        undefined,
+        {
+          subscriptionId,
+          newExpirationDateTime: expirationDateTime,
+        },
+      );
+
+      // Schedule the next renewal
+      this.scheduleOutlookWebhookRenewal(userId, subscriptionId);
+    } catch (error) {
+      this.logger.error(
+        'Failed to renew Outlook webhook',
+        undefined,
+        LogCategory.WEBHOOK,
+        {
+          userId,
+          subscriptionId,
+          error: error.message,
+        },
+      );
+
+      // If renewal fails, try to create a new webhook
+      try {
+        const validToken = await this.getValidToken(userId, 'Microsoft_oauth2');
+        if (validToken) {
+          await this.createOutlookWebhook(validToken, userId);
+        }
+      } catch (recreateError) {
+        this.logger.error(
+          'Failed to recreate Outlook webhook after renewal failure',
+          undefined,
+          LogCategory.WEBHOOK,
+          {
+            userId,
+            error: recreateError.message,
+          },
+        );
+      }
+    }
+  }
+
+  async updateGoogleTokenWithHistoryId(
+    userId: string,
+    historyId: string,
+  ): Promise<void> {
+    try {
+      // Find the Google token for this user
+      const existingToken = await this.prisma.token.findFirst({
+        where: {
+          userId,
+          name: 'Google_oauth2',
+        },
+      });
+
+      if (existingToken) {
+        // Update the token with the historyId
+        await this.prisma.token.update({
+          where: { id: existingToken.id },
+          data: {
+            externalId: historyId,
+          },
+        });
+        
+        this.logger.logAuthEvent(
+          'Google token updated with history ID',
+          userId,
+          { historyId },
+        );
+      } else {
+        this.logger.warn(
+          'No Google token found to update with history ID',
+          LogCategory.AUTH,
+          { userId, historyId },
+        );
+      }
+    } catch (error) {
+      this.logger.error(
+        'Failed to update Google token with history ID',
+        undefined,
+        LogCategory.AUTH,
+        {
+          userId,
+          historyId,
+          error: error.message,
+        },
+      );
+    }
+  }
+
+  async updateMicrosoftTokenWithSubscription(
+    userId: string,
+    subscriptionId: string,
+  ): Promise<void> {
+    try {
+      // Find the Microsoft token for this user
+      const existingToken = await this.prisma.token.findFirst({
+        where: {
+          userId,
+          name: 'Microsoft_oauth2',
+        },
+      });
+
+      if (existingToken) {
+        // Update the token with the subscriptionId
+        await this.prisma.token.update({
+          where: { id: existingToken.id },
+          data: {
+            externalId: subscriptionId,
+          },
+        });
+
+        this.logger.logAuthEvent(
+          'Microsoft token updated with subscription ID',
+          userId,
+          { subscriptionId },
+        );
+      } else {
+        this.logger.warn(
+          'No Microsoft token found to update with subscription ID',
+          LogCategory.AUTH,
+          { userId, subscriptionId },
+        );
+      }
     } catch (error) {
       this.logger.error(
         'Error creating Gmail webhook subscription',

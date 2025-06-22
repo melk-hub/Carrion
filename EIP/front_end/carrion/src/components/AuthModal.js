@@ -10,7 +10,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 function AuthModal({ isOpen, onClose, defaultTab }) {
   const [activeTab, setActiveTab] = useState(defaultTab || 'login');
   const [direction, setDirection] = useState(1);
-  const [credentials, setCredentials] = useState({ identifier: '', password: '', confirmPassword: '', username: '', firstName: '', lastName: '', birthDate: '1995-06-15', rememberMe: false });
+  const [credentials, setCredentials] = useState({ identifier: '', password: '', confirmPassword: '', username: '', rememberMe: false });
   const { setIsAuthenticated } = useAuth();
   const { t } = useLanguage();
   const navigate = useNavigate();

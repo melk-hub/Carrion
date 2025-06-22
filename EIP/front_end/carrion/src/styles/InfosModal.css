@@ -1,3 +1,4 @@
+/* ---- Styles Généraux de la Modale ---- */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -37,6 +38,7 @@
   margin-bottom: 2rem;
 }
 
+/* ---- Conteneur pour l'animation ---- */
 .form-content-wrapper {
   position: relative;
   overflow: hidden;
@@ -47,26 +49,29 @@
   width: 100%;
 }
 
-.info-form {
+/* ---- Styles des formulaires ---- */
+.infos-modal .info-form {
   display: flex;
   flex-direction: column;
   gap: 1.75rem;
 }
 
-.form-group {
+/* ---- Groupe de champ (label + input/select) ---- */
+.infos-modal .form-group {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
 }
 
-.form-group label {
+.infos-modal .form-group label {
   font-weight: 500;
   font-size: 0.9rem;
   color: #4a5568;
 }
 
-.form-group input,
-.date-picker-custom-input {
+/* ---- Styles unifiés pour INPUT et SELECT ---- */
+.infos-modal .form-group input,
+.infos-modal .date-picker-custom-input {
   background-color: white;
   border: 1px solid #cbd5e0;
   border-radius: 8px;
@@ -79,48 +84,97 @@
   text-align: left;
 }
 
-.form-group input:focus,
-.date-picker-custom-input:focus {
+.infos-modal .form-group input:focus,
+.infos-modal .date-picker-custom-input:focus {
   border-color: #4299e1;
   box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.3);
   outline: none;
 }
 
-.select__control {
+/* ---- Styles spécifiques à react-select ---- */
+.infos-modal .select__control {
   min-height: 48px !important;
+  height: 48px !important;
   border-radius: 8px !important;
   border: 1px solid #cbd5e0 !important;
   box-shadow: none !important;
   transition: border-color 0.2s, box-shadow 0.2s !important;
 }
 
-.select__control--is-focused {
+.infos-modal .select__control--is-focused {
   border-color: #4299e1 !important;
   box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.3) !important;
 }
 
-.select__value-container {
+.infos-modal .select__value-container {
   padding: 2px 0.85rem !important;
 }
 
+/* --- THE FIX IS HERE --- */
+/* All button styles are now prefixed with .infos-modal to make them specific */
+.infos-modal .button-group {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 1.5rem;
+  border-top: 1px solid #e2e8f0;
+  padding-top: 1.5rem;
+}
+
+.infos-modal .primary-btn,
+.infos-modal .secondary-btn {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  /* Resetting potentially inherited styles */
+  margin: 0;
+  width: auto;
+  height: auto;
+}
+
+.infos-modal .primary-btn {
+  background-color: #1a202c;
+  color: white;
+}
+.infos-modal .primary-btn:hover {
+  background-color: #2d3748;
+}
+
+.infos-modal .secondary-btn {
+  background-color: #e2e8f0;
+  color: #4a5568;
+}
+.infos-modal .secondary-btn:hover {
+  background-color: #cbd5e0;
+}
+
+/* Special case for the single button on step 1 */
+.infos-modal .button-group-step1 {
+  justify-content: center;
+}
+.infos-modal .button-group-step1 .primary-btn {
+  width: 50%;
+}
+
+/* ---- Other styles remain the same ---- */
 .select__input-container {
   padding: 0 !important;
   margin: 0 !important;
 }
-
 .select__single-value {
   margin: 0 !important;
 }
-
 .select__placeholder {
   color: #a0aec0;
 }
-
 .select__menu {
   border-radius: 8px !important;
   z-index: 9999;
 }
-
 .select__multi-value {
   background-color: #edf2f7;
   border-radius: 4px;
@@ -137,61 +191,16 @@
   background-color: #e53e3e;
   color: white;
 }
-
 .form-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 1.5rem 1.5rem;
 }
-
-.button-group {
-  display: flex;
-  justify-content: flex-end;
-  gap: 1rem;
-  margin-top: 1.5rem;
-  border-top: 1px solid #e2e8f0;
-  padding-top: 1.5rem;
-}
-
-.primary-btn,
-.secondary-btn {
-  padding: 0.75rem 1.5rem;
-  border: none;
-  border-radius: 8px;
-  font-weight: 600;
-  font-size: 0.9rem;
-  cursor: pointer;
-  transition: all 0.2s ease-in-out;
-}
-
-.primary-btn {
-  background-color: #1a202c;
-  color: white;
-}
-.primary-btn:hover {
-  background-color: #2d3748;
-}
-
-.secondary-btn {
-  background-color: #e2e8f0;
-  color: #4a5568;
-}
-.secondary-btn:hover {
-  background-color: #cbd5e0;
-}
-.button-group-step1 {
-  justify-content: center;
-}
-.button-group-step1 .primary-btn {
-  width: 50%;
-}
-
 .radio-group {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 1rem;
 }
-
 .radio-group label {
   background-color: #f7fafc;
   border: 1px solid #e2e8f0;
@@ -204,26 +213,22 @@
   cursor: pointer;
   transition: all 0.2s;
 }
-
 .radio-group label:has(input:checked) {
   border-color: #2d3748;
   background-color: #edf2f7;
   box-shadow: 0 0 0 2px rgba(45, 55, 72, 0.2);
 }
-
 .radio-group input[type="radio"] {
   accent-color: #2d3748;
   width: 1em;
   height: 1em;
 }
-
 .step3-container {
   display: grid;
   grid-template-columns: 200px 1fr;
   gap: 2.5rem;
   align-items: flex-start;
 }
-
 .resume-upload {
   display: flex;
   flex-direction: column;
@@ -237,7 +242,6 @@
 .resume-upload label {
   text-align: center;
 }
-
 .upload-box {
   width: 100%;
   aspect-ratio: 3 / 4;
@@ -257,13 +261,11 @@
   font-size: 2rem;
   color: #a0aec0;
 }
-
 .links-section {
   display: flex;
   flex-direction: column;
   gap: 1.75rem;
 }
-
 .delete-btn {
   background: none;
   border: none;
@@ -271,11 +273,9 @@
   font-size: 0.8rem;
   cursor: pointer;
 }
-
 .react-datepicker-popper {
   z-index: 9999 !important;
 }
-
 .react-datepicker {
   font-family: inherit !important;
   border: 1px solid #e2e8f0 !important;
@@ -283,13 +283,11 @@
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1) !important;
   padding: 0.5rem !important;
 }
-
 .react-datepicker__header {
   background-color: white !important;
   border-bottom: 1px solid #e2e8f0 !important;
   padding-top: 1rem !important;
 }
-
 .react-datepicker__current-month,
 .react-datepicker-time__header,
 .react-datepicker-year-header {
@@ -297,11 +295,9 @@
   font-weight: 600 !important;
   font-size: 1rem !important;
 }
-
 .react-datepicker__navigation-icon::before {
   border-color: #4a5568 !important;
 }
-
 .react-datepicker__day-name,
 .react-datepicker__day,
 .react-datepicker__time-name {
@@ -309,16 +305,13 @@
   width: 2rem !important;
   line-height: 2rem !important;
 }
-
 .react-datepicker__day {
   transition: all 0.2s ease-in-out;
 }
-
 .react-datepicker__day:hover {
   background-color: #edf2f7 !important;
   border-radius: 50% !important;
 }
-
 .react-datepicker__day--selected,
 .react-datepicker__day--in-selecting-range,
 .react-datepicker__day--in-range,
@@ -327,7 +320,6 @@
   color: white !important;
   border-radius: 50% !important;
 }
-
 .react-datepicker__day--disabled {
   color: #a0aec0 !important;
 }

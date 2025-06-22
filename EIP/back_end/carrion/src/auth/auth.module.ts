@@ -20,6 +20,7 @@ import { UserModule } from 'src/user/user.module';
 import { HttpModule } from '@nestjs/axios';
 import { UserProfileModule } from 'src/userProfile/user-profile.module';
 import { CustomLoggingService } from 'src/common/services/logging.service';
+import { UserService } from 'src/user/user.service';
 
 @Global()
 @Module({
@@ -43,6 +44,7 @@ import { CustomLoggingService } from 'src/common/services/logging.service';
     RefreshJwtStrategy,
     GoogleStrategy,
     MicrosoftStrategy,
+    UserService
     {
       provide: APP_GUARD,
       useClass: JwtAuthGuard,

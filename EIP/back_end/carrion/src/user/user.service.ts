@@ -27,11 +27,20 @@ export class UserService {
   }
 
   async create(createUserDto: CreateUserDto) {
-    return await this.prisma.user.create({
-      data: {
-        ...createUserDto,
-      },
-    });
+    try {
+      return await this.prisma.user.create({
+        data: {
+          ...createUserDto,
+        },
+      });
+    } catch (error) {
+      if (error.code === 'P2002') {
+        throw new ConflictException(
+          'User with this email or username already exists',
+        );
+      }
+      throw error;
+    }
   }
 
   async findByIdentifier(identifier: string, isEmail: boolean) {

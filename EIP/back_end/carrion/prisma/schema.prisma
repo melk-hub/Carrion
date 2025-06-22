@@ -6,9 +6,11 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL_1")
+  url      = env("DATABASE_URL")
 }
 
+// The User model should only contain core authentication and identity info.
+// First name and last name have been REMOVED from this model.
 model User {
   id                 String       @id @default(uuid()) @db.Uuid
   username           String       @unique
@@ -52,7 +54,7 @@ model Token {
   externalId        String?  // historyId for Gmail, subscriptionId for Outlook
   createdAt         DateTime @default(now())
   userId            String   @db.Uuid
-  user              User     @relation("UserTokens", fields: [userId], references: [id])
+  user              User     @relation("UserTokens", fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model jobApply {
