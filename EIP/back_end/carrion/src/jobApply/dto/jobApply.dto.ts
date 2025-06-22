@@ -57,9 +57,9 @@ export class JobApplyDto {
   createdAt: Date;
 }
 
-export class CreateJobApplyDto {
+export class UpdateJobApplyDto {
   @ApiProperty({
-    name: 'Title',
+    name: 'title',
     description: 'Title of job',
     type: 'string',
     example: 'Computer engineer senior H/F',
@@ -70,7 +70,7 @@ export class CreateJobApplyDto {
   title: string;
 
   @ApiProperty({
-    name: 'Company',
+    name: 'company',
     description: 'Company name',
     type: 'string',
     example: 'Chanel',
@@ -81,7 +81,7 @@ export class CreateJobApplyDto {
   company: string;
 
   @ApiProperty({
-    name: 'Location',
+    name: 'location',
     description: 'Location of job',
     type: 'string',
     example: 'Paris',
@@ -92,7 +92,7 @@ export class CreateJobApplyDto {
   location: string;
 
   @ApiProperty({
-    name: 'Salary',
+    name: 'salary',
     description: 'Salary of job',
     type: 'number',
     example: '10000',
@@ -113,7 +113,7 @@ export class CreateJobApplyDto {
   imageUrl?: string;
 
   @ApiProperty({
-    name: 'Status',
+    name: 'status',
     description: 'Status of job',
     type: 'string',
     example: 'PENDING',
@@ -122,7 +122,7 @@ export class CreateJobApplyDto {
   status: ApplicationStatus;
 
   @ApiProperty({
-    name: 'Contract Type',
+    name: 'contractType',
     description: 'Contract Type of job',
     type: 'string',
     example: 'Internship',
@@ -132,10 +132,96 @@ export class CreateJobApplyDto {
   contractType: string;
 
   @ApiProperty({
-    name: 'Interview Date',
+    name: 'interviewDate',
     description: 'Interview Date of job',
     type: Date,
-    example: '2021-01-01',
+    example: '2025-06-09 09:08:22',
+  })
+  @IsOptional()
+  @IsDate()
+  @MaxLength(255)
+  interviewDate?: Date;
+}
+
+export class CreateJobApplyDto {
+  @ApiProperty({
+    name: 'title',
+    description: 'Title of job',
+    type: 'string',
+    example: 'Computer engineer senior H/F',
+  })
+  @IsNotEmpty()
+  @IsString()
+  @MaxLength(80)
+  title: string;
+
+  @ApiProperty({
+    name: 'company',
+    description: 'Company name',
+    type: 'string',
+    example: 'Chanel',
+  })
+  @IsNotEmpty()
+  @IsString()
+  @MaxLength(40)
+  company: string;
+
+  @ApiProperty({
+    name: 'location',
+    description: 'Location of job',
+    type: 'string',
+    example: 'Paris',
+  })
+  @IsString()
+  @IsOptional()
+  @MaxLength(40)
+  location: string;
+
+  @ApiProperty({
+    name: 'salary',
+    description: 'Salary of job',
+    type: 'number',
+    example: '10000',
+  })
+  @IsOptional()
+  @IsNumber()
+  salary: number;
+
+  @ApiProperty({
+    name: 'imageUrl',
+    description: 'imageUrl aws db',
+    type: 'string',
+    example: 'https://test.fr',
+  })
+  @IsOptional()
+  @IsString()
+  @MaxLength(255)
+  imageUrl?: string;
+
+  @ApiProperty({
+    name: 'status',
+    description: 'Status of job',
+    type: 'string',
+    example: 'PENDING',
+  })
+  @IsEnum(ApplicationStatus)
+  status: ApplicationStatus;
+
+  @ApiProperty({
+    name: 'contractType',
+    description: 'Contract Type of job',
+    type: 'string',
+    example: 'Internship',
+  })
+  @IsNotEmpty()
+  @MaxLength(255)
+  contractType: string;
+
+  @ApiProperty({
+    name: 'interviewDate',
+    description: 'Interview Date of job',
+    type: Date,
+    example: '2025-06-09 09:08:22',
   })
   @IsOptional()
   @IsDate()

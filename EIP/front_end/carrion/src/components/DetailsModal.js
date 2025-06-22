@@ -5,11 +5,11 @@ import "../styles/Modal.css"
 function DetailsModal({ application, onClose, statusMap }) {
   const getStatusClass = (status) => {
     switch (status) {
-      case "ON":
+      case "APPLIED":
         return "status-accepted"
       case "PENDING":
         return "status-pending"
-      case "OFF":
+      case "REJECTED_BY_COMPANY":
         return "status-refused"
       default:
         return ""

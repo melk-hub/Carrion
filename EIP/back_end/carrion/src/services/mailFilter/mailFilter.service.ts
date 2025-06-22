@@ -9,11 +9,14 @@ import {
   GmailMessage,
   GmailMessagePart,
   GmailHeader,
-} from 'src/webhooks/gmail/gmail.types';
+} from 'src/webhooks/mail/gmail.types';
 import {
   JobApplyParams,
   UpdateJobApply,
 } from 'src/jobApply/interface/jobApply.interface';
+import { OutlookMessage } from 'src/webhooks/mail/outlook.types';
+import { createHash } from 'crypto';
+import { UserService } from 'src/user/user.service';
 
 function extractJsonFromString(str: string): any | null {
   if (!str) return null;
@@ -51,10 +54,263 @@ export class MailFilterService {
   private readonly logger = new Logger(MailFilterService.name);
   private openai: OpenAI;
 
-  constructor(private readonly jobApplyService: JobApplyService) {
+  // Deduplication system
+  private processedEmails = new Set<string>();
+  private readonly EMAIL_CACHE_TTL = 15 * 60 * 1000; // 15 minutes
+
+  // Response caching system for OpenAI calls
+  private responseCache = new Map<
+    string,
+    { response: ExtractedJobDataDto | null; timestamp: number }
+  >();
+  private readonly RESPONSE_CACHE_TTL = 60 * 60 * 1000; // 1 hour
+
+  // Pre-filtering configuration
+  private readonly JOB_KEYWORDS = [
+    // French keywords
+    'recrutement',
+    'candidature',
+    'poste',
+    'emploi',
+    'job',
+    'entretien',
+    'interview',
+    'offre',
+    'stage',
+    'alternance',
+    'apprentissage',
+    'cdi',
+    'cdd',
+    'freelance',
+    'mission',
+    'opportunité',
+    'carrière',
+    'postulation',
+    'embauche',
+    // English keywords
+    'recruitment',
+    'application',
+    'position',
+    'employment',
+    'career',
+    'opportunity',
+    'interview',
+    'offer',
+    'internship',
+    'full-time',
+    'part-time',
+    'contract',
+    'freelance',
+    'remote',
+    'hiring',
+    'vacancy',
+    'candidate',
+  ];
+
+  private readonly JOB_DOMAINS = [
+    'linkedin.com',
+    'indeed.com',
+    'glassdoor.com',
+    'monster.com',
+    'jobteaser.com',
+    'apec.fr',
+    'pole-emploi.fr',
+    'welcometothejungle.com',
+    'jobijoba.com',
+    'regionsjob.com',
+    'cadremploi.fr',
+    'meteojob.com',
+    'stepstone.fr',
+  ];
+
+  private readonly NEGATIVE_INDICATORS = [
+    'newsletter',
+    'promotion',
+    'marketing',
+    'publicité',
+    'spam',
+    'advertising',
+    'unsubscribe',
+    'désabonnement',
+    'commercial',
+    'vente',
+    'soldes',
+    'sale',
+    'discount',
+    'réduction',
+    'password',
+    'mot de passe',
+    'security',
+    'sécurité',
+  ];
+
+  // Performance metrics
+  private metrics = {
+    startTime: Date.now(),
+    processedEmails: 0,
+    preFilteredEmails: 0,
+    openaiCalls: 0,
+    cacheHits: 0,
+    duplicatesSkipped: 0,
+    errors: 0,
+    totalProcessingTime: 0,
+  };
+
+  // Concurrent processing configuration
+  private readonly CONCURRENT_EMAIL_LIMIT = 5; // Shared limit for Gmail and Outlook
+
+  // User count cache to avoid frequent DB calls
+  private userCountCache: { count: number; timestamp: number } | null = null;
+  private readonly USER_COUNT_CACHE_TTL = 10 * 60 * 1000; // 10 minutes
+
+  constructor(
+    private readonly jobApplyService: JobApplyService,
+    private readonly userService: UserService,
+  ) {
     this.openai = new OpenAI({
       apiKey: process.env.OPENAI_API_KEY,
     });
+
+    // Clean up processed emails cache every 20 minutes
+    setInterval(
+      () => {
+        this.processedEmails.clear();
+        this.cleanupResponseCache();
+        this.logger.log('Cleared email deduplication cache');
+        this.logMetrics();
+      },
+      20 * 60 * 1000,
+    );
+  }
+
+  /**
+   * Clean up expired cache entries
+   */
+  private cleanupResponseCache(): void {
+    const now = Date.now();
+    let removedCount = 0;
+
+    for (const [key, value] of this.responseCache.entries()) {
+      if (now - value.timestamp > this.RESPONSE_CACHE_TTL) {
+        this.responseCache.delete(key);
+        removedCount++;
+      }
+    }
+
+    this.logger.log(
+      `Cleaned up ${removedCount} expired cache entries. Cache size: ${this.responseCache.size}`,
+    );
+  }
+
+  /**
+   * Generate cache key for similar emails
+   */
+  private generateCacheKey(emailText: string, emailSubject?: string): string {
+    // Normalize text for better cache hits
+    const normalizedText = emailText
+      .toLowerCase()
+      .replace(/\s+/g, ' ')
+      .replace(/[^\w\s]/g, '')
+      .substring(0, 500); // Use first 500 chars for similarity
+
+    const normalizedSubject = (emailSubject || '')
+      .toLowerCase()
+      .replace(/\s+/g, ' ')
+      .replace(/[^\w\s]/g, '');
+
+    return createHash('md5')
+      .update(`${normalizedSubject}|${normalizedText}`)
+      .digest('hex');
+  }
+
+  /**
+   * Get cached response if available
+   */
+  private getCachedResponse(cacheKey: string): ExtractedJobDataDto | null {
+    const cached = this.responseCache.get(cacheKey);
+    if (cached && Date.now() - cached.timestamp < this.RESPONSE_CACHE_TTL) {
+      this.metrics.cacheHits++;
+      this.logger.log(`Cache hit for key: ${cacheKey.substring(0, 8)}...`);
+      return cached.response;
+    }
+    return null;
+  }
+
+  /**
+   * Store response in cache
+   */
+  private setCachedResponse(
+    cacheKey: string,
+    response: ExtractedJobDataDto | null,
+  ): void {
+    this.responseCache.set(cacheKey, {
+      response,
+      timestamp: Date.now(),
+    });
+  }
+
+  /**
+   * Log performance metrics
+   */
+  private logMetrics(): void {
+    this.logger.log(
+      'MailFilter Performance Metrics:',
+      JSON.stringify({
+        ...this.metrics,
+        preFilterEfficiency:
+          this.metrics.processedEmails > 0
+            ? (
+                (this.metrics.preFilteredEmails /
+                  this.metrics.processedEmails) *
+                100
+              ).toFixed(1) + '%'
+            : '0%',
+        duplicateRate:
+          this.metrics.processedEmails > 0
+            ? (
+                (this.metrics.duplicatesSkipped /
+                  this.metrics.processedEmails) *
+                100
+              ).toFixed(1) + '%'
+            : '0%',
+        cacheHitRate:
+          this.metrics.openaiCalls > 0
+            ? (
+                (this.metrics.cacheHits /
+                  (this.metrics.openaiCalls + this.metrics.cacheHits)) *
+                100
+              ).toFixed(1) + '%'
+            : '0%',
+        cacheSize: this.responseCache.size,
+      }),
+    );
+  }
+
+  /**
+   * Generate a unique hash for email content to detect duplicates
+   */
+  private generateEmailHash(
+    emailText: string,
+    userId: string,
+    emailSubject?: string,
+    emailSender?: string,
+  ): string {
+    const content = `${userId}|${emailSubject || ''}|${emailSender || ''}|${emailText}`;
+    return createHash('sha256').update(content).digest('hex');
+  }
+
+  /**
+   * Check if email has already been processed recently
+   */
+  private isEmailAlreadyProcessed(emailHash: string): boolean {
+    return this.processedEmails.has(emailHash);
+  }
+
+  /**
+   * Mark email as processed
+   */
+  private markEmailAsProcessed(emailHash: string): void {
+    this.processedEmails.add(emailHash);
   }
 
   private decodeBase64Url(encoded?: string): string {
@@ -124,11 +380,152 @@ export class MailFilterService {
     return textContent.trim();
   }
 
+  /**
+   * Pre-filter emails to identify job-related content
+   */
+  private isJobRelatedEmail(
+    emailText: string,
+    emailSubject?: string,
+    emailSender?: string,
+  ): { isJobRelated: boolean; confidence: number; reason: string } {
+    const startTime = Date.now();
+    let score = 0;
+    const reasons: string[] = [];
+
+    // Check sender domain
+    if (emailSender) {
+      const domain = emailSender.match(/@([^>]+)/)?.[1]?.toLowerCase();
+      if (
+        domain &&
+        this.JOB_DOMAINS.some((jobDomain) => domain.includes(jobDomain))
+      ) {
+        score += 30;
+        reasons.push('job-domain');
+      }
+    }
+
+    // Check subject line
+    const subject = (emailSubject || '').toLowerCase();
+    const subjectKeywords = this.JOB_KEYWORDS.filter((keyword) =>
+      subject.includes(keyword.toLowerCase()),
+    );
+    if (subjectKeywords.length > 0) {
+      score += subjectKeywords.length * 15;
+      reasons.push(`subject-keywords: ${subjectKeywords.join(',')}`);
+    }
+
+    // Check email content
+    const content = emailText.toLowerCase();
+    const contentKeywords = this.JOB_KEYWORDS.filter((keyword) =>
+      content.includes(keyword.toLowerCase()),
+    );
+    if (contentKeywords.length > 0) {
+      score += contentKeywords.length * 5;
+      reasons.push(
+        `content-keywords: ${contentKeywords.slice(0, 5).join(',')}`,
+      );
+    }
+
+    // Check for negative indicators
+    const negativeIndicators = this.NEGATIVE_INDICATORS.filter(
+      (indicator) =>
+        content.includes(indicator.toLowerCase()) ||
+        subject.includes(indicator.toLowerCase()),
+    );
+    if (negativeIndicators.length > 0) {
+      score -= negativeIndicators.length * 20;
+      reasons.push(`negative: ${negativeIndicators.join(',')}`);
+    }
+
+    // Additional patterns
+    if (content.includes('candidat') && content.includes('poste')) score += 10;
+    if (content.includes('entretien') && content.includes('date')) score += 15;
+    if (content.includes('offer') && content.includes('position')) score += 10;
+    if (content.includes('interview') && content.includes('schedule'))
+      score += 15;
+
+    const confidence = Math.max(0, Math.min(100, score));
+    const isJobRelated = confidence >= 20; // Threshold for job-related emails
+
+    const processingTime = Date.now() - startTime;
+
+    this.logger.log(
+      `Pre-filter result: ${isJobRelated ? 'JOB' : 'NOT_JOB'} (${confidence}%) in ${processingTime}ms - ${reasons.join(', ')}`,
+    );
+
+    return {
+      isJobRelated,
+      confidence,
+      reason: reasons.join(', '),
+    };
+  }
+
+  /**
+   * Generate optimized prompt based on email content length and complexity
+   */
+  private generateOptimizedPrompt(
+    emailText: string,
+    isComplex: boolean = false,
+  ): string {
+    const basePrompt = `Tu es un assistant expert en recrutement et en analyse d'emails de candidature.
+**PREMIÈRE VALIDATION OBLIGATOIRE** : Vérifie que le contenu est bien lié au recrutement/candidature. Si ce n'est pas le cas, renvoie null.
+
+Extraire des informations d'un email de candidature au format JSON :
+{
+  "company": "Nom de l'entreprise (string, obligatoire)",
+  "title": "Intitulé du poste (string, obligatoire)",
+  "location": "Lieu du poste (string, optionnel)",
+  "salary": "Salaire (string, optionnel)",
+  "contractType": "EXCLUSIVEMENT une de ces 5 valeurs: 'Full-time', 'Part-time', 'Internship', 'Contract', 'Freelance', ou null",
+  "status": "Statut parmi (${Object.values(ApplicationStatus).join(', ')})",
+  "interviewDate": "Date d'entretien au format ISO 8601 (optionnel)"
+}
+
+**RÈGLES STRICTES** :
+- Si pas de recrutement → renvoie null
+- Informations en anglais pour title et contractType
+- Ne pas inventer de données manquantes
+- Company, title, status sont OBLIGATOIRES`;
+
+    if (isComplex) {
+      return (
+        basePrompt +
+        `
+**ANALYSE APPROFONDIE** : Email complexe détecté. Analyse attentivement tout le contexte.`
+      );
+    }
+
+    return (
+      basePrompt +
+      `
+**ANALYSE RAPIDE** : Email simple détecté. Extraction directe des informations principales.`
+    );
+  }
+
+  /**
+   * Determine if email content is complex and needs detailed analysis
+   */
+  private isComplexEmail(emailText: string): boolean {
+    const indicators = [
+      emailText.length > 2000,
+      (emailText.match(/\n/g) || []).length > 20,
+      emailText.includes('thread') || emailText.includes('conversation'),
+      emailText.includes('RE:') || emailText.includes('FW:'),
+      (emailText.match(/[.!?]/g) || []).length > 10,
+    ];
+
+    return indicators.filter(Boolean).length >= 2;
+  }
+
   async processEmailAndCreateJobApplyFromGmail(
     gmailMessage: GmailMessage,
     userId: string,
   ): Promise<string> {
+    const startTime = Date.now();
+    this.metrics.processedEmails++;
+
     if (!gmailMessage || !gmailMessage.payload) {
+      this.metrics.errors++;
       this.logger.error('Received invalid or empty gmailMessage object');
       throw new BadRequestException('Invalid email data provided.');
     }
@@ -149,6 +546,7 @@ export class MailFilterService {
     }
 
     if (!bodyText) {
+      this.metrics.errors++;
       this.logger.error(
         `Could not extract text body for message ${gmailMessage.id}`,
       );
@@ -157,14 +555,46 @@ export class MailFilterService {
       );
     }
 
+    // Pre-filtering check
+    const preFilterResult = this.isJobRelatedEmail(bodyText, subject, sender);
+    if (!preFilterResult.isJobRelated) {
+      this.metrics.preFilteredEmails++;
+      this.logger.log(
+        `Gmail email pre-filtered out (confidence: ${preFilterResult.confidence}%): ${preFilterResult.reason}. Subject: "${subject}"`,
+      );
+      return `Email filtered out - not job related (confidence: ${preFilterResult.confidence}%)`;
+    }
+
+    // Generate hash for deduplication
+    const emailHash = this.generateEmailHash(bodyText, userId, subject, sender);
+
+    // Check if email was already processed
+    if (this.isEmailAlreadyProcessed(emailHash)) {
+      this.metrics.duplicatesSkipped++;
+      this.logger.warn(
+        `Skipping already processed Gmail email. Subject: "${subject}", Sender: "${sender}", MessageId: ${gmailMessage.id}`,
+      );
+      return 'Email already processed - skipped';
+    }
+
+    // Mark as being processed
+    this.markEmailAsProcessed(emailHash);
+
     try {
-      return this.processEmailWithExtractedData(
+      const result = await this.processEmailWithExtractedData(
         bodyText,
         userId,
         subject,
         sender,
+        preFilterResult.confidence,
       );
+
+      const processingTime = Date.now() - startTime;
+      this.metrics.totalProcessingTime += processingTime;
+
+      return result;
     } catch (error) {
+      this.metrics.errors++;
       this.logger.error(
         `Erreur avec l'API OpenAI ou lors du traitement: ${error.message}`,
         error.stack,
@@ -178,9 +608,10 @@ export class MailFilterService {
     userId: string,
     emailSubject?: string,
     emailSender?: string,
+    confidence?: number,
   ): Promise<string> {
     this.logger.log(
-      `Processing email for user ${userId}. Subject: "${emailSubject}", Sender: "${emailSender}"`,
+      `Processing email for user ${userId}. Subject: "${emailSubject}", Sender: "${emailSender}", Confidence: ${confidence}%`,
     );
 
     let emailContext = `Email Body:\n${emailText}\n`;
@@ -192,74 +623,43 @@ export class MailFilterService {
     }
 
     try {
-      const response = await this.openai.chat.completions.create({
-        model: 'gpt-4o-mini',
-        response_format: { type: 'json_object' },
-        messages: [
-          {
-            role: 'system',
-            content: `Tu es un assistant expert en recrutement et en analyse d'emails de candidature.
-    **La toute première tâches que tu dois faire et que tu dois valider avant pouvoir faire la prochaines étapes, c'est de t'affirmer que le contenu que je t'envoies est bien une conversation de recrutement, si ce n'est pas le cas renvoies moi directement un objet null.**
-    **Si tu considère que le mail n'est pas un mail professionel de procédure de recrutement, renvoie null.**
-    **FAIS BIEN ATTENTION AU MAIL LINKEDIN, SI CE N'EST PAS UNE PROCÉDURE DE RECRUTEMENT, NE TRAITE PAS LES MAILS DE LINKEDIN QUI PARLE DE RELATIONS, DE POSTULATIONS A LEUR PAGE D'EMPLOIE, IL FAUT BIEN QUE CE SOIT UN PROCESSUS DE RECRUTEMENT ET NON PAS AUTRE CHOSE.**
-    SI LES TROIS CONDITIONS AU DESSUS SONT VALIDÉES ET SEULEMENT SI ELLES SONT VALIDÉES ta tâches devient: Extraire des informations précises d'un email lié à une candidature d'emploi et de déterminer le statut actuel de cette candidature.
-    Réponds IMPÉRATIVEMENT au format JSON structuré comme suit :
-    {
-      "company": "Nom de l'entreprise (string, mandatory)",
-      "title": "Intitulé du poste (string, mandatory)",
-      "location": "Lieu du poste, le plus précis possible (string, optionnel)",
-      "salary": "Salaire proposé (string, ex: '50000 EUR annuel' ou '3000 EUR mensuel', optionnel)",
-      "contractType": "Type de contrat (ex: 'CDI', 'CDD', 'Stage', 'Alternance', 'Temps plein', 'Temps partiel', 'Freelance', optionnel)",
-      "status": "Statut de la candidature parmi (${Object.values(ApplicationStatus).join(', ')}). Choisis le statut le plus pertinent.",
-      "interviewDate": "Date et heure de l'entretien au format ISO 8601 (YYYY-MM-DDTHH:mm:ssZ) si mentionnée (string, optionnel)",
-    }
-    **SI TU NE TROUVES PAS DE DATA N'ESSAYES PAS DE COMBLER L'OBJETS, IL FAUT QUE LES TITLES SOIENT DES TRUCS QUI EXISTES DÉJÀ PAS DES MOTS COMME "JOB APPLICATION" OU D'AUTRE SOTTISE, SI TU N'EN TROUVE PAS RENVOIE MOI NULL. VERIFIE BIEN QUE LE MAIL ET LES PROPOSITIONS SONT POUR L'UTILISATEUR ET NON LES INFORMATIONS DU SENDER. PAR EXEMPLE SI LE RECRUTEUR SE PRÉSENTE NE FAIT PAS L'ERREUR DE RÉCUPERER SES INFORMATIONS POUR ME LES RENVOYER ET DE FAIRE EN SORTE QUE CES INFORMATIONS SOIT DONNÉES À L'UTILISATEUR.**
-    **Analyse bien le corps du mail, le sujet, l'objet, le mail de l'expéditeur, le footer, il faut que tu t'assures que ce soit bien une conversation de recrutement, il ne faut pas que tu tombes dans les pièges des mails commerciaux, de spam, de mails sociaux de linkedin, analyse bien, si cela parle de plusieurs personnes en même temps, pour vendre quelques choses, de spam, il faut que tu sois sur que c'est bien une conversation de recrutement.**
-    Sur le json que tu me renvoies je veux les informations en anglais: le type de contrat et le title.
-    **Il faut obligatoirement que tu me trouves la société, le title et le status. dans le fil d'actualités des messages, dans l'objets, dans le footer, le corps, ou encore d'autre type de metadata que je te renvoies comme le mail de l'expéditeur, on peut souvent retrouver le nom la société.**
-    Si tu n'arrives pas à trouver la société,**N'HÉSITE PAS À FAIRE DES RECHERCHES, CELA PEUT ÊTRE UNE ÉCOLE, UNE SOCIÉTÉ, UNE ASSOCIATION, etc. MAIS FAIS BIEN ATTENTION FAIS DES RECHERCHES SUR INTERNET POUR VOIR SI CELA EXISTE, JE NE VEUX PAS DE MOT ALÉATOIRE POUR COMBLER L'OBJET JSON** CEPENDANT FAIS BIEN ATTENTION, EST IL NÉCESSAIRE DE METTRES DES BRANCHES DE LA SOCIÉTÉ DANS LE TITLE ?
-    Si une information n'est pas présente, mets la valeur à null ou ne l'inclus pas si optionnel (sauf pour 'company, title et status' qui sont obligatoires).
-    Analyse attentivement le sujet, le mail de l'expéditeur, le corps du mail, les signatures, l'objet aussi, regarder aussi si c'est une réponse à un mail.
-    Si tu considère que le mail n'est pas un mail professionel de procédure de recrutement, renvoie null.
-    Pour ce qui est des informations, renvoies moi le contractType et le title en anglais, il faut que tu me renvoies toujours la même choses alors essaye de suivre un patterne ou une convention de titre de LinkedIn, **Ne me rajoutes pas le type de contrat dans le titre, CE QUI VEUT DIRE NE ME RAJOUTE PAS DES CHOSES COMME: "Full-Time", "Internship" DANS LE TITLE. CEPENDANT TU PEUX METTRE LE POSTE "INTERN" "APPRENTICE"**
-    `,
-          },
-          {
-            role: 'user',
-            content: emailContext,
-          },
-        ],
-        temperature: 0.2,
-        max_tokens: 1000,
-      });
+      const isComplex = this.isComplexEmail(emailText);
+      const optimizedPrompt = this.generateOptimizedPrompt(
+        emailText,
+        isComplex,
+      );
 
-      const rawResponse = response.choices[0].message.content;
-      if (!rawResponse) {
-        this.logger.error('OpenAI returned an empty response content.');
-        throw new Error('OpenAI returned an empty response.');
+      // Check cache first
+      const cacheKey = this.generateCacheKey(emailText, emailSubject);
+      const cachedResponse = this.getCachedResponse(cacheKey);
+
+      let parsedData: ExtractedJobDataDto | null = null;
+
+      if (cachedResponse) {
+        this.logger.log(`Using cached response for similar email`);
+        parsedData = cachedResponse;
+      } else {
+        // Make OpenAI call with fallback mechanism
+        parsedData = await this.callOpenAIWithFallback(
+          optimizedPrompt,
+          emailContext,
+          isComplex,
+        );
+
+        // Cache the response
+        if (parsedData) {
+          this.setCachedResponse(cacheKey, parsedData);
+        }
       }
 
-      const parsedData: ExtractedJobDataDto | null =
-        extractJsonFromString(rawResponse);
-      // DEBUG: À garder si on veut tester avec de la fake data psq openAI ça coute cher hein
-      // const parsedData: ExtractedJobDataDto = {
-      //   company: 'Epitech',
-      //   title: 'ML Engineer',
-      //   location: 'Paris',
-      //   salary: '1000',
-      //   contractType: 'CDI',
-      //   status: ApplicationStatus.ON,
-      //   interviewDate: null,
-      // };
-
       if (!parsedData) {
-        this.logger.error('Failed to parse JSON from OpenAI response.');
+        this.logger.error('Failed to get valid response from OpenAI or cache.');
         return 'Erreur lors du parsing du JSON de la réponse OpenAI.';
       } else if (!parsedData.title || !parsedData.company) {
         this.logger.warn(
           `Didn't create jobApply for this mail: ${emailSender + ' ' + emailSubject}`,
         );
-        return;
+        return 'Email analyzed but no valid job application data found';
       }
 
       if (
@@ -283,6 +683,11 @@ export class MailFilterService {
         location: parsedData.location ? parsedData.location : undefined,
       };
 
+      // Enhanced logging for duplicate detection debugging
+      this.logger.log(
+        `Checking for duplicates with params: ${JSON.stringify(jobApplyParam)}`,
+      );
+
       const existingJobApply = await this.jobApplyService.getJobApplyByParam(
         userId,
         jobApplyParam,
@@ -292,22 +697,40 @@ export class MailFilterService {
         this.logger.warn(
           `Job apply already exists for user ${userId} with title ${parsedData.title} and company ${parsedData.company}. Updating status.`,
         );
+        this.logger.log(
+          `Existing job apply details: ${JSON.stringify({
+            id: existingJobApply.id,
+            title: existingJobApply.title,
+            company: existingJobApply.company,
+            contractType: existingJobApply.contractType,
+            location: existingJobApply.location,
+          })}`,
+        );
 
         const updateJobApply: UpdateJobApply = {
           location: parsedData.location,
           salary: Number.parseInt(parsedData.salary),
           status: parsedData.status,
-          interviewDate: new Date(parsedData.interviewDate),
+          interviewDate:
+            parsedData.interviewDate &&
+            parsedData.interviewDate !== 'null' &&
+            parsedData.interviewDate.trim() !== ''
+              ? new Date(parsedData.interviewDate)
+              : null,
           contractType: parsedData.contractType,
         };
 
         await this.jobApplyService.updateJobApplyByMail(
           existingJobApply.id,
-          parsedData.status,
+          userId,
           updateJobApply,
         );
         return existingJobApply.id;
       }
+
+      this.logger.log(
+        `No existing job apply found. Creating new one with params: ${JSON.stringify(jobApplyParam)}`,
+      );
 
       return this.createJobApply(parsedData, userId);
     } catch (error) {
@@ -316,6 +739,82 @@ export class MailFilterService {
         error.stack,
       );
       return error.message;
+    }
+  }
+
+  /**
+   * Call OpenAI with fallback mechanism for better reliability
+   */
+  private async callOpenAIWithFallback(
+    prompt: string,
+    emailContext: string,
+    isComplex: boolean,
+    retryCount: number = 0,
+  ): Promise<ExtractedJobDataDto | null> {
+    const maxRetries = 2;
+
+    try {
+      this.metrics.openaiCalls++;
+
+      const response = await this.openai.chat.completions.create({
+        model: 'gpt-4o-mini',
+        response_format: { type: 'json_object' },
+        messages: [
+          {
+            role: 'system',
+            content: prompt,
+          },
+          {
+            role: 'user',
+            content: emailContext,
+          },
+        ],
+        temperature: 0.2,
+        max_tokens: isComplex ? 1000 : 600, // Dynamic token allocation
+      });
+
+      const rawResponse = response.choices[0].message.content;
+      if (!rawResponse) {
+        throw new Error('OpenAI returned an empty response.');
+      }
+
+      const parsedData: ExtractedJobDataDto | null =
+        extractJsonFromString(rawResponse);
+
+      return parsedData;
+    } catch (error) {
+      this.logger.warn(
+        `OpenAI call failed (attempt ${retryCount + 1}): ${error.message}`,
+      );
+
+      if (retryCount < maxRetries) {
+        // Exponential backoff
+        const delay = Math.pow(2, retryCount) * 1000;
+        await new Promise((resolve) => setTimeout(resolve, delay));
+        return this.callOpenAIWithFallback(
+          prompt,
+          emailContext,
+          isComplex,
+          retryCount + 1,
+        );
+      }
+
+      // If all retries failed, try with simpler prompt
+      if (isComplex && retryCount >= maxRetries) {
+        this.logger.log('Retrying with simplified prompt for complex email');
+        const simplifiedPrompt = this.generateOptimizedPrompt(
+          emailContext.substring(0, 1000),
+          false,
+        );
+        return this.callOpenAIWithFallback(
+          simplifiedPrompt,
+          emailContext.substring(0, 1000),
+          false,
+          0,
+        );
+      }
+
+      throw error;
     }
   }
 
@@ -334,9 +833,12 @@ export class MailFilterService {
       contractType: parsedData.contractType
         ? parsedData.contractType
         : undefined,
-      interviewDate: parsedData.interviewDate
-        ? new Date(parsedData.interviewDate)
-        : undefined,
+      interviewDate:
+        parsedData.interviewDate &&
+        parsedData.interviewDate !== 'null' &&
+        parsedData.interviewDate.trim() !== ''
+          ? new Date(parsedData.interviewDate)
+          : undefined,
     };
 
     this.logger.log(
@@ -347,5 +849,359 @@ export class MailFilterService {
       jobApplyDto,
     );
     return `Job application processed successfully (ID: ${createdJobApply.id}).`;
+  }
+
+  async processEmailAndCreateJobApplyFromOutlook(
+    outlookMessage: OutlookMessage,
+    userId: string,
+  ): Promise<string> {
+    const startTime = Date.now();
+    this.metrics.processedEmails++;
+
+    if (!outlookMessage) {
+      this.metrics.errors++;
+      this.logger.error('Received invalid or empty outlookMessage object');
+      throw new BadRequestException('Invalid email data provided.');
+    }
+
+    const subject = outlookMessage.subject || '';
+    const sender = `${outlookMessage.from?.emailAddress?.name || ''} <${outlookMessage.from?.emailAddress?.address || ''}>`;
+
+    // Extract text content from Outlook message body
+    let bodyText = this.extractTextFromOutlookMessage(outlookMessage);
+
+    if (!bodyText && outlookMessage.bodyPreview) {
+      this.logger.warn(
+        `No main body extracted for message ${outlookMessage.id}, using bodyPreview.`,
+      );
+      bodyText = outlookMessage.bodyPreview;
+    }
+
+    if (!bodyText) {
+      this.metrics.errors++;
+      this.logger.error(
+        `Could not extract text body for message ${outlookMessage.id}`,
+      );
+      throw new BadRequestException(
+        'Could not extract readable text from the email.',
+      );
+    }
+
+    // Pre-filtering check
+    const preFilterResult = this.isJobRelatedEmail(bodyText, subject, sender);
+    if (!preFilterResult.isJobRelated) {
+      this.metrics.preFilteredEmails++;
+      this.logger.log(
+        `Outlook email pre-filtered out (confidence: ${preFilterResult.confidence}%): ${preFilterResult.reason}. Subject: "${subject}"`,
+      );
+      return `Email filtered out - not job related (confidence: ${preFilterResult.confidence}%)`;
+    }
+
+    // Generate hash for deduplication
+    const emailHash = this.generateEmailHash(bodyText, userId, subject, sender);
+
+    // Check if email was already processed
+    if (this.isEmailAlreadyProcessed(emailHash)) {
+      this.metrics.duplicatesSkipped++;
+      this.logger.warn(
+        `Skipping already processed Outlook email. Subject: "${subject}", Sender: "${sender}", MessageId: ${outlookMessage.id}`,
+      );
+      return 'Email already processed - skipped';
+    }
+
+    // Mark as being processed
+    this.markEmailAsProcessed(emailHash);
+
+    try {
+      const result = await this.processEmailWithExtractedData(
+        bodyText,
+        userId,
+        subject,
+        sender,
+        preFilterResult.confidence,
+      );
+
+      const processingTime = Date.now() - startTime;
+      this.metrics.totalProcessingTime += processingTime;
+
+      return result;
+    } catch (error) {
+      this.metrics.errors++;
+      this.logger.error(
+        `Error with OpenAI API or during processing: ${error.message}`,
+        error.stack,
+      );
+      return error.message;
+    }
+  }
+
+  /**
+   * Extract readable text content from Outlook message
+   */
+  private extractTextFromOutlookMessage(
+    outlookMessage: OutlookMessage,
+  ): string {
+    if (!outlookMessage.body?.content) {
+      return outlookMessage.bodyPreview || '';
+    }
+
+    let content = outlookMessage.body.content;
+
+    // If HTML content, convert to plain text
+    if (outlookMessage.body.contentType === 'html') {
+      content = convert(content, {
+        wordwrap: false,
+        selectors: [
+          { selector: 'a', options: { ignoreHref: true } },
+          { selector: 'img', format: 'skip' },
+          { selector: 'script', format: 'skip' },
+          { selector: 'style', format: 'skip' },
+        ],
+      });
+    }
+
+    return content.trim();
+  }
+
+  /**
+   * Initialize monitoring system
+   */
+  onModuleInit() {
+    // Start cache cleanup every 20 minutes
+    setInterval(
+      () => {
+        this.performCacheCleanup();
+      },
+      20 * 60 * 1000,
+    );
+
+    // Log performance metrics every 30 minutes
+    setInterval(
+      () => {
+        this.logPerformanceMetrics();
+      },
+      30 * 60 * 1000,
+    );
+
+    this.logger.log(
+      'MailFilter Service initialized with optimizations enabled',
+    );
+    this.logger.log(
+      `Pre-filter enabled with ${this.JOB_KEYWORDS.length} keywords and ${this.JOB_DOMAINS.length} domains`,
+    );
+  }
+
+  /**
+   * Cleanup method to clear expired entries from cache and processed emails
+   */
+  private performCacheCleanup(): void {
+    const now = Date.now();
+
+    // Clear expired processed emails
+    const expiredProcessedEmails = [];
+    for (const email of this.processedEmails) {
+      const [hash, timestamp] = email.split(':');
+      if (now - parseInt(timestamp) > this.EMAIL_CACHE_TTL) {
+        expiredProcessedEmails.push(email);
+      }
+    }
+    expiredProcessedEmails.forEach((email) =>
+      this.processedEmails.delete(email),
+    );
+
+    // Clear expired cache entries
+    const expiredCacheKeys = [];
+    for (const [key, entry] of this.responseCache.entries()) {
+      if (now - entry.timestamp > this.RESPONSE_CACHE_TTL) {
+        expiredCacheKeys.push(key);
+      }
+    }
+    expiredCacheKeys.forEach((key) => this.responseCache.delete(key));
+
+    if (expiredProcessedEmails.length > 0 || expiredCacheKeys.length > 0) {
+      this.logger.log(
+        `Cache cleanup: Removed ${expiredProcessedEmails.length} processed emails and ${expiredCacheKeys.length} cached responses`,
+      );
+    }
+  }
+
+  /**
+   * Get performance metrics
+   */
+  public getPerformanceMetrics(): any {
+    return {
+      ...this.metrics,
+      preFilterEfficiency:
+        this.metrics.processedEmails > 0
+          ? (
+              (this.metrics.preFilteredEmails / this.metrics.processedEmails) *
+              100
+            ).toFixed(1) + '%'
+          : '0%',
+      duplicateRate:
+        this.metrics.processedEmails > 0
+          ? (
+              (this.metrics.duplicatesSkipped / this.metrics.processedEmails) *
+              100
+            ).toFixed(1) + '%'
+          : '0%',
+      cacheHitRate:
+        this.metrics.openaiCalls > 0
+          ? (
+              (this.metrics.cacheHits /
+                (this.metrics.openaiCalls + this.metrics.cacheHits)) *
+              100
+            ).toFixed(1) + '%'
+          : '0%',
+      cacheSize: this.responseCache.size,
+      uptime: Math.floor((Date.now() - this.metrics.startTime) / 1000),
+    };
+  }
+
+  /**
+   * Log performance metrics periodically
+   */
+  private logPerformanceMetrics(): void {
+    const metrics = this.getPerformanceMetrics();
+    this.logger.log(`Performance Metrics:
+  Uptime: ${metrics.uptime}s
+  Processed Emails: ${metrics.processedEmails}
+  Pre-filtered Emails: ${metrics.preFilteredEmails}
+  OpenAI Calls: ${metrics.openaiCalls}
+  Cache Hits: ${metrics.cacheHits} (${metrics.cacheHitRate}% hit rate)
+  Duplicates Skipped: ${metrics.duplicatesSkipped}
+  Errors: ${metrics.errors}
+  Avg Processing Time: ${metrics.averageProcessingTime}ms`);
+  }
+
+  /**
+   * Get the current user count from database with caching
+   */
+  private async getUserCount(): Promise<number> {
+    const now = Date.now();
+
+    // Check if we have a valid cached count
+    if (
+      this.userCountCache &&
+      now - this.userCountCache.timestamp < this.USER_COUNT_CACHE_TTL
+    ) {
+      return this.userCountCache.count;
+    }
+
+    try {
+      // Fetch all users from database
+      const users = await this.userService.findAll();
+      const userCount = users.length;
+
+      // Cache the result
+      this.userCountCache = {
+        count: userCount,
+        timestamp: now,
+      };
+
+      this.logger.log(`Updated user count cache: ${userCount} users`);
+      return userCount;
+    } catch (error) {
+      this.logger.error(
+        `Failed to get user count: ${error.message}. Using fallback of 100.`,
+      );
+      // Fallback to a conservative estimate
+      return 100;
+    }
+  }
+
+  /**
+   * Get the concurrent email processing limit (dynamically calculated from real user count)
+   */
+  public async getConcurrentEmailLimit(): Promise<number> {
+    // Get actual user count from database
+    const userCount = await this.getUserCount();
+
+    // Calculate optimal limit based on actual user scale
+    if (userCount <= 100) return 5; // Small scale: 5 concurrent
+    if (userCount <= 500) return 10; // Medium scale: 10 concurrent
+    if (userCount <= 1000) return 15; // Large scale: 15 concurrent (RECOMMANDÉ pour 1000 users)
+    if (userCount <= 5000) return 25; // Enterprise: 25 concurrent
+    return 35; // Massive scale: 35 concurrent
+  }
+
+  /**
+   * Get current performance status and recommendations (with real user count)
+   */
+  public async getPerformanceRecommendations(): Promise<any> {
+    const userCount = await this.getUserCount();
+    const currentLimit = await this.getConcurrentEmailLimit();
+    const errorRate =
+      this.metrics.errors / Math.max(this.metrics.processedEmails, 1);
+    const avgLatency =
+      this.metrics.totalProcessingTime /
+      Math.max(this.metrics.processedEmails, 1);
+
+    return {
+      currentConfig: {
+        userCount: userCount, // Real user count from DB
+        concurrencyLimit: currentLimit,
+        estimatedDailyEmails: userCount * 50, // estimation moyenne
+        estimatedJobEmails: Math.floor(userCount * 50 * 0.2), // 20% job-related
+      },
+      currentPerformance: {
+        errorRate: (errorRate * 100).toFixed(2) + '%',
+        avgLatency: Math.round(avgLatency) + 'ms',
+        cacheHitRate: this.getPerformanceMetrics().cacheHitRate,
+        status: this.getPerformanceStatus(errorRate, avgLatency),
+      },
+      recommendations: this.getScaleRecommendations(userCount),
+      monitoring: {
+        keyMetrics: [
+          'Error rate < 5%',
+          'Avg latency < 2000ms',
+          'OpenAI calls < 900/min',
+          'Cache hit rate > 50%',
+        ],
+      },
+    };
+  }
+
+  private getPerformanceStatus(errorRate: number, avgLatency: number): string {
+    if (errorRate > 0.05 || avgLatency > 2000)
+      return 'POOR - Consider reducing concurrency';
+    if (errorRate < 0.01 && avgLatency < 500)
+      return 'EXCELLENT - Can increase concurrency';
+    return 'GOOD - Current settings optimal';
+  }
+
+  private getScaleRecommendations(userCount: number): any {
+    if (userCount <= 100) {
+      return {
+        scale: 'Small',
+        recommendation: 'Current limit of 5 is optimal',
+        expectedPeak: '~2-10 emails/minute',
+      };
+    }
+    if (userCount <= 500) {
+      return {
+        scale: 'Medium',
+        recommendation: 'Limit of 10 handles typical enterprise load',
+        expectedPeak: '~10-50 emails/minute',
+      };
+    }
+    if (userCount <= 1000) {
+      return {
+        scale: 'Large',
+        recommendation:
+          'Limit of 15 is OPTIMAL for 1000 users - Monitor and adjust',
+        expectedPeak: '~20-100 emails/minute',
+        scenarios: {
+          conservative: '3,000 emails/day (20 emails/user, 15% job-related)',
+          moderate: '10,000 emails/day (50 emails/user, 20% job-related)',
+          intensive: '25,000 emails/day (100 emails/user, 25% job-related)',
+        },
+      };
+    }
+    return {
+      scale: 'Enterprise+',
+      recommendation: `Limit of ${this.getConcurrentEmailLimit()} for high-volume processing`,
+      expectedPeak: '100+ emails/minute',
+    };
   }
 }

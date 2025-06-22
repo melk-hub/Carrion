@@ -7,6 +7,7 @@ import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from 'src/auth/auth.module';
 import { AuthService } from 'src/auth/auth.service';
 import { HttpModule } from '@nestjs/axios';
+import { CustomLoggingService } from 'src/common/services/logging.service';
 
 @Module({
   imports: [
@@ -21,11 +22,12 @@ import { HttpModule } from '@nestjs/axios';
     UserService,
     AuthService,
     JwtService,
+    CustomLoggingService,
     {
       provide: 'CONFIGURATION(refresh-jwt)',
       useValue: process.env.REFRESH_JWT_SECRET,
     },
   ],
-  exports: [UserService],
+  exports: [UserService, CustomLoggingService],
 })
 export class UserModule {}

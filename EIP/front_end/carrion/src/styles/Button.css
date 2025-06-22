@@ -1,7 +1,7 @@
 .primary-button {
   background-color: var(--brand-color-primary);
   color: var(--text-color-light);
-  width: auto;
+  width: 100%;
   border: none;
   border-radius: var(--small-border-radius);
   cursor: pointer;
@@ -13,6 +13,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  margin-top: 1px;
 }
 
 .primary-button:hover {

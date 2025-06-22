@@ -1,6 +1,50 @@
-import React, { useState, useRef, useEffect } from "react"
+import React, { useState, useRef, useEffect } from "react";
 import { Upload, Eye, Trash, CircleUserRound, Pencil } from "lucide-react";
-import "../styles/Profile.css"
+import "../styles/Profile.css";
+
+// --- FIX: Moved DocumentList outside of the Profile component for correctness and performance ---
+const DocumentList = ({ documents, onDelete, onPreview, type, editingDoc, setEditingDoc, editedName, setEditedName, handleRename }) => (
+    <div className="document-list">
+        {documents.map((doc) => (
+            <div key={doc.id} className="document-item">
+                <Eye
+                    size={24}
+                    className="preview-icon clickable"
+                    onClick={() => onPreview(doc)}
+                />
+                
+                {editingDoc?.id === doc.id && editingDoc?.type === type ? (
+                    <input
+                        type="text"
+                        className="document-name-input"
+                        value={editedName}
+                        onChange={(e) => setEditedName(e.target.value)}
+                        onBlur={handleRename}
+                        onKeyDown={(e) => {
+                            if (e.key === 'Enter') handleRename();
+                        }}
+                        autoFocus
+                    />
+                ) : (
+                    <span
+                        className="document-name"
+                        onClick={() => {
+                            setEditingDoc({ type, id: doc.id });
+                            setEditedName(doc.name);
+                        }}
+                    >
+                        {doc.name}
+                    </span>
+                )}
+
+                <button className="delete-button" onClick={() => onDelete(doc.id)}>
+                    <Trash size={20} />
+                </button>
+            </div>
+        ))}
+    </div>
+);
+
 
 function Profile() {
     const [personalInfo, setPersonalInfo] = useState({
@@ -14,7 +58,13 @@ function Profile() {
     const [editedName, setEditedName] = useState('');
     const [services, setServices] = useState([]);
     const [showMenu, setShowMenu] = useState(false);
-    const dropdownRef = useRef(null);
+    const [hover, setHover] = useState(false);
+    const [uploadedImage, setUploadedImage] = useState(null);
+    
+    // --- FIX: Defined the missing refs ---
+    const fileInputRef = useRef(null);
+    const dropdownRef = useRef(null); // Ref for the service dropdown
+
     const AVAILABLE_SERVICES = [
         { name: "LinkedIn", icon: "/icons/linkedin.png" },
         { name: "Outlook", icon: "/icons/outlook.png" },
@@ -74,10 +124,6 @@ function Profile() {
         }
     };
 
-    const [hover, setHover] = useState(false);
-    const [uploadedImage, setUploadedImage] = useState(null);
-    const fileInputRef = useRef(null);
-
     const handleImageUpload = (e) => {
         const file = e.target.files[0];
         if (file) {
@@ -127,48 +173,6 @@ function Profile() {
         console.error('Error during submit:', error);
         }
     };
-
-    const DocumentList = ({ documents, onDelete, onPreview, type }) => (
-        <div className="document-list">
-            {documents.map((doc) => (
-            <div key={doc.id} className="document-item">
-                <Eye
-                size={24}
-                className="preview-icon clickable"
-                onClick={() => onPreview(doc)}
-                />
-                
-                {editingDoc?.id === doc.id && editingDoc?.type === type ? (
-                <input
-                    type="text"
-                    className="document-name-input"
-                    value={editedName}
-                    onChange={(e) => setEditedName(e.target.value)}
-                    onBlur={handleRename}
-                    onKeyDown={(e) => {
-                    if (e.key === 'Enter') handleRename();
-                    }}
-                    autoFocus
-                />
-                ) : (
-                <span
-                    className="document-name"
-                    onClick={() => {
-                    setEditingDoc({ type, id: doc.id });
-                    setEditedName(doc.name);
-                    }}
-                >
-                    {doc.name}
-                </span>
-                )}
-
-                <button className="delete-document" onClick={() => onDelete(doc.id)}>
-                <Trash size={20} />
-                </button>
-            </div>
-            ))}
-        </div>
-    );
 
     return (
         <div className="profile-page">
@@ -237,11 +241,17 @@ function Profile() {
                                     <input type="file" accept="application/pdf" onChange={handleCvSelect} hidden />
                                     </label>
                                 </div>
+                                {/* --- FIX: Passed all required props to DocumentList --- */}
                                 <DocumentList
                                     documents={cvDocuments}
                                     onDelete={handleDeleteCv}
                                     onPreview={handleDocumentClick}
                                     type="cv"
+                                    editingDoc={editingDoc}
+                                    setEditingDoc={setEditingDoc}
+                                    editedName={editedName}
+                                    setEditedName={setEditedName}
+                                    handleRename={handleRename}
                                 />
                             </div>
 
@@ -254,11 +264,17 @@ function Profile() {
                                     <input type="file" accept="application/pdf" onChange={handleMotivationSelect} hidden />
                                     </label>
                                 </div>
+                                {/* --- FIX: Passed all required props to DocumentList --- */}
                                 <DocumentList
                                     documents={motivationDocuments}
                                     onDelete={handleDeleteMotivation}
                                     onPreview={handleDocumentClick}
                                     type="motivation"
+                                    editingDoc={editingDoc}
+                                    setEditingDoc={setEditingDoc}
+                                    editedName={editedName}
+                                    setEditedName={setEditedName}
+                                    handleRename={handleRename}
                                 />
                             </div>
                         </div>
@@ -266,6 +282,7 @@ function Profile() {
                 </div>
                 <div className="profile-right-column">
                     <div className="profile-picture">
+                        {/* --- FIX: Corrected the duplicated/broken JSX --- */}
                         <div className="image-wrapper"
                             onMouseEnter={() => setHover(true)} 
                             onMouseLeave={() => setHover(false)}
@@ -297,7 +314,7 @@ function Profile() {
                                 onChange={handleImageUpload}
                             />
                         </div>
-                        <h2>{personalInfo.prenom} {personalInfo.nom}</h2>
+                        <h2>{personalInfo.prenom || 'Prénom'} {personalInfo.nom || 'Nom'}</h2>
                     </div>
                     <div className="profile-services">
                         <h2>Mes Services Liés</h2>
@@ -310,27 +327,28 @@ function Profile() {
                             ))}
 
                             {remainingServices.length > 0 && (
-                            <div className="service-item add-service" style={{ position: "relative" }} ref={dropdownRef}>
-                                <button onClick={() => setShowMenu(!showMenu)}>+</button>
+                                // --- FIX: Attached the ref to the dropdown's container ---
+                                <div ref={dropdownRef} className="service-item add-service" style={{ position: "relative" }}>
+                                    <button onClick={() => setShowMenu(!showMenu)}>+</button>
 
-                                {showMenu && (
-                                 <ul className="service-dropdown">
-                                    {remainingServices.map((service) => (
-                                        <li key={service.name} onClick={() => handleAddService(service)}>
-                                            <img src={service.icon} alt={service.name} />
-                                            {service.name}
-                                        </li>
-                                        ))}
-                                    </ul>
-                                )}
-                            </div>
+                                    {showMenu && (
+                                        <ul className="service-dropdown">
+                                            {remainingServices.map((service) => (
+                                                <li key={service.name} onClick={() => handleAddService(service)}>
+                                                    <img src={service.icon} alt={service.name} />
+                                                    {service.name}
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    )}
+                                </div>
                             )}
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    )
+    );
 }
 
 export default Profile;

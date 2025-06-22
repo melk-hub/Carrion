@@ -1,4 +1,4 @@
-import { Module, forwardRef } from '@nestjs/common';
+import { Module, forwardRef, Global } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { UserService } from 'src/user/user.service';
@@ -19,7 +19,9 @@ import { MicrosoftStrategy } from './strategies/microsoft.strategy';
 import microsoftOauthConfig from './config/microsoft-oauth.config';
 import { UserModule } from 'src/user/user.module';
 import { HttpModule } from '@nestjs/axios';
+import { CustomLoggingService } from 'src/common/services/logging.service';
 
+@Global()
 @Module({
   imports: [
     forwardRef(() => UserModule),
@@ -35,6 +37,7 @@ import { HttpModule } from '@nestjs/axios';
   providers: [
     AuthService,
     UserService,
+    CustomLoggingService,
     LocalStrategy,
     JwtStrategy,
     RefreshJwtStrategy,
@@ -49,6 +52,6 @@ import { HttpModule } from '@nestjs/axios';
       useClass: RolesGuard,
     },
   ],
-  exports: [AuthService],
+  exports: [AuthService, CustomLoggingService],
 })
 export class AuthModule {}
