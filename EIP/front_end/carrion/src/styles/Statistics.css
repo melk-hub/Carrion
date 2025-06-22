@@ -1,14 +1,15 @@
-.stats-container {
-  padding: 24px;
-  font-family: Arial, sans-serif;
-  background-color: #f4f4f4;
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
 }
 
 .stats-title {
-  font-size: 28px;
+  font-size: 2rem;
   font-weight: bold;
-  margin-bottom: 24px;
   text-align: center;
+  margin-bottom: 2rem;
+  color: #333;
 }
 
 .kpi-grid {
@@ -20,21 +21,27 @@
 
 .kpi-card {
   background-color: white;
-  border-radius: 12px;
-  padding: 16px;
+  border-radius: 16px;
+  padding: 20px;
   text-align: center;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 8px rgba(19, 34, 56, 0.08);
+  transition: transform 0.2s ease;
+}
+
+.kpi-card:hover, .chart-card:hover {
+  transform: translateY(-5px);
 }
 
 .kpi-title {
   font-size: 14px;
-  color: #666;
+  color: #132238;
+  font-weight: 500;
 }
 
 .kpi-value {
-  font-size: 24px;
+  font-size: 28px;
   font-weight: bold;
-  margin-top: 8px;
+  color: #FBB75F;
 }
 
 .charts-grid {
@@ -45,14 +52,16 @@
 
 .chart-card {
   background-color: white;
-  border-radius: 12px;
-  padding: 16px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 4px 8px rgba(19, 34, 56, 0.08);
+  transition: transform 0.2s ease;
 }
 
 .chart-title {
-  font-size: 16px;
-  margin-bottom: 8px;
+  font-size: 18px;
+  color: #132238;
+  margin-bottom: 12px;
   font-weight: 600;
 }
 
@@ -61,3 +70,34 @@
   font-size: 18px;
   text-align: center;
 }
+
+.milestone-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding-top: 12px;
+}
+.milestone {
+  padding: 10px 16px;
+  border-radius: 8px;
+  background-color: #f7f0e8;
+  color: #333;
+  font-weight: bold;
+}
+.achieved {
+  border: 2px solid #82ca9d;
+}
+.not-achieved {
+  border: 2px dashed #ccc;
+  opacity: 0.7;
+}
+
+.milestone-message {
+  margin-top: 2rem;
+  padding: 0.75rem;
+  background-color: #f0f8ff;
+  border-left: 4px solid #4caf50;
+  font-size: 1rem;
+  border-radius: 4px;
+}
+
