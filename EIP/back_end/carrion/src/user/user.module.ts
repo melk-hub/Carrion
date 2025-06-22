@@ -8,8 +8,6 @@ import { AuthModule } from 'src/auth/auth.module';
 import { HttpModule } from '@nestjs/axios';
 import { CustomLoggingService } from 'src/common/services/logging.service';
 import { AuthService } from 'src/auth/auth.service';
-import { HttpModule } from '@nestjs/axios';
-import { CustomLoggingService } from 'src/common/services/logging.service';
 
 @Module({
   imports: [

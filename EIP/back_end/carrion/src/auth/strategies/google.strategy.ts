@@ -33,8 +33,7 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
         username: profile.name.givenName,
         email: profile.emails[0].value,
         password: '',
-        firstName: profile.name.givenName,
-        lastName: profile.name.familyName,
+        hasProfile: false,
       });
       return { ...user, accessToken, refreshToken };
     } catch {

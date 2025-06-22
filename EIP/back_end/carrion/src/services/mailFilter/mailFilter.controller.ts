@@ -17,6 +17,7 @@ import {
 } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/guards/jwt/jwt-auth.guard';
 import { ExtractInfoDto } from './dto/mailFilter.dto';
+import { JobApplyDto } from 'src/jobApply/dto/jobApply.dto';
 
 @ApiTags('mailFilter')
 @ApiBearerAuth()

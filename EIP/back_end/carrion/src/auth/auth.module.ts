@@ -44,7 +44,7 @@ import { UserService } from 'src/user/user.service';
     RefreshJwtStrategy,
     GoogleStrategy,
     MicrosoftStrategy,
-    UserService
+    UserService,
     {
       provide: APP_GUARD,
       useClass: JwtAuthGuard,
