@@ -112,13 +112,11 @@ export class JobApplyController {
   }
 
   @Post(':id/archive')
-
   async archiveJobApplication(@Param('id') jobApplyId: string, @Request() req) {
     const userId = req.user.id;
     return this.jobApplyService.archiveJobApplication(jobApplyId, userId);
   }
 
-  // Unarchive a job application
   @Post(':id/unarchive')
   async unarchiveJobApplication(@Param('id') archivedJobId: string, @Request() req) {
     const userId = req.user.id;
