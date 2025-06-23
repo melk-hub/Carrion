@@ -20,6 +20,7 @@ import Navbar from "./pages/Navbar";
 import Profile from "./pages/Profile";
 import { Toaster } from "react-hot-toast";
 import Settings from "./pages/Settings";
+import Notifications from "./pages/Notification";
 
 function App() {
   return (
@@ -169,6 +170,16 @@ function AppLayout() {
             element={
               isAuthenticated ? (
                 <Settings />
+              ) : (
+                <Navigate to="/" replace state={{ from: location }} />
+              )
+            }
+          />
+          <Route
+            path="/notification"
+            element={
+              isAuthenticated ? (
+                <Notifications sidebarCollapsed={sidebarCollapsed}/>
               ) : (
                 <Navigate to="/" replace state={{ from: location }} />
               )
