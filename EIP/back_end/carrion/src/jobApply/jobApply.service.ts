@@ -323,4 +323,65 @@ export class JobApplyService {
       throw new Error(`Error updating job application: ${error.message}`);
     }
   }
+
+  async archiveJobApplication(jobApplyId: string, userId: string) {
+    const job = await this.prisma.jobApply.findUniqueOrThrow({
+      where: { id: jobApplyId },
+    });
+
+    if (job.UserId !== userId) {
+      throw new ForbiddenException("You can't archive someone else's application.");
+    }
+
+    await this.prisma.archivedJobApply.create({
+      data: {
+        originalId: job.id,
+        title: job.Title,
+        company: job.Company,
+        location: job.Location,
+        salary: job.Salary,
+        status: job.status,
+        imageUrl: job.imageUrl,
+        contractType: job.contractType,
+        interviewDate: job.interviewDate,
+        userId: job.UserId,
+      },
+    });
+
+    await this.prisma.jobApply.delete({
+      where: { id: job.id },
+    });
+    return { message: 'Job application archived successfully.' };
+  }
+
+  async unarchiveJobApplication(archivedJobId: string, userId: string) {
+    const archivedJob = await this.prisma.archivedJobApply.findUniqueOrThrow({
+      where: { id: archivedJobId },
+    });
+
+    if (archivedJob.userId !== userId) {
+      throw new ForbiddenException("You can't unarchive someone else's application.");
+    }
+
+    await this.prisma.jobApply.create({
+      data: {
+        id: archivedJob.originalId,
+        Title: archivedJob.title,
+        Company: archivedJob.company,
+        Location: archivedJob.location,
+        Salary: archivedJob.salary,
+        status: archivedJob.status,
+        imageUrl: archivedJob.imageUrl,
+        contractType: archivedJob.contractType,
+        interviewDate: archivedJob.interviewDate,
+        UserId: archivedJob.userId,
+      },
+    });
+
+    await this.prisma.archivedJobApply.delete({
+      where: { id: archivedJob.id },
+    });
+
+    return { message: 'Job application unarchived successfully.' };
+  }
 }

@@ -12,18 +12,19 @@ datasource db {
 // The User model should only contain core authentication and identity info.
 // First name and last name have been REMOVED from this model.
 model User {
-  id                 String       @id @default(uuid()) @db.Uuid
-  username           String       @unique
-  email              String       @unique
+  id                 String             @id @default(uuid()) @db.Uuid
+  username           String             @unique
+  email              String             @unique
   password           String
-  hasProfile         Boolean      @default(false)
-  createdAt          DateTime     @default(now())
-  role               Role         @default(VISITOR)
-  jobApplies         jobApply[]   @relation("UserJobApplies")
-  userProfile        UserProfile? @relation("UserProfile")
-  Settings           Settings?    @relation("UserSettings")
-  hashedRefreshToken String?      @unique
-  tokens             Token[]      @relation("UserTokens")
+  hasProfile         Boolean            @default(false)
+  createdAt          DateTime           @default(now())
+  role               Role               @default(VISITOR)
+  jobApplies         jobApply[]         @relation("UserJobApplies")
+  userProfile        UserProfile?       @relation("UserProfile")
+  Settings           Settings?          @relation("UserSettings")
+  hashedRefreshToken String?            @unique
+  tokens             Token[]            @relation("UserTokens")
+  archivedJobApplies ArchivedJobApply[] @relation("UserArchivedJobApplies")
 }
 
 model UserProfile {
@@ -70,6 +71,23 @@ model jobApply {
   createdAt     DateTime  @default(now())
   contractType  String?
   interviewDate DateTime?
+}
+
+model ArchivedJobApply {
+  id            String   @id @default(uuid()) @db.Uuid
+  originalId    String   @db.Uuid
+  title         String
+  company       String
+  location      String?
+  salary        Int?
+  status        Status
+  imageUrl      String?
+  contractType  String?
+  interviewDate DateTime?
+  archivedAt    DateTime @default(now())
+
+  userId        String   @db.Uuid
+  user          User     @relation("UserArchivedJobApplies", fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Settings {
