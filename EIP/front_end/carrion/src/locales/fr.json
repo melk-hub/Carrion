@@ -301,11 +301,24 @@
       "applicationsByMonth": "Candidatures par mois",
       "applicationsByCompany": "Candidatures par entreprise"
     },
-    "noData": {
-      "title": "Aucune donnée disponible",
-      "description": "Aucune candidature trouvée pour afficher les statistiques"
-    },
-    "loading": "Chargement des statistiques..."
+    "noData": "Aucune candidature trouvée pour afficher les statistiques",
+    "loading": "Chargement des statistiques...",
+    "streak": "Jours consécutifs",
+    "today": "Aujourd'hui",
+    "thisWeek": "Cette semaine",
+    "thisMonth": "Ce mois-ci",
+    "total": "Total",
+    "evolution": "Évolution sur les 30 derniers jours:",
+    "applications": "candidatures",
+    "success": "Succès atteints:",
+    "congratulations": "Bravo, tu as envoyé",
+    "again": "Encore",
+    "nextStep": "candidatures à envoyer avant le prochain palier",
+    "finish": "Tu as atteint tous les paliers !",
+    "personalGoal": "Ton objectif personnel:",
+    "objective": "Objectif:",
+    "accomplished": "Réalisé:",
+    "remaining": "Restant:"
   },
   "modal": {
     "add": {

@@ -243,9 +243,8 @@ button {
 .navbar-content {
   margin-left: 220px;
   margin-top: 70px;
-  background: #FFF9F0;
   transition: margin-left 0.3s ease;
-  padding: 20px;
+  padding: 25px;
 }
 
 .navbar-content.collapsed {

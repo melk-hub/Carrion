@@ -1,10 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useLanguage } from "../contexts/LanguageContext";
 import apiService from "../services/api.js";
-import {
-  PieChart, Pie,
-  XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, LineChart, Line
-} from "recharts";
+import ReactECharts from "echarts-for-react";
 import "../styles/Statistics.css";
 
 function generateEmptyDays() {
@@ -63,137 +60,215 @@ function Statistics() {
     fetchStats();
   }, []);
 
-  if (!stats || !stats.milestones || !stats.totalApplications || visibleIndex === null) {
-    return <div className="loading">{t('statistics.loading')}</div>;
+  if (
+    !stats ||
+    typeof stats.milestones !== "object" ||
+    typeof stats.totalApplications !== "number" ||
+    visibleIndex === null
+  ) {
+    return <div className="loading">{t("statistics.loading")}</div>;
   }
 
-  const dailyData = generateEmptyDays().map(date => ({
+  let fullDailyData = generateEmptyDays().map((date) => ({
     date,
     count: stats.applicationsPerDay?.[date] || 0,
   }));
-  const maxCount = Math.max(...dailyData.map(d => d.count));
+
+  const firstNonZeroIndex = fullDailyData.findIndex((entry) => entry.count > 0);
+
+  const startIndex = Math.max(firstNonZeroIndex - 1, 0);
+
+  const dailyData = firstNonZeroIndex !== -1 ? fullDailyData.slice(startIndex) : fullDailyData;
+
+  const chartOptions = {
+    tooltip: {
+      trigger: "axis",
+      backgroundColor: "#fff",
+      borderColor: "#ccc",
+      borderWidth: 1,
+      textStyle: {
+        color: "#333",
+      },
+    },
+    grid: {
+      left: "3%",
+      right: "4%",
+      bottom: "15%",
+      top: "10%",
+      containLabel: true,
+    },
+    xAxis: {
+      type: "category",
+      data: dailyData.map((item) =>
+        new Date(item.date).toLocaleDateString("fr-FR", {
+          day: "2-digit",
+          month: "2-digit",
+        })
+      ),
+      axisLabel: {
+        fontSize: 10,
+        rotate: 45,
+      },
+      axisLine: {
+        lineStyle: {
+          color: "#999",
+        },
+      },
+    },
+    yAxis: {
+      type: "value",
+      minInterval: 1,
+      axisLabel: {
+        fontSize: 10,
+      },
+      splitLine: {
+        lineStyle: {
+          type: "dashed",
+          color: "#eee",
+        },
+      },
+    },
+    series: [
+      {
+        name: t("statistics.applications"),
+        data: dailyData.map((item) => item.count),
+        type: "line",
+        smooth: true,
+        showSymbol: true,
+        symbol: "circle",
+        symbolSize: 6,
+        lineStyle: {
+          color: "#ff7f50",
+          width: 3,
+        },
+        areaStyle: {
+          color: "rgba(255, 127, 80, 0.15)",
+        },
+        emphasis: {
+          focus: "series",
+        },
+      },
+    ],
+  };
 
   return (
     <div className="statistics">
       <div className="container">
-        <h1 className="stats-title">{t('statistics.title')}</h1>
-
         {/* KPI Cards */}
         <div className="kpi-grid">
-          <KpiCard title="Streak (jours)" value={stats.streak} />
-          <KpiCard title="Aujourd'hui" value={stats.applicationsToday} />
-          <KpiCard title="Cette semaine" value={stats.applicationsThisWeek} />
-          <KpiCard title="Ce mois-ci" value={stats.applicationsThisMonth} />
-          <KpiCard title="Total" value={stats.totalApplications} />
+          <KpiCard title={t("statistics.streak")} value={stats.streak} />
+          <KpiCard title={t("statistics.today")} value={stats.applicationsToday} />
+          <KpiCard title={t("statistics.thisWeek")} value={stats.applicationsThisWeek} />
+          <KpiCard title={t("statistics.thisMonth")} value={stats.applicationsThisMonth} />
+          <KpiCard title={t("statistics.total")} value={stats.totalApplications} />
         </div>
 
         {/* Graphiques */}
         <div className="charts-grid">
-
-          {/* Évolution quotidienne */}
-          <ChartCard title="Évolution sur les 30 derniers jours:">
+          {/* Évolution quotidienne avec ECharts */}
+          <ChartCard title={t("statistics.evolution")}>
             {dailyData.length > 0 ? (
-              <ResponsiveContainer width="100%" height={250}>
-                <LineChart data={dailyData}>
-                  <XAxis
-                    dataKey="date"
-                    tick={{ fontSize: 10 }}
-                    tickFormatter={(dateStr) =>
-                      new Date(dateStr).toLocaleDateString("fr-FR", {
-                        day: "2-digit",
-                        month: "2-digit",
-                      })
-                    }
-                  />
-                  <YAxis
-                    tick={{ fontSize: 10 }}
-                    tickFormatter={(value) => Number.isInteger(value) ? value : ''}
-                    domain={[0, maxCount]}
-                    allowDecimals={false}
-                  />
-                  <Tooltip />
-                  <Line type="monotone" dataKey="count" stroke="#ff7f50" />
-                </LineChart>
-              </ResponsiveContainer>
+              <ReactECharts option={chartOptions} style={{ height: 250, width: "100%" }} />
             ) : (
-              <p className="no-data">Aucune donnée pour les 30 derniers jours.</p>
+              <p className="no-data">{t("statistics.noData")}</p>
             )}
           </ChartCard>
 
-          {/* Milestones globaux de l'app */}
-          <ChartCard title="Succès atteints:">
+          {/* Milestones globaux */}
+          <ChartCard title={t("statistics.success")}>
             <div className="milestone-wrapper">
-                {Object.entries(stats.milestones || {})
+              {Object.entries(stats.milestones || {})
                 .filter(([, achieved]) => achieved)
                 .sort(([a], [b]) => Number(a) - Number(b))
                 .map(([threshold]) => (
-                    <div key={threshold} className="milestone achieved">
-                    ✅ {threshold} candidatures
-                    </div>
+                  <div key={threshold} className="milestone achieved">
+                    ✅ {threshold} {t("statistics.applications")}
+                  </div>
                 ))}
-    
-                {(() => {
+
+              {(() => {
                 const total = stats.totalApplications || 0;
                 const sortedMilestones = Object.keys(stats.milestones || {})
-                    .map(Number)
-                    .sort((a, b) => a - b);
+                  .map(Number)
+                  .sort((a, b) => a - b);
                 const nextMilestone = sortedMilestones.find((t) => total < t);
-    
-                if (nextMilestone) {
-                    return (
-                    <div className="milestone-message">
-                        🎉 Bravo, tu as envoyé <strong>{total}</strong> candidatures!<br />
-                        Plus que <strong>{nextMilestone - total}</strong> avant le prochain palier
-                    </div>
-                    );
-                } else if (sortedMilestones.length > 0) {
-                    return (
-                    <div className="milestone-message">
-                        🏆 Félicitations, tu as atteint tous les paliers!
-                    </div>
-                    );
-                }
-                return null;
-                })()}
+                const justReached = sortedMilestones.some(
+                  (threshold) => total === threshold
+                );
+
+                return (
+                  <>
+                    {justReached && (
+                      <div className="milestone-message success">
+                        🎉 {t("statistics.congratulations")} <strong>{total}</strong> {t("statistics.applications")} !
+                      </div>
+                    )}
+
+                    {nextMilestone && (
+                      <div className="milestone-message">
+                        <strong>{nextMilestone - total}</strong> {t("statistics.nextStep")}
+                      </div>
+                    )}
+
+                    {!nextMilestone && sortedMilestones.length > 0 && (
+                      <div className="milestone-message">
+                        🏆 {t("statistics.finish")}
+                      </div>
+                    )}
+                  </>
+                );
+              })()}
             </div>
           </ChartCard>
 
-          {/* Example d'Objectif personnel qu'il faudra definir autre par dans l'app*/}
-          <ChartCard title={<>Objectif personnel:<br />{stats.personalGoal.target} candidatures cette semaine</>}>
-            <ResponsiveContainer width="100%" height={250}>
-                <PieChart>
-                <Pie
-                    data={[
-                    {
-                        name: "Envoyées",
-                        value: Math.min(stats.personalGoal.current, stats.personalGoal.target),
-                    },
-                    {
-                        name: "Restant",
-                        value: Math.max(stats.personalGoal.target - stats.personalGoal.current, 0),
-                    },
-                    ]}
-                    dataKey="value"
-                    nameKey="name"
-                    outerRadius={80}
-                >
-                    <Cell fill="#FBB75F" />
-                    <Cell fill="#ccc" />
-                </Pie>
-                <Tooltip />
-                </PieChart>
-            </ResponsiveContainer>
+          {/* Objectif personnel */}
+          <ChartCard title={t("statistics.personalGoal")}>
+            <div className="progress-content">
+              <div className="progress-circle">
+                <svg viewBox="0 0 36 36" className="circular-chart">
+                  <path
+                    className="circle-bg"
+                    d="M18 2.0845
+                        a 15.9155 15.9155 0 0 1 0 31.831
+                        a 15.9155 15.9155 0 0 1 0 -31.831"
+                  />
+                  <path
+                    className="circle"
+                    strokeDasharray={`${Math.round((stats.personalGoal.current / stats.personalGoal.target) * 100)}, 100`}
+                    d="M18 2.0845
+                        a 15.9155 15.9155 0 0 1 0 31.831
+                        a 15.9155 15.9155 0 0 1 0 -31.831"
+                  />
+                  <text x="18" y="20.35" className="percentage">
+                    {Math.round((stats.personalGoal.current / stats.personalGoal.target) * 100)}%
+                  </text>
+                </svg>
+              </div>
+
+              <div className="progress-details">
+                <div className="progress-item">
+                  <span className="progress-label">{t("statistics.goal")}</span>
+                  <span className="progress-value">{stats.personalGoal.target} {t("statistics.applications")} </span>
+                </div>
+                <div className="progress-item">
+                  <span className="progress-label">{t("statistics.accomplished")}</span>
+                  <span className="progress-value">{stats.personalGoal.current} {t("statistics.applications")}</span>
+                </div>
+                <div className="progress-item">
+                  <span className="progress-label">{t("statistics.remaining")}</span>
+                  <span className="progress-value">
+                    {Math.max(stats.personalGoal.target - stats.personalGoal.current, 0)} {t("statistics.applications")}
+                  </span>
+                </div>
+              </div>
+            </div>
 
             <div className="milestone-status">
-                {stats.personalGoal.achieved ? (
+              {stats.personalGoal.achieved && (
                 <p>🎉 Bravo, objectif atteint ! Tu as envoyé {stats.personalGoal.current} candidatures cette semaine !</p>
-                ) : (
-                <p>
-                    Progression : {stats.personalGoal.current} / {stats.personalGoal.target} candidatures cette semaine
-                </p>
-                )}
+              )}
             </div>
-            </ChartCard>
+          </ChartCard>
         </div>
       </div>
     </div>

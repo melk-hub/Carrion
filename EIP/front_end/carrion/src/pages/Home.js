@@ -93,7 +93,7 @@ export default function Home() {
             </button>
             <button
               className="action-btn tertiary"
-              onClick={() => navigate("/Archives")}
+              onClick={() => navigate("/statistics")}
             >
               <div className="action-icon">📊</div>
               <span>{t("home.statistics")}</span>

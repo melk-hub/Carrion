@@ -297,8 +297,23 @@
     "applicationsByMonth": "Applications by month",
     "applicationsByCompany": "Applications by company",
     "applicationsByContractType": "Applications by contract type",
-    "noData": "No data available",
-    "loading": "Loading statistics..."
+    "noData": "No applications found to display statistics",
+    "loading": "Loading statistics...",
+    "streak": "Streak",
+    "today": "Today",
+    "thisWeek": "This week",
+    "thisMonth": "This month",
+    "total": "Total",
+    "evolution": "Evolution based on the last 30 days:",
+    "applications": "applications",
+    "success": "Success completed:",
+    "congratulations": "Congratulations, you sent",
+    "nextStep": "more applications to send before the next level",
+    "finish": "You completed all the levels !",
+    "personalGoal": "Your personal goal:",
+    "goal": "Goal:",
+    "accomplished": "Accomplished:",
+    "remaining": "Remaining:"
   },
   "modal": {
     "add": {

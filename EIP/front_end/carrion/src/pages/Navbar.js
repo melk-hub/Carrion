@@ -39,6 +39,8 @@ function Navbar({ sidebarCollapsed, setSidebarCollapsed, setIsAuthenticated }) {
         return t('navbar.profile');
       case '/settings':
         return t('navbar.settings');
+      case '/statistics':
+        return t('navbar.statistics');
       default:
         return '';
     }
