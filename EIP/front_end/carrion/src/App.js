@@ -16,6 +16,7 @@ import { useAuth, AuthProvider } from "./AuthContext";
 import { LanguageProvider } from "./contexts/LanguageContext";
 import { useLanguage } from "./contexts/LanguageContext";
 import Navbar from './pages/Navbar';
+import Notifications from "./pages/Notification";
 
 function App() {
   return (
@@ -99,6 +100,16 @@ function AppLayout() {
             element={
               isAuthenticated ? (
                 <Archives sidebarCollapsed={sidebarCollapsed}/>
+              ) : (
+                <Navigate to="/" replace state={{ from: location }} />
+              )
+            }
+          />
+          <Route
+            path="/notification"
+            element={
+              isAuthenticated ? (
+                <Notifications sidebarCollapsed={sidebarCollapsed}/>
               ) : (
                 <Navigate to="/" replace state={{ from: location }} />
               )
