@@ -22,7 +22,7 @@ function Archives() {
   useEffect(() => {
     const fetchApplications = async () => {
       try {
-        const response = await apiService.get('/job_applies/get_jobApply');
+        const response = await apiService.get('/job_applies/${selectedApplication.id}/archive');
         if (!response.ok) {
           throw new Error(`${t('dashboard.errors.fetchError')} ${response.status}`);
         }
@@ -64,19 +64,18 @@ function Archives() {
   }
 
   const handleDeArchiveApplication = async (id) => {
-      try {
-        const response = await apiService.delete(`/job_applies/${id}`);
-        // changer la route pour dé-archiver des candidatures
-  
-        if (!response.ok) {
-          throw new Error(`${t('dashboard.errors.archiveError')} ${response.status}`);
-        }
-  
-        setApplications(applications.filter((app) => app.id !== id))
-      } catch (error) {
-        console.error(t('dashboard.errors.archiveError'), error)
+    try {
+      const response = await apiService.post(`/job_applies/${selectedApplication.id}/unarchive`);
+
+      if (!response.ok) {
+        throw new Error(`${t('dashboard.errors.archiveError')} ${response.status}`);
       }
+
+      setApplications(applications.filter((app) => app.id !== id))
+    } catch (error) {
+      console.error(t('dashboard.errors.archiveError'), error)
     }
+  }
 
   const handleDeleteApplication = async (id) => {
     try {
