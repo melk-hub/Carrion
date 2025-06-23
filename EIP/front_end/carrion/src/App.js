@@ -35,7 +35,7 @@ function AppLayout() {
   const { t } = useLanguage();
   const navigate = useNavigate();
   const location = useLocation();
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(true);
 
   useEffect(() => {
     if (!loadingAuth) {
@@ -60,6 +60,10 @@ function AppLayout() {
       }
     }
   }, [isAuthenticated, loadingAuth, navigate, location.pathname]);
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [location.pathname]);
 
   if (loadingAuth) {
     return <div>{t("common.loadingAuth")}</div>;

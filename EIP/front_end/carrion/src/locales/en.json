@@ -118,6 +118,7 @@
     "registerError": "Registration error."
   },
   "home": {
+    "welcomeMessage": "Organize your job search with Carrion",
     "welcome": "Welcome to Carrion!",
     "description": "Your application management platform",
     "getStarted": "Get Started",

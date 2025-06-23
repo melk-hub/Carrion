@@ -107,7 +107,7 @@
 }
 
 .google-login-button {
-  background-color: var(--secondary-color);
+  /* background-color: var(--secondary-color); */
   border: 1px solid #d1d1d1;
   color: var(--text-color);
   margin-left: 0 !important;

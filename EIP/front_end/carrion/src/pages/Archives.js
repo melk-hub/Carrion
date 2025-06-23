@@ -150,7 +150,6 @@ function Archives() {
   return (
     <div className="archives">
       <div className="container">
-        <h1 className="archives-title">{t('archives.title')}</h1>
 
         <div className="stats-container">
           <div className="stat-card">

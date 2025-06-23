@@ -12,7 +12,6 @@ import archives from '../assets/archives.png';
 import bell  from "../assets/bell.png";
 import avatar from "../assets/avatar.png";
 import notification_icon from "../assets/notification.png";
-// import ReduceMotionToggle from '../components/ToogleSwitch';
 
 function Navbar({ sidebarCollapsed, setSidebarCollapsed, setIsAuthenticated }) {
   const navigate = useNavigate();
@@ -21,9 +20,32 @@ function Navbar({ sidebarCollapsed, setSidebarCollapsed, setIsAuthenticated }) {
   const API_URL = process.env.REACT_APP_API_URL;
 
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [reduceMotion, setReduceMotion] = useState(false);
   const [notification, setNotification] = useState(false);
   const dropdownRef = useRef(null);
+
+  // Fonction pour obtenir le nom de la page actuelle
+  const getCurrentPageName = () => {
+    switch (location.pathname) {
+      case '/home':
+        return t('navbar.home');
+      case '/dashboard':
+        return t('navbar.applications');
+      case '/archives':
+        return t('navbar.archives');
+      case '/profile':
+        return t('navbar.profile');
+      case '/settings':
+        return t('navbar.settings');
+      default:
+        return '';
+    }
+  };
+
+  // Fonction pour naviguer et remonter en haut de page
+  const navigateAndScrollTop = (path) => {
+    navigate(path);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   const handleLogout = async () => {
     try {
@@ -57,20 +79,18 @@ function Navbar({ sidebarCollapsed, setSidebarCollapsed, setIsAuthenticated }) {
     setSidebarCollapsed(prev => !prev);
   };
 
-  useEffect(() => {
-    toggleSidebar();
-  }, [reduceMotion]);
-
   return (
     <header className="navbar">
       <div className="topbar">
         <div className="topbar-left">
-          <div className="logo" onClick={() => navigate('/home')}>
+          <div className="logo" onClick={() => navigateAndScrollTop('/home')}>
             <img src={logo} alt="Carrion" className="logo-img"/>
             <span className="logo-text">CARRION</span>
           </div>
         </div>
-        <span className="username">{t('common.hello')} Jeremy Smith</span>
+        <span className="username">
+          {t('common.hello')} - Jeremy Smith - {getCurrentPageName()}
+        </span>
         <div className="topbar-right">
           <LanguageDropdown className="dark-theme" style={{color: 'white'}}/>
           <img 
@@ -84,8 +104,8 @@ function Navbar({ sidebarCollapsed, setSidebarCollapsed, setIsAuthenticated }) {
             <img src={avatar} alt="User" className="avatar" />
             {isDropdownOpen && (
               <ul className="dropdown-menu">
-                <li onClick={() => { navigate('/profile'); setIsDropdownOpen(false); }}>{t('navbar.profile')}</li>
-                <li onClick={() => { navigate('/settings'); setIsDropdownOpen(false); }}>{t('navbar.settings')}</li>
+                <li onClick={() => { navigateAndScrollTop('/profile'); setIsDropdownOpen(false); }}>{t('navbar.profile')}</li>
+                <li onClick={() => { navigateAndScrollTop('/settings'); setIsDropdownOpen(false); }}>{t('navbar.settings')}</li>
                 <li onClick={() => { handleLogout(); setIsDropdownOpen(false); }} style={{color: 'red'}}>{t('navbar.logout')}</li>
               </ul>
             )}
@@ -94,23 +114,23 @@ function Navbar({ sidebarCollapsed, setSidebarCollapsed, setIsAuthenticated }) {
       </div>
       <div className={`sidebar ${sidebarCollapsed ? 'collapsed' : ''}`}>
         <ul className="navbar-menu">
-          <li onClick={() => navigate('/home')} className={isActive('/home') ? 'active' : ''}>
+          <li onClick={() => navigateAndScrollTop('/home')} className={isActive('/home') ? 'active' : ''}>
             <img src={home} alt="Home" className="menu-icon" style={{width: '20px', height: '20px'}}/>
             <span className="menu-text">{t('navbar.home')}</span>
           </li>
-          <li onClick={() => navigate('/dashboard')} className={isActive('/dashboard') ? 'active' : ''}>
+          <li onClick={() => navigateAndScrollTop('/dashboard')} className={isActive('/dashboard') ? 'active' : ''}>
             <img src={candidature} alt="Candidature" className="menu-icon" style={{width: '20px', height: '20px'}}/>
             <span className="menu-text">{t('navbar.applications')}</span>
           </li>
-          <li onClick={() => navigate('/archives')} className={isActive('/archives') ? 'active' : ''}>
+          <li onClick={() => navigateAndScrollTop('/archives')} className={isActive('/archives') ? 'active' : ''}>
             <img src={archives} alt="Archives" className="menu-icon" style={{width: '20px', height: '20px'}}/>
             <span className="menu-text">{t('navbar.archives')}</span>
           </li>
         </ul>
         <div className="motion-toggle">
           <ToggleSwitch 
-            isChecked={reduceMotion}
-            setIsChecked={setReduceMotion}
+            isChecked={sidebarCollapsed}
+            setIsChecked={toggleSidebar}
           />
         </div>
       </div>

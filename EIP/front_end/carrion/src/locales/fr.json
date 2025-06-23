@@ -120,6 +120,7 @@
     "joinUs": "Nous rejoindre !"
   },
   "home": {
+    "welcomeMessage": "Organisez votre recherche d'emploi avec Carrion",
     "welcome": "Bienvenue sur Carrion !",
     "description": "Votre plateforme de gestion de candidatures",
     "getStarted": "Commencer",
