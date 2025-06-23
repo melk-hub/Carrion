@@ -17,6 +17,7 @@ import {
 } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/guards/jwt/jwt-auth.guard';
 import { ExtractInfoDto } from './dto/mailFilter.dto';
+import { JobApplyDto } from 'src/jobApply/dto/jobApply.dto';
 
 @ApiTags('mailFilter')
 @ApiBearerAuth()
@@ -29,6 +30,12 @@ export class MailFilterController {
   @Post('extract-information')
   @ApiOperation({
     summary: 'Extract mail information and create job application',
+  })
+  @ApiResponse({
+    status: 201,
+    description:
+      'Information extracted and job application created successfully.',
+    type: JobApplyDto,
   })
   @ApiResponse({
     status: 201,
@@ -71,8 +78,9 @@ export class MailFilterController {
   @Get('health')
   async getHealth() {
     const metrics = this.mailFilterService.getPerformanceMetrics();
-    const recommendations = await this.mailFilterService.getPerformanceRecommendations();
-    
+    const recommendations =
+      await this.mailFilterService.getPerformanceRecommendations();
+
     return {
       status: 'healthy',
       timestamp: new Date().toISOString(),
@@ -81,9 +89,9 @@ export class MailFilterController {
         cacheHitRate: metrics.cacheHitRate,
         errorRate: recommendations.currentPerformance.errorRate,
         avgLatency: recommendations.currentPerformance.avgLatency,
-        status: recommendations.currentPerformance.status
+        status: recommendations.currentPerformance.status,
       },
-      recommendations: recommendations.recommendations
+      recommendations: recommendations.recommendations,
     };
   }
 }

@@ -269,17 +269,18 @@ h1 {
 
 /* SECTION GLOBAL */
 
-h2 {
+/* h2 {
   font-size: 48px;
   font-weight: bold;
   display: flex;
   justify-content: center;
   font-family: Arial, Helvetica, sans-serif;
-}
+} */
 
 section h2 {
   color: var(--text-color-dark);
   font-size: 48px;
+  font-family: Arial, Helvetica, sans-serif;
 }
 
 /* SECTION SERVICES */

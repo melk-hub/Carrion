@@ -28,13 +28,9 @@ export class UserService {
 
   async create(createUserDto: CreateUserDto) {
     try {
-      const formattedDate = createUserDto.birthDate
-        ? new Date(createUserDto.birthDate).toISOString()
-        : null;
       return await this.prisma.user.create({
         data: {
           ...createUserDto,
-          birthDate: formattedDate,
         },
       });
     } catch (error) {
@@ -68,8 +64,6 @@ export class UserService {
         id: true,
         username: true,
         email: true,
-        firstName: true,
-        lastName: true,
         hashedRefreshToken: true,
         role: true,
       },

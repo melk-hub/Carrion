@@ -9,13 +9,14 @@ import {
 } from "react-router-dom";
 import Landing from "./pages/Landing";
 import Dashboard from "./pages/Dashboard";
-import Home from './pages/Home';
+import Home from "./pages/Home";
 import Archives from "./pages/Archives";
 import AuthCallback from "./components/AuthCallback";
 import { useAuth, AuthProvider } from "./AuthContext";
 import { LanguageProvider } from "./contexts/LanguageContext";
 import { useLanguage } from "./contexts/LanguageContext";
-import Navbar from './pages/Navbar';
+import Navbar from "./pages/Navbar";
+import Profile from "./pages/Profile";
 
 function App() {
   return (
@@ -61,16 +62,28 @@ function AppLayout() {
   }, [isAuthenticated, loadingAuth, navigate, location.pathname]);
 
   if (loadingAuth) {
-    return <div>{t('common.loadingAuth')}</div>;
+    return <div>{t("common.loadingAuth")}</div>;
   }
 
   return (
     <div>
       {location.pathname !== "/" && (
-        <Navbar sidebarCollapsed={sidebarCollapsed} setSidebarCollapsed={setSidebarCollapsed} setIsAuthenticated={setIsAuthenticated} />
+        <Navbar
+          sidebarCollapsed={sidebarCollapsed}
+          setSidebarCollapsed={setSidebarCollapsed}
+          setIsAuthenticated={setIsAuthenticated}
+        />
       )}
 
-      <main className={location.pathname !== "/" ? (sidebarCollapsed ? "navbar-content collapsed" : "navbar-content") : ""}>
+      <main
+        className={
+          location.pathname !== "/"
+            ? sidebarCollapsed
+              ? "navbar-content collapsed"
+              : "navbar-content"
+            : ""
+        }
+      >
         <Routes>
           <Route path="/" element={<Landing />} />
           <Route path="/auth/callback" element={<AuthCallback />} />
@@ -88,7 +101,7 @@ function AppLayout() {
             path="/dashboard"
             element={
               isAuthenticated ? (
-                <Dashboard sidebarCollapsed={sidebarCollapsed}/>
+                <Dashboard sidebarCollapsed={sidebarCollapsed} />
               ) : (
                 <Navigate to="/" replace state={{ from: location }} />
               )
@@ -98,7 +111,17 @@ function AppLayout() {
             path="/archives"
             element={
               isAuthenticated ? (
-                <Archives sidebarCollapsed={sidebarCollapsed}/>
+                <Archives sidebarCollapsed={sidebarCollapsed} />
+              ) : (
+                <Navigate to="/" replace state={{ from: location }} />
+              )
+            }
+          />
+          <Route
+            path="/profile"
+            element={
+              isAuthenticated ? (
+                <Profile />
               ) : (
                 <Navigate to="/" replace state={{ from: location }} />
               )

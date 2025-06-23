@@ -10,7 +10,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 function AuthModal({ isOpen, onClose, defaultTab }) {
   const [activeTab, setActiveTab] = useState(defaultTab || 'login');
   const [direction, setDirection] = useState(1);
-  const [credentials, setCredentials] = useState({ identifier: '', password: '', confirmPassword: '', username: '', firstName: '', lastName: '', birthDate: '1995-06-15', rememberMe: false });
+  const [credentials, setCredentials] = useState({ identifier: '', password: '', confirmPassword: '', username: '', rememberMe: false });
   const { setIsAuthenticated } = useAuth();
   const { t } = useLanguage();
   const navigate = useNavigate();
@@ -21,11 +21,9 @@ function AuthModal({ isOpen, onClose, defaultTab }) {
   useEffect(() => {
     setActiveTab(defaultTab || 'login');
     
-    // Check for OAuth2 authentication errors in URL parameters
     const authError = searchParams.get('error');
     if (authError) {
       setErrorMessage(decodeURIComponent(authError));
-      // Clear the error from URL without reloading the page
       navigate(window.location.pathname, { replace: true });
     }
   }, [defaultTab, searchParams, navigate]);
@@ -92,7 +90,7 @@ function AuthModal({ isOpen, onClose, defaultTab }) {
         const response = await fetch(`${API_URL}/auth/signup`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ username: credentials.username, password: credentials.password, firstName: credentials.firstName, lastName: credentials.lastName, birthDate: credentials.birthDate, email: credentials.email }),
+          body: JSON.stringify({ username: credentials.username, password: credentials.password, email: credentials.email }),
           credentials: 'include',
         });
     

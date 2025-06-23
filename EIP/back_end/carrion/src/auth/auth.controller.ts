@@ -10,12 +10,9 @@ import {
   UseGuards,
   Body,
   Response,
-  BadRequestException,
-  Param,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LocalAuthGuard } from './guards/local/local-auth.guard';
-import { RefreshAuthGuard } from './guards/refresh/refresh-auth.guard';
 import { JwtAuthGuard } from './guards/jwt/jwt-auth.guard';
 import { Public } from './decorators/public.decorator';
 import { GoogleAuthGuard } from './guards/google/google-auth.guard';
@@ -23,7 +20,10 @@ import { CreateUserDto, LoginDto } from 'src/user/dto/create-user.dto';
 import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { MicrosoftAuthGuard } from './guards/microsoft/microsoft-auth.guard';
 import { GoogleLoginDto } from 'src/user/dto/google-login.dto';
-import { CustomLoggingService, LogCategory } from 'src/common/services/logging.service';
+import {
+  CustomLoggingService,
+  LogCategory,
+} from 'src/common/services/logging.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @ApiTags('Authentication')
@@ -67,7 +67,9 @@ export class AuthController {
       sameSite: 'Strict',
       maxAge: tokenTime,
     });
-    return res.status(HttpStatus.OK).send();
+    return res
+      .status(HttpStatus.OK)
+      .send({ message: 'User logged in successfully' });
   }
 
   @Public()
@@ -87,8 +89,8 @@ export class AuthController {
     status: 409,
     description: 'User with the same email or username',
   })
-  async signUp(@Body() createUserDto: CreateUserDto, @Res() res) {
-    const token = await this.authService.signUp(createUserDto);
+  async signUp(@Body() userInfo: CreateUserDto, @Res() res) {
+    const token = await this.authService.signUp(userInfo);
 
     res.cookie('access_token', token.accessToken, {
       httpOnly: true,
@@ -96,7 +98,9 @@ export class AuthController {
       sameSite: 'Strict',
       maxAge: 1000 * 60 * 60 * 24,
     });
-    return res.status(HttpStatus.OK).send();
+    return res
+      .status(HttpStatus.OK)
+      .send({ message: 'User created successfully' });
   }
 
   @Public()
@@ -110,13 +114,13 @@ export class AuthController {
   async refreshAccessToken(@Req() req, @Res() res) {
     try {
       const refreshToken = req.cookies?.['refresh_token'];
-      
+
       if (!refreshToken) {
         return res.status(401).json({ message: 'No refresh token provided' });
       }
 
       const tokens = await this.authService.refreshTokens(refreshToken);
-      
+
       if (!tokens) {
         return res.status(401).json({ message: 'Invalid refresh token' });
       }
@@ -140,7 +144,9 @@ export class AuthController {
 
       return res.status(200).json({ message: 'Token refreshed successfully' });
     } catch (error) {
-      this.logger.error('Token refresh error', undefined, LogCategory.AUTH, { error: error.message });
+      this.logger.error('Token refresh error', undefined, LogCategory.AUTH, {
+        error: error.message,
+      });
       return res.status(401).json({ message: 'Token refresh failed' });
     }
   }
@@ -256,8 +262,15 @@ export class AuthController {
 
       res.redirect(`${process.env.FRONT}/auth/callback?auth=success`);
     } catch (error) {
-      this.logger.error('Google authentication error', undefined, LogCategory.AUTH, { error: error.message });
-      return res.redirect(`${process.env.FRONT}?error=server_error&errorDescription=Authentication failed`);
+      this.logger.error(
+        'Google authentication error',
+        undefined,
+        LogCategory.AUTH,
+        { error: error.message },
+      );
+      return res.redirect(
+        `${process.env.FRONT}?error=server_error&errorDescription=Authentication failed`,
+      );
     }
   }
 
@@ -436,8 +449,15 @@ export class AuthController {
 
       res.redirect(`${process.env.FRONT}/auth/callback?auth=success`);
     } catch (error) {
-      this.logger.error('Microsoft authentication error', undefined, LogCategory.AUTH, { error: error.message });
-      return res.redirect(`${process.env.FRONT}?error=server_error&errorDescription=Authentication failed`);
+      this.logger.error(
+        'Microsoft authentication error',
+        undefined,
+        LogCategory.AUTH,
+        { error: error.message },
+      );
+      return res.redirect(
+        `${process.env.FRONT}?error=server_error&errorDescription=Authentication failed`,
+      );
     }
   }
 
@@ -452,10 +472,11 @@ export class AuthController {
       });
 
       const webhookStatus = [];
-      
+
       for (const tokenRecord of usersWithMicrosoftTokens) {
         if (tokenRecord.externalId) {
-          const isActive = await this.authService.checkWebhookSubscription(tokenRecord);
+          const isActive =
+            await this.authService.checkWebhookSubscription(tokenRecord);
           webhookStatus.push({
             userId: tokenRecord.userId,
             userEmail: tokenRecord.user?.email,
@@ -470,8 +491,8 @@ export class AuthController {
         status: 'success',
         data: {
           totalWebhooks: webhookStatus.length,
-          activeWebhooks: webhookStatus.filter(w => w.isActive).length,
-          inactiveWebhooks: webhookStatus.filter(w => !w.isActive).length,
+          activeWebhooks: webhookStatus.filter((w) => w.isActive).length,
+          inactiveWebhooks: webhookStatus.filter((w) => !w.isActive).length,
           webhooks: webhookStatus,
         },
       };

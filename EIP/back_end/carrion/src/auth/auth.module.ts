@@ -1,7 +1,6 @@
 import { Module, forwardRef, Global } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
-import { UserService } from 'src/user/user.service';
 import { LocalStrategy } from './strategies/local.strategy';
 import { JwtModule } from '@nestjs/jwt';
 import jwtConfig from './config/jwt.config';
@@ -19,7 +18,9 @@ import { MicrosoftStrategy } from './strategies/microsoft.strategy';
 import microsoftOauthConfig from './config/microsoft-oauth.config';
 import { UserModule } from 'src/user/user.module';
 import { HttpModule } from '@nestjs/axios';
+import { UserProfileModule } from 'src/userProfile/user-profile.module';
 import { CustomLoggingService } from 'src/common/services/logging.service';
+import { UserService } from 'src/user/user.service';
 
 @Global()
 @Module({
@@ -32,17 +33,18 @@ import { CustomLoggingService } from 'src/common/services/logging.service';
     ConfigModule.forFeature(googleOauthConfig),
     ConfigModule.forFeature(microsoftOauthConfig),
     HttpModule,
+    forwardRef(() => UserProfileModule),
   ],
   controllers: [AuthController],
   providers: [
     AuthService,
-    UserService,
     CustomLoggingService,
     LocalStrategy,
     JwtStrategy,
     RefreshJwtStrategy,
     GoogleStrategy,
     MicrosoftStrategy,
+    UserService,
     {
       provide: APP_GUARD,
       useClass: JwtAuthGuard,

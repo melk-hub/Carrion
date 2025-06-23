@@ -53,37 +53,95 @@ function extractJsonFromString(str: string): any | null {
 export class MailFilterService {
   private readonly logger = new Logger(MailFilterService.name);
   private openai: OpenAI;
-  
+
   // Deduplication system
   private processedEmails = new Set<string>();
   private readonly EMAIL_CACHE_TTL = 15 * 60 * 1000; // 15 minutes
 
   // Response caching system for OpenAI calls
-  private responseCache = new Map<string, { response: ExtractedJobDataDto | null; timestamp: number }>();
+  private responseCache = new Map<
+    string,
+    { response: ExtractedJobDataDto | null; timestamp: number }
+  >();
   private readonly RESPONSE_CACHE_TTL = 60 * 60 * 1000; // 1 hour
 
   // Pre-filtering configuration
   private readonly JOB_KEYWORDS = [
     // French keywords
-    'recrutement', 'candidature', 'poste', 'emploi', 'job', 'entretien', 'interview',
-    'offre', 'stage', 'alternance', 'apprentissage', 'cdi', 'cdd', 'freelance',
-    'mission', 'opportunité', 'carrière', 'postulation', 'embauche',
+    'recrutement',
+    'candidature',
+    'poste',
+    'emploi',
+    'job',
+    'entretien',
+    'interview',
+    'offre',
+    'stage',
+    'alternance',
+    'apprentissage',
+    'cdi',
+    'cdd',
+    'freelance',
+    'mission',
+    'opportunité',
+    'carrière',
+    'postulation',
+    'embauche',
     // English keywords
-    'recruitment', 'application', 'position', 'employment', 'career', 'opportunity',
-    'interview', 'offer', 'internship', 'full-time', 'part-time', 'contract',
-    'freelance', 'remote', 'hiring', 'vacancy', 'candidate'
+    'recruitment',
+    'application',
+    'position',
+    'employment',
+    'career',
+    'opportunity',
+    'interview',
+    'offer',
+    'internship',
+    'full-time',
+    'part-time',
+    'contract',
+    'freelance',
+    'remote',
+    'hiring',
+    'vacancy',
+    'candidate',
   ];
 
   private readonly JOB_DOMAINS = [
-    'linkedin.com', 'indeed.com', 'glassdoor.com', 'monster.com', 'jobteaser.com',
-    'apec.fr', 'pole-emploi.fr', 'welcometothejungle.com', 'jobijoba.com',
-    'regionsjob.com', 'cadremploi.fr', 'meteojob.com', 'stepstone.fr'
+    'linkedin.com',
+    'indeed.com',
+    'glassdoor.com',
+    'monster.com',
+    'jobteaser.com',
+    'apec.fr',
+    'pole-emploi.fr',
+    'welcometothejungle.com',
+    'jobijoba.com',
+    'regionsjob.com',
+    'cadremploi.fr',
+    'meteojob.com',
+    'stepstone.fr',
   ];
 
   private readonly NEGATIVE_INDICATORS = [
-    'newsletter', 'promotion', 'marketing', 'publicité', 'spam', 'advertising',
-    'unsubscribe', 'désabonnement', 'commercial', 'vente', 'soldes', 'sale',
-    'discount', 'réduction', 'password', 'mot de passe', 'security', 'sécurité'
+    'newsletter',
+    'promotion',
+    'marketing',
+    'publicité',
+    'spam',
+    'advertising',
+    'unsubscribe',
+    'désabonnement',
+    'commercial',
+    'vente',
+    'soldes',
+    'sale',
+    'discount',
+    'réduction',
+    'password',
+    'mot de passe',
+    'security',
+    'sécurité',
   ];
 
   // Performance metrics
@@ -112,14 +170,17 @@ export class MailFilterService {
     this.openai = new OpenAI({
       apiKey: process.env.OPENAI_API_KEY,
     });
-    
+
     // Clean up processed emails cache every 20 minutes
-    setInterval(() => {
-      this.processedEmails.clear();
-      this.cleanupResponseCache();
-      this.logger.log('Cleared email deduplication cache');
-      this.logMetrics();
-    }, 20 * 60 * 1000);
+    setInterval(
+      () => {
+        this.processedEmails.clear();
+        this.cleanupResponseCache();
+        this.logger.log('Cleared email deduplication cache');
+        this.logMetrics();
+      },
+      20 * 60 * 1000,
+    );
   }
 
   /**
@@ -128,15 +189,17 @@ export class MailFilterService {
   private cleanupResponseCache(): void {
     const now = Date.now();
     let removedCount = 0;
-    
+
     for (const [key, value] of this.responseCache.entries()) {
       if (now - value.timestamp > this.RESPONSE_CACHE_TTL) {
         this.responseCache.delete(key);
         removedCount++;
       }
     }
-    
-    this.logger.log(`Cleaned up ${removedCount} expired cache entries. Cache size: ${this.responseCache.size}`);
+
+    this.logger.log(
+      `Cleaned up ${removedCount} expired cache entries. Cache size: ${this.responseCache.size}`,
+    );
   }
 
   /**
@@ -165,7 +228,7 @@ export class MailFilterService {
    */
   private getCachedResponse(cacheKey: string): ExtractedJobDataDto | null {
     const cached = this.responseCache.get(cacheKey);
-    if (cached && (Date.now() - cached.timestamp) < this.RESPONSE_CACHE_TTL) {
+    if (cached && Date.now() - cached.timestamp < this.RESPONSE_CACHE_TTL) {
       this.metrics.cacheHits++;
       this.logger.log(`Cache hit for key: ${cacheKey.substring(0, 8)}...`);
       return cached.response;
@@ -176,10 +239,13 @@ export class MailFilterService {
   /**
    * Store response in cache
    */
-  private setCachedResponse(cacheKey: string, response: ExtractedJobDataDto | null): void {
+  private setCachedResponse(
+    cacheKey: string,
+    response: ExtractedJobDataDto | null,
+  ): void {
     this.responseCache.set(cacheKey, {
       response,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     });
   }
 
@@ -187,19 +253,37 @@ export class MailFilterService {
    * Log performance metrics
    */
   private logMetrics(): void {
-    this.logger.log('MailFilter Performance Metrics:', JSON.stringify({
-      ...this.metrics,
-      preFilterEfficiency: this.metrics.processedEmails > 0 
-        ? ((this.metrics.preFilteredEmails / this.metrics.processedEmails) * 100).toFixed(1) + '%'
-        : '0%',
-      duplicateRate: this.metrics.processedEmails > 0
-        ? ((this.metrics.duplicatesSkipped / this.metrics.processedEmails) * 100).toFixed(1) + '%'
-        : '0%',
-      cacheHitRate: this.metrics.openaiCalls > 0
-        ? ((this.metrics.cacheHits / (this.metrics.openaiCalls + this.metrics.cacheHits)) * 100).toFixed(1) + '%'
-        : '0%',
-      cacheSize: this.responseCache.size
-    }));
+    this.logger.log(
+      'MailFilter Performance Metrics:',
+      JSON.stringify({
+        ...this.metrics,
+        preFilterEfficiency:
+          this.metrics.processedEmails > 0
+            ? (
+                (this.metrics.preFilteredEmails /
+                  this.metrics.processedEmails) *
+                100
+              ).toFixed(1) + '%'
+            : '0%',
+        duplicateRate:
+          this.metrics.processedEmails > 0
+            ? (
+                (this.metrics.duplicatesSkipped /
+                  this.metrics.processedEmails) *
+                100
+              ).toFixed(1) + '%'
+            : '0%',
+        cacheHitRate:
+          this.metrics.openaiCalls > 0
+            ? (
+                (this.metrics.cacheHits /
+                  (this.metrics.openaiCalls + this.metrics.cacheHits)) *
+                100
+              ).toFixed(1) + '%'
+            : '0%',
+        cacheSize: this.responseCache.size,
+      }),
+    );
   }
 
   /**
@@ -302,16 +386,19 @@ export class MailFilterService {
   private isJobRelatedEmail(
     emailText: string,
     emailSubject?: string,
-    emailSender?: string
+    emailSender?: string,
   ): { isJobRelated: boolean; confidence: number; reason: string } {
     const startTime = Date.now();
     let score = 0;
-    let reasons: string[] = [];
+    const reasons: string[] = [];
 
     // Check sender domain
     if (emailSender) {
       const domain = emailSender.match(/@([^>]+)/)?.[1]?.toLowerCase();
-      if (domain && this.JOB_DOMAINS.some(jobDomain => domain.includes(jobDomain))) {
+      if (
+        domain &&
+        this.JOB_DOMAINS.some((jobDomain) => domain.includes(jobDomain))
+      ) {
         score += 30;
         reasons.push('job-domain');
       }
@@ -319,8 +406,8 @@ export class MailFilterService {
 
     // Check subject line
     const subject = (emailSubject || '').toLowerCase();
-    const subjectKeywords = this.JOB_KEYWORDS.filter(keyword => 
-      subject.includes(keyword.toLowerCase())
+    const subjectKeywords = this.JOB_KEYWORDS.filter((keyword) =>
+      subject.includes(keyword.toLowerCase()),
     );
     if (subjectKeywords.length > 0) {
       score += subjectKeywords.length * 15;
@@ -329,17 +416,21 @@ export class MailFilterService {
 
     // Check email content
     const content = emailText.toLowerCase();
-    const contentKeywords = this.JOB_KEYWORDS.filter(keyword => 
-      content.includes(keyword.toLowerCase())
+    const contentKeywords = this.JOB_KEYWORDS.filter((keyword) =>
+      content.includes(keyword.toLowerCase()),
     );
     if (contentKeywords.length > 0) {
       score += contentKeywords.length * 5;
-      reasons.push(`content-keywords: ${contentKeywords.slice(0, 5).join(',')}`);
+      reasons.push(
+        `content-keywords: ${contentKeywords.slice(0, 5).join(',')}`,
+      );
     }
 
     // Check for negative indicators
-    const negativeIndicators = this.NEGATIVE_INDICATORS.filter(indicator =>
-      content.includes(indicator.toLowerCase()) || subject.includes(indicator.toLowerCase())
+    const negativeIndicators = this.NEGATIVE_INDICATORS.filter(
+      (indicator) =>
+        content.includes(indicator.toLowerCase()) ||
+        subject.includes(indicator.toLowerCase()),
     );
     if (negativeIndicators.length > 0) {
       score -= negativeIndicators.length * 20;
@@ -350,26 +441,32 @@ export class MailFilterService {
     if (content.includes('candidat') && content.includes('poste')) score += 10;
     if (content.includes('entretien') && content.includes('date')) score += 15;
     if (content.includes('offer') && content.includes('position')) score += 10;
-    if (content.includes('interview') && content.includes('schedule')) score += 15;
+    if (content.includes('interview') && content.includes('schedule'))
+      score += 15;
 
     const confidence = Math.max(0, Math.min(100, score));
     const isJobRelated = confidence >= 20; // Threshold for job-related emails
 
     const processingTime = Date.now() - startTime;
-    
-    this.logger.log(`Pre-filter result: ${isJobRelated ? 'JOB' : 'NOT_JOB'} (${confidence}%) in ${processingTime}ms - ${reasons.join(', ')}`);
+
+    this.logger.log(
+      `Pre-filter result: ${isJobRelated ? 'JOB' : 'NOT_JOB'} (${confidence}%) in ${processingTime}ms - ${reasons.join(', ')}`,
+    );
 
     return {
       isJobRelated,
       confidence,
-      reason: reasons.join(', ')
+      reason: reasons.join(', '),
     };
   }
 
   /**
    * Generate optimized prompt based on email content length and complexity
    */
-  private generateOptimizedPrompt(emailText: string, isComplex: boolean = false): string {
+  private generateOptimizedPrompt(
+    emailText: string,
+    isComplex: boolean = false,
+  ): string {
     const basePrompt = `Tu es un assistant expert en recrutement et en analyse d'emails de candidature.
 **PREMIÈRE VALIDATION OBLIGATOIRE** : Vérifie que le contenu est bien lié au recrutement/candidature. Si ce n'est pas le cas, renvoie null.
 
@@ -391,12 +488,18 @@ Extraire des informations d'un email de candidature au format JSON :
 - Company, title, status sont OBLIGATOIRES`;
 
     if (isComplex) {
-      return basePrompt + `
-**ANALYSE APPROFONDIE** : Email complexe détecté. Analyse attentivement tout le contexte.`;
+      return (
+        basePrompt +
+        `
+**ANALYSE APPROFONDIE** : Email complexe détecté. Analyse attentivement tout le contexte.`
+      );
     }
 
-    return basePrompt + `
-**ANALYSE RAPIDE** : Email simple détecté. Extraction directe des informations principales.`;
+    return (
+      basePrompt +
+      `
+**ANALYSE RAPIDE** : Email simple détecté. Extraction directe des informations principales.`
+    );
   }
 
   /**
@@ -408,7 +511,7 @@ Extraire des informations d'un email de candidature au format JSON :
       (emailText.match(/\n/g) || []).length > 20,
       emailText.includes('thread') || emailText.includes('conversation'),
       emailText.includes('RE:') || emailText.includes('FW:'),
-      (emailText.match(/[.!?]/g) || []).length > 10
+      (emailText.match(/[.!?]/g) || []).length > 10,
     ];
 
     return indicators.filter(Boolean).length >= 2;
@@ -457,7 +560,7 @@ Extraire des informations d'un email de candidature au format JSON :
     if (!preFilterResult.isJobRelated) {
       this.metrics.preFilteredEmails++;
       this.logger.log(
-        `Gmail email pre-filtered out (confidence: ${preFilterResult.confidence}%): ${preFilterResult.reason}. Subject: "${subject}"`
+        `Gmail email pre-filtered out (confidence: ${preFilterResult.confidence}%): ${preFilterResult.reason}. Subject: "${subject}"`,
       );
       return `Email filtered out - not job related (confidence: ${preFilterResult.confidence}%)`;
     }
@@ -483,12 +586,12 @@ Extraire des informations d'un email de candidature au format JSON :
         userId,
         subject,
         sender,
-        preFilterResult.confidence
+        preFilterResult.confidence,
       );
-      
+
       const processingTime = Date.now() - startTime;
       this.metrics.totalProcessingTime += processingTime;
-      
+
       return result;
     } catch (error) {
       this.metrics.errors++;
@@ -505,7 +608,7 @@ Extraire des informations d'un email de candidature au format JSON :
     userId: string,
     emailSubject?: string,
     emailSender?: string,
-    confidence?: number
+    confidence?: number,
   ): Promise<string> {
     this.logger.log(
       `Processing email for user ${userId}. Subject: "${emailSubject}", Sender: "${emailSender}", Confidence: ${confidence}%`,
@@ -521,7 +624,10 @@ Extraire des informations d'un email de candidature au format JSON :
 
     try {
       const isComplex = this.isComplexEmail(emailText);
-      const optimizedPrompt = this.generateOptimizedPrompt(emailText, isComplex);
+      const optimizedPrompt = this.generateOptimizedPrompt(
+        emailText,
+        isComplex,
+      );
 
       // Check cache first
       const cacheKey = this.generateCacheKey(emailText, emailSubject);
@@ -537,7 +643,7 @@ Extraire des informations d'un email de candidature au format JSON :
         parsedData = await this.callOpenAIWithFallback(
           optimizedPrompt,
           emailContext,
-          isComplex
+          isComplex,
         );
 
         // Cache the response
@@ -643,13 +749,13 @@ Extraire des informations d'un email de candidature au format JSON :
     prompt: string,
     emailContext: string,
     isComplex: boolean,
-    retryCount: number = 0
+    retryCount: number = 0,
   ): Promise<ExtractedJobDataDto | null> {
     const maxRetries = 2;
 
     try {
       this.metrics.openaiCalls++;
-      
+
       const response = await this.openai.chat.completions.create({
         model: 'gpt-4o-mini',
         response_format: { type: 'json_object' },
@@ -677,22 +783,37 @@ Extraire des informations d'un email de candidature au format JSON :
 
       return parsedData;
     } catch (error) {
-      this.logger.warn(`OpenAI call failed (attempt ${retryCount + 1}): ${error.message}`);
-      
+      this.logger.warn(
+        `OpenAI call failed (attempt ${retryCount + 1}): ${error.message}`,
+      );
+
       if (retryCount < maxRetries) {
         // Exponential backoff
         const delay = Math.pow(2, retryCount) * 1000;
-        await new Promise(resolve => setTimeout(resolve, delay));
-        return this.callOpenAIWithFallback(prompt, emailContext, isComplex, retryCount + 1);
+        await new Promise((resolve) => setTimeout(resolve, delay));
+        return this.callOpenAIWithFallback(
+          prompt,
+          emailContext,
+          isComplex,
+          retryCount + 1,
+        );
       }
-      
+
       // If all retries failed, try with simpler prompt
       if (isComplex && retryCount >= maxRetries) {
         this.logger.log('Retrying with simplified prompt for complex email');
-        const simplifiedPrompt = this.generateOptimizedPrompt(emailContext.substring(0, 1000), false);
-        return this.callOpenAIWithFallback(simplifiedPrompt, emailContext.substring(0, 1000), false, 0);
+        const simplifiedPrompt = this.generateOptimizedPrompt(
+          emailContext.substring(0, 1000),
+          false,
+        );
+        return this.callOpenAIWithFallback(
+          simplifiedPrompt,
+          emailContext.substring(0, 1000),
+          false,
+          0,
+        );
       }
-      
+
       throw error;
     }
   }
@@ -771,7 +892,7 @@ Extraire des informations d'un email de candidature au format JSON :
     if (!preFilterResult.isJobRelated) {
       this.metrics.preFilteredEmails++;
       this.logger.log(
-        `Outlook email pre-filtered out (confidence: ${preFilterResult.confidence}%): ${preFilterResult.reason}. Subject: "${subject}"`
+        `Outlook email pre-filtered out (confidence: ${preFilterResult.confidence}%): ${preFilterResult.reason}. Subject: "${subject}"`,
       );
       return `Email filtered out - not job related (confidence: ${preFilterResult.confidence}%)`;
     }
@@ -797,12 +918,12 @@ Extraire des informations d'un email de candidature au format JSON :
         userId,
         subject,
         sender,
-        preFilterResult.confidence
+        preFilterResult.confidence,
       );
-      
+
       const processingTime = Date.now() - startTime;
       this.metrics.totalProcessingTime += processingTime;
-      
+
       return result;
     } catch (error) {
       this.metrics.errors++;
@@ -847,17 +968,27 @@ Extraire des informations d'un email de candidature au format JSON :
    */
   onModuleInit() {
     // Start cache cleanup every 20 minutes
-    setInterval(() => {
-      this.performCacheCleanup();
-    }, 20 * 60 * 1000);
+    setInterval(
+      () => {
+        this.performCacheCleanup();
+      },
+      20 * 60 * 1000,
+    );
 
     // Log performance metrics every 30 minutes
-    setInterval(() => {
-      this.logPerformanceMetrics();
-    }, 30 * 60 * 1000);
+    setInterval(
+      () => {
+        this.logPerformanceMetrics();
+      },
+      30 * 60 * 1000,
+    );
 
-    this.logger.log('MailFilter Service initialized with optimizations enabled');
-    this.logger.log(`Pre-filter enabled with ${this.JOB_KEYWORDS.length} keywords and ${this.JOB_DOMAINS.length} domains`);
+    this.logger.log(
+      'MailFilter Service initialized with optimizations enabled',
+    );
+    this.logger.log(
+      `Pre-filter enabled with ${this.JOB_KEYWORDS.length} keywords and ${this.JOB_DOMAINS.length} domains`,
+    );
   }
 
   /**
@@ -865,7 +996,7 @@ Extraire des informations d'un email de candidature au format JSON :
    */
   private performCacheCleanup(): void {
     const now = Date.now();
-    
+
     // Clear expired processed emails
     const expiredProcessedEmails = [];
     for (const email of this.processedEmails) {
@@ -874,8 +1005,10 @@ Extraire des informations d'un email de candidature au format JSON :
         expiredProcessedEmails.push(email);
       }
     }
-    expiredProcessedEmails.forEach(email => this.processedEmails.delete(email));
-    
+    expiredProcessedEmails.forEach((email) =>
+      this.processedEmails.delete(email),
+    );
+
     // Clear expired cache entries
     const expiredCacheKeys = [];
     for (const [key, entry] of this.responseCache.entries()) {
@@ -883,11 +1016,11 @@ Extraire des informations d'un email de candidature au format JSON :
         expiredCacheKeys.push(key);
       }
     }
-    expiredCacheKeys.forEach(key => this.responseCache.delete(key));
-    
+    expiredCacheKeys.forEach((key) => this.responseCache.delete(key));
+
     if (expiredProcessedEmails.length > 0 || expiredCacheKeys.length > 0) {
       this.logger.log(
-        `Cache cleanup: Removed ${expiredProcessedEmails.length} processed emails and ${expiredCacheKeys.length} cached responses`
+        `Cache cleanup: Removed ${expiredProcessedEmails.length} processed emails and ${expiredCacheKeys.length} cached responses`,
       );
     }
   }
@@ -898,17 +1031,30 @@ Extraire des informations d'un email de candidature au format JSON :
   public getPerformanceMetrics(): any {
     return {
       ...this.metrics,
-      preFilterEfficiency: this.metrics.processedEmails > 0 
-        ? ((this.metrics.preFilteredEmails / this.metrics.processedEmails) * 100).toFixed(1) + '%'
-        : '0%',
-      duplicateRate: this.metrics.processedEmails > 0
-        ? ((this.metrics.duplicatesSkipped / this.metrics.processedEmails) * 100).toFixed(1) + '%'
-        : '0%',
-      cacheHitRate: this.metrics.openaiCalls > 0
-        ? ((this.metrics.cacheHits / (this.metrics.openaiCalls + this.metrics.cacheHits)) * 100).toFixed(1) + '%'
-        : '0%',
+      preFilterEfficiency:
+        this.metrics.processedEmails > 0
+          ? (
+              (this.metrics.preFilteredEmails / this.metrics.processedEmails) *
+              100
+            ).toFixed(1) + '%'
+          : '0%',
+      duplicateRate:
+        this.metrics.processedEmails > 0
+          ? (
+              (this.metrics.duplicatesSkipped / this.metrics.processedEmails) *
+              100
+            ).toFixed(1) + '%'
+          : '0%',
+      cacheHitRate:
+        this.metrics.openaiCalls > 0
+          ? (
+              (this.metrics.cacheHits /
+                (this.metrics.openaiCalls + this.metrics.cacheHits)) *
+              100
+            ).toFixed(1) + '%'
+          : '0%',
       cacheSize: this.responseCache.size,
-      uptime: Math.floor((Date.now() - this.metrics.startTime) / 1000)
+      uptime: Math.floor((Date.now() - this.metrics.startTime) / 1000),
     };
   }
 
@@ -925,8 +1071,7 @@ Extraire des informations d'un email de candidature au format JSON :
   Cache Hits: ${metrics.cacheHits} (${metrics.cacheHitRate}% hit rate)
   Duplicates Skipped: ${metrics.duplicatesSkipped}
   Errors: ${metrics.errors}
-  Avg Processing Time: ${metrics.averageProcessingTime}ms`
-    );
+  Avg Processing Time: ${metrics.averageProcessingTime}ms`);
   }
 
   /**
@@ -1018,8 +1163,10 @@ Extraire des informations d'un email de candidature au format JSON :
   }
 
   private getPerformanceStatus(errorRate: number, avgLatency: number): string {
-    if (errorRate > 0.05 || avgLatency > 2000) return 'POOR - Consider reducing concurrency';
-    if (errorRate < 0.01 && avgLatency < 500) return 'EXCELLENT - Can increase concurrency';
+    if (errorRate > 0.05 || avgLatency > 2000)
+      return 'POOR - Consider reducing concurrency';
+    if (errorRate < 0.01 && avgLatency < 500)
+      return 'EXCELLENT - Can increase concurrency';
     return 'GOOD - Current settings optimal';
   }
 
@@ -1028,32 +1175,33 @@ Extraire des informations d'un email de candidature au format JSON :
       return {
         scale: 'Small',
         recommendation: 'Current limit of 5 is optimal',
-        expectedPeak: '~2-10 emails/minute'
+        expectedPeak: '~2-10 emails/minute',
       };
     }
     if (userCount <= 500) {
       return {
-        scale: 'Medium', 
+        scale: 'Medium',
         recommendation: 'Limit of 10 handles typical enterprise load',
-        expectedPeak: '~10-50 emails/minute'
+        expectedPeak: '~10-50 emails/minute',
       };
     }
     if (userCount <= 1000) {
       return {
         scale: 'Large',
-        recommendation: 'Limit of 15 is OPTIMAL for 1000 users - Monitor and adjust',
+        recommendation:
+          'Limit of 15 is OPTIMAL for 1000 users - Monitor and adjust',
         expectedPeak: '~20-100 emails/minute',
         scenarios: {
           conservative: '3,000 emails/day (20 emails/user, 15% job-related)',
           moderate: '10,000 emails/day (50 emails/user, 20% job-related)',
-          intensive: '25,000 emails/day (100 emails/user, 25% job-related)'
-        }
+          intensive: '25,000 emails/day (100 emails/user, 25% job-related)',
+        },
       };
     }
     return {
       scale: 'Enterprise+',
       recommendation: `Limit of ${this.getConcurrentEmailLimit()} for high-volume processing`,
-      expectedPeak: '100+ emails/minute'
+      expectedPeak: '100+ emails/minute',
     };
   }
 }

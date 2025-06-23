@@ -6,27 +6,47 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL_1")
+  url      = env("DATABASE_URL")
 }
 
+// The User model should only contain core authentication and identity info.
+// First name and last name have been REMOVED from this model.
 model User {
-  id                 String     @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  username           String     @unique
-  firstName          String
-  lastName           String?
-  email              String     @unique
-  password           String?
-  birthDate          DateTime?
-  createdAt          DateTime   @default(now())
-  role               Role       @default(VISITOR)
-  hashedRefreshToken String?    @unique
-  Settings           Settings?  @relation("UserSettings")
-  tokens             Token[]    @relation("UserTokens")
-  jobApplies         jobApply[] @relation("UserJobApplies")
+  id                 String       @id @default(uuid()) @db.Uuid
+  username           String       @unique
+  email              String       @unique
+  password           String
+  hasProfile         Boolean      @default(false)
+  createdAt          DateTime     @default(now())
+  role               Role         @default(VISITOR)
+  jobApplies         jobApply[]   @relation("UserJobApplies")
+  userProfile        UserProfile? @relation("UserProfile")
+  Settings           Settings?    @relation("UserSettings")
+  hashedRefreshToken String?      @unique
+  tokens             Token[]      @relation("UserTokens")
+}
+
+model UserProfile {
+  userId              String    @unique @db.Uuid
+  firstName           String?
+  lastName            String?
+  birthDate           DateTime? @db.Date
+  school              String?
+  city                String?
+  phoneNumber         String?
+  personalDescription String?
+  portfolioLink       String?
+  linkedin            String?
+  goal                String?
+  contractSought      String[]
+  locationSought      String[]
+  sector              String[]
+  resume              String?
+  user                User      @relation("UserProfile", fields: [userId], references: [id])
 }
 
 model Token {
-  id                String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  id                String   @id @default(uuid()) @db.Uuid
   name              String
   accessToken       String
   refreshToken      String
@@ -34,26 +54,26 @@ model Token {
   externalId        String?  // historyId for Gmail, subscriptionId for Outlook
   createdAt         DateTime @default(now())
   userId            String   @db.Uuid
-  user              User     @relation("UserTokens", fields: [userId], references: [id])
+  user              User     @relation("UserTokens", fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model jobApply {
-  id            String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  id            String    @id @default(uuid()) @db.Uuid
   Title         String
   Company       String
   Location      String?
   Salary        Int?
+  User          User      @relation("UserJobApplies", fields: [UserId], references: [id], onDelete: Cascade)
   UserId        String    @db.Uuid
   status        Status
   imageUrl      String?
   createdAt     DateTime  @default(now())
   contractType  String?
   interviewDate DateTime?
-  User          User      @relation("UserJobApplies", fields: [UserId], references: [id], onDelete: Cascade)
 }
 
 model Settings {
-  id       String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  id       String   @id @default(uuid()) @db.Uuid
   UserId   String   @unique @db.Uuid
   document String[]
   imageUrl String?
