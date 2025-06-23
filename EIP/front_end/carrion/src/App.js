@@ -185,6 +185,16 @@ function AppLayout() {
               )
             }
           />
+          <Route
+            path="/notification"
+            element={
+              isAuthenticated ? (
+                <Notifications sidebarCollapsed={sidebarCollapsed}/>
+              ) : (
+                <Navigate to="/" replace state={{ from: location }} />
+              )
+            }
+          />
         </Routes>
       </main>
     </div>
