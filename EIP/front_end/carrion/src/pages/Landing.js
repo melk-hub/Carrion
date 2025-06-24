@@ -16,6 +16,7 @@ import lucide_bar_chart_svg from "../assets/svg/bar_chart_lucide.svg";
 import lucide_folder_svg from "../assets/svg/folder_lucide.svg";
 import AuthModal from '../components/AuthModal';
 import LoginBtn from '../components/LoginBtn';
+
 function Landing() {
   const { isAuthenticated } = useAuth();
   const { t } = useLanguage();
@@ -30,6 +31,51 @@ function Landing() {
   };
 
   const [showAuth, setShowAuth] = useState(false);
+
+  // Animation sur scroll améliorée
+  useEffect(() => {
+    const observerOptions = {
+      threshold: 0.1,
+      rootMargin: '0px 0px -100px 0px'
+    };
+
+    const observerOptionsExit = {
+      threshold: 0,
+      rootMargin: '50px 0px 50px 0px'
+    };
+
+    // Observer pour l'apparition des éléments
+    const observerIn = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('animate-in-view');
+          entry.target.classList.remove('animate-out-view');
+        }
+      });
+    }, observerOptions);
+
+    // Observer pour la disparition des éléments
+    const observerOut = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) {
+          entry.target.classList.add('animate-out-view');
+          entry.target.classList.remove('animate-in-view');
+        }
+      });
+    }, observerOptionsExit);
+
+    // Observer les éléments à animer
+    const animatedElements = document.querySelectorAll('.animate-on-scroll');
+    animatedElements.forEach((el) => {
+      observerIn.observe(el);
+      observerOut.observe(el);
+    });
+
+    return () => {
+      observerIn.disconnect();
+      observerOut.disconnect();
+    };
+  }, []);
 
   useEffect(() => {
     document.body.classList.add("landing-page");
@@ -106,10 +152,10 @@ function Landing() {
       <main className="landing-main-content">
         {/* Section landing */}
         <section className="hero-section">
-          <div className="hero-content">
+          <div className="hero-content fade-in">
             <div className="hero-description">
-              <h1>{t('landing.title')}</h1>
-              <p>
+              <h1 className="text-slide-up">{t('landing.title')}</h1>
+              <p className="text-slide-up delay-1">
                 {t('landing.subtitle')}
               </p>
               <div style={{width: '37.5%'}}>
@@ -120,16 +166,39 @@ function Landing() {
                 />
               </div>
             </div>
-            <img src={landing_img} alt="Illustration de la page d'accueil" />
+            <div className="hero-image-container">
+              <div className="main-image-wrapper">
+                <img src={landing_img} alt="Illustration de la page d'accueil" className="main-hero-image image-zoom-in" />
+                <div className="image-glow"></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Section des statistiques */}
+        <section className="stats-section animate-on-scroll">
+          <div className="stats-container">
+            <div className="stat-item pulse-animation">
+              <h3 className="stat-number">10,000+</h3>
+              <p className="stat-label">{t('landing.stats.users')}</p>
+            </div>
+            <div className="stat-item pulse-animation delay-1">
+              <h3 className="stat-number">95%</h3>
+              <p className="stat-label">{t('landing.stats.success')}</p>
+            </div>
+            <div className="stat-item pulse-animation delay-2">
+              <h3 className="stat-number">24/7</h3>
+              <p className="stat-label">{t('landing.stats.support')}</p>
+            </div>
           </div>
         </section>
 
         {/* Section des services */}
-        <section className="services-section">
-          <h2 className="sections-title">{t('landing.services.title')}</h2>
+        <section className="services-section animate-on-scroll">
+          <h2 className="sections-title slide-up">{t('landing.services.title')}</h2>
 
           <div className="services-content">
-            <div className="service-box">
+            <div className="service-box hover-lift card-slide-left">
               <img src={lucide_search_svg} alt="Icône de recherche" />
               <h3>{t('landing.services.tracking.title')}</h3>
               <ul>
@@ -139,7 +208,7 @@ function Landing() {
               </ul>
             </div>
 
-            <div className="service-box">
+            <div className="service-box hover-lift card-slide-right">
               <img src={lucide_calendar_svg} alt="Icône de calendrier" />
               <h3>{t('landing.services.goals.title')}</h3>
               <ul>
@@ -149,7 +218,7 @@ function Landing() {
               </ul>
             </div>
 
-            <div className="service-box">
+            <div className="service-box hover-lift card-slide-left">
               <img
                 src={lucide_bar_chart_svg}
                 alt="Icône de graphique en barre"
@@ -162,7 +231,7 @@ function Landing() {
               </ul>
             </div>
 
-            <div className="service-box">
+            <div className="service-box hover-lift card-slide-right">
               <img src={lucide_folder_svg} alt="Icône de recherche" />
               <h3>{t('landing.services.documents.title')}</h3>
               <ul>
@@ -175,11 +244,11 @@ function Landing() {
         </section>
 
         {/* Section des tutoriel */}
-        <section className="tutorial-sections">
-          <h2>{t('landing.howItWorks.title')}</h2>
+        <section className="tutorial-sections animate-on-scroll">
+          <h2 className="slide-up">{t('landing.howItWorks.title')}</h2>
 
           <div className="tutorial-content">
-            <div className="tutorial-box">
+            <div className="tutorial-box hover-lift tutorial-slide-left">
               <div className="tutorial-image-container">
                 <img
                   src={centralize_img}
@@ -194,7 +263,7 @@ function Landing() {
               </div>
             </div>
 
-            <div className="tutorial-box">
+            <div className="tutorial-box hover-lift tutorial-slide-right">
               <div className="tutorial-image-container">
                 <img
                   src={progression_img}
@@ -209,7 +278,7 @@ function Landing() {
               </div>
             </div>
 
-            <div className="tutorial-box">
+            <div className="tutorial-box hover-lift tutorial-slide-left">
               <div className="tutorial-image-container">
                 <img
                   src={optimize_img}
@@ -226,17 +295,62 @@ function Landing() {
           </div>
         </section>
 
-        {/* Section des témoignages/avis */}
-        {/* <section className="feedback-sections">
-          <h2>Témoignages</h2>
+        {/* Section des témoignages */}
+        <section className="testimonials-section animate-on-scroll">
+          <h2 className="sections-title slide-up">{t('landing.testimonials.title')}</h2>
+          
+          <div className="testimonials-container">
+            <div className="testimonial-card hover-lift card-slide-up">
+              <div className="testimonial-content">
+                <p>"{t('landing.testimonials.testimonial1.content')}"</p>
+                <div className="testimonial-author">
+                  <strong>{t('landing.testimonials.testimonial1.author')}</strong>
+                  <span>{t('landing.testimonials.testimonial1.position')}</span>
+                </div>
+              </div>
+            </div>
 
-          <div className="feedback-content"></div>
-        </section> */}
+            <div className="testimonial-card hover-lift card-slide-up delay-1">
+              <div className="testimonial-content">
+                <p>"{t('landing.testimonials.testimonial2.content')}"</p>
+                <div className="testimonial-author">
+                  <strong>{t('landing.testimonials.testimonial2.author')}</strong>
+                  <span>{t('landing.testimonials.testimonial2.position')}</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="testimonial-card hover-lift card-slide-up delay-2">
+              <div className="testimonial-content">
+                <p>"{t('landing.testimonials.testimonial3.content')}"</p>
+                <div className="testimonial-author">
+                  <strong>{t('landing.testimonials.testimonial3.author')}</strong>
+                  <span>{t('landing.testimonials.testimonial3.position')}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Section Call to Action */}
+        <section className="cta-section animate-on-scroll">
+          <div className="cta-content fade-in">
+            <h2>{t('landing.cta.title')}</h2>
+            <p>{t('landing.cta.subtitle')}</p>
+            <div className="cta-button-container button-float">
+              <PrimaryButton
+                text={t('landing.cta.button')}
+                onClick={handleLoginClick}
+                size="large"
+              />
+            </div>
+          </div>
+        </section>
 
         {/* Footer */}
-        <footer>
+        {/* <footer className="footer-slide-up">
           <h2>{t('landing.footer')}</h2>
-        </footer>
+        </footer> */}
       </main>
       <AuthModal
         isOpen={showAuth} 

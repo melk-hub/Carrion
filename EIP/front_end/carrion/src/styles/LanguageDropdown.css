@@ -131,18 +131,18 @@
   background: white;
 }
 
-.language-dropdown.navbar-dropdown .language-dropdown-button:hover {
+/* .language-dropdown.navbar-dropdown .language-dropdown-button:hover {
   background: #f8f9fa;
   border-color: #007bff;
-}
+} */
 
 /* For dark theme (e.g., in app navbar) */
 .language-dropdown.dark-theme .language-dropdown-button {
-  border: 2px solid #333;
+  /* border: 2px solid #333; */
   color: #333;
   background: transparent;
 }
-
+/* 
 .language-dropdown.dark-theme .language-dropdown-button:hover {
   background: rgba(0, 0, 0, 0.05);
-} 
+}  */
