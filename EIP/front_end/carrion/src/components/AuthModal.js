@@ -142,10 +142,6 @@ function AuthModal({ isOpen, onClose, defaultTab }) {
 
         <hr />
 
-        {errorMessage && (
-          <div className="oauth-error-message">{errorMessage}</div>
-        )}
-
         <AnimatePresence mode="wait">
           {activeTab === "login" && (
             <motion.div
