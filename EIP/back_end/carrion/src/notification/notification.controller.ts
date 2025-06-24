@@ -6,8 +6,8 @@ export class NotificationsController {
   constructor(private readonly notificationsService: NotificationsService) {}
 
   @Post()
-  create(@Body() body: { userId: number; message: string }) {
-    return this.notificationsService.create(body.userId, body.message);
+  create(@Body() body: { userId: number; type: string; title: string; message: string; company: string }) {
+    return this.notificationsService.create(body.userId, body.type, body.title, body.message, body.company);
   }
 
   @Get(':userId')

@@ -7,9 +7,9 @@ import { TypeOrmModule } from '@nestjs/typeorm';
       type: 'postgres', // ou mysql, sqlite, etc.
       host: 'localhost',
       port: 5432,
-      username: 'ton_user',
-      password: 'ton_mot_de_passe',
-      database: 'nom_de_ta_db',
+      username: 'user',
+      password: 'passord',
+      database: 'nom_db',
       entities: [__dirname + '/**/*.entity{.ts,.js}'],
       synchronize: true, // ❗ à désactiver en prod
     }),
