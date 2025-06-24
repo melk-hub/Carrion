@@ -23,7 +23,7 @@
     "status": "Statut",
     "actions": "Actions",
     "details": "Détails",
-    "hello": "Bonjour",
+    "hello": "Bienvenue",
     "required": "Ce champ est requis"
   },
   "navbar": {
@@ -36,6 +36,29 @@
     "reduceAnimations": "Réduire animations"
   },
   "landing": {
+    "testimonials": {
+      "title": "Ce que nos utilisateurs disent",
+      "testimonial1": {
+        "content": "Merci à Carrion, j'ai pu organiser toutes mes candidatures et trouver mon emploi idéal en 3 mois !",
+        "author": "Marie Dubois",
+        "position": "Développeur Frontend"
+      },
+      "testimonial2": {
+        "content": "L'interface est intuitive et les rappels automatiques m'ont permis d'éviter de perdre des opportunités importantes.",
+        "author": "Thomas Martin",
+        "position": "Ingénieur IT"
+      },
+      "testimonial3": {
+        "content": "Un outil essentiel pour tous les chercheurs d'emploi. Le suivi des objectifs m'a vraiment motivé !",
+        "author": "Sophie Laurent",
+        "position": "Designer UX/UI"
+      }
+    },
+    "cta": {
+      "title": "Prêt à transformer votre recherche d'emploi ?",
+      "subtitle": "Rejoignez des milliers d'utilisateurs qui ont déjà optimisé leur recherche avec Carrion",
+      "button": "Commencer gratuitement"
+    },
     "title": "La plateforme idéale pour gérer ses candidatures",
     "subtitle": "Simplifiez votre recherche d'emploi grâce à Carrion",
     "getStarted": "Démarrer sans attendre",

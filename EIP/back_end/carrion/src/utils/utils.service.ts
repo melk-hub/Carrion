@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 interface cityData {
   state: string;
@@ -8,6 +9,8 @@ interface cityData {
 
 @Injectable()
 export class UtilsService {
+  constructor(private readonly prisma: PrismaService) {}
+
   async getCountryList(inputValue: string) {
     try {
       const response = await fetch(
@@ -18,7 +21,7 @@ export class UtilsService {
         return [];
       }
       const data = await response.json();
-      const cityMap = new Map<string, cityData>(); // Assuming cityData is your type
+      const cityMap = new Map<string, cityData>();
 
       data.results.forEach((city) => {
         if (
@@ -29,7 +32,6 @@ export class UtilsService {
         ) {
           const key = `${city.state}|${city.country}|${city.city}`;
 
-          // We only need to create the object if we haven't seen this key before
           if (!cityMap.has(key)) {
             const cityObj: cityData = {
               state: city.state,
@@ -45,6 +47,23 @@ export class UtilsService {
     } catch (error) {
       console.error('Error fetching city suggestions:', error);
       return [];
+    }
+  }
+
+  async hasProfile(userId: string): Promise<boolean> {
+    try {
+      const user = await this.prisma.user.findUnique({
+        where: {
+          id: userId,
+        },
+      });
+      if (user.hasProfile) {
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.error('Error fetching user profile:', error);
+      return false;
     }
   }
 }

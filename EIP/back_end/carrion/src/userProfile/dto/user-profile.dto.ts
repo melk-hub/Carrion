@@ -1,141 +1,84 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsArray, IsDate, IsOptional, IsString } from 'class-validator';
+import { IsArray, IsDateString, IsOptional, IsString } from 'class-validator';
 
 export class UserProfileDto {
-  @ApiProperty({
-    name: 'firstName',
-    description: 'first name of the user',
-    type: 'string',
-  })
+  @ApiProperty({ required: false })
   @IsOptional()
   @IsString()
   firstName?: string;
 
-  @ApiProperty({
-    name: 'lastName',
-    description: 'last name of the user',
-    type: 'string',
-  })
+  @ApiProperty({ required: false })
   @IsOptional()
   @IsString()
   lastName?: string;
 
   @ApiProperty({
-    name: 'birthDate',
-    description: 'Date of birth of the user',
-    format: 'date',
-    example: '2000-01-01',
+    description: 'Date in YYYY-MM-DD format',
+    required: false,
   })
   @IsOptional()
-  @IsDate()
-  birthDate?: Date;
+  @IsDateString()
+  birthDate?: string;
 
-  @ApiProperty({
-    name: 'school',
-    description: 'School the user attend',
-    type: 'string',
-    example: 'Epitech',
-  })
+  @ApiProperty({ required: false })
   @IsOptional()
   @IsString()
   school?: string;
 
-  @ApiProperty({
-    name: 'city',
-    description: 'City the user live',
-    type: 'string',
-    example: 'Paris',
-  })
+  @ApiProperty({ required: false })
   @IsOptional()
   @IsString()
   city?: string;
 
-  @ApiProperty({
-    name: 'phoneNumber',
-    description: 'Phone number of the user',
-    type: 'string',
-    example: '0600000000',
-  })
+  @ApiProperty({ required: false })
   @IsOptional()
   @IsString()
   phoneNumber?: string;
 
-  @ApiProperty({
-    name: 'personalDescription',
-    description: 'Personal description of the user',
-    type: 'string',
-    example: 'I am a student at Epitech',
-  })
+  @ApiProperty({ required: false })
   @IsOptional()
   @IsString()
   personalDescription?: string;
 
-  @ApiProperty({
-    name: 'portfolioLink',
-    description: 'Link to the portfolio of the user',
-    type: 'string',
-    example: 'https://github.pages.john_doe/',
-  })
+  @ApiProperty({ required: false })
   @IsOptional()
   @IsString()
   portfolioLink?: string;
 
-  @ApiProperty({
-    name: 'linkedin',
-    description: 'Name of the linkedin account of the user',
-    type: 'string',
-    example: 'john-doe',
-  })
+  @ApiProperty({ required: false })
   @IsOptional()
   @IsString()
   linkedin?: string;
 
-  @ApiProperty({
-    name: 'goal',
-    description: 'Goal of the user',
-    type: 'string',
-    example: 'I want to be a game developer',
-  })
+  @ApiProperty({ required: false })
   @IsOptional()
   @IsString()
   goal?: string;
 
-  @ApiProperty({
-    name: 'locationSought',
-    description: 'Location the user want to find work at',
-    type: 'array',
-    example: '[Paris, Annecy, Genève]',
-  })
+  @ApiProperty({ required: false })
   @IsOptional()
-  @IsArray()
-  locationSought?: string[];
+  @IsString()
+  jobSought?: string;
 
-  @ApiProperty({
-    name: 'sector',
-    description: 'Sector the user want to work in',
-    type: 'array',
-    example: '[AI, Cloud, Business]',
-  })
+  @ApiProperty({ type: [String], required: false })
   @IsOptional()
   @IsArray()
-  sector?: string[];
-
-  @ApiProperty({
-    name: 'contractType',
-    description: 'Contract type the user want',
-    type: 'array',
-    example: '[Full-time, Part-time, Internship]',
-  })
-  @IsOptional()
-  @IsArray()
+  @IsString({ each: true })
   contractSought?: string[];
 
-  @ApiProperty({
-    name: 'resume',
-    description: "Info to access user' resume",
-    type: 'string',
-    example: 'Not implemented yet',
-  })
+  @ApiProperty({ type: [String], required: false })
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  locationSought?: string[];
+
+  @ApiProperty({ type: [String], required: false })
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  sector?: string[];
+
+  @ApiProperty({ required: false })
   @IsOptional()
   @IsString()
   resume?: string;

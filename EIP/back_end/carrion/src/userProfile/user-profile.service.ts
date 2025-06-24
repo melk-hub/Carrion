@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { UserProfileDto } from './dto/user-profile.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 
@@ -7,52 +7,45 @@ export class UserProfileService {
   constructor(private readonly prisma: PrismaService) {}
 
   async getUserProfileByUserId(userId: string) {
-    return await this.prisma.userProfile.findUnique({
+    const profile = await this.prisma.userProfile.findUnique({
       where: { userId: userId },
     });
+    if (!profile) {
+      throw new NotFoundException('User profile not found.');
+    }
+    return profile;
   }
 
-  async createUserProfile(
+  async createOrUpdateProfile(
     userId: string,
     userProfileInfo: UserProfileDto,
   ): Promise<string> {
     try {
+      const data = {
+        ...userProfileInfo,
+        birthDate: userProfileInfo.birthDate
+          ? new Date(userProfileInfo.birthDate)
+          : null,
+      };
+
       const userProfile = await this.prisma.userProfile.findUnique({
         where: { userId: userId },
       });
-      if (userProfile) {
-        return await this.updateUserProfile(userId, userProfileInfo);
-      }
-      await this.prisma.userProfile.create({
-        data: {
-          ...userProfileInfo,
-          userId: userId,
-          birthDate: new Date(userProfileInfo.birthDate),
-        },
-      });
-      return 'User profile created';
-    } catch (error) {
-      Logger.error(error.message);
-      return 'Error creating user profile';
-    }
-  }
 
-  async updateUserProfile(
-    userId: string,
-    userProfileInfo: UserProfileDto,
-  ): Promise<string> {
-    try {
-      await this.prisma.userProfile.update({
-        where: { userId: userId },
-        data: {
-          ...userProfileInfo,
-          birthDate: new Date(userProfileInfo.birthDate),
-        },
-      });
-      return 'User profile updated';
+      if (userProfile) {
+        await this.prisma.userProfile.update({ where: { userId }, data });
+        return 'User profile updated';
+      } else {
+        await this.prisma.userProfile.create({ data: { ...data, userId } });
+        await this.prisma.user.update({
+          where: { id: userId },
+          data: { hasProfile: true },
+        });
+        return 'User profile created';
+      }
     } catch (error) {
-      Logger.error(error.message);
-      return 'Error updating user profile';
+      Logger.error(error.message, 'UserProfileService');
+      throw new Error('Error creating or updating user profile');
     }
   }
 }

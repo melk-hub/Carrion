@@ -1,3 +1,6 @@
+/* src/styles/Profile.css */
+
+/* --- Main Page Layout --- */
 .profile-page {
   padding: 2rem 4rem;
   max-width: 1600px;
@@ -19,9 +22,14 @@
   gap: 2.5rem;
 }
 
+/* === THE DEFINITIVE FIX IS HERE === */
 .profile-left-column {
   flex: 3;
   min-width: 450px;
+  /* These three properties create the vertical spacing between cards */
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
 }
 
 .profile-right-column {
@@ -31,6 +39,7 @@
   top: 2rem;
 }
 
+/* --- Card Base Styles --- */
 .profile-card {
   background-color: #ffffff;
   border: 1px solid #e5e7eb;
@@ -50,6 +59,7 @@
   border-bottom: 1px solid #f3f4f6;
 }
 
+/* --- Personal Info Form --- */
 .profile-info-form .form-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -69,7 +79,8 @@
 }
 
 .form-group input,
-.form-group .react-datepicker__input-container input {
+.form-group .react-datepicker-wrapper input,
+.form-group-input {
   padding: 0.75rem 1rem;
   border: 1px solid #d1d5db;
   border-radius: 8px;
@@ -80,7 +91,8 @@
 }
 
 .form-group input:focus,
-.form-group .react-datepicker__input-container input:focus {
+.form-group .react-datepicker-wrapper input:focus,
+.form-group-input:focus {
   border-color: #3b82f6;
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
   outline: none;
@@ -90,11 +102,11 @@
   grid-column: span 2;
 }
 
-.form-actions {
+.form-actions-global {
   display: flex;
   justify-content: flex-end;
-  margin-top: 2rem;
-  grid-column: span 2;
+  width: 100%;
+  /* No margin-top needed here if the parent has a gap */
 }
 
 .save-button {
@@ -102,7 +114,7 @@
   color: white;
   border: none;
   border-radius: 8px;
-  padding: 0.65rem 1.25rem;
+  padding: 0.75rem 1.5rem;
   font-weight: 600;
   cursor: pointer;
   transition: background-color 0.2s;
@@ -112,6 +124,7 @@
   background-color: #374151;
 }
 
+/* --- Right Column: Profile Picture --- */
 .profile-picture-card {
   display: flex;
   flex-direction: column;
@@ -150,6 +163,7 @@
   margin: 0;
 }
 
+/* --- Loader Spinner --- */
 .loader {
   border: 4px solid #f3f3f3;
   border-top: 4px solid #3498db;

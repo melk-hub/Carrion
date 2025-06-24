@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useLanguage } from '../contexts/LanguageContext';
+import { useAuth } from '../AuthContext';
 import LanguageDropdown from '../components/LanguageDropdown';
 import ToggleSwitch from '../components/ToogleSwitch';
 import logo from '../assets/carrion_logo_crop.png';
@@ -17,6 +18,7 @@ function Navbar({ sidebarCollapsed, setSidebarCollapsed, setIsAuthenticated }) {
   const navigate = useNavigate();
   const location = useLocation();
   const { t } = useLanguage();
+  const { getUserDisplayName } = useAuth();
   const API_URL = process.env.REACT_APP_API_URL;
 
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -89,7 +91,7 @@ function Navbar({ sidebarCollapsed, setSidebarCollapsed, setIsAuthenticated }) {
           </div>
         </div>
         <span className="username">
-          {t('common.hello')} - Jeremy Smith - {getCurrentPageName()}
+          {t('common.hello')} {getUserDisplayName()} - {getCurrentPageName()}
         </span>
         <div className="topbar-right">
           <LanguageDropdown className="dark-theme" style={{color: 'white'}}/>

@@ -21,7 +21,7 @@
     "status": "Status",
     "actions": "Actions",
     "details": "Details",
-    "hello": "Hello",
+    "hello": "Welcome",
     "required": "This field is required"
   },
   "navbar": {
@@ -40,6 +40,11 @@
     "login": "Sign in",
     "language": "English",
     "footer": "Footer TBD",
+    "stats": {
+      "users": "Active users",
+      "success": "Success rate",
+      "support": "Support available"
+    },
     "services": {
       "title": "Our Services",
       "tracking": {
@@ -89,6 +94,29 @@
         "title": "Optimize to Succeed",
         "description": "Use tracking information to adjust your approach and maximize your chances of success in your search."
       }
+    },
+    "testimonials": {
+      "title": "What our users say",
+      "testimonial1": {
+        "content": "Thanks to Carrion, I was able to organize all my applications and land my dream job in just 3 months!",
+        "author": "Marie Dubois",
+        "position": "Frontend Developer"
+      },
+      "testimonial2": {
+        "content": "The interface is intuitive and automatic reminders helped me avoid forgetting important follow-ups.",
+        "author": "Thomas Martin",
+        "position": "IT Project Manager"
+      },
+      "testimonial3": {
+        "content": "An essential tool for all job seekers. Goal tracking really motivated me!",
+        "author": "Sophie Laurent",
+        "position": "UX/UI Designer"
+      }
+    },
+    "cta": {
+      "title": "Ready to transform your job search?",
+      "subtitle": "Join thousands of users who have already optimized their search with Carrion",
+      "button": "Start for free"
     }
   },
   "auth": {

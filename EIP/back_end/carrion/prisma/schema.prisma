@@ -27,7 +27,7 @@ model User {
 }
 
 model UserProfile {
-  userId              String    @unique @db.Uuid
+  userId              String    @id @db.Uuid
   firstName           String?
   lastName            String?
   birthDate           DateTime? @db.Date
@@ -42,7 +42,7 @@ model UserProfile {
   locationSought      String[]
   sector              String[]
   resume              String?
-  user                User      @relation("UserProfile", fields: [userId], references: [id])
+  user                User      @relation("UserProfile", fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Token {

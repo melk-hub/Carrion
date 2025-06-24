@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import InfosModal from "../components/InfosModal";
 import { useLanguage } from "../contexts/LanguageContext";
@@ -8,24 +8,58 @@ export default function Home() {
   const [showWelcomeModal, setShowWelcomeModal] = useState(false);
     const navigate = useNavigate();
   const { t } = useLanguage();
+  const API_URL = process.env.REACT_APP_API_URL;
+
+  const effectRan = useRef(false);
 
   useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const isNew = urlParams.get("new") === "true";
-
-    if (isNew) {
-      setShowWelcomeModal(true);
-      window.history.replaceState({}, document.title, window.location.pathname);
+    if (effectRan.current === true) {
+      return;
     }
-  }, []);
+    effectRan.current = true;
+
+    const checkUserProfile = async () => {
+      try {
+        console.log("Fetching profile status...");
+        const response = await fetch(`${API_URL}/utils/hasProfile`, {
+          credentials: "include",
+        });
+
+        if (!response.ok) {
+          throw new Error(`Erreur HTTP: ${response.status}`);
+        }
+
+        const hasProfile = await response.json();
+        console.log("API response from /hasProfile:", hasProfile);
+
+        if (hasProfile === false) {
+          console.log("Profile does not exist. Showing modal.");
+          setShowWelcomeModal(true);
+        } else {
+          console.log("Profile exists. Not showing modal.");
+        }
+      } catch (error) {
+        console.error(
+          "Impossible de vérifier le profil de l'utilisateur:",
+          error
+        );
+      }
+    };
+
+    checkUserProfile();
+  }, [API_URL]);
 
     return (
     <div className="home-container">
       <InfosModal
         isOpen={showWelcomeModal}
-        onClose={() => setShowWelcomeModal(false)}
+        onClose={() => {
+          setShowWelcomeModal(false);
+
+          window.location.reload();
+        }}
       />
-      {/* Welcome Section */}
+
       <div className="welcome-section">
         <div className="welcome-content" style={{ marginRight: "2vw" }} >
           <h1 className="welcome-title">{t("home.welcome")}</h1>
@@ -47,10 +81,7 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Main Content Grid */}
       <div className="main-grid">
-
-        {/* Quick Actions Card */}
         <div className="card quick-actions">
           <div className="card-header">
             <h3>{t("home.quickAccess")}</h3>
@@ -84,7 +115,6 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Activity Timeline Card */}
         <div className="card activity-timeline">
           <div className="card-header">
             <h3>{t("home.recentActivity")}</h3>
@@ -117,7 +147,6 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Progress Card */}
         <div className="card progress-card">
           <div className="card-header">
             <h3>Progression du mois</h3>
@@ -160,7 +189,6 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Tips Card */}
         <div className="card tips-card">
           <div className="card-header">
             <h3>💡 Conseil du jour</h3>
