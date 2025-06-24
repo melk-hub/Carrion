@@ -1,9 +1,17 @@
 import React, { useState, useRef, useEffect } from "react";
 import { CircleUserRound } from "lucide-react";
 import DatePicker, { registerLocale } from "react-datepicker";
+import Select from "react-select";
+import AsyncSelect from "react-select/async";
+import debounce from "lodash.debounce";
 import { fr } from "date-fns/locale/fr";
+import toast from "react-hot-toast";
 import "react-datepicker/dist/react-datepicker.css";
 import "../styles/Profile.css";
+
+import ApiService from "../services/api";
+import { jobSectors } from "../data/jobSectors";
+import { contractOptions } from "../data/contractOptions";
 
 registerLocale("fr", fr);
 
@@ -15,73 +23,56 @@ function Profile() {
     lastName: "",
     birthDate: null,
     school: "",
-    city: "",
+    city: null,
     phoneNumber: "",
-    personalDescription: "",
     portfolioLink: "",
     linkedin: "",
-    goal: "",
-    jobSought: "",
     contractSought: [],
-    locationSought: [],
     sector: [],
-    resume: "",
+    locationSought: [],
   });
 
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [uploadedImage, setUploadedImage] = useState(null);
   const fileInputRef = useRef(null);
-  const API_URL = process.env.REACT_APP_API_URL;
+
+  const debouncedLoadCities = debounce((inputValue, callback) => {
+    ApiService.fetchAndFormatCities(inputValue).then((options) =>
+      callback(options)
+    );
+  }, 500);
 
   useEffect(() => {
     const fetchProfileData = async () => {
       try {
         setIsLoading(true);
-        const response = await fetch(`${API_URL}/user-profile`, {
-          credentials: "include",
-        });
-
+        const response = await ApiService.get("/user-profile");
         if (!response.ok) {
           if (response.status === 404) {
-            console.log(
-              "No existing profile found. Starting with a blank form."
-            );
             setIsLoading(false);
             return;
           }
-          throw new Error("Failed to fetch profile data");
+          throw new Error("Impossible de charger le profil");
         }
-
         const data = await response.json();
-
         setPersonalInfo({
-          firstName: data.firstName || "",
-          lastName: data.lastName || "",
+          ...data,
           birthDate: data.birthDate ? new Date(data.birthDate) : null,
-          school: data.school || "",
-          city: data.city || "",
-          phoneNumber: data.phoneNumber || "",
-          personalDescription: data.personalDescription || "",
-          portfolioLink: data.portfolioLink || "",
-          linkedin: data.linkedin || "",
-          goal: data.goal || "",
-          jobSought: data.jobSought || "",
+          city: data.city ? { label: data.city, value: data.city } : null,
           contractSought: data.contractSought || [],
-          locationSought: data.locationSought || [],
           sector: data.sector || [],
-          resume: data.resume || "",
+          locationSought: data.locationSought || [],
         });
       } catch (err) {
         setError(err.message);
-        console.error("Error fetching profile:", err);
+        toast.error(err.message);
       } finally {
         setIsLoading(false);
       }
     };
-
     fetchProfileData();
-  }, [API_URL]);
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -90,70 +81,109 @@ function Profile() {
 
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
-    if (file) {
-      setUploadedImage(URL.createObjectURL(file));
-    }
+    if (file) setUploadedImage(URL.createObjectURL(file));
   };
 
-  const handleSubmit = async (e) => {
+  // === THE DEFINITIVE FIX IS HERE ===
+  const handleSubmit = (e) => {
     e.preventDefault();
     setError(null);
 
-    try {
+    // The promise executor is now a standard, synchronous function.
+    const savePromise = new Promise((resolve, reject) => {
       const submissionData = {
-        ...personalInfo,
+        firstName: personalInfo.firstName,
+        lastName: personalInfo.lastName,
         birthDate: personalInfo.birthDate
           ? personalInfo.birthDate.toISOString().split("T")[0]
           : null,
-        sector: Array.isArray(personalInfo.sector)
-          ? personalInfo.sector
-          : personalInfo.sector.split(",").map((s) => s.trim()),
+        school: personalInfo.school,
+        city: personalInfo.city ? personalInfo.city.value : "",
+        phoneNumber: personalInfo.phoneNumber,
+        portfolioLink: personalInfo.portfolioLink,
+        linkedin: personalInfo.linkedin,
+        contractSought: personalInfo.contractSought,
+        sector: personalInfo.sector,
+        locationSought: personalInfo.locationSought,
       };
 
-      const response = await fetch(`${API_URL}/user-profile`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(submissionData),
-        credentials: "include",
-      });
+      // The async operation is handled with .then() and .catch() inside the executor.
+      ApiService.post("/user-profile", submissionData)
+        .then((response) => {
+          if (!response.ok) {
+            // We need to parse the JSON to get the error message
+            return response.json().then((errData) => {
+              // Reject the promise with a new Error to pass the message to toast
+              reject(
+                new Error(
+                  errData.message || "Échec de l'enregistrement du profil"
+                )
+              );
+            });
+          }
+          // Resolve the promise on success
+          resolve(response);
+        })
+        .catch((err) => {
+          // Reject on network error
+          reject(err);
+        });
+    });
 
-      if (!response.ok) {
-        throw new Error("Failed to save profile");
-      }
-
-      alert("Profile saved successfully!");
-    } catch (err) {
-      setError(err.message);
-      console.error("Error saving profile:", err);
-    }
+    toast.promise(savePromise, {
+      loading: "Enregistrement en cours...",
+      success: "Profil enregistré avec succès !",
+      error: (err) => `Erreur: ${err.message}`,
+    });
   };
 
-  if (isLoading) {
-    return (
-      <div className="profile-page">
-        <Loader />
-      </div>
-    );
-  }
+  const selectStyles = {
+    input: (provided) => ({ ...provided, boxShadow: "none" }),
+    menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+  };
 
-  if (error) {
-    return <div className="profile-page">Error: {error}</div>;
-  }
+  const getSelectedObjects = (options, values) => {
+    if (!Array.isArray(values)) return [];
+    return values
+      .map((v) => options.find((o) => o.value === v))
+      .filter(Boolean);
+  };
+
+  const getLocationObjects = (values) => {
+    if (!Array.isArray(values)) return [];
+    return values.map((v) => ({ label: v, value: v }));
+  };
+
+  if (isLoading)
+    return (
+      <main className="profile-page">
+        <Loader />
+      </main>
+    );
+  if (error && !personalInfo.firstName)
+    return (
+      <main className="profile-page">Impossible de charger le profil.</main>
+    );
 
   return (
-    <div className="profile-page">
-      <div className="profile-header">
+    <main className="profile-page">
+      <header className="profile-header">
         <h2>Mon compte</h2>
-      </div>
+      </header>
       <div className="profile-container">
-        <div className="profile-left-column">
-          <div className="profile-card">
-            <h2>Informations personnelles</h2>
-            <form className="profile-info-form" onSubmit={handleSubmit}>
+        <form
+          className="profile-left-column"
+          id="profile-form"
+          onSubmit={handleSubmit}
+        >
+          <article className="profile-card">
+            <h2 id="profile-form-heading">Informations personnelles</h2>
+            <div className="profile-info-form">
               <div className="form-grid">
                 <div className="form-group">
-                  <label>Nom</label>
+                  <label htmlFor="lastName">Nom</label>
                   <input
+                    id="lastName"
                     type="text"
                     name="lastName"
                     value={personalInfo.lastName}
@@ -161,8 +191,9 @@ function Profile() {
                   />
                 </div>
                 <div className="form-group">
-                  <label>Prénom</label>
+                  <label htmlFor="firstName">Prénom</label>
                   <input
+                    id="firstName"
                     type="text"
                     name="firstName"
                     value={personalInfo.firstName}
@@ -170,8 +201,9 @@ function Profile() {
                   />
                 </div>
                 <div className="form-group">
-                  <label>Numéro de téléphone</label>
+                  <label htmlFor="phoneNumber">Numéro de téléphone</label>
                   <input
+                    id="phoneNumber"
                     type="tel"
                     name="phoneNumber"
                     value={personalInfo.phoneNumber}
@@ -179,8 +211,9 @@ function Profile() {
                   />
                 </div>
                 <div className="form-group">
-                  <label>Date de naissance</label>
+                  <label htmlFor="birthDate">Date de naissance</label>
                   <DatePicker
+                    id="birthDate"
                     selected={personalInfo.birthDate}
                     onChange={(date) =>
                       setPersonalInfo((prev) => ({ ...prev, birthDate: date }))
@@ -190,35 +223,39 @@ function Profile() {
                     dateFormat="dd/MM/yyyy"
                     showYearDropdown
                     dropdownMode="select"
-                    maxDate={new Date()}
                   />
                 </div>
                 <div className="form-group">
-                  <label>Secteur de recherche</label>
-                  <input
-                    type="text"
-                    name="sector"
-                    value={personalInfo.sector.join(", ")}
-                    onChange={(e) =>
-                      setPersonalInfo((prev) => ({
-                        ...prev,
-                        sector: e.target.value.split(",").map((s) => s.trim()),
-                      }))
-                    }
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Localisation</label>
-                  <input
-                    type="text"
-                    name="city"
+                  <label htmlFor="city">Localisation</label>
+                  <AsyncSelect
+                    inputId="city"
+                    cacheOptions
+                    classNamePrefix="select"
+                    placeholder="Recherchez votre ville..."
+                    loadOptions={debouncedLoadCities}
                     value={personalInfo.city}
+                    onChange={(selected) =>
+                      setPersonalInfo((prev) => ({ ...prev, city: selected }))
+                    }
+                    isClearable
+                    styles={selectStyles}
+                    menuPortalTarget={document.body}
+                  />
+                </div>
+                <div className="form-group">
+                  <label htmlFor="school">École / Université</label>
+                  <input
+                    id="school"
+                    type="text"
+                    name="school"
+                    value={personalInfo.school}
                     onChange={handleChange}
                   />
                 </div>
                 <div className="form-group full-width">
-                  <label>Site web (Portfolio)</label>
+                  <label htmlFor="portfolioLink">Site web (Portfolio)</label>
                   <input
+                    id="portfolioLink"
                     type="text"
                     name="portfolioLink"
                     value={personalInfo.portfolioLink}
@@ -226,25 +263,106 @@ function Profile() {
                   />
                 </div>
                 <div className="form-group full-width">
-                  <label>LinkedIn</label>
+                  <label htmlFor="linkedin">LinkedIn</label>
                   <input
+                    id="linkedin"
                     type="text"
                     name="linkedin"
                     value={personalInfo.linkedin}
                     onChange={handleChange}
                   />
                 </div>
-                <div className="form-actions">
-                  <button type="submit" className="save-button">
-                    Enregistrer
-                  </button>
+              </div>
+            </div>
+          </article>
+
+          <article className="profile-card">
+            <h2>Préférences de recherche</h2>
+            <div className="profile-info-form">
+              <div className="form-grid">
+                <div className="form-group">
+                  <label htmlFor="contractSought">Types de contrat</label>
+                  <Select
+                    inputId="contractSought"
+                    isMulti
+                    classNamePrefix="select"
+                    placeholder="Sélectionnez..."
+                    options={contractOptions}
+                    value={getSelectedObjects(
+                      contractOptions,
+                      personalInfo.contractSought
+                    )}
+                    onChange={(selected) =>
+                      setPersonalInfo((prev) => ({
+                        ...prev,
+                        contractSought: selected
+                          ? selected.map((s) => s.value)
+                          : [],
+                      }))
+                    }
+                    styles={selectStyles}
+                    menuPortalTarget={document.body}
+                  />
+                </div>
+                <div className="form-group">
+                  <label htmlFor="sector">Secteurs de recherche</label>
+                  <Select
+                    inputId="sector"
+                    isMulti
+                    classNamePrefix="select"
+                    placeholder="Sélectionnez..."
+                    options={jobSectors}
+                    value={getSelectedObjects(jobSectors, personalInfo.sector)}
+                    onChange={(selected) =>
+                      setPersonalInfo((prev) => ({
+                        ...prev,
+                        sector: selected ? selected.map((s) => s.value) : [],
+                      }))
+                    }
+                    styles={selectStyles}
+                    menuPortalTarget={document.body}
+                  />
+                </div>
+                <div className="form-group full-width">
+                  <label htmlFor="locationSought">
+                    Localisations souhaitées
+                  </label>
+                  <AsyncSelect
+                    inputId="locationSought"
+                    isMulti
+                    isCreatable
+                    cacheOptions
+                    classNamePrefix="select"
+                    placeholder="Recherchez ou créez..."
+                    loadOptions={debouncedLoadCities}
+                    value={getLocationObjects(personalInfo.locationSought)}
+                    onChange={(selected) =>
+                      setPersonalInfo((prev) => ({
+                        ...prev,
+                        locationSought: selected
+                          ? selected.map((s) => s.value)
+                          : [],
+                      }))
+                    }
+                    styles={selectStyles}
+                    menuPortalTarget={document.body}
+                  />
                 </div>
               </div>
-            </form>
+            </div>
+          </article>
+
+          <div className="form-actions-global">
+            <button type="submit" className="save-button">
+              Enregistrer les modifications
+            </button>
           </div>
-        </div>
-        <div className="profile-right-column">
-          <div className="profile-card profile-picture-card">
+        </form>
+        <aside className="profile-right-column">
+          <section
+            className="profile-card profile-picture-card"
+            aria-label="Photo de profil et informations principales"
+          >
             <div
               className="image-wrapper"
               onClick={() => fileInputRef.current.click()}
@@ -259,7 +377,7 @@ function Profile() {
               {uploadedImage ? (
                 <img
                   src={uploadedImage}
-                  alt="Profile"
+                  alt="Photo de profil actuelle"
                   className="profile-img"
                 />
               ) : (
@@ -269,11 +387,10 @@ function Profile() {
             <h3 className="profile-name">
               {personalInfo.firstName} {personalInfo.lastName}
             </h3>
-            <p className="profile-job">{personalInfo.jobSought}</p>
-          </div>
-        </div>
+          </section>
+        </aside>
       </div>
-    </div>
+    </main>
   );
 }
 

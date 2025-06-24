@@ -1,72 +1,65 @@
 import {
   Controller,
   Get,
-  Logger,
   Post,
-  Put,
+  Body,
   Req,
   UseGuards,
+  Logger,
+  NotFoundException,
 } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/guards/jwt/jwt-auth.guard';
 import { UserProfileService } from './user-profile.service';
-import { ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { UserProfileDto } from './dto/user-profile.dto';
+import { Request } from 'express';
 
+@ApiTags('user-profile')
 @Controller('user-profile')
 export class UserProfileController {
   constructor(private readonly userProfileService: UserProfileService) {}
 
-  @ApiOperation({ summary: "Get the user's profile with his id" })
+  @ApiOperation({ summary: "Get the current user's profile" })
   @ApiResponse({
     status: 200,
-    description: 'Return the user profile',
+    description: 'Returns the user profile.',
   })
+  @ApiResponse({ status: 404, description: 'Profile not found.' })
   @Get()
   @UseGuards(JwtAuthGuard)
-  async getUserProfile(@Req() req: any) {
-    return await this.userProfileService.getUserProfileByUserId(req.user.id);
+  async getUserProfile(@Req() req: Request) {
+    const userId = (req.user as any).id;
+    const profile =
+      await this.userProfileService.getUserProfileByUserId(userId);
+
+    if (!profile) {
+      throw new NotFoundException('User profile not found.');
+    }
+    return profile;
   }
 
-  @ApiOperation({ summary: 'Create an user profile with its id' })
+  @ApiOperation({ summary: 'Create or update the user profile' })
   @ApiResponse({
     status: 201,
-    description: 'User profile created or updated if already exists.',
+    description: 'User profile created or updated successfully.',
   })
-  @Post('create')
+  @Post()
   @UseGuards(JwtAuthGuard)
-  async createUserProfile(@Req() req: any): Promise<object> {
+  async createOrUpdateUserProfile(
+    @Req() req: Request,
+    @Body() userProfileDto: UserProfileDto,
+  ): Promise<object> {
     try {
-      console.log('userProfileDto', req.body);
-      return {
-        message: await this.userProfileService.createUserProfile(
-          req.user.id,
-          req.body,
-        ),
-      };
-    } catch (error) {
-      Logger.error(error.message);
-      return { message: 'Error creating user profile' };
-    }
-  }
+      const userId = (req.user as any).id;
 
-  @ApiOperation({ summary: 'Update an user profile with its id' })
-  @ApiResponse({
-    status: 200,
-    description: 'Create the user profile',
-  })
-  @Put('update')
-  @UseGuards(JwtAuthGuard)
-  async updateUserProfile(@Req() req: any) {
-    try {
-      console.log('userProfileDto', req.body);
-      return {
-        message: await this.userProfileService.updateUserProfile(
-          req.user.id,
-          req.body,
-        ),
-      };
+      const message = await this.userProfileService.createOrUpdateProfile(
+        userId,
+        userProfileDto,
+      );
+      return { message };
     } catch (error) {
-      Logger.error(error.message);
-      return { message: 'Error updating user profile' };
+      Logger.error(error.message, 'UserProfileController');
+      return { message: 'Error saving user profile' };
     }
   }
 }

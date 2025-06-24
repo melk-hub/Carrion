@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import InfosModal from "../components/InfosModal";
 import { useLanguage } from "../contexts/LanguageContext";
@@ -8,24 +8,58 @@ export default function Home() {
   const [showWelcomeModal, setShowWelcomeModal] = useState(false);
     const navigate = useNavigate();
   const { t } = useLanguage();
+  const API_URL = process.env.REACT_APP_API_URL;
+
+  const effectRan = useRef(false);
 
   useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const isNew = urlParams.get("new") === "true";
-
-    if (isNew) {
-      setShowWelcomeModal(true);
-      window.history.replaceState({}, document.title, window.location.pathname);
+    if (effectRan.current === true) {
+      return;
     }
-  }, []);
+    effectRan.current = true;
+
+    const checkUserProfile = async () => {
+      try {
+        console.log("Fetching profile status...");
+        const response = await fetch(`${API_URL}/utils/hasProfile`, {
+          credentials: "include",
+        });
+
+        if (!response.ok) {
+          throw new Error(`Erreur HTTP: ${response.status}`);
+        }
+
+        const hasProfile = await response.json();
+        console.log("API response from /hasProfile:", hasProfile);
+
+        if (hasProfile === false) {
+          console.log("Profile does not exist. Showing modal.");
+          setShowWelcomeModal(true);
+        } else {
+          console.log("Profile exists. Not showing modal.");
+        }
+      } catch (error) {
+        console.error(
+          "Impossible de vérifier le profil de l'utilisateur:",
+          error
+        );
+      }
+    };
+
+    checkUserProfile();
+  }, [API_URL]);
 
     return (
     <div className="home-container">
       <InfosModal
         isOpen={showWelcomeModal}
-        onClose={() => setShowWelcomeModal(false)}
+        onClose={() => {
+          setShowWelcomeModal(false);
+
+          window.location.reload();
+        }}
       />
-      {/* Welcome Section */}
+
       <div className="welcome-section">
         <div className="welcome-content" style={{ marginRight: "2vw" }} >
           <h1 className="welcome-title">{t("home.welcome")}</h1>
@@ -47,10 +81,68 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Main Content Grid */}
       <div className="main-grid">
+        <div className="card recent-applications">
+          <div className="card-header">
+            <h3>{t("home.recentApplications")}</h3>
+            <button
+              className="see-all-btn"
+              onClick={() => navigate("/dashboard")}
+            >
+              Voir tout
+            </button>
+          </div>
+          <div className="applications-list">
+            <div className="application-item">
+              <div className="company-logo">
+                <img
+                  src="https://cdn.shopify.com/assets/images/logos/shopify-bag.png"
+                  alt="Shopify"
+                />
+              </div>
+              <div className="application-info">
+                <h4>Shopify</h4>
+                <p>Stage - Product Owner</p>
+                <span className="status pending">En attente</span>
+              </div>
+              <div className="application-time">
+                <span>Il y a 17h</span>
+              </div>
+            </div>
 
-        {/* Quick Actions Card */}
+            <div className="application-item">
+              <div className="company-logo">
+                <img
+                  src="https://upload.wikimedia.org/wikipedia/commons/6/6a/Boursorama_Logo_2021.png"
+                  alt="Boursorama"
+                />
+              </div>
+              <div className="application-info">
+                <h4>Boursorama</h4>
+                <p>CDD - Développeur Full Stack Junior</p>
+                <span className="status accepted">Acceptée</span>
+              </div>
+              <div className="application-time">
+                <span>Il y a 5h</span>
+              </div>
+            </div>
+
+            <div className="application-item">
+              <div className="company-logo">
+                <div className="placeholder-logo">G</div>
+              </div>
+              <div className="application-info">
+                <h4>Google</h4>
+                <p>CDI - Software Engineer</p>
+                <span className="status interview">Entretien</span>
+              </div>
+              <div className="application-time">
+                <span>Il y a 2j</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <div className="card quick-actions">
           <div className="card-header">
             <h3>{t("home.quickAccess")}</h3>
@@ -84,7 +176,6 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Activity Timeline Card */}
         <div className="card activity-timeline">
           <div className="card-header">
             <h3>{t("home.recentActivity")}</h3>
@@ -117,7 +208,6 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Progress Card */}
         <div className="card progress-card">
           <div className="card-header">
             <h3>Progression du mois</h3>
@@ -160,7 +250,6 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Tips Card */}
         <div className="card tips-card">
           <div className="card-header">
             <h3>💡 Conseil du jour</h3>

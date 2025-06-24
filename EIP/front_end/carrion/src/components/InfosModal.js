@@ -9,6 +9,10 @@ import DatePicker, { registerLocale } from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { fr } from "date-fns/locale/fr";
 
+import ApiService from "../services/api";
+import { jobSectors } from "../data/jobSectors";
+import { contractOptions } from "../data/contractOptions";
+
 registerLocale("fr", fr);
 
 const CustomDateInput = forwardRef(({ value, onClick }, ref) => (
@@ -21,7 +25,6 @@ const CustomDateInput = forwardRef(({ value, onClick }, ref) => (
     {value || "jj/mm/aaaa"}
   </button>
 ));
-
 CustomDateInput.displayName = "CustomDateInput";
 
 function InfosModal({ isOpen, onClose }) {
@@ -42,86 +45,16 @@ function InfosModal({ isOpen, onClose }) {
     portfolioLink: "",
     personalDescription: "",
   });
+
   const [direction, setDirection] = useState(1);
   const resumeInputRef = useRef(null);
   const citySelectRef = useRef(null);
-  const API_URL = process.env.REACT_APP_API_URL;
 
-  const fetchAndFormatCities = async (inputValue) => {
-    if (!inputValue || inputValue.length < 2) return [];
-    try {
-      const response = await fetch(`${API_URL}/utils/countryList`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ inputValue }),
-        credentials: "include",
-      });
-      if (!response.ok) return [];
-      const data = await response.json();
-      return data.map((loc) => ({
-        label: `${loc.city}, ${loc.state}, ${loc.country}`,
-        value: `${loc.city}, ${loc.state}, ${loc.country}`,
-      }));
-    } catch (error) {
-      return [];
-    }
-  };
-
-  const loadOptions = (inputValue, callback) => {
-    fetchAndFormatCities(inputValue).then((options) => callback(options));
-  };
-
-  const debouncedLoadCities = debounce(loadOptions, 500);
-
-  const contractOptions = [
-    { value: "permanent", label: "CDI" },
-    { value: "fixedTerm", label: "CDD" },
-    { value: "fullTime", label: "Temps plein" },
-    { value: "partTime", label: "Temps partiel" },
-    { value: "internship", label: "Stage" },
-    { value: "apprenticeship", label: "Alternance / Apprenti" },
-    { value: "freeLance", label: "Freelance" },
-    { value: "seasonal", label: "Saisonnier" },
-    { value: "volunteer", label: "Bénévole" },
-    { value: "other", label: "Autres" },
-  ];
-
-  const jobSectors = [
-    {
-      value: "informatique",
-      label: "Informatique / Tech / Services Numériques",
-    },
-    {
-      value: "comptabilite_finance",
-      label: "Comptabilité / Finance / Assurance",
-    },
-    { value: "commerce_vente", label: "Commerce / Vente / Distribution" },
-    { value: "marketing_communication", label: "Marketing / Communication" },
-    { value: "ressources_humaines", label: "Ressources Humaines" },
-    { value: "sante_social", label: "Santé / Social / Services à la personne" },
-    {
-      value: "industrie_production",
-      label: "Industrie / Production / Maintenance",
-    },
-    { value: "btp_construction", label: "BTP / Construction" },
-    { value: "logistique_transport", label: "Logistique / Transport" },
-    {
-      value: "hotellerie_restauration",
-      label: "Hôtellerie / Restauration / Tourisme",
-    },
-    { value: "enseignement_formation", label: "Enseignement / Formation" },
-    { value: "art_culture_design", label: "Art / Culture / Design / Mode" },
-    {
-      value: "administration_service_public",
-      label: "Administration / Service Public",
-    },
-    { value: "conseil_audit", label: "Conseil / Audit" },
-    {
-      value: "agriculture_environnement",
-      label: "Agriculture / Environnement",
-    },
-    { value: "autre", label: "Autre" },
-  ];
+  const debouncedLoadCities = debounce((inputValue, callback) => {
+    ApiService.fetchAndFormatCities(inputValue).then((options) =>
+      callback(options)
+    );
+  }, 500);
 
   if (!isOpen) return null;
 
@@ -168,34 +101,25 @@ function InfosModal({ isOpen, onClose }) {
     e.preventDefault();
     try {
       const submissionData = {
-        lastName: personalInfo.lastName,
-        firstName: personalInfo.firstName,
+        ...personalInfo,
+        city: personalInfo.city ? personalInfo.city.value : "",
         birthDate: personalInfo.birthDate
           ? personalInfo.birthDate.toISOString().split("T")[0]
           : null,
-        city: personalInfo.city ? personalInfo.city.label : "",
-        school: personalInfo.school,
-        phoneNumber: personalInfo.phoneNumber,
-        jobSought: personalInfo.jobSought,
-        contractSought: personalInfo.contractSought,
-        goal: personalInfo.goal,
-        sector: personalInfo.sector,
         locationSought: personalInfo.locationSought.map(
           (option) => option.value
         ),
         resume: null,
-        linkedin: personalInfo.linkedin,
-        portfolioLink: personalInfo.portfolioLink,
-        personalDescription: personalInfo.personalDescription,
       };
 
-      const response = await fetch(`${API_URL}/user-profile/create`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(submissionData),
-        credentials: "include",
-      });
-      if (response.ok) onClose();
+      const response = await ApiService.post("/user-profile", submissionData);
+
+      if (response.ok) {
+        onClose();
+      } else {
+        const errorData = await response.json();
+        console.error("Erreur de sauvegarde du profil:", errorData.message);
+      }
     } catch (error) {
       console.error("Erreur lors de la soumission:", error);
     }
@@ -203,10 +127,7 @@ function InfosModal({ isOpen, onClose }) {
 
   const selectStyles = {
     menuPortal: (base) => ({ ...base, zIndex: 9999 }),
-    input: (provided) => ({
-      ...provided,
-      boxShadow: "none",
-    }),
+    input: (provided) => ({ ...provided, boxShadow: "none" }),
   };
 
   return (
@@ -285,11 +206,7 @@ function InfosModal({ isOpen, onClose }) {
                             citySelectRef.current.blur();
                         }}
                         loadingMessage={() => "Recherche..."}
-                        noOptionsMessage={({ inputValue }) =>
-                          !inputValue || inputValue.length < 2
-                            ? "Tapez au moins 2 caractères"
-                            : "Aucune ville trouvée"
-                        }
+                        noOptionsMessage={() => "Aucune ville trouvée"}
                         menuPortalTarget={document.body}
                         styles={selectStyles}
                       />
@@ -318,7 +235,6 @@ function InfosModal({ isOpen, onClose }) {
                 </form>
               </motion.div>
             )}
-
             {activeStep === "step2" && (
               <motion.div
                 key="step2"
@@ -331,8 +247,6 @@ function InfosModal({ isOpen, onClose }) {
                 transition={{ duration: 0.3 }}
               >
                 <form className="info-form" onSubmit={handleNextStep}>
-                  {/* === NEW: jobSought Select component === */}
-
                   <div className="form-group">
                     <label htmlFor="contractSoughtSelect">
                       Type de contrat
@@ -402,11 +316,7 @@ function InfosModal({ isOpen, onClose }) {
                         }))
                       }
                       loadingMessage={() => "Recherche..."}
-                      noOptionsMessage={({ inputValue }) =>
-                        !inputValue || inputValue.length < 2
-                          ? "Tapez au moins 2 caractères"
-                          : "Aucune ville trouvée"
-                      }
+                      noOptionsMessage={() => "Aucune ville trouvée"}
                       menuPortalTarget={document.body}
                       styles={selectStyles}
                     />
@@ -461,7 +371,6 @@ function InfosModal({ isOpen, onClose }) {
                 </form>
               </motion.div>
             )}
-
             {activeStep === "step3" && (
               <motion.div
                 key="step3"

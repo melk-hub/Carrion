@@ -1,16 +1,17 @@
+const API_BASE_URL = process.env.REACT_APP_API_URL;
+
 class ApiService {
   constructor() {
-    this.baseURL = process.env.REACT_APP_API_URL || "http://localhost:3000";
     this.isRefreshing = false;
     this.refreshSubscribers = [];
   }
 
   async request(url, options = {}) {
-    const fullUrl = `${this.baseURL}${url}`;
+    const fullUrl = `${API_BASE_URL}${url}`;
     const defaultOptions = {
-      credentials: 'include',
+      credentials: "include",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
         ...options.headers,
       },
       ...options,
@@ -18,25 +19,25 @@ class ApiService {
 
     try {
       const response = await fetch(fullUrl, defaultOptions);
-      
-      // Si la réponse est 401 (Unauthorized), essayer de refresh le token
-      if (response.status === 401 && !this.isRefreshing) {
-        return this.handleTokenRefresh(fullUrl, defaultOptions);
+
+      if (response.status === 401 && !options.isRetry) {
+        return this.handleTokenRefresh(() =>
+          this.request(url, { ...options, isRetry: true })
+        );
       }
-      
+
       return response;
     } catch (error) {
-      console.error('API request failed:', error);
+      console.error("API request failed:", error);
       throw error;
     }
   }
 
-  async handleTokenRefresh(originalUrl, originalOptions) {
+  async handleTokenRefresh(originalRequest) {
     if (this.isRefreshing) {
-      // Si un refresh est déjà en cours, attendre qu'il se termine
       return new Promise((resolve) => {
         this.refreshSubscribers.push(() => {
-          resolve(fetch(originalUrl, originalOptions));
+          resolve(originalRequest());
         });
       });
     }
@@ -44,26 +45,20 @@ class ApiService {
     this.isRefreshing = true;
 
     try {
-      // Essayer de refresh le token via notre endpoint backend
-      const refreshResponse = await fetch(`${this.baseURL}/auth/refresh`, {
-        method: 'POST',
-        credentials: 'include',
+      const refreshResponse = await fetch(`${API_BASE_URL}/auth/refresh`, {
+        method: "POST",
+        credentials: "include",
       });
 
       if (refreshResponse.ok) {
-        // Token rafraîchi avec succès, retry la requête originale
         this.isRefreshing = false;
-        
-        // Notifier tous les abonnés que le refresh est terminé
-        this.refreshSubscribers.forEach(callback => callback());
+        this.refreshSubscribers.forEach((callback) => callback());
         this.refreshSubscribers = [];
-        
-        return fetch(originalUrl, originalOptions);
+        return originalRequest();
       } else {
-        // Échec du refresh, rediriger vers login
         this.isRefreshing = false;
         this.redirectToLogin();
-        throw new Error('Token refresh failed');
+        throw new Error("Token refresh failed");
       }
     } catch (error) {
       this.isRefreshing = false;
@@ -78,14 +73,13 @@ class ApiService {
     window.location.href = '/';
   }
 
-  // Méthodes raccourcies pour les différents types de requêtes
   async get(url, options = {}) {
-    return this.request(url, { method: 'GET', ...options });
+    return this.request(url, { method: "GET", ...options });
   }
 
   async post(url, data, options = {}) {
     return this.request(url, {
-      method: 'POST',
+      method: "POST",
       body: JSON.stringify(data),
       ...options,
     });
@@ -93,7 +87,7 @@ class ApiService {
 
   async put(url, data, options = {}) {
     return this.request(url, {
-      method: 'PUT',
+      method: "PUT",
       body: JSON.stringify(data),
       ...options,
     });
@@ -101,16 +95,34 @@ class ApiService {
 
   async patch(url, data, options = {}) {
     return this.request(url, {
-      method: 'PATCH',
+      method: "PATCH",
       body: JSON.stringify(data),
       ...options,
     });
   }
 
   async delete(url, options = {}) {
-    return this.request(url, { method: 'DELETE', ...options });
+    return this.request(url, { method: "DELETE", ...options });
+  }
+
+  async fetchAndFormatCities(inputValue) {
+    if (!inputValue || inputValue.length < 2) return [];
+    try {
+      const response = await this.post(`/utils/countryList`, { inputValue });
+
+      if (!response.ok) return [];
+
+      const data = await response.json();
+      return data.map((loc) => ({
+        label: `${loc.city}, ${loc.state}, ${loc.country}`,
+        value: `${loc.city}, ${loc.state}, ${loc.country}`,
+      }));
+    } catch (error) {
+      console.error("Error fetching cities:", error);
+      return [];
+    }
   }
 }
 
-// Exporter une instance singleton
-export default new ApiService(); 
+const apiServiceInstance = new ApiService();
+export default apiServiceInstance;
