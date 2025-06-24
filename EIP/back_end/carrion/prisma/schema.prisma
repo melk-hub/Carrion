@@ -27,7 +27,7 @@ model User {
 }
 
 model UserProfile {
-  userId              String    @unique @db.Uuid
+  userId              String    @id @db.Uuid
   firstName           String?
   lastName            String?
   birthDate           DateTime? @db.Date
