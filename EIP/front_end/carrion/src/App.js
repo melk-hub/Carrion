@@ -17,12 +17,33 @@ import { LanguageProvider } from "./contexts/LanguageContext";
 import { useLanguage } from "./contexts/LanguageContext";
 import Navbar from "./pages/Navbar";
 import Profile from "./pages/Profile";
+import { Toaster } from "react-hot-toast";
 
 function App() {
   return (
     <AuthProvider>
       <LanguageProvider>
         <Router>
+          <Toaster
+            position="top-center"
+            toastOptions={{
+              duration: 4000,
+              style: {
+                background: "#363636",
+                color: "#fff",
+              },
+              success: {
+                style: {
+                  background: "#4CAF50",
+                },
+              },
+              error: {
+                style: {
+                  background: "#F44336",
+                },
+              },
+            }}
+          />
           <AppLayout />
         </Router>
       </LanguageProvider>

@@ -88,9 +88,8 @@ function Navbar({ sidebarCollapsed, setSidebarCollapsed, setIsAuthenticated }) {
             <span className="logo-text">CARRION</span>
           </div>
         </div>
-        <span className="username">
-          {t('common.hello')} - Jeremy Smith - {getCurrentPageName()}
-        </span>
+        {/* TODO Mettre le nom de l'utilisateur si on garde ça, à voir si on récup les données autre part que sur la partie utilisateur */}
+        <span className="username">{t('common.hello')} </span> 
         <div className="topbar-right">
           <LanguageDropdown className="dark-theme" style={{color: 'white'}}/>
           <img 

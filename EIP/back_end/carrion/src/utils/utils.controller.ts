@@ -1,5 +1,6 @@
 import {
   Controller,
+  Get,
   HttpStatus,
   Post,
   Request,
@@ -23,5 +24,13 @@ export class UtilsController {
     return res
       .status(HttpStatus.OK)
       .json(await this.utilsService.getCountryList(body.inputValue));
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('hasProfile')
+  async hasProfile(@Request() req, @Response() res) {
+    return res
+      .status(HttpStatus.OK)
+      .json(await this.utilsService.hasProfile(req.user.id));
   }
 }

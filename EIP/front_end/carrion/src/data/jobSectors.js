@@ -1,0 +1,18 @@
+export const jobSectors = [
+    { value: "informatique", label: "Informatique / Tech / Services Numériques" },
+    { value: "comptabilite_finance", label: "Comptabilité / Finance / Assurance" },
+    { value: "commerce_vente", label: "Commerce / Vente / Distribution" },
+    { value: "marketing_communication", label: "Marketing / Communication" },
+    { value: "ressources_humaines", label: "Ressources Humaines" },
+    { value: "sante_social", label: "Santé / Social / Services à la personne" },
+    { value: "industrie_production", label: "Industrie / Production / Maintenance" },
+    { value: "btp_construction", label: "BTP / Construction" },
+    { value: "logistique_transport", label: "Logistique / Transport" },
+    { value: "hotellerie_restauration", label: "Hôtellerie / Restauration / Tourisme" },
+    { value: "enseignement_formation", label: "Enseignement / Formation" },
+    { value: "art_culture_design", label: "Art / Culture / Design / Mode" },
+    { value: "administration_service_public", label: "Administration / Service Public" },
+    { value: "conseil_audit", label: "Conseil / Audit" },
+    { value: "agriculture_environnement", label: "Agriculture / Environnement" },
+    { value: "autre", label: "Autre" },
+  ];
