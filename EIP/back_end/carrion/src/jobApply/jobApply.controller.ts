@@ -111,15 +111,37 @@ export class JobApplyController {
     );
   }
 
+
   @Post(':id/archive')
+  @ApiOperation({ summary: 'Archive a job application' })
+  @ApiResponse({ status: 200, description: 'Successfully archived the job application' })
+  @ApiResponse({ status: 400, description: "Can't archive job application error" })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 403, description: 'Forbidden' })
   async archiveJobApplication(@Param('id') jobApplyId: string, @Request() req) {
     const userId = req.user.id;
     return this.jobApplyService.archiveJobApplication(jobApplyId, userId);
   }
 
   @Post(':id/unarchive')
+  @ApiOperation({ summary: 'Unarchive a job application' })
+  @ApiResponse({ status: 200, description: 'Successfully unarchived the job application' })
+  @ApiResponse({ status: 400, description: "Can't unarchive job application error" })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 403, description: 'Forbidden' })
   async unarchiveJobApplication(@Param('id') archivedJobId: string, @Request() req) {
     const userId = req.user.id;
     return this.jobApplyService.unarchiveJobApplication(archivedJobId, userId);
+  }
+
+  @Get('get_archivedJobApply')
+  @ApiOperation({ summary: 'Get archivedJobApply information' })
+  @ApiResponse({ status: 200, description: 'Successfully get archivedJobApply' })
+  @ApiResponse({ status: 400, description: "Can't get archivedJobApply error" })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 403, description: 'Forbidden' })
+  async getAllArchivedJobApplies(@Request() req) {
+    const userId = req.user.id;
+    return this.jobApplyService.getAllArchivedJobApplies(userId);
   }
 }

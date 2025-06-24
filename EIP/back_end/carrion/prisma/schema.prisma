@@ -85,7 +85,6 @@ model ArchivedJobApply {
   contractType  String?
   interviewDate DateTime?
   archivedAt    DateTime @default(now())
-
   userId        String   @db.Uuid
   user          User     @relation("UserArchivedJobApplies", fields: [userId], references: [id], onDelete: Cascade)
 }

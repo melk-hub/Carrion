@@ -384,4 +384,32 @@ export class JobApplyService {
 
     return { message: 'Job application unarchived successfully.' };
   }
+
+  async getAllArchivedJobApplies(userId: string) {
+    try {
+      const archivedJobApplies = await this.prisma.archivedJobApply.findMany({
+        where: {
+          userId: userId,
+        },
+        include: {
+          user: true,
+        },
+      });
+
+      return archivedJobApplies.map((archived) => ({
+        id: archived.id,
+        title: archived.title,
+        company: archived.company,
+        location: archived.location,
+        salary: archived.salary,
+        imageUrl: archived.imageUrl,
+        status: archived.status as ApplicationStatus,
+        contractType: archived.contractType,
+        interviewDate: archived.interviewDate,
+        createdAt: archived.archivedAt,
+      }));
+    } catch (error) {
+      throw new Error(`Error retrieving archived job applications: ${error}`);
+    }
+  }
 }
