@@ -10,8 +10,8 @@ export class NotificationsService {
     private notificationRepo: Repository<Notification>,
   ) {}
 
-  async create(userId: number, message: string) {
-    const notification = this.notificationRepo.create({ userId, message });
+  async create(userId: number, type: string, title: string, message: string, company: string) {
+    const notification = this.notificationRepo.create({ userId, type, title, message, company});
     return await this.notificationRepo.save(notification);
   }
 
