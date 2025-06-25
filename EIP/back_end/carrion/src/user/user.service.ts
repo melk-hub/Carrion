@@ -114,7 +114,6 @@ export class UserService {
     }
 
     try {
-      // Check if user exists
       const userExists = await this.prisma.user.findUnique({
         where: { id: userId },
         select: { id: true },
@@ -124,17 +123,15 @@ export class UserService {
         throw new NotFoundException(`User with id ${userId} not found`);
       }
 
-      // Search user settings by UserId
       let userSettings = await this.prisma.settings.findUnique({
-        where: { UserId: userId },
+        where: { userId: userId },
         select: { document: true, id: true },
       });
 
-      // If the user does not have any settings yet, create them
       if (!userSettings) {
         userSettings = await this.prisma.settings.create({
           data: {
-            UserId: userId,
+            userId: userId,
             document: [newDocument],
           },
           select: { document: true, id: true },
@@ -142,23 +139,20 @@ export class UserService {
         return userSettings;
       }
 
-      // Check if document already exists to avoid duplicates
       if (userSettings.document.includes(newDocument)) {
         throw new ConflictException(
           `Document ${newDocument} already exists for this user`,
         );
       }
 
-      // Add new document to existing list
       const updatedDocuments = [...userSettings.document, newDocument];
 
       return await this.prisma.settings.update({
-        where: { UserId: userId },
+        where: { userId: userId },
         data: { document: updatedDocuments },
         select: { document: true, id: true },
       });
     } catch (error) {
-      // Re-throw NestJS exceptions
       if (
         error instanceof NotFoundException ||
         error instanceof ConflictException ||
@@ -166,11 +160,11 @@ export class UserService {
       ) {
         throw error;
       }
-      // Handle Prisma errors
+
       if (error.code === 'P2025') {
         throw new NotFoundException(`Settings not found for user ${userId}`);
       }
-      // Generic error
+
       throw new BadRequestException(`Failed to add document: ${error.message}`);
     }
   }

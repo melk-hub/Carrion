@@ -93,8 +93,7 @@ function Dashboard() {
 
   const handleArchiveApplication = async (id) => {
     try {
-      const response = await apiService.delete(`/job_applies/${id}`);
-      // changer la route pour les archives des candidatures
+      const response = await apiService.post(`/job_applies/${id}/archive`);
 
       if (!response.ok) {
         throw new Error(`${t('dashboard.errors.archiveError')} ${response.status}`);
@@ -323,6 +322,7 @@ function Dashboard() {
                   onEdit={openEditPopup}
                   onDelete={handleDeleteApplication}
                   onDetails={openDetailsPopup}
+                  onArchive={handleArchiveApplication}
                 />
               ))
             ) : (

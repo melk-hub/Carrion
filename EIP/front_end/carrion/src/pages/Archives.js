@@ -1,35 +1,39 @@
-"use client"
+"use client";
 
-import React, { useState, useEffect, useMemo } from "react"
-import { useLanguage } from "../contexts/LanguageContext"
-import "../styles/Archives.css"
-import ApplicationCard from "../components/Dashboardcard.js"
-import ApplicationList from "../components/DashboardList.js"
-import EditApplicationModal from "../components/EditApplicationModal.js"
-import DetailsModal from "../components/DetailsModal.js"
-import apiService from "../services/api.js"
+import React, { useState, useEffect, useMemo } from "react";
+import { useLanguage } from "../contexts/LanguageContext";
+import "../styles/Archives.css";
+import ApplicationCard from "../components/Dashboardcard.js";
+import ApplicationList from "../components/DashboardList.js";
+import EditApplicationModal from "../components/EditApplicationModal.js";
+import DetailsModal from "../components/DetailsModal.js";
+import apiService from "../services/api.js";
 
 function Archives() {
-  const { t } = useLanguage()
-  const [applications, setApplications] = useState([])
-  const [searchTerm, setSearchTerm] = useState("")
-  const [viewMode, setViewMode] = useState("grid")
-  const [sortBy, setSortBy] = useState("date")
-  const [selectedStatuses, setSelectedStatuses] = useState(new Set())
-  const [selectedApplication, setSelectedApplication] = useState(null)
-  const [popupType, setPopupType] = useState(null)
+  const { t } = useLanguage();
+  const [applications, setApplications] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [viewMode, setViewMode] = useState("grid");
+  const [sortBy, setSortBy] = useState("date");
+  const [selectedStatuses, setSelectedStatuses] = useState(new Set());
+  const [selectedApplication, setSelectedApplication] = useState(null);
+  const [popupType, setPopupType] = useState(null);
 
   useEffect(() => {
     const fetchApplications = async () => {
       try {
-        const response = await apiService.get('/job_applies/get_jobApply');
+        const response = await apiService.get(
+          `/job_applies/get_archivedJobApply`
+        );
         if (!response.ok) {
-          throw new Error(`${t('dashboard.errors.fetchError')} ${response.status}`);
+          throw new Error(
+            `${t("dashboard.errors.fetchError")} ${response.status}`
+          );
         }
         const data = await response.json();
         setApplications(Array.isArray(data) ? data : []);
       } catch (error) {
-        console.error(t('dashboard.errors.fetchError'), error);
+        console.error(t("dashboard.errors.fetchError"), error);
       }
     };
     fetchApplications();
@@ -37,149 +41,168 @@ function Archives() {
 
   const handleUpdateApplication = async () => {
     try {
-      const response = await apiService.put(`/job_applies/${selectedApplication.id}/status`, {
-        title: selectedApplication.title,
-        company: selectedApplication.company,
-        status: selectedApplication.status,
-        location: selectedApplication.location || undefined,
-        salary: selectedApplication.salary ? parseInt(selectedApplication.salary) : undefined,
-        contractType: selectedApplication.contractType || "Full-time",
-        interviewDate: selectedApplication.interviewDate ? new Date(selectedApplication.interviewDate).toISOString() : undefined,
-        imageUrl: selectedApplication.imageUrl || undefined,
-      });
+      const response = await apiService.put(
+        `/job_applies/${selectedApplication.id}/archived-status`,
+        {
+          title: selectedApplication.title,
+          company: selectedApplication.company,
+          status: selectedApplication.status,
+          location: selectedApplication.location || undefined,
+          salary: selectedApplication.salary
+            ? parseInt(selectedApplication.salary)
+            : undefined,
+          contractType: selectedApplication.contractType || "Full-time",
+          interviewDate: selectedApplication.interviewDate
+            ? new Date(selectedApplication.interviewDate).toISOString()
+            : undefined,
+          imageUrl: selectedApplication.imageUrl || undefined,
+        }
+      );
 
       if (!response.ok) {
-        throw new Error(`${t('dashboard.errors.updateError')} ${response.status}`);
+        throw new Error(
+          `${t("dashboard.errors.updateError")} ${response.status}`
+        );
       }
 
       const updatedApplication = await response.json();
-      
+
       setApplications((prevApps) =>
-        prevApps.map((app) => (app.id === selectedApplication.id ? { ...app, ...updatedApplication } : app)),
-      )
-      closePopup()
+        prevApps.map((app) =>
+          app.id === selectedApplication.id
+            ? { ...app, ...updatedApplication }
+            : app
+        )
+      );
+      closePopup();
     } catch (error) {
-      console.error(t('dashboard.errors.updateError'), error)
+      console.error(t("dashboard.errors.updateError"), error);
     }
-  }
+  };
 
   const handleDeArchiveApplication = async (id) => {
-      try {
-        const response = await apiService.delete(`/job_applies/${id}`);
-        // changer la route pour dé-archiver des candidatures
-  
-        if (!response.ok) {
-          throw new Error(`${t('dashboard.errors.archiveError')} ${response.status}`);
-        }
-  
-        setApplications(applications.filter((app) => app.id !== id))
-      } catch (error) {
-        console.error(t('dashboard.errors.archiveError'), error)
+    try {
+      const response = await apiService.post(
+        `/job_applies/${id}/unarchive`
+      );
+
+      if (!response.ok) {
+        throw new Error(
+          `${t("dashboard.errors.archiveError")} ${response.status}`
+        );
       }
+
+      setApplications(applications.filter((app) => app.id !== id));
+    } catch (error) {
+      console.error(t("dashboard.errors.archiveError"), error);
     }
+  };
 
   const handleDeleteApplication = async (id) => {
     try {
-      const response = await apiService.delete(`/job_applies/${id}`);
+      const response = await apiService.delete(`/job_applies/${id}/archived`);
 
       if (!response.ok) {
-        throw new Error(`${t('dashboard.errors.deleteError')} ${response.status}`);
+        throw new Error(
+          `${t("dashboard.errors.deleteError")} ${response.status}`
+        );
       }
 
-      setApplications(applications.filter((app) => app.id !== id))
+      setApplications(applications.filter((app) => app.id !== id));
     } catch (error) {
-      console.error(t('dashboard.errors.deleteError'), error)
+      console.error(t("dashboard.errors.deleteError"), error);
     }
-  }
+  };
 
   const statusMap = {
-    APPLIED: t('dashboard.statuses.APPLIED'),
-    PENDING: t('dashboard.statuses.PENDING'),
-    REJECTED_BY_COMPANY: t('dashboard.statuses.REJECTED_BY_COMPANY'),
-  }
+    APPLIED: t("dashboard.statuses.APPLIED"),
+    PENDING: t("dashboard.statuses.PENDING"),
+    REJECTED_BY_COMPANY: t("dashboard.statuses.REJECTED_BY_COMPANY"),
+  };
 
   const handleStatusChange = (status) => {
     setSelectedStatuses((prev) => {
-      const newSet = new Set(prev)
-      newSet.has(status) ? newSet.delete(status) : newSet.add(status)
-      return newSet
-    })
-  }
+      const newSet = new Set(prev);
+      newSet.has(status) ? newSet.delete(status) : newSet.add(status);
+      return newSet;
+    });
+  };
 
   const sortedAndFilteredApplications = useMemo(() => {
     const filtered = applications.filter(
       (app) =>
-        (selectedStatuses.size === 0 || selectedStatuses.has(statusMap[app.status])) &&
+        (selectedStatuses.size === 0 ||
+          selectedStatuses.has(statusMap[app.status])) &&
         (app.company?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          app.title?.toLowerCase().includes(searchTerm.toLowerCase())),
-    )
+          app.title?.toLowerCase().includes(searchTerm.toLowerCase()))
+    );
 
     return filtered.sort((a, b) => {
       if (sortBy === "date") {
-        return new Date(b.createdAt) - new Date(a.createdAt)
+        return new Date(b.createdAt) - new Date(a.createdAt);
       } else if (sortBy === "status") {
-        return statusMap[a.status].localeCompare(statusMap[b.status])
+        return statusMap[a.status].localeCompare(statusMap[b.status]);
       }
-      return 0
-    })
-  }, [applications, selectedStatuses, sortBy, searchTerm])
+      return 0;
+    });
+  }, [applications, selectedStatuses, sortBy, searchTerm]);
 
   const openEditPopup = (application) => {
-    setSelectedApplication(application)
-    setPopupType("edit")
-  }
+    setSelectedApplication(application);
+    setPopupType("edit");
+  };
 
   const openDetailsPopup = (application) => {
-    setSelectedApplication(application)
-    setPopupType("details")
-  }
+    setSelectedApplication(application);
+    setPopupType("details");
+  };
 
   const closePopup = () => {
-    setSelectedApplication(null)
-    setPopupType(null)
-  }
+    setSelectedApplication(null);
+    setPopupType(null);
+  };
 
   // Statistiques
   const stats = {
     total: applications.length,
     pending: applications.filter((app) => app.status === "PENDING").length,
     accepted: applications.filter((app) => app.status === "APPLIED").length,
-    refused: applications.filter((app) => app.status === "REJECTED_BY_COMPANY").length,
-  }
+    refused: applications.filter((app) => app.status === "REJECTED_BY_COMPANY")
+      .length,
+  };
 
   return (
     <div className="archives">
       <div className="container">
-
         <div className="stats-container">
           <div className="stat-card">
-            <h3 className="stat-title">{t('archives.stats.total')}</h3>
+            <h3 className="stat-title">{t("archives.stats.total")}</h3>
             <p className="stat-value">{stats.total}</p>
           </div>
           <div className="stat-card pending">
-            <h3 className="stat-title">{t('archives.stats.pending')}</h3>
+            <h3 className="stat-title">{t("archives.stats.pending")}</h3>
             <p className="stat-value">{stats.pending}</p>
           </div>
           <div className="stat-card accepted">
-            <h3 className="stat-title">{t('archives.stats.accepted')}</h3>
+            <h3 className="stat-title">{t("archives.stats.accepted")}</h3>
             <p className="stat-value">{stats.accepted}</p>
           </div>
           <div className="stat-card refused">
-            <h3 className="stat-title">{t('archives.stats.refused')}</h3>
+            <h3 className="stat-title">{t("archives.stats.refused")}</h3>
             <p className="stat-value">{stats.refused}</p>
           </div>
         </div>
 
         <div className="banner">
           <div className="banner-content">
-            <h2 className="banner-title">{t('archives.banner.title')}</h2>
-            <p className="banner-text">{t('archives.banner.description')}</p>
+            <h2 className="banner-title">{t("archives.banner.title")}</h2>
+            <p className="banner-text">{t("archives.banner.description")}</p>
           </div>
           <div className="search-container">
             <input
               type="text"
               className="search-input"
-              placeholder={t('archives.search.placeholder')}
+              placeholder={t("archives.search.placeholder")}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -204,7 +227,7 @@ function Archives() {
           <div className="controls-right">
             <div className="sort-container">
               <label htmlFor="sort-select" className="sort-label">
-                {t('archives.label')} :
+                {t("archives.label")} :
               </label>
               <select
                 id="sort-select"
@@ -212,23 +235,27 @@ function Archives() {
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
               >
-                <option value="date">{t('archives.date')}</option>
-                <option value="status">{t('archives.status')}</option>
+                <option value="date">{t("archives.date")}</option>
+                <option value="status">{t("archives.status")}</option>
               </select>
             </div>
 
             <div className="view-toggle">
               <button
-                className={`toggle-button ${viewMode === "grid" ? "active" : ""}`}
+                className={`toggle-button ${
+                  viewMode === "grid" ? "active" : ""
+                }`}
                 onClick={() => setViewMode("grid")}
               >
-                {t('archives.viewGrid')}
+                {t("archives.viewGrid")}
               </button>
               <button
-                className={`toggle-button ${viewMode === "list" ? "active" : ""}`}
+                className={`toggle-button ${
+                  viewMode === "list" ? "active" : ""
+                }`}
                 onClick={() => setViewMode("list")}
               >
-                {t('archives.viewList')}
+                {t("archives.viewList")}
               </button>
             </div>
           </div>
@@ -251,10 +278,8 @@ function Archives() {
             ) : (
               <div className="empty-state">
                 <div className="empty-icon">📄</div>
-                <h3 className="empty-title">{t('archives.empty.title')}</h3>
-                <p className="empty-text">
-                  {t('archives.empty.text')}
-                </p>
+                <h3 className="empty-title">{t("archives.empty.title")}</h3>
+                <p className="empty-text">{t("archives.empty.text")}</p>
               </div>
             )}
           </div>
@@ -275,10 +300,8 @@ function Archives() {
             ) : (
               <div className="empty-state">
                 <div className="empty-icon">📄</div>
-                <h3 className="empty-title">{t('archives.empty.title')}</h3>
-                <p className="empty-text">
-                  {t('archives.empty.text')}
-                </p>
+                <h3 className="empty-title">{t("archives.empty.title")}</h3>
+                <p className="empty-text">{t("archives.empty.text")}</p>
               </div>
             )}
           </div>
@@ -296,10 +319,14 @@ function Archives() {
       )}
 
       {popupType === "details" && selectedApplication && (
-        <DetailsModal application={selectedApplication} onClose={closePopup} statusMap={statusMap} />
+        <DetailsModal
+          application={selectedApplication}
+          onClose={closePopup}
+          statusMap={statusMap}
+        />
       )}
     </div>
-  )
+  );
 }
 
-export default Archives
+export default Archives;

@@ -1,6 +1,3 @@
-/* src/styles/Profile.css */
-
-/* --- Main Page Layout --- */
 .profile-page {
   padding: 2rem 4rem;
   max-width: 1600px;
@@ -22,11 +19,10 @@
   gap: 2.5rem;
 }
 
-/* === THE DEFINITIVE FIX IS HERE === */
 .profile-left-column {
   flex: 3;
   min-width: 450px;
-  /* These three properties create the vertical spacing between cards */
+
   display: flex;
   flex-direction: column;
   gap: 2.5rem;
@@ -39,7 +35,6 @@
   top: 2rem;
 }
 
-/* --- Card Base Styles --- */
 .profile-card {
   background-color: #ffffff;
   border: 1px solid #e5e7eb;
@@ -59,7 +54,6 @@
   border-bottom: 1px solid #f3f4f6;
 }
 
-/* --- Personal Info Form --- */
 .profile-info-form .form-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -106,7 +100,6 @@
   display: flex;
   justify-content: flex-end;
   width: 100%;
-  /* No margin-top needed here if the parent has a gap */
 }
 
 .save-button {
@@ -124,7 +117,6 @@
   background-color: #374151;
 }
 
-/* --- Right Column: Profile Picture --- */
 .profile-picture-card {
   display: flex;
   flex-direction: column;
@@ -163,7 +155,6 @@
   margin: 0;
 }
 
-/* --- Loader Spinner --- */
 .loader {
   border: 4px solid #f3f3f3;
   border-top: 4px solid #3498db;

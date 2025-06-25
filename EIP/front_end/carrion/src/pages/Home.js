@@ -6,7 +6,7 @@ import "../styles/Home.css";
 
 export default function Home() {
   const [showWelcomeModal, setShowWelcomeModal] = useState(false);
-    const navigate = useNavigate();
+  const navigate = useNavigate();
   const { t } = useLanguage();
   const API_URL = process.env.REACT_APP_API_URL;
 
@@ -20,7 +20,6 @@ export default function Home() {
 
     const checkUserProfile = async () => {
       try {
-        console.log("Fetching profile status...");
         const response = await fetch(`${API_URL}/utils/hasProfile`, {
           credentials: "include",
         });
@@ -30,14 +29,8 @@ export default function Home() {
         }
 
         const hasProfile = await response.json();
-        console.log("API response from /hasProfile:", hasProfile);
 
-        if (hasProfile === false) {
-          console.log("Profile does not exist. Showing modal.");
-          setShowWelcomeModal(true);
-        } else {
-          console.log("Profile exists. Not showing modal.");
-        }
+        if (hasProfile === false) setShowWelcomeModal(true);
       } catch (error) {
         console.error(
           "Impossible de vérifier le profil de l'utilisateur:",
@@ -49,7 +42,7 @@ export default function Home() {
     checkUserProfile();
   }, [API_URL]);
 
-    return (
+  return (
     <div className="home-container">
       <InfosModal
         isOpen={showWelcomeModal}
@@ -61,7 +54,7 @@ export default function Home() {
       />
 
       <div className="welcome-section">
-        <div className="welcome-content" style={{ marginRight: "2vw" }} >
+        <div className="welcome-content" style={{ marginRight: "2vw" }}>
           <h1 className="welcome-title">{t("home.welcome")}</h1>
           <p className="welcome-subtitle">{t("home.welcomeMessage")}</p>
         </div>
@@ -216,55 +209,54 @@ export default function Home() {
           <div className="applications-list">
             <div className="application-item">
               <div className="company-logo">
-                            <img
-                                src="https://cdn.shopify.com/assets/images/logos/shopify-bag.png"
-                                alt="Shopify"
-                            />
+                <img
+                  src="https://cdn.shopify.com/assets/images/logos/shopify-bag.png"
+                  alt="Shopify"
+                />
               </div>
               <div className="application-info">
                 <h4>Shopify</h4>
-                                <p>Stage - Product Owner</p>
+                <p>Stage - Product Owner</p>
                 <span className="status pending">En attente</span>
               </div>
               <div className="application-time">
                 <span>Il y a 17h</span>
-                            </div>
-                    </div>
+              </div>
+            </div>
 
             <div className="application-item">
               <div className="company-logo">
-                            <img
-                                src="https://upload.wikimedia.org/wikipedia/commons/6/6a/Boursorama_Logo_2021.png"
-                                alt="Boursorama"
-                            />
+                <img
+                  src="https://upload.wikimedia.org/wikipedia/commons/6/6a/Boursorama_Logo_2021.png"
+                  alt="Boursorama"
+                />
               </div>
               <div className="application-info">
                 <h4>Boursorama</h4>
-                                <p>CDD - Développeur Full Stack Junior</p>
+                <p>CDD - Développeur Full Stack Junior</p>
                 <span className="status accepted">Acceptée</span>
-                            </div>
+              </div>
               <div className="application-time">
                 <span>Il y a 5h</span>
-                    </div>
-                </div>
+              </div>
+            </div>
 
             <div className="application-item">
               <div className="company-logo">
                 <div className="placeholder-logo">G</div>
-                        </div>
+              </div>
               <div className="application-info">
                 <h4>Google</h4>
                 <p>CDI - Software Engineer</p>
                 <span className="status interview">Entretien</span>
-                    </div>
+              </div>
               <div className="application-time">
                 <span>Il y a 2j</span>
-                    </div>
-                </div>
+              </div>
+            </div>
           </div>
         </div>
-
-            </div>
-        </div>
-    );
+      </div>
+    </div>
+  );
 }

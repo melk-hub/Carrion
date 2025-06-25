@@ -9,21 +9,20 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// The User model should only contain core authentication and identity info.
-// First name and last name have been REMOVED from this model.
 model User {
-  id                 String       @id @default(uuid()) @db.Uuid
-  username           String       @unique
-  email              String       @unique
+  id                 String             @id @default(uuid()) @db.Uuid
+  username           String             @unique
+  email              String             @unique
   password           String
-  hasProfile         Boolean      @default(false)
-  createdAt          DateTime     @default(now())
-  role               Role         @default(VISITOR)
-  jobApplies         jobApply[]   @relation("UserJobApplies")
-  userProfile        UserProfile? @relation("UserProfile")
-  Settings           Settings?    @relation("UserSettings")
-  hashedRefreshToken String?      @unique
-  tokens             Token[]      @relation("UserTokens")
+  hasProfile         Boolean            @default(false)
+  createdAt          DateTime           @default(now())
+  role               Role               @default(VISITOR)
+  jobApplies         jobApply[]         @relation("UserJobApplies")
+  userProfile        UserProfile?       @relation("UserProfile")
+  Settings           Settings?          @relation("UserSettings")
+  hashedRefreshToken String?            @unique
+  tokens             Token[]            @relation("UserTokens")
+  archivedJobApplies ArchivedJobApply[] @relation("UserArchivedJobApplies")
 }
 
 model UserProfile {
@@ -51,7 +50,7 @@ model Token {
   accessToken       String
   refreshToken      String
   tokenTimeValidity DateTime
-  externalId        String?  // historyId for Gmail, subscriptionId for Outlook
+  externalId        String?  
   createdAt         DateTime @default(now())
   userId            String   @db.Uuid
   user              User     @relation("UserTokens", fields: [userId], references: [id], onDelete: Cascade)
@@ -59,12 +58,12 @@ model Token {
 
 model jobApply {
   id            String    @id @default(uuid()) @db.Uuid
-  Title         String
-  Company       String
-  Location      String?
-  Salary        Int?
-  User          User      @relation("UserJobApplies", fields: [UserId], references: [id], onDelete: Cascade)
-  UserId        String    @db.Uuid
+  title         String
+  company       String
+  location      String?
+  salary        Int?
+  user          User      @relation("UserJobApplies", fields: [userId], references: [id], onDelete: Cascade)
+  userId        String    @db.Uuid
   status        Status
   imageUrl      String?
   createdAt     DateTime  @default(now())
@@ -72,12 +71,28 @@ model jobApply {
   interviewDate DateTime?
 }
 
+model ArchivedJobApply {
+  id            String   @id @default(uuid()) @db.Uuid
+  originalId    String   @db.Uuid
+  title         String
+  company       String
+  location      String?
+  salary        Int?
+  status        Status
+  imageUrl      String?
+  contractType  String?
+  interviewDate DateTime?
+  archivedAt    DateTime @default(now())
+  userId        String   @db.Uuid
+  user          User     @relation("UserArchivedJobApplies", fields: [userId], references: [id], onDelete: Cascade)
+}
+
 model Settings {
   id       String   @id @default(uuid()) @db.Uuid
-  UserId   String   @unique @db.Uuid
+  userId   String   @unique @db.Uuid
   document String[]
   imageUrl String?
-  user     User     @relation("UserSettings", fields: [UserId], references: [id], onDelete: Cascade)
+  user     User     @relation("UserSettings", fields: [userId], references: [id], onDelete: Cascade)
 }
 
 enum Status {
