@@ -322,6 +322,7 @@ function Dashboard() {
                   onEdit={openEditPopup}
                   onDelete={handleDeleteApplication}
                   onDetails={openDetailsPopup}
+                  onArchive={handleArchiveApplication}
                 />
               ))
             ) : (
