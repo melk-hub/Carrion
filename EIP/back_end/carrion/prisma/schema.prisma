@@ -24,6 +24,7 @@ model User {
   hashedRefreshToken String?             @unique
   tokens             Token[]             @relation("UserTokens")
   userAchievements   UserAchievement[]   @relation("UserAchievements")
+  notifications      Notification[] @relation("UserNotifications")
 }
 
 model UserProfile {
@@ -57,15 +58,16 @@ model Token {
   user              User     @relation("UserTokens", fields: [userId], references: [id], onDelete: Cascade)
 }
 
-model notification {
+model Notification {
   id            String     @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
   userId        String     @db.Uuid
-  type          Type       @default(DEFAULT)
-  company       String?
+  type          NotifcationType
+  company       String
   title         String
   message       String
   createdAt     DateTime   @default(now())
-  read          Bool       @default(false)
+  read          Boolean    @default(false)
+  user          User       @relation("UserNotifications", fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model jobApply {
@@ -184,3 +186,10 @@ enum Type {
   INFO
   DEFAULT
 }
+  enum NotifcationType {
+    SUCCESS
+    ERROR
+    WARNING
+    INFO
+    DEFAULT
+  }

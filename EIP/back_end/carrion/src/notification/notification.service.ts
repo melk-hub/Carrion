@@ -1,88 +1,43 @@
-import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import {
-  IsUUID,
-  IsNotEmpty,
-  IsString,
-  MaxLength,
-  IsOptional,
-  IsEnum,
-  IsDate,
-} from 'class-validator';
-
-export enum ApplicationType {
-  SUCCESS = 'APPLIED',
-  ERROR = 'PENDING',
-  INFO = 'INTERVIEW_SCHEDULED',
-  WARNING = 'TECHNICAL_TEST',
-  DEFAULT = 'DEFAULT'
-}
-
-// DTO de création d'une notification
-export class CreateNotificationDto {
-  @IsUUID()
-  id: string;
-
-  @IsNotEmpty()
-  @IsString()
-  @MaxLength(80)
-  title: string;
-
-  @IsOptional()
-  @IsString()
-  @MaxLength(80)
-  company?: string;
-
-  @IsNotEmpty()
-  @IsString()
-  @MaxLength(255)
-  message: string;
-
-  @IsEnum(ApplicationType)
-  type: ApplicationType;
-
-  @IsOptional()
-  read?: boolean = false;
-
-  @IsNotEmpty()
-  @IsDate()
-  createdAt: Date;
-}
+// notification.service.ts
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
-export class NotificationsService {
-  constructor(
-    @InjectRepository(Notification)
-    private readonly notificationRepo: Repository<Notification>,
-  ) {}
+export class NotificationService {
+  constructor(private prisma: PrismaService) {}
 
-  async create(
-    userId: number,
-    type: ApplicationType,
-    title: string,
-    message: string,
-    company?: string,
-  ) {
-    const notification = this.notificationRepo.create({
-      userId,
-      type,
-      title,
-      message,
-      company,
-      read: false,
-      createdAt: new Date(),
+  async getUserNotifications(userId: string) {
+    const notifications = await this.prisma.notification.findMany({
+      where: { userId },
+      orderBy: { createdAt: 'desc' },
     });
-
-    return await this.notificationRepo.save(notification);
+    const now = new Date();
+    return notifications.map((n) => ({
+      ...n,
+      hoursAgo: Math.floor((now.getTime() - n.createdAt.getTime()) / 3600000),
+    }));
   }
 
-  async findByUser(userId: number) {
-    return await this.notificationRepo.find({ where: { userId } });
+  async toggleReadStatus(notificationId: string, userId: string) {
+    const notification = await this.prisma.notification.findFirst({
+      where: { id: notificationId, userId },
+    });
+    if (!notification) {
+      throw new NotFoundException('Notification not found for user');
+    }
+    return this.prisma.notification.update({
+      where: { id: notification.id },
+      data: { read: !notification.read },
+    });
   }
 
-  async markAsRead(id: number) {
-    await this.notificationRepo.update(id, { read: true });
-    return { message: 'Notification marked as read' };
+  async deleteNotification(notificationId: string, userId: string) {
+    const deleted = await this.prisma.notification.deleteMany({
+      where: { id: notificationId, userId },
+    });
+    if (deleted.count === 0) {
+      throw new NotFoundException('Notification not found or not owned by user');
+    }
+    return { success: true };
   }
 }
