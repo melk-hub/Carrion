@@ -127,7 +127,7 @@ function ApplicationList({ application, statusMap, onEdit, onDelete, onDetails, 
             </div>
           </button>
           
-          <button className="modern-list-button secondary" onClick={() => onArchive(application)} title={location.pathname.includes("dashboard") ? t("common.archive") : location.pathname.includes("archive") ? t("common.dearchive") : t("common.archive")}>
+          <button className="modern-list-button secondary" onClick={() => onArchive(application.id)} title={location.pathname.includes("dashboard") ? t("common.archive") : location.pathname.includes("archive") ? t("common.dearchive") : t("common.archive")}>
             <div className="list-button-icon-wrapper">
               {/* Emplacement pour icône éditer */}
               <img src="/icons/edit.svg" alt="Edit" className="list-button-icon" />
