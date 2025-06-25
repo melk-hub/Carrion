@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import "../styles/Notification.css";
 import axios from "axios"
 
-const API_URL = process.env.REACT_APP_API_URL || "http://localhost:3000"
+const API_URL = process.env.REACT_APP_API_URL
 
 function Notifications() {
   const [notifications, setNotifications] = useState([])
@@ -10,8 +10,6 @@ function Notifications() {
   const [selectedNotifications, setSelectedNotifications] = useState(new Set())
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
-
-  const userId = 1 // Remplacez par l'ID de l'utilisateur connecté
 
   useEffect(() => {
     fetchNotifications()
@@ -22,7 +20,7 @@ function Notifications() {
       setLoading(true)
       setError(null)
 
-      const response = await axios.get(`${API_URL}/notifications/${userId}`, {
+      const response = await axios.get(`${API_URL}/notifications`, {
         withCredentials: true,
       })
 
@@ -31,6 +29,7 @@ function Notifications() {
       setError(err.response?.data?.message || "Erreur lors de la récupération des notifications")
       console.error("Erreur:", err)
 
+      // Fallback vers des données mockées en cas d'erreur
       setNotifications([
         {
           id: 1,
@@ -104,13 +103,14 @@ function Notifications() {
   const markAsRead = async (id) => {
     try {
       await axios.patch(
-        `${API_URL}/notifications/read/${id}`,
+        `${API_URL}/notifications/${id}/read`,
         {},
         {
           withCredentials: true,
         },
       )
 
+      // Mise à jour local
       setNotifications((prev) =>
         prev.map((notification) => (notification.id === id ? { ...notification, read: true } : notification)),
       )
@@ -121,7 +121,15 @@ function Notifications() {
 
   const markAsUnread = async (id) => {
     try {
+      await axios.patch(
+        `${API_URL}/notifications/${id}/read`,
+        {},
+        {
+          withCredentials: true,
+        },
+      )
 
+      // Mettre à jour l'état local
       setNotifications((prev) =>
         prev.map((notification) => (notification.id === id ? { ...notification, read: false } : notification)),
       )
@@ -132,12 +140,11 @@ function Notifications() {
 
   const deleteNotification = async (id) => {
     try {
-      // un endpoint DELETE,
-      // await axios.delete(`${API_URL}/notifications/${id}`, {
-      //   withCredentials: true
-      // })
+      await axios.delete(`${API_URL}/notifications/${id}`, {
+        withCredentials: true,
+      })
 
-      // Pour l'instant, on supprime juste de l'état local
+      // Mise a jour local
       setNotifications((prev) => prev.filter((notification) => notification.id !== id))
       setSelectedNotifications((prev) => {
         const newSet = new Set(prev)
@@ -151,12 +158,12 @@ function Notifications() {
 
   const markAllAsRead = async () => {
     try {
-      // Marque les notifications non lues comme lues
+      // Marque toutes les notifications non lues comme lues
       const unreadNotifications = notifications.filter((n) => !n.read)
 
       const promises = unreadNotifications.map((notification) =>
         axios.patch(
-          `${API_URL}/notifications/read/${notification.id}`,
+          `${API_URL}/notifications/${notification.id}/read`,
           {},
           {
             withCredentials: true,
@@ -166,7 +173,7 @@ function Notifications() {
 
       await Promise.all(promises)
 
-      // Mise à jour local
+      // Mise a jour local
       setNotifications((prev) => prev.map((notification) => ({ ...notification, read: true })))
     } catch (err) {
       console.error("Erreur lors du marquage de toutes comme lues:", err)
@@ -194,15 +201,17 @@ function Notifications() {
 
   const deleteSelected = async () => {
     try {
-      // Si vous avez un endpoint pour supprimer en lot
-      // await axios.delete(`${API_URL}/notifications/bulk`, {
-      //   data: { ids: Array.from(selectedNotifications) },
-      //   withCredentials: true
-      // })
+      // Supprime chaque notification sélectionnée
+      const deletePromises = Array.from(selectedNotifications).map((id) =>
+        axios.delete(`${API_URL}/notifications/${id}`, {
+          withCredentials: true,
+        }),
+      )
 
-      const deletePromises = Array.from(selectedNotifications).map((id) => deleteNotification(id))
       await Promise.all(deletePromises)
 
+      // Mise a jour local
+      setNotifications((prev) => prev.filter((notification) => !selectedNotifications.has(notification.id)))
       setSelectedNotifications(new Set())
     } catch (err) {
       console.error("Erreur lors de la suppression en lot:", err)

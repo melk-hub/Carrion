@@ -31,12 +31,8 @@
     "@nestjs/mapped-types": "^2.0.6",
     "@nestjs/passport": "^10.0.3",
     "@nestjs/platform-express": "^10.0.0",
-<<<<<<< HEAD
-    "@nestjs/swagger": "^8.1.1",
-=======
     "@nestjs/swagger": "^8.1.0",
     "@nestjs/typeorm": "^11.0.0",
->>>>>>> 5008c36 ([ADD] : notification backend nt)
     "@prisma/client": "^6.3.1",
     "argon2": "^0.41.1",
     "axios": "^1.7.9",
