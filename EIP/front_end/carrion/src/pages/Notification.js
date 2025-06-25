@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from "react";
 import "../styles/Notification.css";
+import axios from "axios"
+
+const API_URL = process.env.REACT_APP_API_URL || "http://localhost:3000"
 
 function Notifications() {
   const [notifications, setNotifications] = useState([])
@@ -18,16 +21,14 @@ function Notifications() {
     try {
       setLoading(true)
       setError(null)
-      const response = await fetch(`/api/notifications/${userId}`)
 
-      if (!response.ok) {
-        throw new Error("Erreur lors de la récupération des notifications")
-      }
+      const response = await axios.get(`${API_URL}/notifications/${userId}`, {
+        withCredentials: true,
+      })
 
-      const data = await response.json()
-      setNotifications(data)
+      setNotifications(response.data)
     } catch (err) {
-      setError(err.message)
+      setError(err.response?.data?.message || "Erreur lors de la récupération des notifications")
       console.error("Erreur:", err)
 
       setNotifications([
@@ -37,7 +38,7 @@ function Notifications() {
           title: "Candidature acceptée",
           message: "Votre candidature chez Tech Solutions a été acceptée ! Félicitations.",
           timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
-          isRead: false,
+          read: false,
           company: "Tech Solutions",
         },
         {
@@ -46,7 +47,7 @@ function Notifications() {
           title: "Nouvelle opportunité",
           message: "Une nouvelle offre d'emploi correspond à votre profil : Développeur React Senior.",
           timestamp: new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString(),
-          isRead: false,
+          read: false,
           company: "StartupXYZ",
         },
         {
@@ -55,8 +56,44 @@ function Notifications() {
           title: "Entretien programmé",
           message: "Votre entretien avec Acme Corp est prévu demain à 14h00. N'oubliez pas de vous préparer.",
           timestamp: new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString(),
-          isRead: true,
+          read: true,
           company: "Acme Corp",
+        },
+        {
+          id: 4,
+          type: "error",
+          title: "Candidature refusée",
+          message: "Malheureusement, votre candidature chez Digital Agency n'a pas été retenue.",
+          timestamp: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
+          read: true,
+          company: "Digital Agency",
+        },
+        {
+          id: 5,
+          type: "info",
+          title: "Profil consulté",
+          message: "Votre profil a été consulté par 3 recruteurs cette semaine.",
+          timestamp: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+          read: false,
+          company: null,
+        },
+        {
+          id: 6,
+          type: "success",
+          title: "CV mis à jour",
+          message: "Votre CV a été mis à jour avec succès. Il est maintenant visible par les recruteurs.",
+          timestamp: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
+          read: true,
+          company: null,
+        },
+        {
+          id: 7,
+          type: "warning",
+          title: "Rappel de suivi",
+          message: "Il est temps de faire un suivi pour votre candidature chez Innovation Labs.",
+          timestamp: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
+          read: false,
+          company: "Innovation Labs",
         },
       ])
     } finally {
@@ -66,30 +103,27 @@ function Notifications() {
 
   const markAsRead = async (id) => {
     try {
-      const response = await fetch(`/api/notifications/read/${id}`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
+      await axios.patch(
+        `${API_URL}/notifications/read/${id}`,
+        {},
+        {
+          withCredentials: true,
         },
-      })
-
-      if (!response.ok) {
-        throw new Error("Erreur lors de la mise à jour")
-      }
+      )
 
       setNotifications((prev) =>
-        prev.map((notification) => (notification.id === id ? { ...notification, isRead: true } : notification)),
+        prev.map((notification) => (notification.id === id ? { ...notification, read: true } : notification)),
       )
     } catch (err) {
       console.error("Erreur lors du marquage comme lu:", err)
-
     }
   }
 
   const markAsUnread = async (id) => {
     try {
+
       setNotifications((prev) =>
-        prev.map((notification) => (notification.id === id ? { ...notification, isRead: false } : notification)),
+        prev.map((notification) => (notification.id === id ? { ...notification, read: false } : notification)),
       )
     } catch (err) {
       console.error("Erreur lors du marquage comme non lu:", err)
@@ -98,7 +132,10 @@ function Notifications() {
 
   const deleteNotification = async (id) => {
     try {
-      // const response = await fetch(`/api/notifications/${id}`, { method: 'DELETE' })
+      // un endpoint DELETE,
+      // await axios.delete(`${API_URL}/notifications/${id}`, {
+      //   withCredentials: true
+      // })
 
       // Pour l'instant, on supprime juste de l'état local
       setNotifications((prev) => prev.filter((notification) => notification.id !== id))
@@ -114,23 +151,23 @@ function Notifications() {
 
   const markAllAsRead = async () => {
     try {
-      // Marque toutes les notifications non lues comme lues
-      const unreadNotifications = notifications.filter((n) => !n.isRead)
+      // Marque les notifications non lues comme lues
+      const unreadNotifications = notifications.filter((n) => !n.read)
 
-      // Appel API pour chaque notification non lue
       const promises = unreadNotifications.map((notification) =>
-        fetch(`/api/notifications/read/${notification.id}`, {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
+        axios.patch(
+          `${API_URL}/notifications/read/${notification.id}`,
+          {},
+          {
+            withCredentials: true,
           },
-        }),
+        ),
       )
 
       await Promise.all(promises)
 
-      // Mise a jour local
-      setNotifications((prev) => prev.map((notification) => ({ ...notification, isRead: true })))
+      // Mise à jour local
+      setNotifications((prev) => prev.map((notification) => ({ ...notification, read: true })))
     } catch (err) {
       console.error("Erreur lors du marquage de toutes comme lues:", err)
     }
@@ -139,9 +176,9 @@ function Notifications() {
   const getFilteredNotifications = () => {
     switch (filter) {
       case "unread":
-        return notifications.filter((n) => !n.isRead)
+        return notifications.filter((n) => !n.read)
       case "read":
-        return notifications.filter((n) => n.isRead)
+        return notifications.filter((n) => n.read)
       case "success":
         return notifications.filter((n) => n.type === "success")
       case "warning":
@@ -155,9 +192,21 @@ function Notifications() {
     }
   }
 
-  const deleteSelected = () => {
-    selectedNotifications.forEach((id) => deleteNotification(id))
-    setSelectedNotifications(new Set())
+  const deleteSelected = async () => {
+    try {
+      // Si vous avez un endpoint pour supprimer en lot
+      // await axios.delete(`${API_URL}/notifications/bulk`, {
+      //   data: { ids: Array.from(selectedNotifications) },
+      //   withCredentials: true
+      // })
+
+      const deletePromises = Array.from(selectedNotifications).map((id) => deleteNotification(id))
+      await Promise.all(deletePromises)
+
+      setSelectedNotifications(new Set())
+    } catch (err) {
+      console.error("Erreur lors de la suppression en lot:", err)
+    }
   }
 
   const toggleSelection = (id) => {
@@ -213,7 +262,7 @@ function Notifications() {
   }
 
   const filteredNotifications = getFilteredNotifications()
-  const unreadCount = notifications.filter((n) => !n.isRead).length
+  const unreadCount = notifications.filter((n) => !n.read).length
 
   // Affichage loading
   if (loading) {
@@ -230,7 +279,7 @@ function Notifications() {
   }
 
   // Affichage erreur
-  if (error) {
+  if (error && notifications.length === 0) {
     return (
       <div className="notifications-page">
         <div className="notifications-container">
@@ -257,7 +306,7 @@ function Notifications() {
           </div>
 
           <div className="header-actions">
-            <button className="action-button" onClick={markAllAsRead}>
+            <button className="action-button" onClick={markAllAsRead} disabled={unreadCount === 0}>
               Tout marquer comme lu
             </button>
             {selectedNotifications.size > 0 && (
@@ -271,7 +320,13 @@ function Notifications() {
           </div>
         </div>
 
-        {/* Le reste du JSX reste identique... */}
+        {error && (
+          <div className="error-banner">
+            <span>⚠️ {error}</span>
+            <button onClick={() => setError(null)}>✕</button>
+          </div>
+        )}
+
         <div className="notifications-controls">
           <div className="filter-buttons">
             <button className={`filter-button ${filter === "all" ? "active" : ""}`} onClick={() => setFilter("all")}>
@@ -326,7 +381,7 @@ function Notifications() {
             filteredNotifications.map((notification) => (
               <div
                 key={notification.id}
-                className={`notification-item ${notification.type} ${!notification.isRead ? "unread" : ""} ${selectedNotifications.has(notification.id) ? "selected" : ""}`}
+                className={`notification-item ${notification.type} ${!notification.read ? "unread" : ""} ${selectedNotifications.has(notification.id) ? "selected" : ""}`}
               >
                 <div className="notification-checkbox">
                   <input
@@ -350,7 +405,7 @@ function Notifications() {
                 </div>
 
                 <div className="notification-actions">
-                  {!notification.isRead ? (
+                  {!notification.read ? (
                     <button
                       className="notification-action-button"
                       onClick={() => markAsRead(notification.id)}
@@ -377,7 +432,7 @@ function Notifications() {
                   </button>
                 </div>
 
-                {!notification.isRead && <div className="unread-indicator"></div>}
+                {!notification.read && <div className="unread-indicator"></div>}
               </div>
             ))
           ) : (

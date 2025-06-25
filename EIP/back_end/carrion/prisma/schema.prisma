@@ -57,6 +57,17 @@ model Token {
   user              User     @relation("UserTokens", fields: [userId], references: [id], onDelete: Cascade)
 }
 
+model notification {
+  id            String     @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  userId        String     @db.Uuid
+  type          Type       @default(DEFAULT)
+  company       String?
+  title         String
+  message       String
+  createdAt     DateTime   @default(now())
+  read          Bool       @default(false)
+}
+
 model jobApply {
   id            String    @id @default(uuid()) @db.Uuid
   title         String
@@ -165,4 +176,11 @@ enum AchievementType {
   PERCENTAGE
   TIME_BASED
   SPECIAL
+}
+enum Type {
+  SUCCESS
+  ERROR
+  WARNING
+  INFO
+  DEFAULT
 }
