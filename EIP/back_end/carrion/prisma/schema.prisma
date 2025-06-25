@@ -9,8 +9,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// The User model should only contain core authentication and identity info.
-// First name and last name have been REMOVED from this model.
 model User {
   id                 String             @id @default(uuid()) @db.Uuid
   username           String             @unique
@@ -52,7 +50,7 @@ model Token {
   accessToken       String
   refreshToken      String
   tokenTimeValidity DateTime
-  externalId        String?  // historyId for Gmail, subscriptionId for Outlook
+  externalId        String?  
   createdAt         DateTime @default(now())
   userId            String   @db.Uuid
   user              User     @relation("UserTokens", fields: [userId], references: [id], onDelete: Cascade)
@@ -60,12 +58,12 @@ model Token {
 
 model jobApply {
   id            String    @id @default(uuid()) @db.Uuid
-  Title         String
-  Company       String
-  Location      String?
-  Salary        Int?
-  User          User      @relation("UserJobApplies", fields: [UserId], references: [id], onDelete: Cascade)
-  UserId        String    @db.Uuid
+  title         String
+  company       String
+  location      String?
+  salary        Int?
+  user          User      @relation("UserJobApplies", fields: [userId], references: [id], onDelete: Cascade)
+  userId        String    @db.Uuid
   status        Status
   imageUrl      String?
   createdAt     DateTime  @default(now())
@@ -91,10 +89,10 @@ model ArchivedJobApply {
 
 model Settings {
   id       String   @id @default(uuid()) @db.Uuid
-  UserId   String   @unique @db.Uuid
+  userId   String   @unique @db.Uuid
   document String[]
   imageUrl String?
-  user     User     @relation("UserSettings", fields: [UserId], references: [id], onDelete: Cascade)
+  user     User     @relation("UserSettings", fields: [userId], references: [id], onDelete: Cascade)
 }
 
 enum Status {

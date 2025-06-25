@@ -4,7 +4,11 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { CreateJobApplyDto, JobApplyDto, UpdateJobApplyDto } from './dto/jobApply.dto';
+import {
+  CreateJobApplyDto,
+  JobApplyDto,
+  UpdateJobApplyDto,
+} from './dto/jobApply.dto';
 import { ApplicationStatus } from './enum/application-status.enum';
 
 export interface JobApplyParams {
@@ -33,18 +37,18 @@ export class JobApplyService {
     try {
       const jobApplies = await this.prisma.jobApply.findMany({
         where: {
-          UserId: userId,
+          userId: userId,
         },
         include: {
-          User: true,
+          user: true,
         },
       });
       return jobApplies.map((jobApply) => ({
         id: jobApply.id,
-        title: jobApply.Title,
-        company: jobApply.Company,
-        location: jobApply.Location,
-        salary: jobApply.Salary,
+        title: jobApply.title,
+        company: jobApply.company,
+        location: jobApply.location,
+        salary: jobApply.salary,
         imageUrl: jobApply.imageUrl,
         status: jobApply.status as ApplicationStatus,
         contractType: jobApply.contractType,
@@ -61,7 +65,6 @@ export class JobApplyService {
     jobApplyParams: JobApplyParams,
   ): Promise<JobApplyDto> {
     try {
-      // Enhanced logging for debugging duplicate detection
       console.log(`Searching for job apply with params:`, {
         userId,
         title: jobApplyParams.title,
@@ -70,21 +73,18 @@ export class JobApplyService {
         location: jobApplyParams.location,
       });
 
-      // Build the search criteria
       const searchCriteria: any = {
-        UserId: userId,
-        Title: jobApplyParams.title,
-        Company: jobApplyParams.company,
+        userId: userId,
+        title: jobApplyParams.title,
+        company: jobApplyParams.company,
       };
 
-      // Only add contractType to search if it's defined and not null/undefined
       if (jobApplyParams.contractType) {
         searchCriteria.contractType = jobApplyParams.contractType;
       }
 
-      // Only add location to search if it's provided
       if (jobApplyParams.location) {
-        searchCriteria.Location = jobApplyParams.location;
+        searchCriteria.location = jobApplyParams.location;
       }
 
       console.log(`Final search criteria:`, searchCriteria);
@@ -92,7 +92,7 @@ export class JobApplyService {
       const jobApply = await this.prisma.jobApply.findFirst({
         where: searchCriteria,
         include: {
-          User: true,
+          user: true,
         },
       });
 
@@ -103,18 +103,18 @@ export class JobApplyService {
 
       console.log(`Found existing job apply:`, {
         id: jobApply.id,
-        title: jobApply.Title,
-        company: jobApply.Company,
+        title: jobApply.title,
+        company: jobApply.company,
         contractType: jobApply.contractType,
-        location: jobApply.Location,
+        location: jobApply.location,
       });
 
       return {
         id: jobApply.id,
-        title: jobApply.Title,
-        company: jobApply.Company,
-        location: jobApply.Location,
-        salary: jobApply.Salary,
+        title: jobApply.title,
+        company: jobApply.company,
+        location: jobApply.location,
+        salary: jobApply.salary,
         imageUrl: jobApply.imageUrl,
         status: jobApply.status as ApplicationStatus,
         contractType: jobApply.contractType,
@@ -133,24 +133,24 @@ export class JobApplyService {
     try {
       const jobApply = await this.prisma.jobApply.create({
         data: {
-          UserId: userId,
-          Company: createJobApplyDto.company,
-          Location: createJobApplyDto.location,
-          Salary: createJobApplyDto.salary,
+          userId: userId,
+          company: createJobApplyDto.company,
+          location: createJobApplyDto.location,
+          salary: createJobApplyDto.salary,
           imageUrl: createJobApplyDto.imageUrl,
           status: createJobApplyDto.status,
           contractType: createJobApplyDto.contractType,
           interviewDate: createJobApplyDto.interviewDate,
-          Title: createJobApplyDto.title,
+          title: createJobApplyDto.title,
         },
       });
 
       return {
         id: jobApply.id,
-        title: jobApply.Title,
-        company: jobApply.Company,
-        location: jobApply.Location,
-        salary: jobApply.Salary,
+        title: jobApply.title,
+        company: jobApply.company,
+        location: jobApply.location,
+        salary: jobApply.salary,
         imageUrl: jobApply.imageUrl,
         status: jobApply.status as ApplicationStatus,
         contractType: jobApply.contractType,
@@ -170,17 +170,46 @@ export class JobApplyService {
       const jobApply = await this.prisma.jobApply.findUnique({
         where: { id: jobApplyId },
       });
+
       if (!jobApply) {
         throw new NotFoundException(
-          `Job application with ID ${jobApplyId} not found.`,
+          `Active job application with ID ${jobApplyId} not found.`,
         );
       }
-      if (jobApply.UserId !== userId) {
+      if (jobApply.userId !== userId) {
         throw new ForbiddenException(
           "You don't have permission to delete this job application.",
         );
       }
       await this.prisma.jobApply.delete({
+        where: { id: jobApplyId },
+      });
+      return { message: 'Job application deleted successfully' };
+    } catch (error) {
+      throw new Error(`Error deleting job application: ${error.message}`);
+    }
+  }
+
+  async deleteArchivedJobApply(
+    jobApplyId: string,
+    userId: string,
+  ): Promise<{ message: string }> {
+    try {
+      const jobApply = await this.prisma.archivedJobApply.findUnique({
+        where: { id: jobApplyId },
+      });
+
+      if (!jobApply) {
+        throw new NotFoundException(
+          `Active job application with ID ${jobApplyId} not found.`,
+        );
+      }
+      if (jobApply.userId !== userId) {
+        throw new ForbiddenException(
+          "You don't have permission to delete this job application.",
+        );
+      }
+      await this.prisma.archivedJobApply.delete({
         where: { id: jobApplyId },
       });
       return { message: 'Job application deleted successfully' };
@@ -198,12 +227,13 @@ export class JobApplyService {
       const jobApply = await this.prisma.jobApply.findUnique({
         where: { id: jobApplyId },
       });
+
       if (!jobApply) {
         throw new NotFoundException(
           `Job application with ID ${jobApplyId} not found.`,
         );
       }
-      if (jobApply.UserId !== userId) {
+      if (jobApply.userId !== userId) {
         throw new ForbiddenException(
           "You don't have permission to update this job application.",
         );
@@ -214,10 +244,10 @@ export class JobApplyService {
       });
       return {
         id: updatedJobApply.id,
-        title: updatedJobApply.Title,
-        company: updatedJobApply.Company,
-        location: updatedJobApply.Location,
-        salary: updatedJobApply.Salary,
+        title: updatedJobApply.title,
+        company: updatedJobApply.company,
+        location: updatedJobApply.location,
+        salary: updatedJobApply.salary,
         imageUrl: updatedJobApply.imageUrl,
         status: updatedJobApply.status as ApplicationStatus,
         contractType: updatedJobApply.contractType,
@@ -237,7 +267,6 @@ export class JobApplyService {
     updateJobApply: UpdateJobApply,
   ): Promise<string> {
     try {
-      // Validate interview date before using it
       const validInterviewDate =
         updateJobApply.interviewDate &&
         updateJobApply.interviewDate instanceof Date &&
@@ -249,9 +278,9 @@ export class JobApplyService {
         where: { id: jobApplyId },
         data: {
           ...(updateJobApply.location
-            ? { Location: updateJobApply.location }
+            ? { location: updateJobApply.location }
             : {}),
-          ...(updateJobApply.salary ? { Salary: updateJobApply.salary } : {}),
+          ...(updateJobApply.salary ? { salary: updateJobApply.salary } : {}),
           ...(updateJobApply.status ? { status: updateJobApply.status } : {}),
           ...(validInterviewDate ? { interviewDate: validInterviewDate } : {}),
         },
@@ -280,11 +309,11 @@ export class JobApplyService {
 
       if (!jobApply) {
         throw new NotFoundException(
-          `Job application with ID ${jobApplyId} not found.`,
+          `Active job application with ID ${jobApplyId} not found. It may be archived.`,
         );
       }
 
-      if (jobApply.UserId !== userId) {
+      if (jobApply.userId !== userId) {
         throw new ForbiddenException(
           "You don't have permission to update this job application.",
         );
@@ -293,23 +322,39 @@ export class JobApplyService {
       const updatedJobApply = await this.prisma.jobApply.update({
         where: { id: jobApplyId },
         data: {
-          ...(updateJobApplyDto.title ? { Title: updateJobApplyDto.title } : {}),
-          ...(updateJobApplyDto.company ? { Company: updateJobApplyDto.company } : {}),
-          ...(updateJobApplyDto.location ? { Location: updateJobApplyDto.location } : {}),
-          ...(updateJobApplyDto.salary !== undefined ? { Salary: updateJobApplyDto.salary } : {}),
-          ...(updateJobApplyDto.imageUrl ? { imageUrl: updateJobApplyDto.imageUrl } : {}),
-          ...(updateJobApplyDto.status ? { status: updateJobApplyDto.status } : {}),
-          ...(updateJobApplyDto.contractType ? { contractType: updateJobApplyDto.contractType } : {}),
-          ...(updateJobApplyDto.interviewDate ? { interviewDate: updateJobApplyDto.interviewDate } : {}),
+          ...(updateJobApplyDto.title
+            ? { title: updateJobApplyDto.title }
+            : {}),
+          ...(updateJobApplyDto.company
+            ? { company: updateJobApplyDto.company }
+            : {}),
+          ...(updateJobApplyDto.location
+            ? { location: updateJobApplyDto.location }
+            : {}),
+          ...(updateJobApplyDto.salary !== undefined
+            ? { salary: updateJobApplyDto.salary }
+            : {}),
+          ...(updateJobApplyDto.imageUrl
+            ? { imageUrl: updateJobApplyDto.imageUrl }
+            : {}),
+          ...(updateJobApplyDto.status
+            ? { status: updateJobApplyDto.status }
+            : {}),
+          ...(updateJobApplyDto.contractType
+            ? { contractType: updateJobApplyDto.contractType }
+            : {}),
+          ...(updateJobApplyDto.interviewDate
+            ? { interviewDate: updateJobApplyDto.interviewDate }
+            : {}),
         },
       });
 
       return {
         id: updatedJobApply.id,
-        title: updatedJobApply.Title,
-        company: updatedJobApply.Company,
-        location: updatedJobApply.Location,
-        salary: updatedJobApply.Salary,
+        title: updatedJobApply.title,
+        company: updatedJobApply.company,
+        location: updatedJobApply.location,
+        salary: updatedJobApply.salary,
         imageUrl: updatedJobApply.imageUrl,
         status: updatedJobApply.status as ApplicationStatus,
         contractType: updatedJobApply.contractType,
@@ -317,7 +362,85 @@ export class JobApplyService {
         createdAt: updatedJobApply.createdAt,
       };
     } catch (error) {
-      if (error instanceof NotFoundException || error instanceof ForbiddenException) {
+      if (
+        error instanceof NotFoundException ||
+        error instanceof ForbiddenException
+      ) {
+        throw error;
+      }
+      throw new Error(`Error updating job application: ${error.message}`);
+    }
+  }
+
+  async updateArchivedJobApplyByData(
+    archivedJobApplyId: string,
+    userId: string,
+    updateJobApplyDto: UpdateJobApplyDto,
+  ): Promise<JobApplyDto> {
+    try {
+      const jobApply = await this.prisma.archivedJobApply.findUnique({
+        where: { id: archivedJobApplyId },
+      });
+
+      if (!jobApply) {
+        throw new NotFoundException(
+          `Active job application with ID ${archivedJobApplyId} not found. It may be archived.`,
+        );
+      }
+
+      if (jobApply.userId !== userId) {
+        throw new ForbiddenException(
+          "You don't have permission to update this job application.",
+        );
+      }
+
+      const updatedJobApply = await this.prisma.archivedJobApply.update({
+        where: { id: archivedJobApplyId },
+        data: {
+          ...(updateJobApplyDto.title
+            ? { title: updateJobApplyDto.title }
+            : {}),
+          ...(updateJobApplyDto.company
+            ? { company: updateJobApplyDto.company }
+            : {}),
+          ...(updateJobApplyDto.location
+            ? { location: updateJobApplyDto.location }
+            : {}),
+          ...(updateJobApplyDto.salary !== undefined
+            ? { salary: updateJobApplyDto.salary }
+            : {}),
+          ...(updateJobApplyDto.imageUrl
+            ? { imageUrl: updateJobApplyDto.imageUrl }
+            : {}),
+          ...(updateJobApplyDto.status
+            ? { status: updateJobApplyDto.status }
+            : {}),
+          ...(updateJobApplyDto.contractType
+            ? { contractType: updateJobApplyDto.contractType }
+            : {}),
+          ...(updateJobApplyDto.interviewDate
+            ? { interviewDate: updateJobApplyDto.interviewDate }
+            : {}),
+        },
+      });
+
+      return {
+        id: updatedJobApply.id,
+        title: updatedJobApply.title,
+        company: updatedJobApply.company,
+        location: updatedJobApply.location,
+        salary: updatedJobApply.salary,
+        imageUrl: updatedJobApply.imageUrl,
+        status: updatedJobApply.status as ApplicationStatus,
+        contractType: updatedJobApply.contractType,
+        interviewDate: updatedJobApply.interviewDate,
+        createdAt: updatedJobApply.archivedAt,
+      };
+    } catch (error) {
+      if (
+        error instanceof NotFoundException ||
+        error instanceof ForbiddenException
+      ) {
         throw error;
       }
       throw new Error(`Error updating job application: ${error.message}`);
@@ -329,22 +452,24 @@ export class JobApplyService {
       where: { id: jobApplyId },
     });
 
-    if (job.UserId !== userId) {
-      throw new ForbiddenException("You can't archive someone else's application.");
+    if (job.userId !== userId) {
+      throw new ForbiddenException(
+        "You can't archive someone else's application.",
+      );
     }
 
     await this.prisma.archivedJobApply.create({
       data: {
         originalId: job.id,
-        title: job.Title,
-        company: job.Company,
-        location: job.Location,
-        salary: job.Salary,
+        title: job.title,
+        company: job.company,
+        location: job.location,
+        salary: job.salary,
         status: job.status,
         imageUrl: job.imageUrl,
         contractType: job.contractType,
         interviewDate: job.interviewDate,
-        userId: job.UserId,
+        userId: job.userId,
       },
     });
 
@@ -355,26 +480,28 @@ export class JobApplyService {
   }
 
   async unarchiveJobApplication(archivedJobId: string, userId: string) {
-    const archivedJob = await this.prisma.archivedJobApply.findUniqueOrThrow({
+    const archivedJob = await this.prisma.archivedJobApply.findUnique({
       where: { id: archivedJobId },
     });
 
     if (archivedJob.userId !== userId) {
-      throw new ForbiddenException("You can't unarchive someone else's application.");
+      throw new ForbiddenException(
+        "You can't unarchive someone else's application.",
+      );
     }
 
     await this.prisma.jobApply.create({
       data: {
         id: archivedJob.originalId,
-        Title: archivedJob.title,
-        Company: archivedJob.company,
-        Location: archivedJob.location,
-        Salary: archivedJob.salary,
+        title: archivedJob.title,
+        company: archivedJob.company,
+        location: archivedJob.location,
+        salary: archivedJob.salary,
         status: archivedJob.status,
         imageUrl: archivedJob.imageUrl,
         contractType: archivedJob.contractType,
         interviewDate: archivedJob.interviewDate,
-        UserId: archivedJob.userId,
+        userId: archivedJob.userId,
       },
     });
 
@@ -398,6 +525,7 @@ export class JobApplyService {
 
       return archivedJobApplies.map((archived) => ({
         id: archived.id,
+        originalId: archived.originalId,
         title: archived.title,
         company: archived.company,
         location: archived.location,

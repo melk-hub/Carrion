@@ -24,7 +24,6 @@ import {
   UpdateJobApplyDto,
 } from './dto/jobApply.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt/jwt-auth.guard';
-import { ApplicationStatus } from './enum/application-status.enum';
 
 @ApiTags('jobApply')
 @ApiBearerAuth()
@@ -73,6 +72,17 @@ export class JobApplyController {
     return this.jobApplyService.deleteJobApply(jobApplyId, req.user.id);
   }
 
+  @Delete(':id/archived')
+  @ApiOperation({ summary: 'Delete a job application' })
+  @ApiResponse({
+    status: 200,
+    description: 'Job application deleted successfully',
+  })
+  @ApiResponse({ status: 404, description: 'Job application not found' })
+  async deleteArchivedJob(@Param('id') jobApplyId: string, @Request() req) {
+    return this.jobApplyService.deleteArchivedJobApply(jobApplyId, req.user.id);
+  }
+
   @Put(':id/status')
   @ApiOperation({ summary: 'Update job application (PUT method)' })
   @ApiResponse({
@@ -111,11 +121,35 @@ export class JobApplyController {
     );
   }
 
+  @Put(':id/archived-status')
+  @ApiOperation({ summary: 'Update job application status' })
+  @ApiResponse({
+    status: 200,
+    description: 'Job application status updated successfully',
+  })
+  @ApiResponse({ status: 404, description: 'Job application not found' })
+  async updateArchivedJobStatus(
+    @Param('id') archivedJobApplyId: string,
+    @Body() updateJobApplyDto: UpdateJobApplyDto,
+    @Request() req,
+  ) {
+    return this.jobApplyService.updateArchivedJobApplyByData(
+      archivedJobApplyId,
+      req.user.id,
+      updateJobApplyDto,
+    );
+  }
 
   @Post(':id/archive')
   @ApiOperation({ summary: 'Archive a job application' })
-  @ApiResponse({ status: 200, description: 'Successfully archived the job application' })
-  @ApiResponse({ status: 400, description: "Can't archive job application error" })
+  @ApiResponse({
+    status: 200,
+    description: 'Successfully archived the job application',
+  })
+  @ApiResponse({
+    status: 400,
+    description: "Can't archive job application error",
+  })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiResponse({ status: 403, description: 'Forbidden' })
   async archiveJobApplication(@Param('id') jobApplyId: string, @Request() req) {
@@ -125,18 +159,30 @@ export class JobApplyController {
 
   @Post(':id/unarchive')
   @ApiOperation({ summary: 'Unarchive a job application' })
-  @ApiResponse({ status: 200, description: 'Successfully unarchived the job application' })
-  @ApiResponse({ status: 400, description: "Can't unarchive job application error" })
+  @ApiResponse({
+    status: 200,
+    description: 'Successfully unarchived the job application',
+  })
+  @ApiResponse({
+    status: 400,
+    description: "Can't unarchive job application error",
+  })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiResponse({ status: 403, description: 'Forbidden' })
-  async unarchiveJobApplication(@Param('id') archivedJobId: string, @Request() req) {
+  async unarchiveJobApplication(
+    @Param('id') archivedJobId: string,
+    @Request() req,
+  ) {
     const userId = req.user.id;
     return this.jobApplyService.unarchiveJobApplication(archivedJobId, userId);
   }
 
   @Get('get_archivedJobApply')
   @ApiOperation({ summary: 'Get archivedJobApply information' })
-  @ApiResponse({ status: 200, description: 'Successfully get archivedJobApply' })
+  @ApiResponse({
+    status: 200,
+    description: 'Successfully get archivedJobApply',
+  })
   @ApiResponse({ status: 400, description: "Can't get archivedJobApply error" })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiResponse({ status: 403, description: 'Forbidden' })
