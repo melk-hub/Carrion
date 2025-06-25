@@ -12,37 +12,20 @@ datasource db {
 // The User model should only contain core authentication and identity info.
 // First name and last name have been REMOVED from this model.
 model User {
-  id                 String       @id @default(uuid()) @db.Uuid
-  username           String       @unique
-  email              String       @unique
-  password           String
-  hasProfile         Boolean      @default(false)
-  createdAt          DateTime     @default(now())
-  role               Role         @default(VISITOR)
-  jobApplies         jobApply[]   @relation("UserJobApplies")
-  userProfile        UserProfile? @relation("UserProfile")
-  Settings           Settings?    @relation("UserSettings")
-  hashedRefreshToken String?      @unique
-  tokens             Token[]      @relation("UserTokens")
-}
-
-model UserProfile {
-  userId              String    @id @db.Uuid
-  firstName           String?
-  lastName            String?
-  birthDate           DateTime? @db.Date
-  school              String?
-  city                String?
-  phoneNumber         String?
-  personalDescription String?
-  portfolioLink       String?
-  linkedin            String?
-  goal                String?
-  contractSought      String[]
-  locationSought      String[]
-  sector              String[]
-  resume              String?
-  user                User      @relation("UserProfile", fields: [userId], references: [id], onDelete: Cascade)
+  id                 String         @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  username           String         @unique
+  firstName          String
+  lastName           String?
+  email              String         @unique
+  password           String?
+  birthDate          DateTime?
+  createdAt          DateTime       @default(now())
+  role               Role           @default(VISITOR)
+  hashedRefreshToken String?        @unique
+  Settings           Settings?      @relation("UserSettings")
+  tokens             Token[]        @relation("UserTokens")
+  jobApplies         jobApply[]     @relation("UserJobApplies")
+  notifications      Notification[] @relation("UserNotifications")
 }
 
 model Token {
@@ -57,15 +40,16 @@ model Token {
   user              User     @relation("UserTokens", fields: [userId], references: [id], onDelete: Cascade)
 }
 
-model notification {
+model Notification {
   id            String     @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
   userId        String     @db.Uuid
-  type          Type       @default(DEFAULT)
-  company       String?
+  type          NotifcationType
+  company       String
   title         String
   message       String
   createdAt     DateTime   @default(now())
-  read          Bool       @default(false)
+  read          Boolean    @default(false)
+  user          User       @relation("UserNotifications", fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model jobApply {
@@ -113,10 +97,10 @@ enum Role {
   VISITOR
 }
 
-enum Type {
-  SUCCESS
-  ERROR
-  WARNING
-  INFO
-  DEFAULT
-}
+  enum NotifcationType {
+    SUCCESS
+    ERROR
+    WARNING
+    INFO
+    DEFAULT
+  }
