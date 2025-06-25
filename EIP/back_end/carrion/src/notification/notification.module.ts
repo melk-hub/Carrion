@@ -1,19 +1,13 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { NotificationsService } from './notification.service';
+import { NotificationsController } from './notification.controller';
+import { PrismaModule } from 'src/prisma/prisma.module';
 
 @Module({
-  imports: [
-    TypeOrmModule.forRoot({
-      type: 'postgres', // ou mysql, sqlite, etc.
-      host: 'localhost',
-      port: 5432,
-      username: 'user',
-      password: 'passord',
-      database: 'nom_db',
-      entities: [__dirname + '/**/*.entity{.ts,.js}'],
-      synchronize: true, // ❗ à désactiver en prod
-    }),
-  ],
+  imports: [PrismaModule],
+  controllers: [NotificationsController],
+  providers: [NotificationsService],
 })
 export class NotificaionModule {}
 
