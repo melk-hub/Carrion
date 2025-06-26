@@ -539,8 +539,8 @@ export class AuthService {
           await this.createOutlookWebhook(accessToken, userId, retryCount + 1);
         }, delay);
 
-        return;
-      }
+      return;
+    }
 
       // Enhanced error logging
       let errorDetails: any = {

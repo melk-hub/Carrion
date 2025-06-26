@@ -837,8 +837,8 @@ Extraire des informations d'un email de candidature au format JSON :
         parsedData.interviewDate &&
         parsedData.interviewDate !== 'null' &&
         parsedData.interviewDate.trim() !== ''
-          ? new Date(parsedData.interviewDate)
-          : undefined,
+        ? new Date(parsedData.interviewDate)
+        : undefined,
     };
 
     this.logger.log(

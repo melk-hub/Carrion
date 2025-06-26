@@ -19,6 +19,7 @@ import { useLanguage } from "./contexts/LanguageContext";
 import Navbar from "./pages/Navbar";
 import Profile from "./pages/Profile";
 import { Toaster } from "react-hot-toast";
+import Settings from "./pages/Settings";
 
 function App() {
   return (
@@ -158,6 +159,16 @@ function AppLayout() {
             element={
               isAuthenticated ? (
                 <Statistics sidebarCollapsed={sidebarCollapsed}/>
+              ) : (
+                <Navigate to="/" replace state={{ from: location }} />
+              )
+            }
+          />
+          <Route
+            path="/settings"
+            element={
+              isAuthenticated ? (
+                <Settings />
               ) : (
                 <Navigate to="/" replace state={{ from: location }} />
               )

@@ -199,8 +199,8 @@ function Archives() {
             <p className="banner-text">{t("archives.banner.description")}</p>
           </div>
           <div className="search-container">
-            <input
-              type="text"
+          <input
+            type="text"
               className="search-input"
               placeholder={t("archives.search.placeholder")}
               value={searchTerm}
@@ -238,7 +238,7 @@ function Archives() {
                 <option value="date">{t("archives.date")}</option>
                 <option value="status">{t("archives.status")}</option>
               </select>
-            </div>
+      </div>
 
             <div className="view-toggle">
               <button
@@ -259,7 +259,7 @@ function Archives() {
               </button>
             </div>
           </div>
-        </div>
+      </div>
 
         {viewMode === "grid" ? (
           <div className="applications-grid">
@@ -281,8 +281,8 @@ function Archives() {
                 <h3 className="empty-title">{t("archives.empty.title")}</h3>
                 <p className="empty-text">{t("archives.empty.text")}</p>
               </div>
-            )}
-          </div>
+          )}
+        </div>
         ) : (
           <div className="applications-list">
             {sortedAndFilteredApplications.length > 0 ? (
@@ -304,9 +304,9 @@ function Archives() {
                 <p className="empty-text">{t("archives.empty.text")}</p>
               </div>
             )}
-          </div>
-        )}
-      </div>
+            </div>
+          )}
+        </div>
 
       {popupType === "edit" && selectedApplication && (
         <EditApplicationModal
