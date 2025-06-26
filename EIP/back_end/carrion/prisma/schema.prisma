@@ -52,7 +52,7 @@ model Token {
   accessToken       String
   refreshToken      String
   tokenTimeValidity DateTime
-  externalId        String?  
+  externalId        String?
   createdAt         DateTime @default(now())
   userId            String   @db.Uuid
   user              User     @relation("UserTokens", fields: [userId], references: [id], onDelete: Cascade)
@@ -115,12 +115,12 @@ model Settings {
 
 model CarrionAchievement {
   id          String              @id @default(uuid()) @db.Uuid
-  title       String              
-  description String              
-  category    AchievementCategory 
-  type        AchievementType     
-  threshold   Int?                
-  condition   String?             
+  title       String
+  description String
+  category    AchievementCategory
+  type        AchievementType
+  threshold   Int?
+  condition   String?
   points      Int                 @default(10)
   isActive    Boolean             @default(true)
   createdAt   DateTime            @default(now())
@@ -179,17 +179,11 @@ enum AchievementType {
   TIME_BASED
   SPECIAL
 }
-enum Type {
-  SUCCESS
-  ERROR
+
+enum NotificationType {
+  POSITIVE
+  NEGATIVE
   WARNING
   INFO
   DEFAULT
 }
-  enum NotifcationType {
-    SUCCESS
-    ERROR
-    WARNING
-    INFO
-    DEFAULT
-  }

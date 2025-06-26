@@ -10,6 +10,7 @@ import {
   UpdateJobApplyDto,
 } from './dto/jobApply.dto';
 import { ApplicationStatus } from './enum/application-status.enum';
+import { NotificationService } from 'src/notification/notification.service';
 
 export interface JobApplyParams {
   title: string;
@@ -31,7 +32,10 @@ export interface UpdateJobApply {
 
 @Injectable()
 export class JobApplyService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly notificationService: NotificationService,
+  ) {}
 
   async getAllJobApplies(userId: string): Promise<JobApplyDto[]> {
     try {
@@ -145,6 +149,14 @@ export class JobApplyService {
         },
       });
 
+      await this.notificationService.createNotification({
+        userId: userId,
+        company: createJobApplyDto.company,
+        title: `Création de votre candidature`,
+        type: 'POSITIVE',
+        message: `Votre candidature chez ${createJobApplyDto.company} en tant que ${createJobApplyDto.title} a été enregistrée!`
+      });
+
       return {
         id: jobApply.id,
         title: jobApply.title,
@@ -181,6 +193,15 @@ export class JobApplyService {
           "You don't have permission to delete this job application.",
         );
       }
+
+      await this.notificationService.createNotification({
+        userId: userId,
+        company: jobApply.company,
+        title: `Suppression de votre candidature`,
+        type: 'NEGATIVE',
+        message: `Votre candidature chez ${jobApply.company} en tant que ${jobApply.title} a été supprimé!`
+      });
+
       await this.prisma.jobApply.delete({
         where: { id: jobApplyId },
       });
@@ -209,6 +230,15 @@ export class JobApplyService {
           "You don't have permission to delete this job application.",
         );
       }
+
+      await this.notificationService.createNotification({
+        userId: userId,
+        company: jobApply.company,
+        title: `Suppression de votre candidature archivée`,
+        type: 'NEGATIVE',
+        message: `Votre archive chez ${jobApply.company} en tant que ${jobApply.title} a été supprimée!`
+      });
+
       await this.prisma.archivedJobApply.delete({
         where: { id: jobApplyId },
       });
@@ -233,11 +263,13 @@ export class JobApplyService {
           `Job application with ID ${jobApplyId} not found.`,
         );
       }
+
       if (jobApply.userId !== userId) {
         throw new ForbiddenException(
           "You don't have permission to update this job application.",
         );
       }
+
       const updatedJobApply = await this.prisma.jobApply.update({
         where: { id: jobApplyId },
         data: { ...UpdateJobApplyDto },
@@ -267,6 +299,22 @@ export class JobApplyService {
     updateJobApply: UpdateJobApply,
   ): Promise<string> {
     try {
+      const jobApply = await this.prisma.jobApply.findUnique({
+        where: { id: jobApplyId },
+      });
+
+      if (!jobApply) {
+        throw new NotFoundException(
+          `Job application with ID ${jobApplyId} not found.`,
+        );
+      }
+
+      if (jobApply.userId !== userId) {
+        throw new ForbiddenException(
+          "You don't have permission to update this job application.",
+        );
+      }
+
       const validInterviewDate =
         updateJobApply.interviewDate &&
         updateJobApply.interviewDate instanceof Date &&
@@ -285,6 +333,15 @@ export class JobApplyService {
           ...(validInterviewDate ? { interviewDate: validInterviewDate } : {}),
         },
       });
+
+      await this.notificationService.createNotification({
+        userId: userId,
+        company: jobApply.company,
+        title: `Modification de votre candidature`,
+        type: 'INFO',
+        message: `Votre candidature chez ${jobApply.company} en tant que ${jobApply.title} a été modifiée!`
+      });
+
       return `Job offer: ${jobApplyId} for user: ${userId} updated successfully`;
     } catch (error) {
       throw new Error(
@@ -347,6 +404,14 @@ export class JobApplyService {
             ? { interviewDate: updateJobApplyDto.interviewDate }
             : {}),
         },
+      });
+
+      await this.notificationService.createNotification({
+        userId: userId,
+        company: jobApply.company,
+        title: `Modification de votre candidature`,
+        type: 'INFO',
+        message: `Votre candidature chez ${jobApply.company} en tant que ${jobApply.title} a été modifiée!`
       });
 
       return {
@@ -424,6 +489,14 @@ export class JobApplyService {
         },
       });
 
+      await this.notificationService.createNotification({
+        userId: userId,
+        company: jobApply.company,
+        title: `Modification de votre candidature archivée`,
+        type: 'INFO',
+        message: `Votre archive chez ${jobApply.company} en tant que ${jobApply.title} a été modifiée!`
+      });
+
       return {
         id: updatedJobApply.id,
         title: updatedJobApply.title,
@@ -473,9 +546,18 @@ export class JobApplyService {
       },
     });
 
+    await this.notificationService.createNotification({
+      userId: userId,
+      company: job.company,
+      title: `Archivage de votre candidature`,
+      type: 'POSITIVE',
+      message: `Votre candidature chez ${job.company} en tant que ${job.title} a été archivée avec succès!`
+    });
+
     await this.prisma.jobApply.delete({
       where: { id: job.id },
     });
+
     return { message: 'Job application archived successfully.' };
   }
 
@@ -503,6 +585,14 @@ export class JobApplyService {
         interviewDate: archivedJob.interviewDate,
         userId: archivedJob.userId,
       },
+    });
+
+    await this.notificationService.createNotification({
+      userId: userId,
+      company: archivedJob.company,
+      title: `Désarchivage de votre candidature`,
+      type: 'POSITIVE',
+      message: `Votre archive chez ${archivedJob.company} en tant que ${archivedJob.title} a été désarchivée avec succès!`
     });
 
     await this.prisma.archivedJobApply.delete({
