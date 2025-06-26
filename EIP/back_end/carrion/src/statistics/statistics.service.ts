@@ -25,26 +25,26 @@ export class StatisticsService {
       interviewCount,
       lastApplication,
     ] = await Promise.all([
-      this.prisma.jobApply.count({ where: { UserId: userId } }),
+      this.prisma.jobApply.count({ where: { userId: userId } }),
       this.prisma.jobApply.count({
-        where: { UserId: userId, createdAt: { gte: startOfDay(now) } },
+        where: { userId: userId, createdAt: { gte: startOfDay(now) } },
       }),
       this.prisma.jobApply.count({
-        where: { UserId: userId, createdAt: { gte: sevenDaysAgo } },
+        where: { userId: userId, createdAt: { gte: sevenDaysAgo } },
       }),
       this.prisma.jobApply.count({
-        where: { UserId: userId, createdAt: { gte: thirtyDaysAgo } },
+        where: { userId: userId, createdAt: { gte: thirtyDaysAgo } },
       }),
       this.getApplicationsGroupedByDate(userId),
       this.getGroupedCount(userId, 'status'),
       this.getGroupedCount(userId, 'contractType'),
-      this.getGroupedCount(userId, 'Company'),
-      this.getGroupedCount(userId, 'Location'),
+      this.getGroupedCount(userId, 'company'),
+      this.getGroupedCount(userId, 'location'),
       this.prisma.jobApply.count({
-        where: { UserId: userId, interviewDate: { not: null } },
+        where: { userId: userId, interviewDate: { not: null } },
       }),
       this.prisma.jobApply.findFirst({
-        where: { UserId: userId },
+        where: { userId: userId },
         orderBy: { createdAt: 'desc' },
         select: { createdAt: true },
       }),
@@ -86,11 +86,11 @@ export class StatisticsService {
 
   private async getGroupedCount(
     userId: string,
-    field: 'status' | 'contractType' | 'Company' | 'Location',
+    field: 'status' | 'contractType' | 'company' | 'location',
   ) {
     const raw = await this.prisma.jobApply.groupBy({
       by: [field],
-      where: { UserId: userId },
+      where: { userId: userId },
       _count: { _all: true },
     });
 
@@ -105,7 +105,7 @@ export class StatisticsService {
     const results = await this.prisma.jobApply.groupBy({
       by: ['createdAt'],
       where: {
-        UserId: userId,
+        userId: userId,
         createdAt: { gte: from },
       },
       _count: { _all: true },
@@ -144,16 +144,16 @@ export class StatisticsService {
   async getApplicationLocations(userId: string) {
     const jobApplications = await this.prisma.jobApply.findMany({
       where: {
-        UserId: userId,
-        Location: {
+        userId: userId,
+        location: {
           not: null,
         },
       },
       select: {
         id: true,
-        Location: true,
-        Company: true,
-        Title: true,
+        location: true,
+        company: true,
+        title: true,
         status: true,
         createdAt: true,
       },
@@ -172,7 +172,7 @@ export class StatisticsService {
     const locationMap = new Map();
 
     applications.forEach((app) => {
-      const location = app.Location;
+      const location = app.location;
       if (!locationMap.has(location)) {
         locationMap.set(location, {
           location,
@@ -187,8 +187,8 @@ export class StatisticsService {
       locationData.count++;
       locationData.applications.push({
         id: app.id,
-        company: app.Company,
-        jobTitle: app.Title,
+        company: app.company,
+        jobTitle: app.title,
         status: app.status,
         date: app.createdAt,
       });

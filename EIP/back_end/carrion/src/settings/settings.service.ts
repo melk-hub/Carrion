@@ -1,7 +1,4 @@
-import {
-  Injectable,
-  BadRequestException,
-} from '@nestjs/common';
+import { Injectable, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
@@ -10,7 +7,7 @@ export class SettingsService {
 
   async getWeeklyGoal(userId: string) {
     const settings = await this.prisma.settings.findUnique({
-      where: { UserId: userId },
+      where: { userId: userId },
       select: { weeklyGoal: true },
     });
 
@@ -18,7 +15,7 @@ export class SettingsService {
       // Créer les paramètres par défaut si ils n'existent pas
       const newSettings = await this.prisma.settings.create({
         data: {
-          UserId: userId,
+          userId: userId,
           weeklyGoal: 10,
           monthlyGoal: 30,
           document: [],
@@ -33,7 +30,7 @@ export class SettingsService {
 
   async getGoalSettings(userId: string) {
     const settings = await this.prisma.settings.findUnique({
-      where: { UserId: userId },
+      where: { userId: userId },
       select: { weeklyGoal: true, monthlyGoal: true },
     });
 
@@ -41,7 +38,7 @@ export class SettingsService {
       // Créer les paramètres par défaut si ils n'existent pas
       const newSettings = await this.prisma.settings.create({
         data: {
-          UserId: userId,
+          userId: userId,
           weeklyGoal: 10,
           monthlyGoal: 30,
           document: [],
@@ -62,14 +59,14 @@ export class SettingsService {
     try {
       // Vérifier si les paramètres existent
       const existingSettings = await this.prisma.settings.findUnique({
-        where: { UserId: userId },
+        where: { userId: userId },
       });
 
       if (!existingSettings) {
         // Créer les paramètres si ils n'existent pas
         return await this.prisma.settings.create({
           data: {
-            UserId: userId,
+            userId: userId,
             weeklyGoal,
             monthlyGoal: 30,
             document: [],
@@ -80,7 +77,7 @@ export class SettingsService {
 
       // Mettre à jour l'objectif existant
       return await this.prisma.settings.update({
-        where: { UserId: userId },
+        where: { userId: userId },
         data: { weeklyGoal },
         select: { weeklyGoal: true },
       });
@@ -107,7 +104,7 @@ export class SettingsService {
     try {
       // Vérifier si les paramètres existent
       const existingSettings = await this.prisma.settings.findUnique({
-        where: { UserId: userId },
+        where: { userId: userId },
       });
 
       const updateData: any = {};
@@ -118,7 +115,7 @@ export class SettingsService {
         // Créer les paramètres si ils n'existent pas
         return await this.prisma.settings.create({
           data: {
-            UserId: userId,
+            userId: userId,
             weeklyGoal: weeklyGoal || 10,
             monthlyGoal: monthlyGoal || 30,
             document: [],
@@ -129,7 +126,7 @@ export class SettingsService {
 
       // Mettre à jour les objectifs existants
       return await this.prisma.settings.update({
-        where: { UserId: userId },
+        where: { userId: userId },
         data: updateData,
         select: { weeklyGoal: true, monthlyGoal: true },
       });
@@ -142,14 +139,14 @@ export class SettingsService {
 
   async getUserSettings(userId: string) {
     const settings = await this.prisma.settings.findUnique({
-      where: { UserId: userId },
+      where: { userId: userId },
     });
 
     if (!settings) {
       // Créer les paramètres par défaut si ils n'existent pas
       return await this.prisma.settings.create({
         data: {
-          UserId: userId,
+          userId: userId,
           weeklyGoal: 10,
           monthlyGoal: 30,
           document: [],
@@ -163,7 +160,7 @@ export class SettingsService {
   async createOrUpdateSettings(userId: string, data: any) {
     try {
       const existingSettings = await this.prisma.settings.findUnique({
-        where: { UserId: userId },
+        where: { userId: userId },
       });
 
       if (!existingSettings) {
@@ -176,7 +173,7 @@ export class SettingsService {
       }
 
       return await this.prisma.settings.update({
-        where: { UserId: userId },
+        where: { userId: userId },
         data,
       });
     } catch (error) {
@@ -185,4 +182,4 @@ export class SettingsService {
       );
     }
   }
-} 
+}
