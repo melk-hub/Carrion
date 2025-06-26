@@ -1,31 +1,70 @@
 import React, { useEffect, useState } from "react";
-import { useLanguage } from "../contexts/LanguageContext";
 import apiService from "../services/api.js";
-import ReactECharts from "echarts-for-react";
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  ArcElement,
+  Title,
+  Tooltip,
+  Legend,
+  Filler,
+} from 'chart.js';
+import { Line, Doughnut } from 'react-chartjs-2';
+import { format, subDays, isToday, isThisWeek, isThisMonth, endOfWeek, endOfMonth } from 'date-fns';
+import { fr } from 'date-fns/locale';
 import "../styles/Statistics.css";
 
-function generateEmptyDays() {
-  const days = [];
-  const now = new Date();
-
-  for (let i = 29; i >= 0; i--) {
-    const d = new Date(now);
-    d.setDate(now.getDate() - i);
-    const date = d.toISOString().slice(0, 10);
-    days.push(date);
-  }
-
-  return days;
-}
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  ArcElement,
+  Title,
+  Tooltip,
+  Legend,
+  Filler
+);
 
 function Statistics() {
-  const { t } = useLanguage();
   const [stats, setStats] = useState(null);
-  const [visibleIndex, setVisibleIndex] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [timeRange, setTimeRange] = useState('7days');
+  const [activeGoalType, setActiveGoalType] = useState('weekly');
+  const [goalSettings, setGoalSettings] = useState({
+    weeklyGoal: 5,
+    monthlyGoal: 20
+  });
+  
+  // États pour le carousel des statuts
+  const [currentStatusIndex, setCurrentStatusIndex] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
+  const [startX, setStartX] = useState(0);
+  const [currentX, setCurrentX] = useState(0);
 
   useEffect(() => {
+    fetchStats();
+    fetchGoalSettings();
+  }, []);
+
+  // Auto-scroll pour le carousel des statuts
+  // Supprimé - pas d'autoplay
+
+  useEffect(() => {
+    if (stats?.statusDistribution) {
+      const statusCount = Object.keys(stats.statusDistribution).length;
+      if (currentStatusIndex >= statusCount) {
+        setCurrentStatusIndex(0);
+      }
+    }
+  }, [stats?.statusDistribution, currentStatusIndex]);
+
     const fetchStats = async () => {
       try {
+      setLoading(true);
         const response = await apiService.get("/statistics", {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -38,257 +77,717 @@ function Statistics() {
 
         const data = await response.json();
         setStats(data);
-
-        const thresholds = Object.keys(data.milestones || {})
-          .map(Number)
-          .sort((a, b) => a - b);
-
-        const firstUnachievedIndex = thresholds.findIndex(
-          (t) => !data.milestones[String(t)]
-        );
-
-        setVisibleIndex(
-          firstUnachievedIndex !== -1
-            ? firstUnachievedIndex
-            : thresholds.length - 1
-        );
       } catch (error) {
         console.error("Erreur lors du chargement des statistiques :", error);
-      }
-    };
-
-    fetchStats();
-  }, []);
-
-  if (
-    !stats ||
-    typeof stats.milestones !== "object" ||
-    typeof stats.totalApplications !== "number" ||
-    visibleIndex === null
-  ) {
-    return <div className="loading">{t("statistics.loading")}</div>;
-  }
-
-  let fullDailyData = generateEmptyDays().map((date) => ({
-    date,
-    count: stats.applicationsPerDay?.[date] || 0,
-  }));
-
-  const firstNonZeroIndex = fullDailyData.findIndex((entry) => entry.count > 0);
-
-  const startIndex = Math.max(firstNonZeroIndex - 1, 0);
-
-  const dailyData = firstNonZeroIndex !== -1 ? fullDailyData.slice(startIndex) : fullDailyData;
-
-  const chartOptions = {
-    tooltip: {
-      trigger: "axis",
-      backgroundColor: "#fff",
-      borderColor: "#ccc",
-      borderWidth: 1,
-      textStyle: {
-        color: "#333",
-      },
-    },
-    grid: {
-      left: "3%",
-      right: "4%",
-      bottom: "15%",
-      top: "10%",
-      containLabel: true,
-    },
-    xAxis: {
-      type: "category",
-      data: dailyData.map((item) =>
-        new Date(item.date).toLocaleDateString("fr-FR", {
-          day: "2-digit",
-          month: "2-digit",
-        })
-      ),
-      axisLabel: {
-        fontSize: 10,
-        rotate: 45,
-      },
-      axisLine: {
-        lineStyle: {
-          color: "#999",
-        },
-      },
-    },
-    yAxis: {
-      type: "value",
-      minInterval: 1,
-      axisLabel: {
-        fontSize: 10,
-      },
-      splitLine: {
-        lineStyle: {
-          type: "dashed",
-          color: "#eee",
-        },
-      },
-    },
-    series: [
-      {
-        name: t("statistics.applications"),
-        data: dailyData.map((item) => item.count),
-        type: "line",
-        smooth: true,
-        showSymbol: true,
-        symbol: "circle",
-        symbolSize: 6,
-        lineStyle: {
-          color: "#ff7f50",
-          width: 3,
-        },
-        areaStyle: {
-          color: "rgba(255, 127, 80, 0.15)",
-        },
-        emphasis: {
-          focus: "series",
-        },
-      },
-    ],
+    } finally {
+      setLoading(false);
+    }
   };
 
+  const fetchGoalSettings = async () => {
+    try {
+      const response = await apiService.get("/settings/goal", {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        setGoalSettings({
+          weeklyGoal: data.weeklyGoal || 5,
+          monthlyGoal: data.monthlyGoal || 20
+        });
+      }
+    } catch (error) {
+      console.error("Erreur lors du chargement des paramètres d'objectif :", error);
+    }
+  };
+
+  // Préparer les données statistiques
+  const prepareStatsData = () => {
+    if (!stats || !stats.applicationsPerDay) return null;
+
+    const now = new Date();
+    let days = [];
+    let daysCount = 30;
+
+    switch (timeRange) {
+      case '7days':
+        daysCount = 7;
+        break;
+      case '30days':
+        daysCount = 30;
+        break;
+      case '3months':
+        daysCount = 90;
+        break;
+      case '6months':
+        daysCount = 180;
+        break;
+      default:
+        daysCount = 30;
+    }
+
+    // Générer les jours
+    for (let i = daysCount - 1; i >= 0; i--) {
+      const date = subDays(now, i);
+      const dateStr = format(date, 'yyyy-MM-dd');
+      days.push({
+        date: dateStr,
+        dateObj: date,
+        count: stats.applicationsPerDay[dateStr] || 0,
+      });
+    }
+
+    // Calculer les totaux
+    const totals = {
+      today: days.filter(d => isToday(d.dateObj)).reduce((sum, d) => sum + d.count, 0),
+      thisWeek: days.filter(d => isThisWeek(d.dateObj, { weekStartsOn: 1 })).reduce((sum, d) => sum + d.count, 0),
+      thisMonth: days.filter(d => isThisMonth(d.dateObj)).reduce((sum, d) => sum + d.count, 0),
+      total: days.reduce((sum, d) => sum + d.count, 0),
+      weekAverage: Math.round((days.filter(d => isThisWeek(d.dateObj, { weekStartsOn: 1 })).reduce((sum, d) => sum + d.count, 0)) / 7 * 10) / 10,
+      monthAverage: Math.round((days.filter(d => isThisMonth(d.dateObj)).reduce((sum, d) => sum + d.count, 0)) / 30 * 10) / 10,
+    };
+
+    return { days, totals };
+  };
+
+  const statsData = prepareStatsData();
+
+  const getLineChartConfig = () => {
+    if (!statsData) return null;
+
+    const labels = statsData.days.map(d => {
+      if (timeRange === '7days') {
+        return format(new Date(d.date), 'EEE', { locale: fr });
+      } else {
+        return format(new Date(d.date), 'dd/MM');
+      }
+    });
+
+    const data = {
+      labels,
+      datasets: [
+        {
+          label: 'Candidatures',
+          data: statsData.days.map(d => d.count),
+          borderColor: '#132238',
+          backgroundColor: 'rgba(19, 34, 56, 0.1)',
+          tension: 0.4,
+          fill: true,
+          pointBackgroundColor: '#fbb75f',
+          pointBorderColor: '#132238',
+          pointBorderWidth: 2,
+          pointRadius: 4,
+        },
+      ],
+    };
+
+    const options = {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          display: false,
+        },
+    tooltip: {
+          backgroundColor: '#132238',
+          titleColor: '#ffffff',
+          bodyColor: '#ffffff',
+          borderColor: '#fbb75f',
+      borderWidth: 1,
+        },
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          ticks: {
+            stepSize: 1,
+            color: '#64748b',
+    },
+    grid: {
+            color: '#e2e8f0',
+          },
+        },
+        x: {
+          ticks: {
+            color: '#64748b',
+          },
+          grid: {
+            display: false,
+          },
+        },
+      },
+    };
+
+    return { data, options };
+  };
+
+  const getStatusChartConfig = () => {
+    if (!stats || !stats.statusDistribution) return null;
+
+    const statusColors = {
+      APPLIED: '#fbb75f',
+      PENDING: '#f59e0b',
+      INTERVIEW_SCHEDULED: '#3b82f6',
+      OFFER_RECEIVED: '#10b981',
+      REJECTED_BY_COMPANY: '#ef4444',
+      OFFER_ACCEPTED: '#22c55e',
+    };
+
+    const labels = Object.keys(stats.statusDistribution);
+    const values = Object.values(stats.statusDistribution);
+    const total = values.reduce((sum, val) => sum + val, 0);
+    const backgroundColors = labels.map(status => statusColors[status] || '#94a3b8');
+
+    const data = {
+      labels: labels.map(status => {
+        const statusLabels = {
+          APPLIED: 'Postulé',
+          PENDING: 'En attente',
+          INTERVIEW_SCHEDULED: 'Entretien',
+          OFFER_RECEIVED: 'Offre reçue',
+          REJECTED_BY_COMPANY: 'Refusé',
+          OFFER_ACCEPTED: 'Accepté',
+        };
+        return statusLabels[status] || status;
+      }),
+      datasets: [{
+        data: values,
+        backgroundColor: backgroundColors,
+        borderColor: '#ffffff',
+        borderWidth: 2,
+      }],
+    };
+
+    const options = {
+      responsive: true,
+      maintainAspectRatio: false,
+      cutout: '77.5%',
+      plugins: {
+        legend: {
+          display: false,
+        },
+        tooltip: {
+          backgroundColor: '#132238',
+          titleColor: '#ffffff',
+          bodyColor: '#ffffff',
+          borderColor: '#fbb75f',
+          borderWidth: 1,
+          callbacks: {
+            label: function(context) {
+              const percentage = total > 0 ? Math.round((context.raw / total) * 100) : 0;
+              return `${context.label}: ${context.raw} (${percentage}%)`;
+            }
+          }
+        },
+      },
+    };
+
+    return { data, options, total, values, labels: data.labels };
+  };
+
+  const calculateGoalProgress = () => {
+    if (!stats || !statsData) return { current: 0, target: 10, percentage: 0, timeLeft: '', period: 'semaine' };
+
+    let current = 0;
+    let target = goalSettings.weeklyGoal;
+    let period = 'semaine';
+    let timeLeft = '';
+
+    if (activeGoalType === 'weekly') {
+      current = statsData.totals.thisWeek;
+      target = goalSettings.weeklyGoal;
+      period = 'semaine';
+      const now = new Date();
+      const endWeek = endOfWeek(now, { weekStartsOn: 1 });
+      const daysLeft = Math.ceil((endWeek - now) / (1000 * 60 * 60 * 24));
+      timeLeft = `${daysLeft} jour${daysLeft > 1 ? 's' : ''} restant${daysLeft > 1 ? 's' : ''}`;
+    } else {
+      current = statsData.totals.thisMonth;
+      target = goalSettings.monthlyGoal;
+      period = 'mois';
+      const now = new Date();
+      const endMonth = endOfMonth(now);
+      const daysLeft = Math.ceil((endMonth - now) / (1000 * 60 * 60 * 24));
+      timeLeft = `${daysLeft} jour${daysLeft > 1 ? 's' : ''} restant${daysLeft > 1 ? 's' : ''}`;
+    }
+
+    const percentage = Math.min((current / target) * 100, 100);
+    
+    return { current, target, percentage, timeLeft, period };
+  };
+
+  const goalProgress = calculateGoalProgress();
+
+  if (loading) {
+    return (
+      <div className="carrion-statistics">
+        <div className="statistics-loading">
+          <div className="loading-spinner"></div>
+          <h2>Chargement des statistiques...</h2>
+        </div>
+      </div>
+    );
+  }
+
+  const lineChartConfig = getLineChartConfig();
+  const statusChartInfo = getStatusChartConfig();
+
   return (
-    <div className="statistics">
-      <div className="container">
-        {/* KPI Cards */}
+    <div className="carrion-statistics">
+      {statsData && (
         <div className="kpi-grid">
-          <KpiCard title={t("statistics.streak")} value={stats.streak} />
-          <KpiCard title={t("statistics.today")} value={stats.applicationsToday} />
-          <KpiCard title={t("statistics.thisWeek")} value={stats.applicationsThisWeek} />
-          <KpiCard title={t("statistics.thisMonth")} value={stats.applicationsThisMonth} />
-          <KpiCard title={t("statistics.total")} value={stats.totalApplications} />
+          <div className="kpi-card">
+            <div className="kpi-value">{statsData.totals.today}</div>
+            <div className="kpi-label">Aujourd'hui</div>
+          </div>
+          <div className="kpi-card">
+            <div className="kpi-value">{statsData.totals.thisWeek}</div>
+            <div className="kpi-label">Cette semaine</div>
+          </div>
+          <div className="kpi-card">
+            <div className="kpi-value">{statsData.totals.thisMonth}</div>
+            <div className="kpi-label">Ce mois</div>
+          </div>
+          <div className="kpi-card">
+            <div className="kpi-value">{statsData.totals.total}</div>
+            <div className="kpi-label">Total</div>
+          </div>
+          <div className="kpi-card">
+            <div className="kpi-value">{statsData.totals.weekAverage}</div>
+            <div className="kpi-label">Moyenne/semaine</div>
+          </div>
+          <div className="kpi-card">
+            <div className="kpi-value">{stats.streak || 0}</div>
+            <div className="kpi-label">Série actuelle</div>
+          </div>
+        </div>
+      )}
+
+      {/* Charts Grid */}
+        <div className="charts-grid">
+        {/* Evolution Chart */}
+        <div className="chart-card">
+          <div className="chart-header">
+            <h3>Évolution des candidatures</h3>
+            <div className="time-range-selector">
+              <button 
+                className={timeRange === '7days' ? 'active' : ''}
+                onClick={() => setTimeRange('7days')}
+              >
+                7j
+              </button>
+              <button 
+                className={timeRange === '30days' ? 'active' : ''}
+                onClick={() => setTimeRange('30days')}
+              >
+                30j
+              </button>
+              <button 
+                className={timeRange === '3months' ? 'active' : ''}
+                onClick={() => setTimeRange('3months')}
+              >
+                3m
+              </button>
+              <button 
+                className={timeRange === '6months' ? 'active' : ''}
+                onClick={() => setTimeRange('6months')}
+              >
+                6m
+              </button>
+            </div>
+          </div>
+          <div className="chart-container">
+            {lineChartConfig ? (
+              <Line data={lineChartConfig.data} options={lineChartConfig.options} />
+            ) : (
+              <div className="empty-state">
+                <p>Aucune donnée disponible</p>
+                <small>Commencez à postuler pour voir vos statistiques !</small>
+              </div>
+            )}
+          </div>
         </div>
 
-        {/* Graphiques */}
-        <div className="charts-grid">
-          {/* Évolution quotidienne avec ECharts */}
-          <ChartCard title={t("statistics.evolution")}>
-            {dailyData.length > 0 ? (
-              <ReactECharts option={chartOptions} style={{ height: 250, width: "100%" }} />
-            ) : (
-              <p className="no-data">{t("statistics.noData")}</p>
-            )}
-          </ChartCard>
-
-          {/* Milestones globaux */}
-          <ChartCard title={t("statistics.success")}>
-            <div className="milestone-wrapper">
-              {Object.entries(stats.milestones || {})
-                .filter(([, achieved]) => achieved)
-                .sort(([a], [b]) => Number(a) - Number(b))
-                .map(([threshold]) => (
-                  <div key={threshold} className="milestone achieved">
-                    ✅ {threshold} {t("statistics.applications")}
+        {/* Status Distribution Chart */}
+        <div className="chart-card">
+          <div className="chart-header">
+            <h3>Répartition par statut</h3>
+          </div>
+          <div className="chart-container">
+            {statusChartInfo && statusChartInfo.data && statusChartInfo.data.datasets.length > 0 && statusChartInfo.total > 0 ? (
+              <div className="status-chart-wrapper">
+                <div className="doughnut-container">
+                  <Doughnut data={statusChartInfo.data} options={statusChartInfo.options} />
+                  <div className="chart-center-content">
+                    <div className="center-total">{statusChartInfo.total}</div>
+                    <div className="center-label">Total</div>
                   </div>
-                ))}
+                </div>
+                
+                {/* Status Distribution Carousel */}
+                <div className="status-legend-carousel">
 
               {(() => {
-                const total = stats.totalApplications || 0;
-                const sortedMilestones = Object.keys(stats.milestones || {})
-                  .map(Number)
-                  .sort((a, b) => a - b);
-                const nextMilestone = sortedMilestones.find((t) => total < t);
-                const justReached = sortedMilestones.some(
-                  (threshold) => total === threshold
-                );
+                    const statusEntries = Object.entries(stats.statusDistribution);
+                    const statusLabels = {
+                      APPLIED: 'Postulé',
+                      PENDING: 'En attente',
+                      INTERVIEW_SCHEDULED: 'Entretien',
+                      OFFER_RECEIVED: 'Offre reçue',
+                      REJECTED_BY_COMPANY: 'Refusé',
+                      OFFER_ACCEPTED: 'Accepté',
+                    };
+                    const statusColors = {
+                      APPLIED: '#fbb75f',
+                      PENDING: '#f59e0b',
+                      INTERVIEW_SCHEDULED: '#3b82f6',
+                      OFFER_RECEIVED: '#10b981',
+                      REJECTED_BY_COMPANY: '#ef4444',
+                      OFFER_ACCEPTED: '#22c55e',
+                    };
 
                 return (
                   <>
-                    {justReached && (
-                      <div className="milestone-message success">
-                        🎉 {t("statistics.congratulations")} <strong>{total}</strong> {t("statistics.applications")} !
+                        {/* Navigation buttons */}
+                        {statusEntries.length > 1 && (
+                          <>
+                            <button 
+                              className="carousel-nav-btn prev"
+                              onClick={() => {
+                                setCurrentStatusIndex(prev => 
+                                  prev === 0 ? statusEntries.length - 1 : prev - 1
+                                );
+                              }}
+                            >
+                              ‹
+                            </button>
+                            <button 
+                              className="carousel-nav-btn next"
+                              onClick={() => {
+                                setCurrentStatusIndex(prev => 
+                                  (prev + 1) % statusEntries.length
+                                );
+                              }}
+                            >
+                              ›
+                            </button>
+                          </>
+                        )}
+                        
+                        {/* Carousel container */}
+                        <div className="carousel-container">
+                          <div 
+                            className="carousel-track-single"
+                            style={{
+                              transform: `translateX(-${currentStatusIndex * 100}%)`,
+                              transition: isDragging ? 'none' : 'transform 0.3s ease-in-out'
+                            }}
+                            onMouseDown={(e) => {
+                              setIsDragging(true);
+                              setStartX(e.clientX);
+                              setCurrentX(e.clientX);
+                            }}
+                            onMouseMove={(e) => {
+                              if (!isDragging) return;
+                              e.preventDefault();
+                              setCurrentX(e.clientX);
+                            }}
+                            onMouseUp={() => {
+                              if (isDragging) {
+                                const diff = startX - currentX;
+                                const threshold = 50;
+                                
+                                if (Math.abs(diff) > threshold) {
+                                  if (diff > 0 && currentStatusIndex < statusEntries.length - 1) {
+                                    // Glisser vers la gauche - carte suivante
+                                    setCurrentStatusIndex(prev => prev + 1);
+                                  } else if (diff < 0 && currentStatusIndex > 0) {
+                                    // Glisser vers la droite - carte précédente
+                                    setCurrentStatusIndex(prev => prev - 1);
+                                  }
+                                }
+                                
+                                setIsDragging(false);
+                                setStartX(0);
+                                setCurrentX(0);
+                              }
+                            }}
+                            onMouseLeave={() => {
+                              if (isDragging) {
+                                setIsDragging(false);
+                                setStartX(0);
+                                setCurrentX(0);
+                              }
+                            }}
+                          >
+                            {/* Afficher une carte à la fois */}
+                            {statusEntries.map(([status, count], index) => {
+                              const label = statusLabels[status] || status;
+                              const color = statusColors[status] || '#94a3b8';
+                              const percentage = statusChartInfo.total > 0 ? Math.round((count / statusChartInfo.total) * 100) : 0;
+                              
+                              return (
+                                <div 
+                                  key={`status-${status}-${index}`} 
+                                  className="carousel-status-card-single"
+                                  style={{'--status-color': color}}
+                                >
+                                  <div className="status-name">{label}</div>
+                                  <div className="stats-row">
+                                    <div className="count-badge">{count}</div>
+                                    <div 
+                                      className="percentage-badge"
+                                      style={{ backgroundColor: color }}
+                                    >
+                                      {percentage}%
+                                    </div>
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
                       </div>
-                    )}
-
-                    {nextMilestone && (
-                      <div className="milestone-message">
-                        <strong>{nextMilestone - total}</strong> {t("statistics.nextStep")}
-                      </div>
-                    )}
-
-                    {!nextMilestone && sortedMilestones.length > 0 && (
-                      <div className="milestone-message">
-                        🏆 {t("statistics.finish")}
+                        
+                        {/* Indicateurs de carte */}
+                        {statusEntries.length > 1 && (
+                          <div className="carousel-indicators">
+                            {statusEntries.map((_, index) => (
+                              <div
+                                key={`indicator-${index}`}
+                                className={`carousel-dot ${index === currentStatusIndex ? 'active' : ''}`}
+                                onClick={() => {
+                                  setCurrentStatusIndex(index);
+                                }}
+                              />
+                            ))}
                       </div>
                     )}
                   </>
                 );
               })()}
             </div>
-          </ChartCard>
+              </div>
+            ) : (
+              <div className="status-chart-no-data">
+                <div className="no-data-icon">
+                  📊
+                </div>
+                <h3>Aucune candidature</h3>
+                <p>Commencez à postuler pour voir la répartition de vos candidatures par statut</p>
+              </div>
+            )}
+          </div>
+        </div>
 
-          {/* Objectif personnel */}
-          <ChartCard title={t("statistics.personalGoal")}>
-            <div className="progress-content">
-              <div className="progress-circle">
-                <svg viewBox="0 0 36 36" className="circular-chart">
-                  <path
-                    className="circle-bg"
-                    d="M18 2.0845
-                        a 15.9155 15.9155 0 0 1 0 31.831
-                        a 15.9155 15.9155 0 0 1 0 -31.831"
+        {/* Goal Progress */}
+        <div className="chart-card">
+          <div className="chart-header">
+            <h3>Objectif {activeGoalType === 'weekly' ? 'hebdomadaire' : 'mensuel'}</h3>
+            <div className="goal-type-selector">
+              <button 
+                className={activeGoalType === 'weekly' ? 'active' : ''}
+                onClick={() => setActiveGoalType('weekly')}
+              >
+                Semaine
+              </button>
+              <button 
+                className={activeGoalType === 'monthly' ? 'active' : ''}
+                onClick={() => setActiveGoalType('monthly')}
+              >
+                Mois
+              </button>
+            </div>
+          </div>
+          <div className="chart-container">
+            <div className="goal-progress-card-improved">
+              <div className="progress-circle-container">
+                <svg className="progress-circle" viewBox="0 0 100 100">
+                  <circle
+                    cx="50"
+                    cy="50"
+                    r="42"
+                    stroke="#f1f5f9"
+                    strokeWidth="6"
+                    fill="transparent"
                   />
-                  <path
-                    className="circle"
-                    strokeDasharray={`${Math.round((stats.personalGoal.current / stats.personalGoal.target) * 100)}, 100`}
-                    d="M18 2.0845
-                        a 15.9155 15.9155 0 0 1 0 31.831
-                        a 15.9155 15.9155 0 0 1 0 -31.831"
+                  <circle
+                    cx="50"
+                    cy="50"
+                    r="42"
+                    stroke="#132238"
+                    strokeWidth="6"
+                    fill="transparent"
+                    strokeDasharray={`${2 * Math.PI * 42}`}
+                    strokeDashoffset={`${2 * Math.PI * 42 * (1 - goalProgress.percentage / 100)}`}
+                    strokeLinecap="round"
+                    className="progress-stroke"
                   />
-                  <text x="18" y="20.35" className="percentage">
-                    {Math.round((stats.personalGoal.current / stats.personalGoal.target) * 100)}%
-                  </text>
                 </svg>
+                <div className="progress-percentage">
+                  {Math.round(goalProgress.percentage)}%
+                </div>
               </div>
 
-              <div className="progress-details">
-                <div className="progress-item">
-                  <span className="progress-label">{t("statistics.goal")}</span>
-                  <span className="progress-value">{stats.personalGoal.target} {t("statistics.applications")} </span>
+              <div className="goal-main-info">
+                <div className="goal-title">
+                  {goalProgress.current} / {goalProgress.target}
                 </div>
-                <div className="progress-item">
-                  <span className="progress-label">{t("statistics.accomplished")}</span>
-                  <span className="progress-value">{stats.personalGoal.current} {t("statistics.applications")}</span>
+                <div className="goal-subtitle">
+                  candidatures cette {activeGoalType === 'weekly' ? 'semaine' : 'mois'}
                 </div>
-                <div className="progress-item">
-                  <span className="progress-label">{t("statistics.remaining")}</span>
-                  <span className="progress-value">
-                    {Math.max(stats.personalGoal.target - stats.personalGoal.current, 0)} {t("statistics.applications")}
+                <div className="time-remaining">
+                  {goalProgress.timeLeft}
+                </div>
+              </div>
+
+              <div className="goal-stats-row">
+                <div className="goal-stat-item">
+                  <span className="stat-number">{goalProgress.current}</span>
+                  <span className="stat-label">Réalisé</span>
+                </div>
+                <div className="goal-stat-item">
+                  <span className="stat-number">{Math.max(goalProgress.target - goalProgress.current, 0)}</span>
+                  <span className="stat-label">Restant</span>
+                </div>
+                <div className="goal-stat-item">
+                  <span className="stat-number">{Math.round((goalProgress.current / Math.max(goalProgress.target, 1)) * 100)}%</span>
+                  <span className="stat-label">Progression</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Performance Insights */}
+        <div className="chart-card">
+          <div className="chart-header">
+            <h3>Performance</h3>
+          </div>
+          <div className="chart-container">
+            <div className="performance-insights">
+              <div className="insight-item">
+                <span className="insight-label">Taux de réponse</span>
+                <span className="insight-value">
+                  {stats?.totalApplications > 0 
+                    ? Math.round((stats.interviewCount / stats.totalApplications) * 100) 
+                    : 0}%
+                </span>
+              </div>
+              <div className="insight-item">
+                <span className="insight-label">Candidatures par jour</span>
+                <span className="insight-value">
+                  {statsData ? Math.round(statsData.totals.total / 30 * 10) / 10 : 0}
+                </span>
+              </div>
+              <div className="insight-item">
+                <span className="insight-label">Jours consécutifs</span>
+                <span className="insight-value">
+                  {stats?.streak || 0}
+                </span>
+              </div>
+              <div className="insight-item">
+                <span className="insight-label">Record de série</span>
+                <span className="insight-value">
+                  {stats?.bestStreak || stats?.streak || 0}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Weekly Comparison */}
+        <div className="chart-card">
+          <div className="chart-header">
+            <h3>Comparaison hebdomadaire</h3>
+          </div>
+          <div className="chart-container">
+            <div className="weekly-comparison">
+              <div className="comparison-item">
+                <span className="comparison-label">Cette semaine</span>
+                <span className="comparison-value">{statsData?.totals.thisWeek || 0}</span>
+                <div className="comparison-bar">
+                  <div 
+                    className="comparison-fill current" 
+                    style={{ width: `${Math.min((statsData?.totals.thisWeek || 0) / Math.max(statsData?.totals.thisWeek || 1, goalSettings.weeklyGoal) * 100, 100)}%` }}
+                  ></div>
+                </div>
+              </div>
+              <div className="comparison-item">
+                <span className="comparison-label">Semaine dernière</span>
+                <span className="comparison-value">
+                  {statsData ? statsData.days.filter(d => {
+                    const weekAgo = new Date();
+                    weekAgo.setDate(weekAgo.getDate() - 7);
+                    const startOfLastWeek = new Date(weekAgo);
+                    startOfLastWeek.setDate(startOfLastWeek.getDate() - startOfLastWeek.getDay() + 1);
+                    const endOfLastWeek = new Date(startOfLastWeek);
+                    endOfLastWeek.setDate(endOfLastWeek.getDate() + 6);
+                    const dayDate = new Date(d.date);
+                    return dayDate >= startOfLastWeek && dayDate <= endOfLastWeek;
+                  }).reduce((sum, d) => sum + d.count, 0) : 0}
                   </span>
+                <div className="comparison-bar">
+                  <div 
+                    className="comparison-fill last" 
+                    style={{ width: `${Math.min((statsData ? statsData.days.filter(d => {
+                      const weekAgo = new Date();
+                      weekAgo.setDate(weekAgo.getDate() - 7);
+                      const startOfLastWeek = new Date(weekAgo);
+                      startOfLastWeek.setDate(startOfLastWeek.getDate() - startOfLastWeek.getDay() + 1);
+                      const endOfLastWeek = new Date(startOfLastWeek);
+                      endOfLastWeek.setDate(endOfLastWeek.getDate() + 6);
+                      const dayDate = new Date(d.date);
+                      return dayDate >= startOfLastWeek && dayDate <= endOfLastWeek;
+                    }).reduce((sum, d) => sum + d.count, 0) : 0) / Math.max(statsData?.totals.thisWeek || 1, goalSettings.weeklyGoal) * 100, 100)}%` }}
+                  ></div>
+                </div>
+              </div>
                 </div>
               </div>
             </div>
 
-            <div className="milestone-status">
-              {stats.personalGoal.achieved && (
-                <p>🎉 Bravo, objectif atteint ! Tu as envoyé {stats.personalGoal.current} candidatures cette semaine !</p>
-              )}
+        {/* Additional Stats */}
+        <div className="chart-card">
+          <div className="chart-header">
+            <h3>Statistiques détaillées</h3>
+          </div>
+          <div className="chart-container">
+            <div className="advanced-stats">
+              <div className="stat-row">
+                <span className="comparison-label">Entretiens obtenus</span>
+                <span className="stat-value">{stats?.interviewCount || 0}</span>
+              </div>
+              <div className="stat-row">
+                <span className="comparison-label">Dernière candidature</span>
+                <span className="stat-value">
+                  {stats?.lastApplicationDate 
+                    ? format(new Date(stats.lastApplicationDate), 'dd/MM/yyyy') 
+                    : 'Aucune'}
+                </span>
+              </div>
+              <div className="stat-row">
+                <span className="comparison-label">Moyenne mensuelle</span>
+                <span className="stat-value">{statsData?.totals.monthAverage || 0}</span>
+              </div>
+              <div className="stat-row">
+                <span className="comparison-label">Total candidatures</span>
+                <span className="stat-value">{stats?.totalApplications || 0}</span>
+              </div>
+              <div className="stat-row">
+                <span className="comparison-label">Meilleure série</span>
+                <span className="stat-value">{stats?.bestStreak || stats?.streak || 0} jours</span>
+              </div>
+              <div className="stat-row">
+                <span className="comparison-label">Offres reçues</span>
+                <span className="stat-value">{stats?.statusDistribution?.OFFER_RECEIVED || 0}</span>
+              </div>
             </div>
-          </ChartCard>
+          </div>
         </div>
       </div>
-    </div>
-  );
-}
-
-function KpiCard({ title, value }) {
-  return (
-    <div className="kpi-card">
-      <h2 className="kpi-title">{title}</h2>
-      <p className="kpi-value">{value}</p>
-    </div>
-  );
-}
-
-function ChartCard({ title, children }) {
-  return (
-    <div className="chart-card">
-      <h3 className="chart-title">{title}</h3>
-      {children}
     </div>
   );
 }

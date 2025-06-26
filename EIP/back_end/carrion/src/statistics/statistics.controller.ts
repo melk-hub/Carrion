@@ -20,4 +20,13 @@ export class StatisticsController {
     }
     return this.statisticsService.getStatistics(req.user.id);
   }
+
+  @Get('locations')
+  @UseGuards(JwtAuthGuard)
+  async getApplicationLocations(@Request() req) {
+    if (!req.user?.id) {
+      throw new UnauthorizedException('User ID not found in request');
+    }
+    return this.statisticsService.getApplicationLocations(req.user.id);
+  }
 }

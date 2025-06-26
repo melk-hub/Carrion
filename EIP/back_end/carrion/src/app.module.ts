@@ -16,6 +16,8 @@ import { OutlookModule } from './webhooks/microsoft/outlook.module';
 import { S3Module } from './aws/s3.module';
 import { StatisticsController } from './statistics/statistics.controller';
 import { StatisticsService } from './statistics/statistics.service';
+import { SettingsModule } from './settings/settings.module';
+import { AchievementsModule } from './achievements/achievements.module';
 
 @Module({
   imports: [
@@ -30,6 +32,8 @@ import { StatisticsService } from './statistics/statistics.service';
     UsersModule,
     UtilsModule,
     S3Module,
+    SettingsModule,
+    AchievementsModule,
   ],
   controllers: [AppController, MailFilterController, StatisticsController],
   providers: [AppService, MailFilterService, StatisticsService],

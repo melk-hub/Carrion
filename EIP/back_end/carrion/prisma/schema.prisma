@@ -10,18 +10,19 @@ datasource db {
 }
 
 model User {
-  id                 String             @id @default(uuid()) @db.Uuid
-  username           String             @unique
-  email              String             @unique
+  id                 String              @id @default(uuid()) @db.Uuid
+  username           String              @unique
+  email              String              @unique
   password           String
-  hasProfile         Boolean            @default(false)
-  createdAt          DateTime           @default(now())
-  role               Role               @default(VISITOR)
-  jobApplies         jobApply[]         @relation("UserJobApplies")
-  userProfile        UserProfile?       @relation("UserProfile")
-  Settings           Settings?          @relation("UserSettings")
-  hashedRefreshToken String?            @unique
-  tokens             Token[]            @relation("UserTokens")
+  hasProfile         Boolean             @default(false)
+  createdAt          DateTime            @default(now())
+  role               Role                @default(VISITOR)
+  jobApplies         jobApply[]          @relation("UserJobApplies")
+  userProfile        UserProfile?        @relation("UserProfile")
+  Settings           Settings?           @relation("UserSettings")
+  hashedRefreshToken String?             @unique
+  tokens             Token[]             @relation("UserTokens")
+  userAchievements   UserAchievement[]   @relation("UserAchievements")
   archivedJobApplies ArchivedJobApply[] @relation("UserArchivedJobApplies")
 }
 
@@ -88,11 +89,41 @@ model ArchivedJobApply {
 }
 
 model Settings {
-  id       String   @id @default(uuid()) @db.Uuid
-  userId   String   @unique @db.Uuid
-  document String[]
-  imageUrl String?
-  user     User     @relation("UserSettings", fields: [userId], references: [id], onDelete: Cascade)
+  id   String   @id @default(uuid())
+  UserId       String   @unique @db.Uuid
+  document     String[]
+  imageUrl     String?
+  weeklyGoal   Int      @default(10)
+  monthlyGoal  Int      @default(30)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  User         User     @relation("UserSettings", fields: [UserId], references: [id])
+}
+
+model CarrionAchievement {
+  id          String              @id @default(uuid()) @db.Uuid
+  title       String              
+  description String              
+  category    AchievementCategory 
+  type        AchievementType     
+  threshold   Int?                
+  condition   String?             
+  points      Int                 @default(10)
+  isActive    Boolean             @default(true)
+  createdAt   DateTime            @default(now())
+  users       UserAchievement[]   @relation("AchievementUsers")
+}
+
+model UserAchievement {
+  id            String             @id @default(uuid()) @db.Uuid
+  userId        String             @db.Uuid
+  achievementId String             @db.Uuid
+  unlockedAt    DateTime           @default(now())
+  progress      Int?               @default(0)
+  user          User               @relation("UserAchievements", fields: [userId], references: [id], onDelete: Cascade)
+  achievement   CarrionAchievement @relation("AchievementUsers", fields: [achievementId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, achievementId])
 }
 
 enum Status {
@@ -115,4 +146,23 @@ enum Role {
   MANAGER
   DEV
   VISITOR
+}
+
+enum AchievementCategory {
+  APPLICATIONS
+  INTERVIEWS
+  SUCCESS
+  STREAK
+  PROFILE
+  INTERACTION
+  MILESTONE
+  SEASONAL
+}
+
+enum AchievementType {
+  COUNT
+  STREAK
+  PERCENTAGE
+  TIME_BASED
+  SPECIAL
 }
