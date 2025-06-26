@@ -215,7 +215,7 @@ button:hover .text-button {
   align-items: center;
   padding: 30px 0;
   margin: 0 110px;
-  overflow: hidden;
+  overflow: visible;
   padding-bottom: 12%;
   padding-top: 9%;
   gap: 60px;
@@ -324,9 +324,9 @@ h1 {
   left: -15%;
   background: radial-gradient(circle at 60% 40%, #FFA500, #FF6A00);
   z-index: 0;
-  border-radius: 70% 40% 50% 50% / 70% 60% 20% 40%;
+  border-radius: 70% 40% 20% 50% / 70% 60% 40% 40%;
   transform: rotate(-15deg);
-  filter: blur(1px);
+  filter: blur(Opx);
   opacity: 0.8;
 }
 
