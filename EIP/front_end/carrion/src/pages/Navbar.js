@@ -10,10 +10,10 @@ import axios from 'axios';
 import home from '../assets/home-button.png';
 import candidature from '../assets/candidate-profile.png';
 import archives from '../assets/archives.png';
-import statistics from '../assets/statistics.jpg';
 import bell  from "../assets/bell.png";
 import avatar from "../assets/avatar.png";
 import notification_icon from "../assets/notification.png";
+import statistics from '../assets/pie-chart.png';
 
 function Navbar({ sidebarCollapsed, setSidebarCollapsed, setIsAuthenticated }) {
   const navigate = useNavigate();
