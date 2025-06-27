@@ -3,6 +3,7 @@ import {
   NotFoundException,
   ConflictException,
   BadRequestException,
+  Logger,
 } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -97,9 +98,15 @@ export class UserService {
 
   async remove(id: string) {
     try {
-      return await this.prisma.user.delete({
+      const deletedUser = await this.prisma.user.delete({
         where: { id },
       });
+
+      Logger.warn(
+        `User with id ${id} and all related data have been deleted successfully.`,
+      );
+
+      return deletedUser;
     } catch (error) {
       if (error.code === 'P2025') {
         throw new NotFoundException(`User with id ${id} not found`);

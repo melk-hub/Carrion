@@ -7,6 +7,9 @@ const GoogleLoginButton = () => {
     if (!redirectUri) {
         throw new Error("Environment variable REACT_APP_GOOGLE_REDIRECT_URI is required but not defined.");
     }
+    if (!GOOGLE_ID) {
+        throw new Error("Environment variable REACT_APP_GOOGLE_CLIENT_ID is required but not defined.");
+    }
     const scopes = [
       'https://www.googleapis.com/auth/userinfo.email',
       'https://www.googleapis.com/auth/userinfo.profile',

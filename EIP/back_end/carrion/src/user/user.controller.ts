@@ -16,8 +16,8 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { AddDocumentDto } from './dto/add-document.dto';
 import { JwtAuthGuard } from 'src/auth/guards/jwt/jwt-auth.guard';
-import { Role } from 'src/auth/enums/role.enum';
-import { Roles } from 'src/auth/decorators/roles.decorator';
+// import { Role } from 'src/auth/enums/role.enum';
+// import { Roles } from 'src/auth/decorators/roles.decorator';
 import {
   ApiTags,
   ApiOperation,
@@ -27,7 +27,7 @@ import {
 
 @ApiTags('User')
 @ApiBearerAuth()
-@Roles(Role.USER)
+// @Roles(Role.USER)
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
@@ -77,14 +77,17 @@ export class UserController {
     return this.userService.update(id, updateUserDto);
   }
 
-  @Roles(Role.ADMIN)
-  @Delete(':id')
-  @ApiOperation({ summary: 'Delete user (Admin only)' })
-  @ApiResponse({ status: 200, description: 'User deleted successfully' })
-  @ApiResponse({ status: 403, description: 'Forbidden - Admin role required' })
-  @ApiResponse({ status: 404, description: 'User not found' })
-  remove(@Param('id') id: string) {
-    return this.userService.remove(id);
+  @Delete('me')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiOperation({ summary: 'Delete current user account' })
+  @ApiResponse({
+    status: 204,
+    description: 'User account deleted successfully',
+  })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 403, description: 'Forbidden resource' })
+  async remove(@Req() req) {
+    await this.userService.remove(req.user.id);
   }
 
   @UseGuards(JwtAuthGuard)

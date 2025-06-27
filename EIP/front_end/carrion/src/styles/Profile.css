@@ -33,6 +33,9 @@
   min-width: 300px;
   position: sticky;
   top: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
 }
 
 .profile-card {

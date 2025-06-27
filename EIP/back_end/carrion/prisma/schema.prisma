@@ -10,20 +10,21 @@ datasource db {
 }
 
 model User {
-  id                 String              @id @default(uuid()) @db.Uuid
-  username           String              @unique
-  email              String              @unique
+  id                 String             @id @default(uuid()) @db.Uuid
+  username           String             @unique
+  email              String             @unique
   password           String
-  hasProfile         Boolean             @default(false)
-  createdAt          DateTime            @default(now())
-  role               Role                @default(VISITOR)
-  jobApplies         jobApply[]          @relation("UserJobApplies")
-  archivedJobApplies ArchivedJobApply[]  @relation("UserArchivedJobApplies")
-  userProfile        UserProfile?        @relation("UserProfile")
-  Settings           Settings?           @relation("UserSettings")
-  hashedRefreshToken String?             @unique
-  tokens             Token[]             @relation("UserTokens")
-  userAchievements   UserAchievement[]   @relation("UserAchievements")
+  hasProfile         Boolean            @default(false)
+  createdAt          DateTime           @default(now())
+  role               Role               @default(VISITOR)
+  jobApplies         jobApply[]         @relation("UserJobApplies")
+  archivedJobApplies ArchivedJobApply[] @relation("UserArchivedJobApplies")
+  userProfile        UserProfile?       @relation("UserProfile")
+  Settings           Settings?          @relation("UserSettings")
+  hashedRefreshToken String?            @unique
+  tokens             Token[]            @relation("UserTokens")
+  userAchievements   UserAchievement[]  @relation("UserAchievements")
+  notifications      Notification[]     @relation("UserNotifications")
 }
 
 model UserProfile {
@@ -51,10 +52,22 @@ model Token {
   accessToken       String
   refreshToken      String
   tokenTimeValidity DateTime
-  externalId        String?  
+  externalId        String?
   createdAt         DateTime @default(now())
   userId            String   @db.Uuid
   user              User     @relation("UserTokens", fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Notification {
+  id        String           @id @default(uuid()) @db.Uuid
+  userId    String           @db.Uuid
+  type      NotificationType
+  company   String
+  title     String
+  message   String
+  createdAt DateTime         @default(now())
+  read      Boolean          @default(false)
+  user      User             @relation("UserNotifications", fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model jobApply {
@@ -73,8 +86,8 @@ model jobApply {
 }
 
 model ArchivedJobApply {
-  id            String   @id @default(uuid()) @db.Uuid
-  originalId    String   @db.Uuid
+  id            String    @id @default(uuid()) @db.Uuid
+  originalId    String    @db.Uuid
   title         String
   company       String
   location      String?
@@ -83,9 +96,9 @@ model ArchivedJobApply {
   imageUrl      String?
   contractType  String?
   interviewDate DateTime?
-  archivedAt    DateTime @default(now())
-  userId        String   @db.Uuid
-  user          User     @relation("UserArchivedJobApplies", fields: [userId], references: [id], onDelete: Cascade)
+  archivedAt    DateTime  @default(now())
+  userId        String    @db.Uuid
+  user          User      @relation("UserArchivedJobApplies", fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Settings {
@@ -97,17 +110,19 @@ model Settings {
   monthlyGoal Int      @default(30)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-  User        User     @relation("UserSettings", fields: [userId], references: [id])
+  
+  // --- UNIQUE MODIFICATION ---
+  User        User     @relation("UserSettings", fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model CarrionAchievement {
   id          String              @id @default(uuid()) @db.Uuid
-  title       String              
-  description String              
-  category    AchievementCategory 
-  type        AchievementType     
-  threshold   Int?                
-  condition   String?             
+  title       String
+  description String
+  category    AchievementCategory
+  type        AchievementType
+  threshold   Int?
+  condition   String?
   points      Int                 @default(10)
   isActive    Boolean             @default(true)
   createdAt   DateTime            @default(now())
@@ -165,4 +180,12 @@ enum AchievementType {
   PERCENTAGE
   TIME_BASED
   SPECIAL
+}
+
+enum NotificationType {
+  SUCCESS
+  ERROR
+  WARNING
+  INFO
+  DEFAULT
 }

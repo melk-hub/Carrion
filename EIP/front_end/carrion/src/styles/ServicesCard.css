@@ -1,0 +1,64 @@
+.services-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.service-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 1rem;
+  border-radius: 0.75rem;
+
+  background-color: white;
+  border: 1px solid #e5e7eb;
+  text-align: center;
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.05);
+}
+
+.service-icon-wrapper {
+  width: 64px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.service-icon-wrapper img {
+  width: 32px;
+  height: auto;
+  object-fit: contain;
+}
+
+.service-name {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #374151;
+}
+
+.add-service-btn {
+  cursor: pointer;
+  transition: background-color 0.2s;
+  border: 2px dashed #d1d5db;
+  background-color: transparent;
+  box-shadow: none;
+}
+
+.add-service-btn:hover {
+  background-color: #f9fafb;
+}
+
+.service-name-hidden {
+  border: 0;
+  clip: rect(0 0 0 0);
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  width: 1px;
+}

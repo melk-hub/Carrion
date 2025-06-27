@@ -1,49 +1,58 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
-import { ConfigType } from '@nestjs/config';
-import { Strategy, Profile } from 'passport-microsoft';
-import microsoftOauthConfig from '../config/microsoft-oauth.config';
+import { Strategy } from 'passport-microsoft';
 import { AuthService } from '../auth.service';
 
 @Injectable()
 export class MicrosoftStrategy extends PassportStrategy(Strategy, 'microsoft') {
-  constructor(
-    @Inject(microsoftOauthConfig.KEY)
-    private microsoftConfig: ConfigType<typeof microsoftOauthConfig>,
-    private authService: AuthService,
-  ) {
+  constructor(private authService: AuthService) {
     super({
-      clientID: microsoftConfig.clientID,
-      clientSecret: microsoftConfig.clientSecret,
-      callbackURL: microsoftConfig.callbackURL,
-      scope: [
-        'openid',
-        'profile',
-        'offline_access',
-        'User.Read',
-        'Mail.Read',
-        'https://graph.microsoft.com/Mail.Read',
-        'https://graph.microsoft.com/User.Read',
-      ],
-      prompt: 'consent',
-      accessType: 'offline',
-      responseType: 'code',
-      responseMode: 'query',
+      passReqToCallback: true,
+      clientID: process.env.MICROSOFT_CLIENT_ID,
+      clientSecret: process.env.MICROSOFT_CLIENT_SECRET,
+      callbackURL: process.env.BACKEND_URL
+        ? `${process.env.BACKEND_URL}/auth/microsoft/callback`
+        : 'http://localhost:8080/auth/microsoft/callback',
+      tenant: 'common',
+      scope: ['openid', 'profile', 'offline_access', 'user.read', 'mail.read'],
     });
   }
 
-  async validate(accessToken: string, refreshToken: string, profile: Profile) {
+  async validate(
+    req: any,
+    accessToken: string,
+    refreshToken: string,
+    profile: any,
+    done: (err: any, user: any, info?: any) => void,
+  ) {
+    const email =
+      (profile.emails && profile.emails[0]?.value) ||
+      profile.userPrincipalName ||
+      profile._json?.mail;
+    if (!email) {
+      return done(
+        new UnauthorizedException(
+          'Could not retrieve email from Microsoft profile.',
+        ),
+        false,
+      );
+    }
+
     try {
-      const user = await this.authService.validateOAuthUser({
-        username: profile.username ?? profile.name.givenName,
-        email: profile.emails[0].value,
-        password: '',
-        hasProfile: false,
-      });
-      return { ...user, accessToken, refreshToken };
-    } catch (error) {
-      console.error('erreur:', error);
-      return;
+      const loggedInUser = req.user;
+      const user = await this.authService.validateOAuthUser(
+        {
+          username: profile.displayName || 'user',
+          email: email,
+          password: '',
+          hasProfile: true,
+        },
+        loggedInUser?.id,
+      );
+
+      return done(null, { ...user, accessToken, refreshToken });
+    } catch (err) {
+      return done(err, false);
     }
   }
 }
