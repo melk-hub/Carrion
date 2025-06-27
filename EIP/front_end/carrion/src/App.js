@@ -22,6 +22,7 @@ import Profile from "./pages/Profile";
 import { Toaster } from "react-hot-toast";
 import Settings from "./pages/Settings";
 import Notifications from "./pages/Notification";
+import Ranking from "./pages/Classement";
 
 function App() {
   return (
@@ -183,6 +184,16 @@ function AppLayout() {
             element={
               isAuthenticated ? (
                 <Notifications sidebarCollapsed={sidebarCollapsed}/>
+              ) : (
+                <Navigate to="/" replace state={{ from: location }} />
+              )
+            }
+          />
+          <Route
+            path="/ranking"
+            element={
+              isAuthenticated ? (
+                <Ranking />
               ) : (
                 <Navigate to="/" replace state={{ from: location }} />
               )
