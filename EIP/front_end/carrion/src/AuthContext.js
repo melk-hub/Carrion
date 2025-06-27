@@ -63,7 +63,6 @@ export const AuthProvider = ({ children }) => {
     const firstName = userProfile.firstName || '';
     const lastName = userProfile.lastName || '';
     
-    // Si les deux sont vides ou manquants, retourner "Carrion"
     if (!firstName.trim() && !lastName.trim()) {
       return 'Carrion';
     }

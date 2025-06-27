@@ -10,6 +10,7 @@ import {
   UpdateJobApplyDto,
 } from './dto/jobApply.dto';
 import { ApplicationStatus } from './enum/application-status.enum';
+import { NotificationService } from 'src/notification/notification.service';
 
 export interface JobApplyParams {
   title: string;
@@ -31,7 +32,10 @@ export interface UpdateJobApply {
 
 @Injectable()
 export class JobApplyService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly notificationService: NotificationService,
+  ) {}
 
   async getAllJobApplies(userId: string): Promise<JobApplyDto[]> {
     try {
@@ -145,6 +149,17 @@ export class JobApplyService {
         },
       });
 
+      await this.notificationService.createNotification({
+        userId: userId,
+        titleKey: 'notifications.titles.application.created',
+        messageKey: 'notifications.application.created',
+        type: 'POSITIVE',
+        variables: {
+          company: createJobApplyDto.company,
+          jobTitle: createJobApplyDto.title,
+        },
+      });
+
       return {
         id: jobApply.id,
         title: jobApply.title,
@@ -181,6 +196,18 @@ export class JobApplyService {
           "You don't have permission to delete this job application.",
         );
       }
+
+      await this.notificationService.createNotification({
+        userId: userId,
+        titleKey: 'notifications.titles.application.deleted',
+        messageKey: 'notifications.application.deleted',
+        type: 'NEGATIVE',
+        variables: {
+          company: jobApply.company,
+          jobTitle: jobApply.title,
+        },
+      });
+
       await this.prisma.jobApply.delete({
         where: { id: jobApplyId },
       });
@@ -209,6 +236,18 @@ export class JobApplyService {
           "You don't have permission to delete this job application.",
         );
       }
+
+      await this.notificationService.createNotification({
+        userId: userId,
+        titleKey: 'notifications.titles.archive.deleted',
+        messageKey: 'notifications.archive.deleted',
+        type: 'NEGATIVE',
+        variables: {
+          company: jobApply.company,
+          jobTitle: jobApply.title,
+        },
+      });
+
       await this.prisma.archivedJobApply.delete({
         where: { id: jobApplyId },
       });
@@ -233,11 +272,13 @@ export class JobApplyService {
           `Job application with ID ${jobApplyId} not found.`,
         );
       }
+
       if (jobApply.userId !== userId) {
         throw new ForbiddenException(
           "You don't have permission to update this job application.",
         );
       }
+
       const updatedJobApply = await this.prisma.jobApply.update({
         where: { id: jobApplyId },
         data: { ...UpdateJobApplyDto },
@@ -267,12 +308,65 @@ export class JobApplyService {
     updateJobApply: UpdateJobApply,
   ): Promise<string> {
     try {
+      const jobApply = await this.prisma.jobApply.findUnique({
+        where: { id: jobApplyId },
+      });
+
+      if (!jobApply) {
+        throw new NotFoundException(
+          `Job application with ID ${jobApplyId} not found.`,
+        );
+      }
+
+      if (jobApply.userId !== userId) {
+        throw new ForbiddenException(
+          "You don't have permission to update this job application.",
+        );
+      }
+
       const validInterviewDate =
         updateJobApply.interviewDate &&
         updateJobApply.interviewDate instanceof Date &&
         !isNaN(updateJobApply.interviewDate.getTime())
           ? updateJobApply.interviewDate
           : null;
+
+      const variables: any = {
+        company: jobApply.company,
+        jobTitle: jobApply.title,
+      };
+
+      let hasChanges = false;
+
+      if (
+        updateJobApply.location &&
+        updateJobApply.location !== jobApply.location
+      ) {
+        variables.locationStart =
+          jobApply.location || 'notifications.noLocation';
+        variables.locationEnd = updateJobApply.location;
+        hasChanges = true;
+      }
+      if (updateJobApply.salary && updateJobApply.salary !== jobApply.salary) {
+        variables.salaryStart = jobApply.salary || 'notifications.noSalary';
+        variables.salaryEnd = updateJobApply.salary;
+        hasChanges = true;
+      }
+      if (updateJobApply.status && updateJobApply.status !== jobApply.status) {
+        variables.statusStart = jobApply.status;
+        variables.statusEnd = updateJobApply.status;
+        hasChanges = true;
+      }
+      if (
+        validInterviewDate &&
+        validInterviewDate.getTime() !== jobApply.interviewDate?.getTime()
+      ) {
+        variables.interviewStart = jobApply.interviewDate
+          ? jobApply.interviewDate.toLocaleDateString('fr-FR')
+          : 'notifications.noInterview';
+        variables.interviewEnd = validInterviewDate.toLocaleDateString('fr-FR');
+        hasChanges = true;
+      }
 
       await this.prisma.jobApply.update({
         where: { id: jobApplyId },
@@ -285,6 +379,17 @@ export class JobApplyService {
           ...(validInterviewDate ? { interviewDate: validInterviewDate } : {}),
         },
       });
+
+      if (hasChanges) {
+        await this.notificationService.createNotification({
+          userId: userId,
+          titleKey: 'notifications.titles.application.updated',
+          messageKey: 'notifications.application.updated',
+          type: 'INFO',
+          variables: variables,
+        });
+      }
+
       return `Job offer: ${jobApplyId} for user: ${userId} updated successfully`;
     } catch (error) {
       throw new Error(
@@ -319,6 +424,74 @@ export class JobApplyService {
         );
       }
 
+      // Collecter les changements pour la notification
+      const variables: any = {
+        company: jobApply.company,
+        jobTitle: jobApply.title,
+      };
+
+      let hasChanges = false;
+
+      if (
+        updateJobApplyDto.title &&
+        updateJobApplyDto.title !== jobApply.title
+      ) {
+        variables.titleStart = jobApply.title;
+        variables.titleEnd = updateJobApplyDto.title;
+        hasChanges = true;
+      }
+      if (
+        updateJobApplyDto.company &&
+        updateJobApplyDto.company !== jobApply.company
+      ) {
+        variables.companyStart = jobApply.company;
+        variables.companyEnd = updateJobApplyDto.company;
+        hasChanges = true;
+      }
+      if (
+        updateJobApplyDto.location &&
+        updateJobApplyDto.location !== jobApply.location
+      ) {
+        variables.locationStart = jobApply.location || 'notifications.noLocation';
+        variables.locationEnd = updateJobApplyDto.location;
+        hasChanges = true;
+      }
+      if (
+        updateJobApplyDto.salary !== undefined &&
+        updateJobApplyDto.salary !== jobApply.salary
+      ) {
+        variables.salaryStart = jobApply.salary || 'notifications.noSalary';
+        variables.salaryEnd = updateJobApplyDto.salary || 'notifications.noSalary';
+        hasChanges = true;
+      }
+      if (
+        updateJobApplyDto.status &&
+        updateJobApplyDto.status !== jobApply.status
+      ) {
+        variables.statusStart = jobApply.status;
+        variables.statusEnd = updateJobApplyDto.status;
+        hasChanges = true;
+      }
+      if (
+        updateJobApplyDto.contractType &&
+        updateJobApplyDto.contractType !== jobApply.contractType
+      ) {
+        variables.contractTypeStart = jobApply.contractType || 'notifications.noContractType';
+        variables.contractTypeEnd = updateJobApplyDto.contractType;
+        hasChanges = true;
+      }
+      if (
+        updateJobApplyDto.interviewDate &&
+        updateJobApplyDto.interviewDate.getTime() !==
+          jobApply.interviewDate?.getTime()
+      ) {
+        variables.interviewStart = jobApply.interviewDate
+          ? jobApply.interviewDate.toLocaleDateString('fr-FR')
+          : 'notifications.noInterview';
+        variables.interviewEnd = updateJobApplyDto.interviewDate.toLocaleDateString('fr-FR');
+        hasChanges = true;
+      }
+
       const updatedJobApply = await this.prisma.jobApply.update({
         where: { id: jobApplyId },
         data: {
@@ -348,6 +521,17 @@ export class JobApplyService {
             : {}),
         },
       });
+
+      // Créer la notification avec les détails des changements
+      if (hasChanges) {
+        await this.notificationService.createNotification({
+          userId: userId,
+          titleKey: 'notifications.titles.application.updated',
+          messageKey: 'notifications.application.updated',
+          type: 'INFO',
+          variables: variables,
+        });
+      }
 
       return {
         id: updatedJobApply.id,
@@ -424,6 +608,17 @@ export class JobApplyService {
         },
       });
 
+      await this.notificationService.createNotification({
+        userId: userId,
+        titleKey: 'notifications.titles.archive.updated',
+        messageKey: 'notifications.archive.updated',
+        type: 'INFO',
+        variables: {
+          company: jobApply.company,
+          jobTitle: jobApply.title,
+        },
+      });
+
       return {
         id: updatedJobApply.id,
         title: updatedJobApply.title,
@@ -473,9 +668,21 @@ export class JobApplyService {
       },
     });
 
+    await this.notificationService.createNotification({
+      userId: userId,
+      titleKey: 'notifications.titles.application.archived',
+      messageKey: 'notifications.application.archived',
+      type: 'POSITIVE',
+      variables: {
+        company: job.company,
+        jobTitle: job.title,
+      },
+    });
+
     await this.prisma.jobApply.delete({
       where: { id: job.id },
     });
+
     return { message: 'Job application archived successfully.' };
   }
 
@@ -502,6 +709,17 @@ export class JobApplyService {
         contractType: archivedJob.contractType,
         interviewDate: archivedJob.interviewDate,
         userId: archivedJob.userId,
+      },
+    });
+
+    await this.notificationService.createNotification({
+      userId: userId,
+      titleKey: 'notifications.titles.application.unarchived',
+      messageKey: 'notifications.application.unarchived',
+      type: 'POSITIVE',
+      variables: {
+        company: archivedJob.company,
+        jobTitle: archivedJob.title,
       },
     });
 

@@ -189,6 +189,62 @@ button {
   cursor: pointer;
   display: flex;
   align-items: center;
+  position: relative;
+}
+
+/* Animation pour l'icône de notification quand il y a des notifications non lues */
+.navbar-menu li .notifications.has-unread {
+  animation: notification-pulse 2s infinite;
+}
+
+@keyframes notification-pulse {
+  0%, 100% {
+    transform: scale(1);
+    filter: brightness(1);
+  }
+  50% {
+    transform: scale(1.1);
+    filter: brightness(1.2);
+  }
+}
+
+/* Badge pour le compteur de notifications */
+.notification-badge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  color: white;
+  border-radius: 50%;
+  min-width: 18px;
+  height: 18px;
+  font-size: 10px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(239, 68, 68, 0.3);
+  animation: badge-bounce 1s ease-in-out;
+}
+
+@keyframes badge-bounce {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  60% {
+    transform: scale(1.2);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* S'assurer que les autres éléments ne sont pas affectés */
+.notification-item:not(.navbar-menu .notifications) {
+  animation: none !important;
 }
 
 .user-profile {

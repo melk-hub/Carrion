@@ -26,7 +26,7 @@ export const LanguageProvider = ({ children }) => {
     }
   };
 
-  const t = (key) => {
+  const t = (key, variables = {}) => {
     const keys = key.split('.');
     let value = translations[currentLanguage];
     
@@ -47,7 +47,20 @@ export const LanguageProvider = ({ children }) => {
       }
     }
     
-    return value || key;
+    let translation = value || key;
+    
+    // Replace variables in the format {{variable}} or {variable}
+    if (typeof translation === 'string' && variables && Object.keys(variables).length > 0) {
+      Object.entries(variables).forEach(([varKey, varValue]) => {
+        // Support both {{variable}} and {variable} formats
+        const regexDouble = new RegExp(`{{${varKey}}}`, 'g');
+        const regexSingle = new RegExp(`{${varKey}}`, 'g');
+        translation = translation.replace(regexDouble, String(varValue));
+        translation = translation.replace(regexSingle, String(varValue));
+      });
+    }
+    
+    return translation;
   };
 
   const value = {

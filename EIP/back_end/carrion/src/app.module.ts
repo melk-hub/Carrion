@@ -18,6 +18,7 @@ import { StatisticsController } from './statistics/statistics.controller';
 import { StatisticsService } from './statistics/statistics.service';
 import { SettingsModule } from './settings/settings.module';
 import { AchievementsModule } from './achievements/achievements.module';
+import { NotificationModule } from './notification/notification.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { AchievementsModule } from './achievements/achievements.module';
     S3Module,
     SettingsModule,
     AchievementsModule,
+    NotificationModule,
   ],
   controllers: [AppController, MailFilterController, StatisticsController],
   providers: [AppService, MailFilterService, StatisticsService],
