@@ -41,6 +41,8 @@ function Navbar({ sidebarCollapsed, setSidebarCollapsed, setIsAuthenticated }) {
         return t('navbar.settings');
       case '/statistics':
         return t('navbar.statistics');
+      case '/notification':
+        return t('navbar.notification');
       default:
         return '';
     }
@@ -98,13 +100,6 @@ function Navbar({ sidebarCollapsed, setSidebarCollapsed, setIsAuthenticated }) {
         </span>
         <div className="topbar-right">
           <LanguageDropdown className="dark-theme" style={{color: 'white'}}/>
-          <img 
-            src={notification ? notification_icon : bell} 
-            alt={notification ? "Notification" : "Bell"} 
-            className="menu-icon notifications" 
-            style={{width: '30px', height: '30px'}} 
-            onClick={() => setNotification(!notification)}
-          />
           <div className="user-profile" ref={dropdownRef} onClick={handleToggleDropdown}>
             <img src={avatar} alt="User" className="avatar" />
             {isDropdownOpen && (
@@ -134,6 +129,16 @@ function Navbar({ sidebarCollapsed, setSidebarCollapsed, setIsAuthenticated }) {
           <li onClick={() => navigate('/statistics')} className={isActive('/statistics') ? 'active' : ''}>
             <img src={statistics} alt="Statistics" className="menu-icon" style={{width: '20px', height: '20px'}}/>
             <span className="menu-text">{t('navbar.statistics')}</span>
+          </li>
+          <li onClick={() => navigate('/notification')} className={isActive('/notification') ? 'active' : ''}>
+            <img 
+              src={notification ? notification_icon : bell} 
+              alt={notification ? "Notification" : "Bell"} 
+              className="menu-icon notifications" 
+              style={{width: '25px', height: '25px'}} 
+              onClick={() => setNotification(!notification)}
+            />
+            <span className="menu-text">{t('navbar.notification')}</span>
           </li>
         </ul>
         <div className="motion-toggle">
