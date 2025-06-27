@@ -1,222 +1,79 @@
 import React, { useState, useEffect } from "react";
 import "../styles/Notification.css";
-import axios from "axios"
-
-const API_URL = process.env.REACT_APP_API_URL
+import { useLanguage } from '../contexts/LanguageContext';
+import { useNotifications } from '../contexts/NotificationContext';
 
 function Notifications() {
-  const [notifications, setNotifications] = useState([])
-  const [filter, setFilter] = useState("all")
-  const [selectedNotifications, setSelectedNotifications] = useState(new Set())
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
+  const { t } = useLanguage();
+  const { 
+    notifications, 
+    unreadCount, 
+    loading, 
+    fetchNotifications, 
+    markAsRead, 
+    markAllAsRead, 
+    deleteNotification
+  } = useNotifications();
+  
+  const [filter, setFilter] = useState("all");
+  const [selectedNotifications, setSelectedNotifications] = useState(new Set());
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    fetchNotifications()
-  }, [])
-
-  const fetchNotifications = async () => {
-    try {
-      setLoading(true)
-      setError(null)
-
-      const response = await axios.get(`${API_URL}/notifications`, {
-        withCredentials: true,
-      })
-
-      setNotifications(response.data)
-    } catch (err) {
-      setError(err.response?.data?.message || "Erreur lors de la récupération des notifications")
-      console.error("Erreur:", err)
-
-      // Fallback vers des données mockées en cas d'erreur
-      setNotifications([
-        {
-          id: 1,
-          type: "success",
-          title: "Candidature acceptée",
-          message: "Votre candidature chez Tech Solutions a été acceptée ! Félicitations.",
-          timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
-          read: false,
-          company: "Tech Solutions",
-        },
-        {
-          id: 2,
-          type: "info",
-          title: "Nouvelle opportunité",
-          message: "Une nouvelle offre d'emploi correspond à votre profil : Développeur React Senior.",
-          timestamp: new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString(),
-          read: false,
-          company: "StartupXYZ",
-        },
-        {
-          id: 3,
-          type: "warning",
-          title: "Entretien programmé",
-          message: "Votre entretien avec Acme Corp est prévu demain à 14h00. N'oubliez pas de vous préparer.",
-          timestamp: new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString(),
-          read: true,
-          company: "Acme Corp",
-        },
-        {
-          id: 4,
-          type: "error",
-          title: "Candidature refusée",
-          message: "Malheureusement, votre candidature chez Digital Agency n'a pas été retenue.",
-          timestamp: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
-          read: true,
-          company: "Digital Agency",
-        },
-        {
-          id: 5,
-          type: "info",
-          title: "Profil consulté",
-          message: "Votre profil a été consulté par 3 recruteurs cette semaine.",
-          timestamp: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
-          read: false,
-          company: null,
-        },
-        {
-          id: 6,
-          type: "success",
-          title: "CV mis à jour",
-          message: "Votre CV a été mis à jour avec succès. Il est maintenant visible par les recruteurs.",
-          timestamp: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
-          read: true,
-          company: null,
-        },
-        {
-          id: 7,
-          type: "warning",
-          title: "Rappel de suivi",
-          message: "Il est temps de faire un suivi pour votre candidature chez Innovation Labs.",
-          timestamp: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
-          read: false,
-          company: "Innovation Labs",
-        },
-      ])
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const markAsRead = async (id) => {
-    try {
-      await axios.patch(
-        `${API_URL}/notifications/${id}/read`,
-        {},
-        {
-          withCredentials: true,
-        },
-      )
-
-      // Mise à jour local
-      setNotifications((prev) =>
-        prev.map((notification) => (notification.id === id ? { ...notification, read: true } : notification)),
-      )
-    } catch (err) {
-      console.error("Erreur lors du marquage comme lu:", err)
-    }
-  }
-
-  const markAsUnread = async (id) => {
-    try {
-      await axios.patch(
-        `${API_URL}/notifications/${id}/read`,
-        {},
-        {
-          withCredentials: true,
-        },
-      )
-
-      // Mettre à jour l'état local
-      setNotifications((prev) =>
-        prev.map((notification) => (notification.id === id ? { ...notification, read: false } : notification)),
-      )
-    } catch (err) {
-      console.error("Erreur lors du marquage comme non lu:", err)
-    }
-  }
-
-  const deleteNotification = async (id) => {
-    try {
-      await axios.delete(`${API_URL}/notifications/${id}`, {
-        withCredentials: true,
-      })
-
-      // Mise a jour local
-      setNotifications((prev) => prev.filter((notification) => notification.id !== id))
-      setSelectedNotifications((prev) => {
-        const newSet = new Set(prev)
-        newSet.delete(id)
-        return newSet
-      })
-    } catch (err) {
-      console.error("Erreur lors de la suppression:", err)
-    }
-  }
-
-  const markAllAsRead = async () => {
-    try {
-      // Marque toutes les notifications non lues comme lues
-      const unreadNotifications = notifications.filter((n) => !n.read)
-
-      const promises = unreadNotifications.map((notification) =>
-        axios.patch(
-          `${API_URL}/notifications/${notification.id}/read`,
-          {},
-          {
-            withCredentials: true,
-          },
-        ),
-      )
-
-      await Promise.all(promises)
-
-      // Mise a jour local
-      setNotifications((prev) => prev.map((notification) => ({ ...notification, read: true })))
-    } catch (err) {
-      console.error("Erreur lors du marquage de toutes comme lues:", err)
-    }
-  }
+    // Rafraîchir les notifications quand on arrive sur la page
+    fetchNotifications();
+  }, []);
 
   const getFilteredNotifications = () => {
+    let filtered = [];
+    
     switch (filter) {
       case "unread":
-        return notifications.filter((n) => !n.read)
+        filtered = notifications.filter((n) => !n.read)
+        break;
       case "read":
-        return notifications.filter((n) => n.read)
-      case "success":
-        return notifications.filter((n) => n.type === "success")
-      case "warning":
-        return notifications.filter((n) => n.type === "warning")
-      case "error":
-        return notifications.filter((n) => n.type === "error")
-      case "info":
-        return notifications.filter((n) => n.type === "info")
+        filtered = notifications.filter((n) => n.read)
+        break;
+      case "POSITIVE":
+        filtered = notifications.filter((n) => n.type === "POSITIVE")
+        break;
+      case "WARNING":
+        filtered = notifications.filter((n) => n.type === "WARNING")
+        break;
+      case "NEGATIVE":
+        filtered = notifications.filter((n) => n.type === "NEGATIVE")
+        break;
+      case "INFO":
+        filtered = notifications.filter((n) => n.type === "INFO")
+        break;
       default:
-        return notifications
+        filtered = notifications
     }
+
+    // Trier par statut (non lues en premier) puis par date (plus récent en premier)
+    return filtered.sort((a, b) => {
+      // D'abord trier par statut de lecture (non lues en premier)
+      if (a.read !== b.read) {
+        return a.read ? 1 : -1; // Les non lues (read=false) viennent en premier
+      }
+      // Puis trier par date (plus récent en premier)
+      return new Date(b.createdAt) - new Date(a.createdAt);
+    });
   }
 
   const deleteSelected = async () => {
     try {
-      // Supprime chaque notification sélectionnée
+      // Supprime chaque notification sélectionnée en utilisant le contexte
       const deletePromises = Array.from(selectedNotifications).map((id) =>
-        axios.delete(`${API_URL}/notifications/${id}`, {
-          withCredentials: true,
-        }),
-      )
+        deleteNotification(id)
+      );
 
-      await Promise.all(deletePromises)
-
-      // Mise a jour local
-      setNotifications((prev) => prev.filter((notification) => !selectedNotifications.has(notification.id)))
-      setSelectedNotifications(new Set())
+      await Promise.all(deletePromises);
+      setSelectedNotifications(new Set());
     } catch (err) {
-      console.error("Erreur lors de la suppression en lot:", err)
+      console.error("Erreur lors de la suppression en lot:", err);
     }
-  }
+  };
 
   const toggleSelection = (id) => {
     setSelectedNotifications((prev) => {
@@ -239,39 +96,106 @@ function Notifications() {
     setSelectedNotifications(new Set())
   }
 
-  const getNotificationIcon = (type) => {
-    switch (type) {
-      case "success":
-        return "✅"
-      case "error":
-        return "❌"
-      case "warning":
-        return "⚠️"
-      case "info":
-        return "ℹ️"
-      default:
-        return "📢"
+  const handleNotificationClick = (notification) => {
+    if (!notification.read) {
+      markAsRead(notification.id);
     }
-  }
+  };
 
-  const formatTimestamp = (timestamp) => {
+  const formatNotificationMessage = (messageKey, variables = {}) => {
+    if (!messageKey) return '';
+    
+    if (messageKey === 'notifications.application.updated') {
+      const baseMessage = t('notifications.application.updated.base', { company: variables.company, jobTitle: variables.jobTitle });
+      
+      const changes = [];
+      
+      if (variables.statusStart && variables.statusEnd && variables.statusStart !== variables.statusEnd) {
+        const statusStart = variables.statusStart;
+        const statusEnd = variables.statusEnd;
+        changes.push(t('notifications.changes.status', { from: statusStart, to: statusEnd }));
+      }
+      
+      if (variables.locationStart && variables.locationEnd && variables.locationStart !== variables.locationEnd) {
+        const locationStart = variables.locationStart.startsWith('notifications.') 
+          ? t(variables.locationStart) 
+          : variables.locationStart;
+        const locationEnd = variables.locationEnd;
+        changes.push(t('notifications.changes.location', { from: locationStart, to: locationEnd }));
+      }
+      
+      if (variables.salaryStart && variables.salaryEnd && variables.salaryStart !== variables.salaryEnd) {
+        const salaryStart = variables.salaryStart === 'notifications.noSalary' 
+          ? t('notifications.noSalary') 
+          : `${variables.salaryStart}€`;
+        const salaryEnd = variables.salaryEnd === 'notifications.noSalary' 
+          ? t('notifications.noSalary') 
+          : `${variables.salaryEnd}€`;
+        changes.push(t('notifications.changes.salary', { from: salaryStart, to: salaryEnd }));
+      }
+      
+      if (variables.contractTypeStart && variables.contractTypeEnd && variables.contractTypeStart !== variables.contractTypeEnd) {
+        const contractTypeStart = variables.contractTypeStart.startsWith('notifications.') 
+          ? t(variables.contractTypeStart) 
+          : variables.contractTypeStart;
+        const contractTypeEnd = variables.contractTypeEnd;
+        changes.push(t('notifications.changes.contractType', { from: contractTypeStart, to: contractTypeEnd }));
+      }
+      
+      if (variables.interviewStart && variables.interviewEnd && variables.interviewStart !== variables.interviewEnd) {
+        const interviewStart = variables.interviewStart === 'notifications.noInterview' 
+          ? t('notifications.noInterview') 
+          : variables.interviewStart;
+        const interviewEnd = variables.interviewEnd;
+        changes.push(t('notifications.changes.interview', { from: interviewStart, to: interviewEnd }));
+      }
+      
+      if (variables.titleStart && variables.titleEnd && variables.titleStart !== variables.titleEnd) {
+        changes.push(t('notifications.changes.title', { from: variables.titleStart, to: variables.titleEnd }));
+      }
+      
+      if (variables.companyStart && variables.companyEnd && variables.companyStart !== variables.companyEnd) {
+        changes.push(t('notifications.changes.company', { from: variables.companyStart, to: variables.companyEnd }));
+      }
+      
+      if (changes.length > 0) {
+        return `${baseMessage}\n${changes.join('\n')}`;
+      } else {
+        return baseMessage;
+      }
+    }
+    
+    // Pour les autres messages, utiliser la traduction normale
+    return t(messageKey, variables);
+  };
+
+  const formatTimestamp = (created_at) => {
+    if (!created_at) return t('notifications.time.unknown');
+    
     const now = new Date()
-    const notificationTime = new Date(timestamp)
+    const notificationTime = new Date(created_at)
+    
+    // Vérifier si la date est valide
+    if (isNaN(notificationTime.getTime())) {
+      return t('notifications.time.unknown');
+    }
+    
     const diffInMinutes = Math.floor((now - notificationTime) / (1000 * 60))
 
-    if (diffInMinutes < 60) {
-      return `Il y a ${diffInMinutes} min`
+    if (diffInMinutes < 1) {
+      return t('notifications.time.now')
+    } else if (diffInMinutes < 60) {
+      return t('notifications.time.minutes', { minutes: diffInMinutes })
     } else if (diffInMinutes < 1440) {
       const hours = Math.floor(diffInMinutes / 60)
-      return `Il y a ${hours}h`
+      return t('notifications.time.hours', { hours })
     } else {
       const days = Math.floor(diffInMinutes / 1440)
-      return `Il y a ${days}j`
+      return t('notifications.time.days', { days })
     }
   }
 
   const filteredNotifications = getFilteredNotifications()
-  const unreadCount = notifications.filter((n) => !n.read).length
 
   // Affichage loading
   if (loading) {
@@ -280,7 +204,7 @@ function Notifications() {
         <div className="notifications-container">
           <div className="loading-state">
             <div className="loading-spinner"></div>
-            <p>Chargement des notifications...</p>
+            <p>{t('notifications.loading')}</p>
           </div>
         </div>
       </div>
@@ -294,10 +218,10 @@ function Notifications() {
         <div className="notifications-container">
           <div className="error-state">
             <div className="error-icon">⚠️</div>
-            <h3>Erreur de chargement</h3>
+            <h3>{t('notifications.errors.title')}</h3>
             <p>{error}</p>
             <button className="retry-button" onClick={fetchNotifications}>
-              Réessayer
+              {t('notifications.actions.retry')}
             </button>
           </div>
         </div>
@@ -310,21 +234,21 @@ function Notifications() {
       <div className="notifications-container">
         <div className="notifications-header">
           <div className="header-title">
-            <h1>Notifications</h1>
-            {unreadCount > 0 && <span className="unread-badge">{unreadCount} non lues</span>}
+            <h1>{t('notifications.title')}</h1>
+            {unreadCount > 0 && <span className="unread-badge">{t('notifications.unread.badge', { count: unreadCount })}</span>}
           </div>
 
           <div className="header-actions">
-            <button className="action-button" onClick={markAllAsRead} disabled={unreadCount === 0}>
-              Tout marquer comme lu
+            <button className="action-button all-read" onClick={markAllAsRead} disabled={unreadCount === 0}>
+              {t('notifications.actions.markAllRead')}
             </button>
             {selectedNotifications.size > 0 && (
               <button className="action-button delete" onClick={deleteSelected}>
-                Supprimer sélectionnées ({selectedNotifications.size})
+                {t('notifications.actions.deleteSelected', { count: selectedNotifications.size })}
               </button>
             )}
             <button className="action-button refresh" onClick={fetchNotifications}>
-              🔄 Actualiser
+              {t('notifications.actions.refresh')}
             </button>
           </div>
         </div>
@@ -339,47 +263,47 @@ function Notifications() {
         <div className="notifications-controls">
           <div className="filter-buttons">
             <button className={`filter-button ${filter === "all" ? "active" : ""}`} onClick={() => setFilter("all")}>
-              Toutes ({notifications.length})
+              {t('notifications.filters.all', { count: notifications.length })}
             </button>
             <button
               className={`filter-button ${filter === "unread" ? "active" : ""}`}
               onClick={() => setFilter("unread")}
             >
-              Non lues ({unreadCount})
+              {t('notifications.filters.unread', { count: unreadCount })}
             </button>
             <button className={`filter-button ${filter === "read" ? "active" : ""}`} onClick={() => setFilter("read")}>
-              Lues ({notifications.length - unreadCount})
+              {t('notifications.filters.read', { count: notifications.length - unreadCount })}
             </button>
             <button
-              className={`filter-button ${filter === "success" ? "active" : ""}`}
-              onClick={() => setFilter("success")}
+              className={`filter-button ${filter === "POSITIVE" ? "active" : ""}`}
+              onClick={() => setFilter("POSITIVE")}
             >
-              Succès
+              {t('notifications.filters.positive')}
             </button>
             <button
-              className={`filter-button ${filter === "warning" ? "active" : ""}`}
-              onClick={() => setFilter("warning")}
+              className={`filter-button ${filter === "WARNING" ? "active" : ""}`}
+              onClick={() => setFilter("WARNING")}
             >
-              Avertissements
+              {t('notifications.filters.warning')}
             </button>
             <button
-              className={`filter-button ${filter === "error" ? "active" : ""}`}
-              onClick={() => setFilter("error")}
+              className={`filter-button ${filter === "NEGATIVE" ? "active" : ""}`}
+              onClick={() => setFilter("NEGATIVE")}
             >
-              Erreurs
+              {t('notifications.filters.negative')}
             </button>
-            <button className={`filter-button ${filter === "info" ? "active" : ""}`} onClick={() => setFilter("info")}>
-              Infos
+            <button className={`filter-button ${filter === "INFO" ? "active" : ""}`} onClick={() => setFilter("INFO")}>
+              {t('notifications.filters.info')}
             </button>
           </div>
 
           {filteredNotifications.length > 0 && (
             <div className="selection-controls">
               <button className="selection-button" onClick={selectAll}>
-                Tout sélectionner
+                {t('notifications.actions.selectAll')}
               </button>
               <button className="selection-button" onClick={deselectAll}>
-                Tout désélectionner
+                {t('notifications.actions.deselectAll')}
               </button>
             </div>
           )}
@@ -391,67 +315,65 @@ function Notifications() {
               <div
                 key={notification.id}
                 className={`notification-item ${notification.type} ${!notification.read ? "unread" : ""} ${selectedNotifications.has(notification.id) ? "selected" : ""}`}
+                onClick={() => handleNotificationClick(notification)}
               >
-                <div className="notification-checkbox">
+                <div className="notification-checkbox" onClick={(e) => e.stopPropagation()}>
                   <input
                     type="checkbox"
                     checked={selectedNotifications.has(notification.id)}
                     onChange={() => toggleSelection(notification.id)}
                   />
                 </div>
-
-                <div className="notification-icon">{getNotificationIcon(notification.type)}</div>
-
+                
                 <div className="notification-content">
                   <div className="notification-header">
-                    <h3 className="notification-title">{notification.title}</h3>
-                    <span className="notification-time">{formatTimestamp(notification.timestamp)}</span>
+                    <h3 className="notification-title">{
+                      notification.titleKey 
+                        ? t(notification.titleKey, notification.variables || {})
+                        : notification.title || t('notifications.titles.application.updated')
+                    }</h3>
+                    <span className="notification-time">{formatTimestamp(notification.createdAt)}</span>
                   </div>
 
-                  <p className="notification-message">{notification.message}</p>
+                  <div 
+                    className="notification-message"
+                    dangerouslySetInnerHTML={{
+                      __html: (notification.messageKey 
+                        ? formatNotificationMessage(notification.messageKey, notification.variables || {})
+                        : notification.message || ''
+                      ).replace(/\n/g, '<br>')
+                    }}
+                  />
 
                   {notification.company && <span className="notification-company">📍 {notification.company}</span>}
                 </div>
 
-                <div className="notification-actions">
-                  {!notification.read ? (
-                    <button
-                      className="notification-action-button"
-                      onClick={() => markAsRead(notification.id)}
-                      title="Marquer comme lu"
-                    >
-                      👁️
-                    </button>
-                  ) : (
-                    <button
-                      className="notification-action-button"
-                      onClick={() => markAsUnread(notification.id)}
-                      title="Marquer comme non lu"
-                    >
-                      👁️‍🗨️
-                    </button>
-                  )}
+                <div className="notification-actions" onClick={(e) => e.stopPropagation()}>
+                  <div className="notification-status">
+                    {!notification.read ? (
+                      <div className="unread-indicator-modern">
+                        <span className="unread-dot"></span>
+                        <span className="unread-text">{t('notifications.status.unread')}</span>
+                      </div>
+                    ) : (
+                      <div className="read-indicator">
+                        <span className="read-icon">✓</span>
+                        <span className="read-text">{t('notifications.status.read')}</span>
+                      </div>
+                    )}
+                  </div>
 
-                  <button
-                    className="notification-action-button delete"
-                    onClick={() => deleteNotification(notification.id)}
-                    title="Supprimer"
-                  >
-                    🗑️
-                  </button>
                 </div>
-
-                {!notification.read && <div className="unread-indicator"></div>}
               </div>
             ))
           ) : (
             <div className="empty-state">
               <div className="empty-icon">🔔</div>
-              <h3 className="empty-title">Aucune notification</h3>
+              <h3 className="empty-title">{t('notifications.empty.title')}</h3>
               <p className="empty-text">
                 {filter === "all"
-                  ? "Vous n'avez aucune notification pour le moment."
-                  : `Aucune notification ${filter === "unread" ? "non lue" : filter} trouvée.`}
+                  ? t('notifications.empty.noNotifications')
+                  : t('notifications.empty.noFilteredNotifications', { filter: t(`notifications.filters.${filter.toLowerCase()}`) })}
               </p>
             </div>
           )}

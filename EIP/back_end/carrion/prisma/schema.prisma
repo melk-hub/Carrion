@@ -61,10 +61,11 @@ model Token {
 model Notification {
   id            String     @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
   userId        String     @db.Uuid
-  type          NotifcationType
-  company       String
-  title         String
-  message       String
+  type          NotificationType
+  titleKey      String?
+  messageKey    String?
+  variables     Json?
+  language      String?    @default("fr")
   createdAt     DateTime   @default(now())
   read          Boolean    @default(false)
   user          User       @relation("UserNotifications", fields: [userId], references: [id], onDelete: Cascade)
@@ -110,7 +111,7 @@ model Settings {
   monthlyGoal Int      @default(30)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-  User        User     @relation("UserSettings", fields: [userId], references: [id])
+  user        User     @relation("UserSettings", fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model CarrionAchievement {

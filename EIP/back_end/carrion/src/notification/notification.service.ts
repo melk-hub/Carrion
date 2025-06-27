@@ -68,18 +68,23 @@ export class NotificationService {
 
   async createNotification(data: {
     userId: string;
-    company: string;
-    title: string;
+    titleKey: string;
+    messageKey: string;
     type: 'POSITIVE' | 'NEGATIVE' | 'INFO' | 'WARNING';
-    message: string;
+    variables?: Record<string, any>;
+    language?: string;
   }) {
+    const language = data.language || 'fr';
+    const variables = data.variables || {};
+
     return this.prisma.notification.create({
       data: {
         userId: data.userId,
-        company: data.company,
-        title: data.title,
         type: data.type,
-        message: data.message,
+        titleKey: data.titleKey,
+        messageKey: data.messageKey,
+        variables: variables,
+        language: language,
       },
     });
   }

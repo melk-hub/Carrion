@@ -34,7 +34,8 @@
     "profile": "Mon profil",
     "settings": "Paramètres",
     "logout": "Se déconnecter",
-    "reduceAnimations": "Réduire animations"
+    "reduceAnimations": "Réduire animations",
+    "notification": "Notifications"
   },
   "landing": {
     "testimonials": {
@@ -372,5 +373,109 @@
     "invalidUrl": "URL invalide",
     "invalidDate": "Date invalide",
     "invalidSalary": "Salaire invalide"
+  },
+  "notifications": {
+    "application": {
+      "created": "Votre candidature chez {{company}} en tant que {{jobTitle}} a été enregistrée!",
+      "deleted": "Votre candidature chez {{company}} en tant que {{jobTitle}} a été supprimée!",
+      "updated": {
+        "base": "Votre candidature chez {{company}} en tant que {{jobTitle}} a été modifiée: "
+      },
+      "archived": "Votre candidature chez {{company}} en tant que {{jobTitle}} a été archivée!",
+      "unarchived": "Votre candidature chez {{company}} en tant que {{jobTitle}} a été désarchivée!"
+    },
+    "archive": {
+      "deleted": "Votre candidature chez {{company}} en tant que {{jobTitle}} a été supprimée!",
+      "updated": "Votre candidature chez {{company}} en tant que {{jobTitle}} a été modifiée!"
+    },
+    "goal": {
+      "weekly": {
+        "created": "Votre objectif hebdomadaire a été fixé à {{weeklyGoal}} candidatures par semaine.",
+        "updated": "Votre objectif hebdomadaire a été mis à jour de {{oldGoal}} à {{newGoal}} candidatures par semaine."
+      },
+      "monthly": {
+        "created": "Votre objectif mensuel a été fixé à {{monthlyGoal}} candidatures par mois.",
+        "updated": "Votre objectif mensuel a été mis à jour de {{oldGoal}} à {{newGoal}} candidatures par mois."
+      }
+    },
+    "titles": {
+      "application": {
+        "created": "Création de votre candidature",
+        "deleted": "Suppression de votre candidature",
+        "updated": "Modification de votre candidature",
+        "archived": "Archivage de votre candidature",
+        "unarchived": "Désarchivage de votre candidature"
+      },
+      "archive": {
+        "deleted": "Suppression de votre candidature archivée",
+        "updated": "Modification de votre candidature archivée"
+      },
+      "goal": {
+        "weekly": "Objectif hebdomadaire fixé",
+        "weeklyUpdated": "Objectif hebdomadaire mis à jour",
+        "monthly": "Objectif mensuel fixé",
+        "monthlyUpdated": "Objectif mensuel mis à jour"
+      }
+    },
+    "changes": {
+      "status": " Statut: {{from}} en {{to}}",
+      "location": " Lieu: {{from}} en {{to}}",
+      "salary": " Salaire: {{from}} en {{to}}",
+      "contractType": " Type de contrat: {{from}} en {{to}}",
+      "interview": " Date d'entretien: {{from}} en {{to}}",
+      "title": " Poste: {{from}} en {{to}}",
+      "company": " Entreprise: {{from}} en {{to}}"
+    },
+    "noLocation": "Non spécifié",
+    "noSalary": "Non spécifié",
+    "noInterview": "Non programmé",
+    "noContractType": "Non spécifié",
+    "weekly": "Objectif hebdomadaire fixé",
+    "monthly": "Objectif mensuel fixé",
+    "title": "Notifications",
+    "loading": "Chargement des notifications...",
+    "errors": {
+      "title": "Erreur lors du chargement des notifications",
+      "fetch": "Erreur lors de la récupération des notifications"
+    },
+    "unread": {
+      "badge": "{{count}} non lus"
+    },
+    "actions": {
+      "markAllRead": "Marquer toutes comme lues",
+      "deleteSelected": "Supprimer ({{count}})",
+      "refresh": "Actualiser",
+      "retry": "Réessayer",
+      "selectAll": "Tout sélectionner",
+      "deselectAll": "Tout désélectionner",
+      "markRead": "Marquer comme lue",
+      "markUnread": "Marquer comme non lue",
+      "delete": "Supprimer"
+    },
+    "filters": {
+      "all": "Toutes ({{count}})",
+      "unread": "Non lue(s) ({{count}})",
+      "read": "Lue(s) ({{count}})",
+      "positive": "Succès",
+      "warning": "Alertes",
+      "negative": "Erreurs",
+      "info": "Informations"
+    },
+    "time": {
+      "unknown": "Date inconnue",
+      "now": "Maintenant",
+      "minutes": "{{minutes}}m",
+      "hours": "{{hours}}h",
+      "days": "{{days}}d"
+    },
+    "status": {
+      "read": "Lu",
+      "unread": "Non lu"
+    },
+    "empty": {
+      "title": "Aucune notification",
+      "noNotifications": "Vous n'avez pas de notifications pour le moment.",
+      "noFilteredNotifications": "Aucune notification {{filter}} trouvée."
+    }
   }
 } 

@@ -15,6 +15,7 @@ import Statistics from "./pages/Statistics";
 import AuthCallback from "./components/AuthCallback";
 import { useAuth, AuthProvider } from "./AuthContext";
 import { LanguageProvider } from "./contexts/LanguageContext";
+import { NotificationProvider } from "./contexts/NotificationContext";
 import { useLanguage } from "./contexts/LanguageContext";
 import Navbar from "./pages/Navbar";
 import Profile from "./pages/Profile";
@@ -26,29 +27,31 @@ function App() {
   return (
     <AuthProvider>
       <LanguageProvider>
-        <Router>
-          <Toaster
-            position="top-center"
-            toastOptions={{
-              duration: 4000,
-              style: {
-                background: "#363636",
-                color: "#fff",
-              },
-              success: {
+        <NotificationProvider>
+          <Router>
+            <Toaster
+              position="top-center"
+              toastOptions={{
+                duration: 4000,
                 style: {
-                  background: "#4CAF50",
+                  background: "#363636",
+                  color: "#fff",
                 },
-              },
-              error: {
-                style: {
-                  background: "#F44336",
+                success: {
+                  style: {
+                    background: "#4CAF50",
+                  },
                 },
-              },
-            }}
-          />
-          <AppLayout />
-        </Router>
+                error: {
+                  style: {
+                    background: "#F44336",
+                  },
+                },
+              }}
+            />
+            <AppLayout />
+          </Router>
+        </NotificationProvider>
       </LanguageProvider>
     </AuthProvider>
   );

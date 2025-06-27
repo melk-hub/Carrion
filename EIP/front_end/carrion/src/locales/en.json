@@ -32,7 +32,8 @@
     "profile": "My Profile",
     "settings": "Settings",
     "logout": "Logout",
-    "reduceAnimations": "Reduce animations"
+    "reduceAnimations": "Reduce animations",
+    "notification": "Notifications"
   },
   "landing": {
     "title": "The ideal platform to manage your applications",
@@ -353,12 +354,116 @@
     "FULL_TIME": "Full-time"
   },
   "validation": {
-    "companyRequired": "The company name is required",
-    "positionRequired": "The job title is required",
-    "statusRequired": "The status is required",
-    "contractTypeRequired": "The contract type is required",
+    "companyRequired": "Company name is required",
+    "positionRequired": "Job title is required",
+    "statusRequired": "Status is required",
+    "contractTypeRequired": "Contract type is required",
     "invalidUrl": "Invalid URL",
     "invalidDate": "Invalid date",
     "invalidSalary": "Invalid salary"
+  },
+  "notifications": {
+    "application": {
+      "created": "Your application at {{company}} as {{jobTitle}} has been recorded!",
+      "deleted": "Your application at {{company}} as {{jobTitle}} has been deleted!",
+      "updated": {
+        "base": "Your application at {{company}} as {{jobTitle}} has been modified: "
+      },
+      "archived": "Your application at {{company}} as {{jobTitle}} has been successfully archived!",
+      "unarchived": "Your archived application at {{company}} as {{jobTitle}} has been successfully unarchived!"
+    },
+    "archive": {
+      "deleted": "Your archived application at {{company}} as {{jobTitle}} has been deleted!",
+      "updated": "Your archived application at {{company}} as {{jobTitle}} has been modified!"
+    },
+    "goal": {
+      "weekly": {
+        "created": "Your weekly goal has been set to {{weeklyGoal}} applications per week.",
+        "updated": "Your weekly goal has been changed from {{oldGoal}} to {{newGoal}} applications per week."
+      },
+      "monthly": {
+        "created": "Your monthly goal has been set to {{monthlyGoal}} applications per month.",
+        "updated": "Your monthly goal has been changed from {{oldGoal}} to {{newGoal}} applications per month."
+      }
+    },
+    "titles": {
+      "application": {
+        "created": "Application creation",
+        "deleted": "Application deletion",
+        "updated": "Application modification",
+        "archived": "Application archiving",
+        "unarchived": "Application unarchiving"
+      },
+      "archive": {
+        "deleted": "Archived application deletion",
+        "updated": "Archived application modification"
+      },
+      "goal": {
+        "weekly": "Weekly goal set",
+        "weeklyUpdated": "Weekly goal modified",
+        "monthly": "Monthly goal set",
+        "monthlyUpdated": "Monthly goal modified"
+      }
+    },
+    "changes": {
+      "status": " Status: {{from}} → {{to}}",
+      "location": " Location: {{from}} → {{to}}",
+      "salary": " Salary: {{from}} → {{to}}",
+      "contractType": " Contract type: {{from}} → {{to}}",
+      "interview": " Interview date: {{from}} → {{to}}",
+      "title": " Position: {{from}} → {{to}}",
+      "company": " Company: {{from}} → {{to}}"
+    },
+    "noLocation": "Not specified",
+    "noSalary": "Not specified", 
+    "noInterview": "Not scheduled",
+    "noContractType": "Not specified",
+    "weekly": "Weekly goal set",
+    "monthly": "Monthly goal set",
+    "title": "Notifications",
+    "loading": "Charging notifications...",
+    "errors": {
+      "title": "Error loading notifications",
+      "fetch": "Error fetching notifications"
+    },
+    "unread": {
+      "badge": "{{count}} unread"
+    },
+    "actions": {
+      "markAllRead": "Mark all as read",
+      "deleteSelected": "Delete selected ({{count}})",
+      "refresh": "Refresh",
+      "retry": "Retry",
+      "selectAll": "Select all",
+      "deselectAll": "Deselect all",
+      "markRead": "Mark as read",
+      "markUnread": "Mark as unread",
+      "delete": "Delete"
+    },
+    "filters": {
+      "all": "All ({{count}})",
+      "unread": "Unread ({{count}})",
+      "read": "Read ({{count}})",
+      "positive": "Success",
+      "warning": "Warnings",
+      "negative": "Errors",
+      "info": "Infos"
+    },
+    "time": {
+      "unknown": "Unknown date",
+      "now": "Now",
+      "minutes": "{{minutes}}m ago",
+      "hours": "{{hours}}h ago",
+      "days": "{{days}}d ago"
+    },
+    "status": {
+      "read": "Read",
+      "unread": "Unread"
+    },
+    "empty": {
+      "title": "No notifications",
+      "noNotifications": "You have no notifications for the moment.",
+      "noFilteredNotifications": "No notifications {{filter}} found."
+    }
   }
 } 
