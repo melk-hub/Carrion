@@ -6,6 +6,7 @@ import "../styles/AuthModal.css";
 import GoogleLoginButton from "./GoogleLoginBtn";
 import OutlookLoginButton from "./OutlookLoginButton";
 import { motion, AnimatePresence } from "framer-motion";
+import { FiEye, FiEyeOff } from "react-icons/fi";
 
 function AuthModal({ isOpen, onClose, defaultTab }) {
   const [activeTab, setActiveTab] = useState(defaultTab || "login");
@@ -17,6 +18,7 @@ function AuthModal({ isOpen, onClose, defaultTab }) {
   const [errorMessage, setErrorMessage] = useState("");
   const [searchParams] = useSearchParams();
   const API_URL = process.env.REACT_APP_API_URL;
+  const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
     setActiveTab(defaultTab || "login");
@@ -39,6 +41,10 @@ function AuthModal({ isOpen, onClose, defaultTab }) {
       ...prevCredentials,
       [name]: newValue,
     }));
+  };
+
+  const togglePasswordVisibility = () => {
+    setShowPassword((prev) => !prev);
   };
 
   const handleTabChange = (tab) => {
@@ -164,14 +170,19 @@ function AuthModal({ isOpen, onClose, defaultTab }) {
                   required
                 />
                 <label>{t("auth.password")}</label>
-                <input
-                  type="password"
-                  name="password"
-                  placeholder={t("auth.password")}
-                  value={credentials.password}
-                  onChange={handleChange}
-                  required
-                />
+                <div className="password-wrapper">
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    name="password"
+                    placeholder={t("auth.password")}
+                    value={credentials.password}
+                    onChange={handleChange}
+                    required
+                  />
+                  <span className="toggle-password" onClick={togglePasswordVisibility}>
+    {showPassword ? <FiEyeOff size={20} /> : <FiEye size={20} />}
+  </span>
+                </div>
                 {errorMessage && (
                   <p className="error-message">{errorMessage}</p>
                 )}
@@ -231,25 +242,35 @@ function AuthModal({ isOpen, onClose, defaultTab }) {
                 <div className="row-inputs">
                   <div>
                     <label>{t("auth.password")}</label>
-                    <input
-                      type="password"
-                      name="password"
-                      placeholder={t("auth.password")}
-                      value={credentials.password}
-                      onChange={handleChange}
-                      required
-                    />
+                    <div className="password-wrapper">
+                      <input
+                        type={showPassword ? "text" : "password"}
+                        name="password"
+                        placeholder={t("auth.password")}
+                        value={credentials.password}
+                        onChange={handleChange}
+                        required
+                      />
+                      <span className="toggle-password" onClick={togglePasswordVisibility}>
+    {showPassword ? <FiEyeOff size={20} /> : <FiEye size={20} />}
+  </span>
+                    </div>
                   </div>
                   <div>
                     <label>{t("auth.confirmPassword")}</label>
-                    <input
-                      type="password"
-                      name="confirmPassword"
-                      placeholder={t("auth.confirmPassword")}
-                      value={credentials.confirmPassword}
-                      onChange={handleChange}
-                      required
-                    />
+                    <div className="password-wrapper">
+                      <input
+                        type={showPassword ? "text" : "password"}
+                        name="confirmPassword"
+                        placeholder={t("auth.confirmPassword")}
+                        value={credentials.confirmPassword}
+                        onChange={handleChange}
+                        required
+                      />
+                      <span className="toggle-password" onClick={togglePasswordVisibility}>
+    {showPassword ? <FiEyeOff size={20} /> : <FiEye size={20} />}
+  </span>
+                    </div>
                   </div>
                 </div>
                 <button type="submit" className="primary-btn">
