@@ -186,12 +186,6 @@ function AppLayout() {
                 <Notifications sidebarCollapsed={sidebarCollapsed}/>
               ) : (
                 <Navigate to="/" replace state={{ from: location }} />
-            path="/ranking"
-            element={
-              isAuthenticated ? (
-                <Ranking />
-              ) : (
-                <Ranking />
               )
             }
           />
