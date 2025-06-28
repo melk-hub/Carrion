@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useLanguage } from '../contexts/LanguageContext';
+import { useNotifications } from '../contexts/NotificationContext';
 import { useAuth } from '../AuthContext';
 import LanguageDropdown from '../components/LanguageDropdown';
 import ToggleSwitch from '../components/ToogleSwitch';
@@ -19,11 +20,11 @@ function Navbar({ sidebarCollapsed, setSidebarCollapsed, setIsAuthenticated }) {
   const navigate = useNavigate();
   const location = useLocation();
   const { t } = useLanguage();
+  const { unreadCount, fetchNotifications } = useNotifications();
   const { getUserDisplayName } = useAuth();
   const API_URL = process.env.REACT_APP_API_URL;
 
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [notification, setNotification] = useState(false);
   const dropdownRef = useRef(null);
 
   // Fonction pour obtenir le nom de la page actuelle
@@ -41,6 +42,8 @@ function Navbar({ sidebarCollapsed, setSidebarCollapsed, setIsAuthenticated }) {
         return t('navbar.settings');
       case '/statistics':
         return t('navbar.statistics');
+      case '/notification':
+        return t('navbar.notification');
       default:
         return '';
     }
@@ -50,6 +53,11 @@ function Navbar({ sidebarCollapsed, setSidebarCollapsed, setIsAuthenticated }) {
   const navigateAndScrollTop = (path) => {
     navigate(path);
     window.scrollTo({ top: 0, behavior: 'smooth' });
+    
+    // Si on navigue vers les notifications, rafraîchir le compteur
+    if (path === '/notification') {
+      setTimeout(fetchNotifications, 500);
+    }
   };
 
   const handleLogout = async () => {
@@ -98,13 +106,6 @@ function Navbar({ sidebarCollapsed, setSidebarCollapsed, setIsAuthenticated }) {
         </span>
         <div className="topbar-right">
           <LanguageDropdown className="dark-theme" style={{color: 'white'}}/>
-          <img 
-            src={notification ? notification_icon : bell} 
-            alt={notification ? "Notification" : "Bell"} 
-            className="menu-icon notifications" 
-            style={{width: '30px', height: '30px'}} 
-            onClick={() => setNotification(!notification)}
-          />
           <div className="user-profile" ref={dropdownRef} onClick={handleToggleDropdown}>
             <img src={avatar} alt="User" className="avatar" />
             {isDropdownOpen && (
@@ -135,6 +136,22 @@ function Navbar({ sidebarCollapsed, setSidebarCollapsed, setIsAuthenticated }) {
             <img src={statistics} alt="Statistics" className="menu-icon" style={{width: '20px', height: '20px'}}/>
             <span className="menu-text">{t('navbar.statistics')}</span>
           </li>
+          <li onClick={() => navigate('/notification')} className={isActive('/notification') ? 'active' : ''}>
+            <div className="notifications" style={{ position: 'relative' }}>
+              <img 
+                src={unreadCount > 0 ? notification_icon : bell} 
+                alt={unreadCount > 0 ? "Notification" : "Bell"} 
+                className={`menu-icon notifications ${unreadCount > 0 ? 'has-unread' : ''}`}
+                style={{width: '25px', height: '25px'}} 
+              />
+              {unreadCount > 0 && (
+                <span className="notification-badge">
+                  {unreadCount > 99 ? '99+' : unreadCount}
+                </span>
+              )}
+            </div>
+            <span className="menu-text">{t('navbar.notification')}</span>
+          </li>
         </ul>
         <div className="motion-toggle">
           <ToggleSwitch 
@@ -143,6 +160,8 @@ function Navbar({ sidebarCollapsed, setSidebarCollapsed, setIsAuthenticated }) {
           />
         </div>
       </div>
+      <div className="corner-bg" />
+      <div className="corner-curve" />
     </header>
   );
 }

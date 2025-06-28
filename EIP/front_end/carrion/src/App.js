@@ -15,39 +15,43 @@ import Statistics from "./pages/Statistics";
 import AuthCallback from "./components/AuthCallback";
 import { useAuth, AuthProvider } from "./AuthContext";
 import { LanguageProvider } from "./contexts/LanguageContext";
+import { NotificationProvider } from "./contexts/NotificationContext";
 import { useLanguage } from "./contexts/LanguageContext";
 import Navbar from "./pages/Navbar";
 import Profile from "./pages/Profile";
 import { Toaster } from "react-hot-toast";
 import Settings from "./pages/Settings";
+import Notifications from "./pages/Notification";
 
 function App() {
   return (
     <AuthProvider>
       <LanguageProvider>
-        <Router>
-          <Toaster
-            position="top-center"
-            toastOptions={{
-              duration: 4000,
-              style: {
-                background: "#363636",
-                color: "#fff",
-              },
-              success: {
+        <NotificationProvider>
+          <Router>
+            <Toaster
+              position="top-center"
+              toastOptions={{
+                duration: 4000,
                 style: {
-                  background: "#4CAF50",
+                  background: "#363636",
+                  color: "#fff",
                 },
-              },
-              error: {
-                style: {
-                  background: "#F44336",
+                success: {
+                  style: {
+                    background: "#4CAF50",
+                  },
                 },
-              },
-            }}
-          />
-          <AppLayout />
-        </Router>
+                error: {
+                  style: {
+                    background: "#F44336",
+                  },
+                },
+              }}
+            />
+            <AppLayout />
+          </Router>
+        </NotificationProvider>
       </LanguageProvider>
     </AuthProvider>
   );
@@ -169,6 +173,16 @@ function AppLayout() {
             element={
               isAuthenticated ? (
                 <Settings />
+              ) : (
+                <Navigate to="/" replace state={{ from: location }} />
+              )
+            }
+          />
+          <Route
+            path="/notification"
+            element={
+              isAuthenticated ? (
+                <Notifications sidebarCollapsed={sidebarCollapsed}/>
               ) : (
                 <Navigate to="/" replace state={{ from: location }} />
               )

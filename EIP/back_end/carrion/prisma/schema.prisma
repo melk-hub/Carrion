@@ -59,15 +59,16 @@ model Token {
 }
 
 model Notification {
-  id        String           @id @default(uuid()) @db.Uuid
-  userId    String           @db.Uuid
-  type      NotificationType
-  company   String
-  title     String
-  message   String
-  createdAt DateTime         @default(now())
-  read      Boolean          @default(false)
-  user      User             @relation("UserNotifications", fields: [userId], references: [id], onDelete: Cascade)
+  id            String     @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  userId        String     @db.Uuid
+  type          NotificationType
+  titleKey      String?
+  messageKey    String?
+  variables     Json?
+  language      String?    @default("fr")
+  createdAt     DateTime   @default(now())
+  read          Boolean    @default(false)
+  user          User       @relation("UserNotifications", fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model jobApply {
@@ -110,9 +111,7 @@ model Settings {
   monthlyGoal Int      @default(30)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-  
-  // --- UNIQUE MODIFICATION ---
-  User        User     @relation("UserSettings", fields: [userId], references: [id], onDelete: Cascade)
+  user        User     @relation("UserSettings", fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model CarrionAchievement {
@@ -183,8 +182,8 @@ enum AchievementType {
 }
 
 enum NotificationType {
-  SUCCESS
-  ERROR
+  POSITIVE
+  NEGATIVE
   WARNING
   INFO
   DEFAULT
