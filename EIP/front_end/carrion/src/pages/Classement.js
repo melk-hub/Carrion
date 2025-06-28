@@ -20,6 +20,29 @@ function Ranking() {
     fetchRanking(1)
   }, [])
 
+  const calculateUserPage = (userRank, usersPerPage) => {
+    if (!userRank) return 1
+    return Math.ceil(userRank / usersPerPage)
+  }
+
+  const fetchTopThree = async () => {
+    try {
+      const response = await axios.get(`${API_URL}/users/all-users`, {
+        params: {
+          page: 1,
+          limit: 3,
+        },
+        withCredentials: true,
+      })
+
+      if (response.data.users && response.data.users.length > 0) {
+        setTopThreeUsers(response.data.users.slice(0, 3))
+      }
+    } catch (err) {
+      console.error("Erreur lors de la récupération du top 3:", err)
+    }
+  }
+
   const fetchRanking = async (page = 1) => {
     try {
       setLoading(true)
