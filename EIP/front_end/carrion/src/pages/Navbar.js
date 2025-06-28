@@ -15,6 +15,7 @@ import bell  from "../assets/bell.png";
 import avatar from "../assets/avatar.png";
 import notification_icon from "../assets/notification.png";
 import statistics from '../assets/pie-chart.png';
+import podium from '../assets/podium.png';
 
 function Navbar({ sidebarCollapsed, setSidebarCollapsed, setIsAuthenticated }) {
   const navigate = useNavigate();
@@ -44,6 +45,8 @@ function Navbar({ sidebarCollapsed, setSidebarCollapsed, setIsAuthenticated }) {
         return t('navbar.statistics');
       case '/notification':
         return t('navbar.notification');
+      case '/ranking':
+        return t('navbar.ranking');
       default:
         return '';
     }
@@ -135,6 +138,10 @@ function Navbar({ sidebarCollapsed, setSidebarCollapsed, setIsAuthenticated }) {
           <li onClick={() => navigate('/statistics')} className={isActive('/statistics') ? 'active' : ''}>
             <img src={statistics} alt="Statistics" className="menu-icon" style={{width: '20px', height: '20px'}}/>
             <span className="menu-text">{t('navbar.statistics')}</span>
+          </li>
+          <li onClick={() => navigate('/ranking')} className={isActive('/ranking') ? 'active' : ''}>
+            <img src={podium} alt="Podium" className="menu-icon" style={{width: '20px', height: '20px'}}/>
+            <span className="menu-text">{t('navbar.ranking')}</span>
           </li>
           <li onClick={() => navigate('/notification')} className={isActive('/notification') ? 'active' : ''}>
             <div className="notifications" style={{ position: 'relative' }}>
