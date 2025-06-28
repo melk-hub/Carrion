@@ -160,6 +160,8 @@ function Navbar({ sidebarCollapsed, setSidebarCollapsed, setIsAuthenticated }) {
           />
         </div>
       </div>
+      <div className="corner-bg" />
+      <div className="corner-curve" />
     </header>
   );
 }
