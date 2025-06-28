@@ -92,4 +92,9 @@ export class UserController {
   async updateProfile(@Req() req, @Body() updateUserDto: UpdateUserDto) {
     return this.userService.update(req.user.id, updateUserDto);
   }
+
+  @Get('all-users')
+  async getUsersWithStats() {
+    return this.userService.getUsersWithStats();
+  }
 }
