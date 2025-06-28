@@ -180,13 +180,13 @@ function AuthModal({ isOpen, onClose, defaultTab }) {
                     required
                   />
                   <span className="toggle-password" onClick={togglePasswordVisibility}>
-    {showPassword ? <FiEyeOff size={20} /> : <FiEye size={20} />}
-  </span>
+                    {showPassword ? <FiEyeOff size={20} /> : <FiEye size={20} />}
+                  </span>
                 </div>
                 {errorMessage && (
                   <p className="error-message">{errorMessage}</p>
                 )}
-                <div>
+                <div style={{ marginTop: "3%" }}>
                   <input
                     type="checkbox"
                     id="rememberMe"
@@ -252,8 +252,8 @@ function AuthModal({ isOpen, onClose, defaultTab }) {
                         required
                       />
                       <span className="toggle-password" onClick={togglePasswordVisibility}>
-    {showPassword ? <FiEyeOff size={20} /> : <FiEye size={20} />}
-  </span>
+                        {showPassword ? <FiEyeOff size={20} /> : <FiEye size={20} />}
+                      </span>
                     </div>
                   </div>
                   <div>
@@ -268,8 +268,8 @@ function AuthModal({ isOpen, onClose, defaultTab }) {
                         required
                       />
                       <span className="toggle-password" onClick={togglePasswordVisibility}>
-    {showPassword ? <FiEyeOff size={20} /> : <FiEye size={20} />}
-  </span>
+                        {showPassword ? <FiEyeOff size={20} /> : <FiEye size={20} />}
+                      </span>
                     </div>
                   </div>
                 </div>

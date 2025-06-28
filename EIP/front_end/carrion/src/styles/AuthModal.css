@@ -235,6 +235,7 @@
   height: 100%;
   cursor: pointer;
   color: #666;
+  margin-top: 1%;
 }
 
 .toggle-password:hover {
