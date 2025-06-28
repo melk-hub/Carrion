@@ -33,7 +33,8 @@
     "settings": "Settings",
     "logout": "Logout",
     "reduceAnimations": "Reduce animations",
-    "notification": "Notifications"
+    "notification": "Notifications",
+    "ranking": "Ranking"
   },
   "landing": {
     "title": "The ideal platform to manage your applications",
@@ -364,26 +365,26 @@
   },
   "notifications": {
     "application": {
-      "created": "Your application at {{company}} as {{jobTitle}} has been recorded!",
+      "created": "Your application at {{company}} as {{jobTitle}} has been saved!",
       "deleted": "Your application at {{company}} as {{jobTitle}} has been deleted!",
       "updated": {
         "base": "Your application at {{company}} as {{jobTitle}} has been modified: "
       },
-      "archived": "Your application at {{company}} as {{jobTitle}} has been successfully archived!",
-      "unarchived": "Your archived application at {{company}} as {{jobTitle}} has been successfully unarchived!"
+      "archived": "Your application at {{company}} as {{jobTitle}} has been archived!",
+      "unarchived": "Your application at {{company}} as {{jobTitle}} has been unarchived!"
     },
     "archive": {
-      "deleted": "Your archived application at {{company}} as {{jobTitle}} has been deleted!",
-      "updated": "Your archived application at {{company}} as {{jobTitle}} has been modified!"
+      "deleted": "Your application at {{company}} as {{jobTitle}} has been deleted!",
+      "updated": "Your application at {{company}} as {{jobTitle}} has been modified!"
     },
     "goal": {
       "weekly": {
         "created": "Your weekly goal has been set to {{weeklyGoal}} applications per week.",
-        "updated": "Your weekly goal has been changed from {{oldGoal}} to {{newGoal}} applications per week."
+        "updated": "Your weekly goal has been updated from {{oldGoal}} to {{newGoal}} applications per week."
       },
       "monthly": {
         "created": "Your monthly goal has been set to {{monthlyGoal}} applications per month.",
-        "updated": "Your monthly goal has been changed from {{oldGoal}} to {{newGoal}} applications per month."
+        "updated": "Your monthly goal has been updated from {{oldGoal}} to {{newGoal}} applications per month."
       }
     },
     "titles": {
@@ -400,28 +401,28 @@
       },
       "goal": {
         "weekly": "Weekly goal set",
-        "weeklyUpdated": "Weekly goal modified",
+        "weeklyUpdated": "Weekly goal updated",
         "monthly": "Monthly goal set",
-        "monthlyUpdated": "Monthly goal modified"
+        "monthlyUpdated": "Monthly goal updated"
       }
     },
     "changes": {
-      "status": " Status: {{from}} → {{to}}",
-      "location": " Location: {{from}} → {{to}}",
-      "salary": " Salary: {{from}} → {{to}}",
-      "contractType": " Contract type: {{from}} → {{to}}",
-      "interview": " Interview date: {{from}} → {{to}}",
-      "title": " Position: {{from}} → {{to}}",
-      "company": " Company: {{from}} → {{to}}"
+      "status": " Status: {{from}} to {{to}}",
+      "location": " Location: {{from}} to {{to}}",
+      "salary": " Salary: {{from}} to {{to}}",
+      "contractType": " Contract type: {{from}} to {{to}}",
+      "interview": " Interview date: {{from}} to {{to}}",
+      "title": " Position: {{from}} to {{to}}",
+      "company": " Company: {{from}} to {{to}}"
     },
     "noLocation": "Not specified",
-    "noSalary": "Not specified", 
+    "noSalary": "Not specified",
     "noInterview": "Not scheduled",
     "noContractType": "Not specified",
     "weekly": "Weekly goal set",
     "monthly": "Monthly goal set",
     "title": "Notifications",
-    "loading": "Charging notifications...",
+    "loading": "Loading notifications...",
     "errors": {
       "title": "Error loading notifications",
       "fetch": "Error fetching notifications"
@@ -431,7 +432,7 @@
     },
     "actions": {
       "markAllRead": "Mark all as read",
-      "deleteSelected": "Delete selected ({{count}})",
+      "deleteSelected": "Delete ({{count}})",
       "refresh": "Refresh",
       "retry": "Retry",
       "selectAll": "Select all",
@@ -447,14 +448,14 @@
       "positive": "Success",
       "warning": "Warnings",
       "negative": "Errors",
-      "info": "Infos"
+      "info": "Information"
     },
     "time": {
       "unknown": "Unknown date",
       "now": "Now",
-      "minutes": "{{minutes}}m ago",
-      "hours": "{{hours}}h ago",
-      "days": "{{days}}d ago"
+      "minutes": "{{minutes}}m",
+      "hours": "{{hours}}h",
+      "days": "{{days}}d"
     },
     "status": {
       "read": "Read",
@@ -462,8 +463,62 @@
     },
     "empty": {
       "title": "No notifications",
-      "noNotifications": "You have no notifications for the moment.",
-      "noFilteredNotifications": "No notifications {{filter}} found."
+      "noNotifications": "You have no notifications at the moment.",
+      "noFilteredNotifications": "No {{filter}} notifications found."
+    }
+  },
+  "ranking": {
+    "warnings": {
+      "noUserDataReceived": "No user data received or invalid data",
+      "noUsersFound": "No users found"
+    },
+    "errors": {
+      "fetchError": "Error retrieving ranking",
+      "consoleError": "Error:"
+    },
+    "positions": {
+      "first": "1st",
+      "second": "2nd",
+      "third": "3rd",
+      "nth": "{{rank}}th"
+    },
+    "loading": {
+      "text": "Loading ranking..."
+    },
+    "error": {
+      "title": "Loading error",
+      "retryButton": "Retry"
+    },
+    "empty": {
+      "title": "No ranking available",
+      "description": "There is currently no ranking data to display.",
+      "futureInfo": "Rankings will appear once users have applications.",
+      "refreshButton": "Refresh"
+    },
+    "podium": {
+      "title": "Podium"
+    },
+    "stats": {
+      "applications": "Applications",
+      "totalApplications": "Total applications"
+    },
+    "badges": {
+      "itsYou": "It's you!",
+      "you": "You"
+    },
+    "complete": {
+      "title": "Complete Ranking",
+      "refreshButton": "Refresh",
+      "refreshTitle": "Refresh ranking"
+    },
+    "userPosition": {
+      "text": "Your position: {{rank}}th",
+      "goToButton": "Go to my position"
+    },
+    "pagination": {
+      "previous": "Previous",
+      "next": "Next",
+      "info": "Page {{currentPage}} of {{totalPages}} ({{usersShown}} users shown)"
     }
   }
 } 

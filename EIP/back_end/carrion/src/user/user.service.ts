@@ -174,20 +174,29 @@ export class UserService {
       include: {
         jobApplies: true,
         Settings: true,
+        userProfile: true,
       },
     });
 
     return users.map((user) => {
       const totalApplications = user.jobApplies.length;
-      const acceptedApplications = user.jobApplies.filter(app => app.status === 'APPLIED').length;
-      const pendingApplications = user.jobApplies.filter(app => app.status === 'PENDING').length;
-      const rejectedApplications = user.jobApplies.filter(app => app.status === 'REJECTED_BY_COMPANY').length;
+      const acceptedApplications = user.jobApplies.filter(
+        (app) => app.status === 'APPLIED',
+      ).length;
+      const pendingApplications = user.jobApplies.filter(
+        (app) => app.status === 'PENDING',
+      ).length;
+      const rejectedApplications = user.jobApplies.filter(
+        (app) => app.status === 'REJECTED_BY_COMPANY',
+      ).length;
 
       return {
         id: user.id,
         username: user.username,
         email: user.email,
-        avatar: user.Settings.imageUrl,
+        firstName: user.userProfile?.firstName || '',
+        lastName: user.userProfile?.lastName || '',
+        avatar: user.Settings?.imageUrl,
         totalApplications,
         acceptedApplications,
         pendingApplications,
