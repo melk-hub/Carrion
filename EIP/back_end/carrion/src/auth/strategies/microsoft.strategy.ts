@@ -3,6 +3,8 @@ import { PassportStrategy } from '@nestjs/passport';
 import { Strategy } from 'passport-microsoft';
 import { AuthService } from '../auth.service';
 import { JwtService } from '@nestjs/jwt';
+import { Profile } from 'passport';
+import { CreateUserDto } from 'src/user/dto/create-user.dto';
 
 @Injectable()
 export class MicrosoftStrategy extends PassportStrategy(Strategy, 'microsoft') {
@@ -24,7 +26,7 @@ export class MicrosoftStrategy extends PassportStrategy(Strategy, 'microsoft') {
     req: any,
     accessToken: string,
     refreshToken: string,
-    profile: any,
+    profile: Profile & { _json?: any; userPrincipalName?: string },
     done: (err: any, user: any, info?: any) => void,
   ) {
     const email =
@@ -32,42 +34,58 @@ export class MicrosoftStrategy extends PassportStrategy(Strategy, 'microsoft') {
       profile.userPrincipalName ||
       profile._json?.mail;
 
-    if (!email) {
+    const providerId = profile.id;
+
+    if (!email || !providerId) {
       return done(
         new UnauthorizedException(
-          'Could not retrieve email from Microsoft profile.',
+          'Could not retrieve essential information from Microsoft profile.',
         ),
         false,
       );
     }
 
+    const { displayName, name } = profile;
     let loggedInUserId: string | undefined = undefined;
-
+    let isLinkFlow = false;
     const state = req.query.state;
-    if (state) {
+
+    if (state && typeof state === 'string') {
       try {
         const decodedState = this.jwtService.verify(state);
         if (decodedState && decodedState.sub) {
           loggedInUserId = decodedState.sub;
+          isLinkFlow = true;
         }
       } catch (e) {
-        console.error(e);
+        console.log(e);
       }
     }
 
+    const oauthProfile: CreateUserDto = {
+      username: displayName || email.split('@')[0],
+      email: email,
+      password: '',
+      hasProfile: true,
+      firstName: name?.givenName || '',
+      lastName: name?.familyName || '',
+    };
+
     try {
       const user = await this.authService.validateOAuthUser(
-        {
-          username: profile.displayName || 'user',
-          email: email,
-          password: '',
-          hasProfile: true,
-          firstName: profile?.name.givenName || '',
-          lastName: profile?.name.familyName || '',
-        },
+        'Microsoft_oauth2',
+        providerId,
+        oauthProfile,
         loggedInUserId,
       );
-      return done(null, { ...user, accessToken, refreshToken });
+
+      return done(null, {
+        ...user,
+        accessToken,
+        refreshToken,
+        isLinkFlow,
+        providerId,
+      });
     } catch (err) {
       return done(err, false);
     }

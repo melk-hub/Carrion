@@ -51,11 +51,14 @@ model Token {
   name              String
   accessToken       String
   refreshToken      String
+  providerId        String
   tokenTimeValidity DateTime
   externalId        String?
   createdAt         DateTime @default(now())
   userId            String   @db.Uuid
   user              User     @relation("UserTokens", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([name, providerId])
 }
 
 model Notification {

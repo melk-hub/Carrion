@@ -136,7 +136,7 @@ export class AuthController {
       const token = req.res.req.cookies['access_token'];
       if (!token) return res.status(401).json({ message: 'Not authenticated' });
       const user = await this.authService.validateCookie(token);
-      if (!user) return res.status(401).json({ message: 'Token invalide' });
+      if (!user) return res.status(401).json({ message: 'Invalid token' });
       return res.status(200).json({ message: 'Authenticated' });
     } catch (error) {
       return res
@@ -210,12 +210,11 @@ export class AuthController {
       user.refreshToken || '',
       7,
       'Google_oauth2',
+      user.providerId,
     );
     await this.authService.createGmailWebhook(user.accessToken, user.id);
 
-    const isLinkFlow = req.query.state && typeof req.query.state === 'string';
-
-    if (isLinkFlow) {
+    if (user.isLinkFlow) {
       return res.redirect(`${process.env.FRONT}/profile?link_success=google`);
     }
 
@@ -234,7 +233,7 @@ export class AuthController {
         maxAge: 1000 * 60 * 60 * 24 * 30,
       });
     }
-    res.redirect(`${process.env.FRONT}?auth=success`);
+    res.redirect(`${process.env.FRONT}/?auth=success`);
   }
 
   @Public()
@@ -250,12 +249,21 @@ export class AuthController {
       user.refreshToken || '',
       7,
       'Microsoft_oauth2',
+      user.providerId,
     );
-    await this.authService.createOutlookWebhook(user.accessToken, user.id);
 
-    const isLinkFlow = req.query.state && typeof req.query.state === 'string';
+    const webhookId = await this.authService.createOutlookWebhook(
+      user.accessToken,
+      user.id,
+    );
+    if (webhookId) {
+      await this.authService.updateMicrosoftTokenWithSubscription(
+        user.id,
+        webhookId,
+      );
+    }
 
-    if (isLinkFlow) {
+    if (user.isLinkFlow) {
       return res.redirect(
         `${process.env.FRONT}/profile?link_success=microsoft`,
       );
@@ -276,6 +284,6 @@ export class AuthController {
         maxAge: 1000 * 60 * 60 * 24 * 30,
       });
     }
-    res.redirect(`${process.env.FRONT}?auth=success`);
+    res.redirect(`${process.env.FRONT}/?auth=success`);
   }
 }
