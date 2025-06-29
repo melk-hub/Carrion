@@ -16,8 +16,8 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { AddDocumentDto } from './dto/add-document.dto';
 import { JwtAuthGuard } from 'src/auth/guards/jwt/jwt-auth.guard';
-// import { Role } from 'src/auth/enums/role.enum';
-// import { Roles } from 'src/auth/decorators/roles.decorator';
+import { Role } from 'src/auth/enums/role.enum';
+import { Roles } from 'src/auth/decorators/roles.decorator';
 import {
   ApiTags,
   ApiOperation,
