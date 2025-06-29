@@ -61,7 +61,7 @@ export class UserController {
   @ApiResponse({ status: 404, description: 'User not found' })
   @ApiResponse({ status: 409, description: 'Document already exists' })
   async addDocument(@Req() req, @Body() addDocumentDto: AddDocumentDto) {
-    return this.userService.addDocument(req.user.id, addDocumentDto.document);
+    return this.userService.addDocument(req.user.id, addDocumentDto.resume);
   }
 
   @Patch(':id')

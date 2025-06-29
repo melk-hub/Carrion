@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import { CircleUserRound } from "lucide-react";
 import DatePicker, { registerLocale } from "react-datepicker";
 import Select from "react-select";
@@ -37,7 +37,6 @@ function Profile() {
 
   const [connectedServices, setConnectedServices] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
-
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [uploadedImage, setUploadedImage] = useState(null);
@@ -49,30 +48,71 @@ function Profile() {
       .then((options) => callback(options));
   }, 500);
 
+  const fetchConnectedServices = useCallback(async () => {
+    try {
+      const response = await apiService.get("/user-profile/services");
+      if (response.ok) {
+        const data = await response.json();
+        setConnectedServices(data.services || []);
+      } else {
+        throw new Error("Impossible de charger les services connectés");
+      }
+    } catch (err) {
+      toast.error(err.message);
+    }
+  }, []);
+
   useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const errorType = urlParams.get("error");
+    const successType = urlParams.get("link_success");
+
+    if (errorType) {
+      const errorMessage = urlParams.get("message");
+      let messageToDisplay =
+        "Une erreur est survenue lors de la liaison du service.";
+
+      if (errorType === "conflict") {
+        messageToDisplay = errorMessage
+          ? `Liaison impossible : ${decodeURIComponent(errorMessage)}`
+          : "Liaison impossible : L'e-mail est déjà utilisé par un autre compte.";
+      } else if (errorType === "permission_denied") {
+        messageToDisplay =
+          "Vous avez refusé les permissions nécessaires pour lier le service.";
+      }
+
+      toast.error(messageToDisplay, { duration: 8000 });
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+
+    if (successType) {
+      toast.success(
+        `Le service ${
+          successType.charAt(0).toUpperCase() + successType.slice(1)
+        } a été lié avec succès !`
+      );
+      fetchConnectedServices();
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+
     const fetchProfileData = async () => {
       try {
         setIsLoading(true);
-
         const response = await apiService.get("/user-profile");
-        if (!response.ok) {
-          if (response.status === 404) {
-            setIsLoading(false);
-            return;
-          }
-          throw new Error("Impossible de charger le profil");
-        }
-        const data = await response.json();
-        setPersonalInfo({
-          ...data,
-          birthDate: data.birthDate ? new Date(data.birthDate) : null,
-          city: data.city ? { label: data.city, value: data.city } : null,
-          contractSought: data.contractSought || [],
-          sector: data.sector || [],
-          locationSought: data.locationSought || [],
-        });
 
-        setConnectedServices(data.services || []);
+        if (response.ok) {
+          const data = await response.json();
+          setPersonalInfo({
+            ...data,
+            birthDate: data.birthDate ? new Date(data.birthDate) : null,
+            city: data.city ? { label: data.city, value: data.city } : null,
+            contractSought: data.contractSought || [],
+            sector: data.sector || [],
+            locationSought: data.locationSought || [],
+          });
+        }
+
+        await fetchConnectedServices();
       } catch (err) {
         setError(err.message);
         toast.error(err.message);
@@ -80,98 +120,96 @@ function Profile() {
         setIsLoading(false);
       }
     };
+
     fetchProfileData();
-  }, []);
+  }, [fetchConnectedServices]);
+
+  const handleDisconnectService = async (serviceName) => {
+    const serviceDisplayName = serviceName.includes("Google")
+      ? "Google"
+      : "Microsoft";
+    if (
+      !window.confirm(
+        `Êtes-vous sûr de vouloir déconnecter votre compte ${serviceDisplayName} ?`
+      )
+    ) {
+      return;
+    }
+
+    const disconnectPromise = apiService.delete(
+      `/user-profile/services/${serviceName}`
+    );
+
+    toast.promise(disconnectPromise, {
+      loading: `Déconnexion du service ${serviceDisplayName}...`,
+      success: () => {
+        setConnectedServices((prevServices) =>
+          prevServices.filter((s) => s.name !== serviceName)
+        );
+        return `Service ${serviceDisplayName} déconnecté avec succès !`;
+      },
+      error: `Échec de la déconnexion du service ${serviceDisplayName}.`,
+    });
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setPersonalInfo((prev) => ({ ...prev, [name]: value }));
   };
-
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
     if (file) setUploadedImage(URL.createObjectURL(file));
   };
-
   const handleSubmit = (e) => {
     e.preventDefault();
-    setError(null);
-
-    const savePromise = new Promise((resolve, reject) => {
-      const submissionData = {
-        firstName: personalInfo.firstName,
-        lastName: personalInfo.lastName,
-        birthDate: personalInfo.birthDate
-          ? personalInfo.birthDate.toISOString().split("T")[0]
-          : null,
-        school: personalInfo.school,
-        city: personalInfo.city ? personalInfo.city.value : "",
-        phoneNumber: personalInfo.phoneNumber,
-        portfolioLink: personalInfo.portfolioLink,
-        linkedin: personalInfo.linkedin,
-        contractSought: personalInfo.contractSought,
-        sector: personalInfo.sector,
-        locationSought: personalInfo.locationSought,
-      };
-
-      apiService
-        .post("/user-profile", submissionData)
-        .then((response) => {
-          if (!response.ok) {
-            return response.json().then((errData) => {
-              reject(
-                new Error(
-                  errData.message || "Échec de l'enregistrement du profil"
-                )
-              );
-            });
-          }
-
-          resolve(response);
-        })
-        .catch((err) => {
-          reject(err);
-        });
-    });
-
+    const submissionData = {
+      firstName: personalInfo.firstName,
+      lastName: personalInfo.lastName,
+      birthDate: personalInfo.birthDate
+        ? personalInfo.birthDate.toISOString().split("T")[0]
+        : null,
+      school: personalInfo.school,
+      city: personalInfo.city ? personalInfo.city.value : "",
+      phoneNumber: personalInfo.phoneNumber,
+      portfolioLink: personalInfo.portfolioLink,
+      linkedin: personalInfo.linkedin,
+      contractSought: personalInfo.contractSought,
+      sector: personalInfo.sector,
+      locationSought: personalInfo.locationSought,
+    };
+    const savePromise = apiService.post("/user-profile", submissionData);
     toast.promise(savePromise, {
       loading: "Enregistrement en cours...",
       success: "Profil enregistré avec succès !",
-      error: (err) => `Erreur: ${err.message}`,
+      error: "Échec de l'enregistrement du profil",
     });
   };
-
   const selectStyles = {
     input: (provided) => ({ ...provided, boxShadow: "none" }),
     menuPortal: (base) => ({ ...base, zIndex: 9999 }),
   };
-
   const getSelectedObjects = (options, values) => {
     if (!Array.isArray(values)) return [];
     return values
       .map((v) => options.find((o) => o.value === v))
       .filter(Boolean);
   };
-
   const getLocationObjects = (values) => {
     if (!Array.isArray(values)) return [];
     return values.map((v) => ({ label: v, value: v }));
   };
-
-  if (isLoading)
+  if (isLoading) {
     return (
       <main className="profile-page">
         <Loader />
       </main>
     );
-  if (error && !personalInfo.firstName)
-    return (
-      <main className="profile-page">Impossible de charger le profil.</main>
-    );
-
+  }
+  if (error) {
+    return <main className="profile-page">Erreur: {error}</main>;
+  }
   return (
     <>
-      {" "}
       <main className="profile-page">
         <header className="profile-header">
           <h2>Mon compte</h2>
@@ -183,7 +221,7 @@ function Profile() {
             onSubmit={handleSubmit}
           >
             <article className="profile-card">
-              <h2 id="profile-form-heading">Informations personnelles</h2>
+              <h2>Informations personnelles</h2>
               <div className="profile-info-form">
                 <div className="form-grid">
                   <div className="form-group">
@@ -192,7 +230,7 @@ function Profile() {
                       id="lastName"
                       type="text"
                       name="lastName"
-                      value={personalInfo.lastName}
+                      value={personalInfo.lastName || ""}
                       onChange={handleChange}
                     />
                   </div>
@@ -202,7 +240,7 @@ function Profile() {
                       id="firstName"
                       type="text"
                       name="firstName"
-                      value={personalInfo.firstName}
+                      value={personalInfo.firstName || ""}
                       onChange={handleChange}
                     />
                   </div>
@@ -212,7 +250,7 @@ function Profile() {
                       id="phoneNumber"
                       type="tel"
                       name="phoneNumber"
-                      value={personalInfo.phoneNumber}
+                      value={personalInfo.phoneNumber || ""}
                       onChange={handleChange}
                     />
                   </div>
@@ -257,7 +295,7 @@ function Profile() {
                       id="school"
                       type="text"
                       name="school"
-                      value={personalInfo.school}
+                      value={personalInfo.school || ""}
                       onChange={handleChange}
                     />
                   </div>
@@ -267,7 +305,7 @@ function Profile() {
                       id="portfolioLink"
                       type="text"
                       name="portfolioLink"
-                      value={personalInfo.portfolioLink}
+                      value={personalInfo.portfolioLink || ""}
                       onChange={handleChange}
                     />
                   </div>
@@ -277,14 +315,13 @@ function Profile() {
                       id="linkedin"
                       type="text"
                       name="linkedin"
-                      value={personalInfo.linkedin}
+                      value={personalInfo.linkedin || ""}
                       onChange={handleChange}
                     />
                   </div>
                 </div>
               </div>
             </article>
-
             <article className="profile-card">
               <h2>Préférences de recherche</h2>
               <div className="profile-info-form">
@@ -363,7 +400,6 @@ function Profile() {
                 </div>
               </div>
             </article>
-
             <div className="form-actions-global">
               <button type="submit" className="save-button">
                 Enregistrer les modifications
@@ -371,10 +407,7 @@ function Profile() {
             </div>
           </form>
           <aside className="profile-right-column">
-            <section
-              className="profile-card profile-picture-card"
-              aria-label="Photo de profil et informations principales"
-            >
+            <section className="profile-card profile-picture-card">
               <div
                 className="image-wrapper"
                 onClick={() => fileInputRef.current.click()}
@@ -389,7 +422,7 @@ function Profile() {
                 {uploadedImage ? (
                   <img
                     src={uploadedImage}
-                    alt="Photo de profil actuelle"
+                    alt="Photo de profil"
                     className="profile-img"
                   />
                 ) : (
@@ -397,13 +430,14 @@ function Profile() {
                 )}
               </div>
               <h3 className="profile-name">
-                {personalInfo.firstName} {personalInfo.lastName}
+                {personalInfo.firstName || "Votre"}{" "}
+                {personalInfo.lastName || "Nom"}
               </h3>
             </section>
-
             <ServicesCard
               connectedServices={connectedServices}
               onAddService={() => setIsModalOpen(true)}
+              onDisconnectService={handleDisconnectService}
             />
           </aside>
         </div>
@@ -411,6 +445,7 @@ function Profile() {
       <AddServiceModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
+        connectedServices={connectedServices}
       />
     </>
   );

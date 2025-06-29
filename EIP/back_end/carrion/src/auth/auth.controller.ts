@@ -25,14 +25,16 @@ import {
   LogCategory,
 } from 'src/common/services/logging.service';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { JwtService } from '@nestjs/jwt';
 
 @ApiTags('Authentication')
 @Controller('auth')
 export class AuthController {
   constructor(
     private readonly authService: AuthService,
-    private logger: CustomLoggingService,
-    private prisma: PrismaService,
+    private readonly logger: CustomLoggingService,
+    private readonly prisma: PrismaService,
+    private readonly jwtService: JwtService,
   ) {}
 
   @Public()
@@ -143,35 +145,64 @@ export class AuthController {
     }
   }
 
-  @UseGuards(JwtAuthGuard, AuthGuard('google'))
   @Get('google/link')
-  @ApiOperation({ summary: 'Link a Google account to the current user' })
-  async linkGoogleAccount() {}
+  @UseGuards(JwtAuthGuard)
+  linkGoogleAccount(@Req() req, @Res() res) {
+    const stateToken = this.jwtService.sign(
+      { sub: req.user.id },
+      { expiresIn: '5m' },
+    );
+    const params = new URLSearchParams({
+      client_id: process.env.GOOGLE_CLIENT_ID,
+      redirect_uri: process.env.GOOGLE_REDIRECT_URI,
+      scope:
+        'email profile https://www.googleapis.com/auth/gmail.readonly https://www.googleapis.com/auth/gmail.modify https://www.googleapis.com/auth/gmail.labels',
+      response_type: 'code',
+      access_type: 'offline',
+      prompt: 'consent',
+      state: stateToken,
+    });
+    res.redirect(
+      `https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`,
+    );
+  }
 
-  @UseGuards(JwtAuthGuard, AuthGuard('microsoft'))
   @Get('microsoft/link')
-  @ApiOperation({ summary: 'Link a Microsoft account to the current user' })
-  async linkMicrosoftAccount() {}
+  @UseGuards(JwtAuthGuard)
+  linkMicrosoftAccount(@Req() req, @Res() res) {
+    const stateToken = this.jwtService.sign(
+      { sub: req.user.id },
+      { expiresIn: '5m' },
+    );
+    const params = new URLSearchParams({
+      client_id: process.env.MICROSOFT_CLIENT_ID,
+      redirect_uri: process.env.MICROSOFT_REDIRECT_URI,
+      scope: 'openid profile offline_access User.Read Mail.Read',
+      response_type: 'code',
+      response_mode: 'query',
+      state: stateToken,
+    });
+    res.redirect(
+      `https://login.microsoftonline.com/common/oauth2/v2.0/authorize?${params.toString()}`,
+    );
+  }
 
   @Public()
   @Get('google/login')
   @UseGuards(AuthGuard('google'))
-  @ApiOperation({ summary: 'Initiate Google OAuth2 login' })
-  async googleLoginInitiate() {}
+  googleLoginInitiate() {}
 
   @Public()
   @Get('microsoft/login')
   @UseGuards(AuthGuard('microsoft'))
-  @ApiOperation({ summary: 'Initiate Microsoft OAuth2 login' })
-  async microsoftLoginInitiate() {}
+  microsoftLoginInitiate() {}
 
   @Public()
   @Get('google/callback')
   @UseGuards(GoogleAuthGuard)
-  @ApiOperation({ summary: 'Google login/link callback' })
   async googleCallback(@Req() req, @Res() res) {
     const user = req.user as any;
-    if (user.redirected) return;
+    if (!user || user.redirected) return;
 
     await this.authService.saveTokens(
       user.id,
@@ -182,8 +213,10 @@ export class AuthController {
     );
     await this.authService.createGmailWebhook(user.accessToken, user.id);
 
-    if (req.cookies['access_token']) {
-      return res.redirect(`${process.env.FRONT}/profile`);
+    const isLinkFlow = req.query.state && typeof req.query.state === 'string';
+
+    if (isLinkFlow) {
+      return res.redirect(`${process.env.FRONT}/profile?link_success=google`);
     }
 
     const tokens = await this.authService.login(user.id);
@@ -201,16 +234,15 @@ export class AuthController {
         maxAge: 1000 * 60 * 60 * 24 * 30,
       });
     }
-    res.redirect(`${process.env.FRONT}/auth/callback?auth=success`);
+    res.redirect(`${process.env.FRONT}?auth=success`);
   }
 
   @Public()
   @Get('microsoft/callback')
   @UseGuards(MicrosoftAuthGuard)
-  @ApiOperation({ summary: 'Microsoft login/link callback' })
   async microsoftCallback(@Req() req, @Res() res) {
     const user = req.user as any;
-    if (user.redirected) return;
+    if (!user || user.redirected) return;
 
     await this.authService.saveTokens(
       user.id,
@@ -221,8 +253,12 @@ export class AuthController {
     );
     await this.authService.createOutlookWebhook(user.accessToken, user.id);
 
-    if (req.cookies['access_token']) {
-      return res.redirect(`${process.env.FRONT}/profile`);
+    const isLinkFlow = req.query.state && typeof req.query.state === 'string';
+
+    if (isLinkFlow) {
+      return res.redirect(
+        `${process.env.FRONT}/profile?link_success=microsoft`,
+      );
     }
 
     const tokens = await this.authService.login(user.id);
@@ -230,7 +266,7 @@ export class AuthController {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',
-      maxAge: 1000 * 60 * 60 * 24,
+      maxAge: 1000 * 60 * 60 * 24 * 7,
     });
     if (tokens.refreshToken) {
       res.cookie('refresh_token', tokens.refreshToken, {
@@ -240,63 +276,6 @@ export class AuthController {
         maxAge: 1000 * 60 * 60 * 24 * 30,
       });
     }
-    res.redirect(`${process.env.FRONT}/auth/callback?auth=success`);
-  }
-
-  @Public()
-  @Get('webhook-health')
-  async getWebhookHealth() {
-    try {
-      const usersWithMicrosoftTokens = await this.prisma.token.findMany({
-        where: { name: 'Microsoft_oauth2' },
-        include: { user: true },
-      });
-      const webhookStatus = [];
-      for (const tokenRecord of usersWithMicrosoftTokens) {
-        if (tokenRecord.externalId) {
-          const isActive =
-            await this.authService.checkWebhookSubscription(tokenRecord);
-          webhookStatus.push({
-            userId: tokenRecord.userId,
-            userEmail: tokenRecord.user?.email,
-            subscriptionId: tokenRecord.externalId,
-            isActive,
-            lastUpdated: tokenRecord.createdAt,
-          });
-        }
-      }
-      return {
-        status: 'success',
-        data: {
-          totalWebhooks: webhookStatus.length,
-          activeWebhooks: webhookStatus.filter((w) => w.isActive).length,
-          inactiveWebhooks: webhookStatus.filter((w) => !w.isActive).length,
-          webhooks: webhookStatus,
-        },
-      };
-    } catch (error) {
-      return {
-        status: 'error',
-        message: 'Failed to check webhook health',
-        error: error.message,
-      };
-    }
-  }
-
-  @Post('recreate-webhooks')
-  async recreateAllWebhooks() {
-    try {
-      await this.authService.monitorWebhookHealth();
-      return {
-        status: 'success',
-        message: 'Webhook recreation process initiated',
-      };
-    } catch (error) {
-      return {
-        status: 'error',
-        message: 'Failed to recreate webhooks',
-        error: error.message,
-      };
-    }
+    res.redirect(`${process.env.FRONT}?auth=success`);
   }
 }

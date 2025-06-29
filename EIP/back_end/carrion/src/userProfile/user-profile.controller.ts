@@ -7,6 +7,10 @@ import {
   UseGuards,
   Logger,
   NotFoundException,
+  Delete,
+  Param,
+  HttpCode,
+  HttpStatus,
 } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/guards/jwt/jwt-auth.guard';
 import { UserProfileService } from './user-profile.service';
@@ -16,6 +20,7 @@ import { Request } from 'express';
 
 @ApiTags('user-profile')
 @Controller('user-profile')
+@UseGuards(JwtAuthGuard)
 export class UserProfileController {
   constructor(private readonly userProfileService: UserProfileService) {}
 
@@ -26,7 +31,6 @@ export class UserProfileController {
   })
   @ApiResponse({ status: 404, description: 'Profile not found.' })
   @Get()
-  @UseGuards(JwtAuthGuard)
   async getUserProfile(@Req() req: Request) {
     const userId = (req.user as any).id;
     const profile =
@@ -44,7 +48,6 @@ export class UserProfileController {
     description: 'User profile created or updated successfully.',
   })
   @Post()
-  @UseGuards(JwtAuthGuard)
   async createOrUpdateUserProfile(
     @Req() req: Request,
     @Body() userProfileDto: UserProfileDto,
@@ -60,6 +63,42 @@ export class UserProfileController {
     } catch (error) {
       Logger.error(error.message, 'UserProfileController');
       return { message: 'Error saving user profile' };
+    }
+  }
+
+  @ApiOperation({ summary: 'Get the user services list' })
+  @ApiResponse({
+    status: 200,
+    description: 'Returns the user services list.',
+  })
+  @Get('services')
+  async getUserServicesList(@Req() req: Request) {
+    const userId = (req.user as any).id;
+    const services = await this.userProfileService.getUserServicesList(userId);
+    return services;
+  }
+
+  @Delete('services/all')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiOperation({ summary: 'Disconnect all services from the user account' })
+  async disconnectAllServices(@Req() req: Request) {
+    const userId = (req.user as any).id;
+    await this.userProfileService.disconnectAllServices(userId);
+  }
+
+  @Delete('services/:serviceName')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiOperation({
+    summary: 'Disconnect a single service from the user account',
+  })
+  async disconnectService(
+    @Req() req: Request,
+    @Param('serviceName') serviceName: string,
+  ) {
+    const userId = (req.user as any).id;
+    const validServices = ['Google_oauth2', 'Microsoft_oauth2'];
+    if (validServices.includes(serviceName)) {
+      await this.userProfileService.disconnectService(userId, serviceName);
     }
   }
 }

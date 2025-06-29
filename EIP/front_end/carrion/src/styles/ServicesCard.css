@@ -1,64 +1,92 @@
-.services-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+.services-card {
+  display: flex;
+  flex-direction: column;
   gap: 1rem;
-  margin-top: 1rem;
+}
+
+.services-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
 }
 
 .service-item {
   display: flex;
-  flex-direction: column;
+  justify-content: space-between;
   align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  padding: 1rem;
-  border-radius: 0.75rem;
-
-  background-color: white;
+  padding: 0.75rem;
   border: 1px solid #e5e7eb;
-  text-align: center;
-  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.05);
+  border-radius: 8px;
+  background-color: #fff;
+  transition: box-shadow 0.2s ease-in-out;
+}
+
+.service-item:hover {
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+}
+
+.service-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
 .service-icon-wrapper {
-  width: 64px;
-  height: 64px;
   display: flex;
-  align-items: center;
   justify-content: center;
+  align-items: center;
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
 }
 
-.service-icon-wrapper img {
-  width: 32px;
-  height: auto;
+.service-icon-img {
+  width: 22px;
+  height: 22px;
   object-fit: contain;
 }
 
 .service-name {
-  font-size: 0.875rem;
   font-weight: 500;
-  color: #374151;
+  color: #111827;
+}
+
+.disconnect-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #9ca3af;
+  transition: all 0.2s ease-in-out;
+}
+
+.disconnect-btn:hover {
+  background-color: #fee2e2;
+  color: #ef4444;
 }
 
 .add-service-btn {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  background-color: #fff;
+  color: #374151;
+  font-weight: 500;
   cursor: pointer;
   transition: background-color 0.2s;
-  border: 2px dashed #d1d5db;
-  background-color: transparent;
-  box-shadow: none;
 }
 
 .add-service-btn:hover {
   background-color: #f9fafb;
 }
 
-.service-name-hidden {
-  border: 0;
-  clip: rect(0 0 0 0);
-  height: 1px;
-  margin: -1px;
-  overflow: hidden;
-  padding: 0;
-  position: absolute;
-  width: 1px;
+.no-services-message {
+  text-align: center;
+  color: #6b7280;
+  padding: 1rem 0;
 }

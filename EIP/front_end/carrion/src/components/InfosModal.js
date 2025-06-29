@@ -126,7 +126,8 @@ function InfosModal({ isOpen, onClose }) {
   };
 
   const selectStyles = {
-    menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+    menuPortal: (base) => ({ ...base, zIndex: 10002 }),
+
     input: (provided) => ({ ...provided, boxShadow: "none" }),
   };
 
@@ -183,7 +184,7 @@ function InfosModal({ isOpen, onClose }) {
                         maxDate={new Date()}
                         customInput={<CustomDateInput />}
                         portalId="datepicker-portal"
-                        popperPlacement="auto"
+                        popperClassName="datepicker-force-top"
                       />
                     </div>
                     <div className="form-group">

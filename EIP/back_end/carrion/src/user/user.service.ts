@@ -29,9 +29,11 @@ export class UserService {
 
   async create(createUserDto: CreateUserDto) {
     try {
+      const normalizedEmail = createUserDto.email.toLowerCase();
       return await this.prisma.user.create({
         data: {
           ...createUserDto,
+          email: normalizedEmail,
         },
       });
     } catch (error) {
@@ -45,8 +47,14 @@ export class UserService {
   }
 
   async findByIdentifier(identifier: string, isEmail: boolean) {
+    if (isEmail) {
+      const normalizedIdentifier = identifier.toLowerCase();
+      return await this.prisma.user.findUnique({
+        where: { email: normalizedIdentifier },
+      });
+    }
     return await this.prisma.user.findUnique({
-      where: isEmail ? { email: identifier } : { username: identifier },
+      where: { username: identifier },
     });
   }
 
@@ -79,6 +87,9 @@ export class UserService {
 
   async update(id: string, updateUserDto: UpdateUserDto) {
     try {
+      if (updateUserDto.email) {
+        updateUserDto.email = updateUserDto.email.toLowerCase();
+      }
       return await this.prisma.user.update({
         where: { id },
         data: updateUserDto,

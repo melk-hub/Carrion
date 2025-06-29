@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import apiService from "../services/api.js";
 import "../styles/Settings.css";
+import toast from "react-hot-toast";
 
 function Settings() {
   const [goalSettings, setGoalSettings] = useState({
@@ -11,7 +12,7 @@ function Settings() {
   const [saving, setSaving] = useState(false);
   const [success, setSuccess] = useState(false);
 
-  // const [isDisconnecting, setIsDisconnecting] = useState(false);
+  const [isDisconnecting, setIsDisconnecting] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const API_URL = process.env.REACT_APP_API_URL;
 
@@ -77,10 +78,32 @@ function Settings() {
     }));
   };
 
-  // const handleDisconnectServices = async () => {
-  //   alert("Not implemented yet, need to wait for OUTLOOK KEY POR FAVOR");
-  //   return;
-  // };
+  const handleDisconnectAllServices = async () => {
+    if (
+      !window.confirm(
+        "Êtes-vous sûr de vouloir déconnecter TOUS vos services ? Vous devrez les relier manuellement pour retrouver les fonctionnalités associées."
+      )
+    ) {
+      return;
+    }
+    setIsDisconnecting(true);
+
+    const disconnectPromise = apiService.delete("/user-profile/services/all");
+
+    toast.promise(disconnectPromise, {
+      loading: "Déconnexion de tous les services...",
+      success: () => {
+        setIsDisconnecting(false);
+        return "Tous les services ont été déconnectés avec succès.";
+      },
+      error: (err) => {
+        setIsDisconnecting(false);
+        return `Une erreur est survenue: ${
+          err.message || "Veuillez réessayer."
+        }`;
+      },
+    });
+  };
 
   const handleDeleteAccount = async () => {
     if (
@@ -89,7 +112,6 @@ function Settings() {
       )
     ) {
       setIsDeleting(true);
-      console.log("test");
       try {
         const response = await fetch(`${API_URL}/user/me`, {
           method: "DELETE",
@@ -144,16 +166,16 @@ function Settings() {
                 <strong>Déconnecter les services</strong>
                 <p className="action-description">
                   Ceci révoquera l'accès à tous les services externes connectés
-                  (ex: Gmail).
+                  (ex: Gmail, Outlook).
                 </p>
               </div>
-              {/* <button
-                onClick={handleDisconnectServices}
+              <button
+                onClick={handleDisconnectAllServices}
                 className="btn-secondary"
                 disabled={isDisconnecting}
               >
                 {isDisconnecting ? "Déconnexion..." : "Tout déconnecter"}
-              </button> */}
+              </button>
             </div>
             <div className="action-item">
               <div>

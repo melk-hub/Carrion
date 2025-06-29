@@ -16,35 +16,58 @@ import lucide_bar_chart_svg from "../assets/svg/bar_chart_lucide.svg";
 import lucide_folder_svg from "../assets/svg/folder_lucide.svg";
 import AuthModal from "../components/AuthModal";
 import LoginBtn from "../components/LoginBtn";
+import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 
 function Landing() {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, setIsAuthenticated } = useAuth();
   const { t } = useLanguage();
+  const navigate = useNavigate();
   const [isHeaderVisible, setIsHeaderVisible] = useState(true);
   const [isAtTop, setIsAtTop] = useState(true);
   const lastScrollY = useRef(0);
   const scrollThreshold = 5;
   const topThreshold = 5;
+  const [showAuth, setShowAuth] = useState(false);
 
   const handleLoginClick = () => {
     setShowAuth(true);
   };
 
-  const [showAuth, setShowAuth] = useState(false);
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const errorType = urlParams.get("error");
+    const successType = urlParams.get("auth");
 
-  // Animation sur scroll améliorée
+    if (errorType) {
+      let messageToDisplay = t("auth.genericError");
+      if (errorType === "permission_denied") {
+        messageToDisplay = t("auth.permissionDenied");
+      }
+      toast.error(messageToDisplay, { duration: 6000 });
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+
+    if (successType === "success") {
+      toast.success(t("auth.loginSuccessRedirect"));
+      setIsAuthenticated(true);
+      window.history.replaceState({}, document.title, window.location.pathname);
+
+      setTimeout(() => {
+        navigate("/home");
+      }, 1500);
+    }
+  }, [t, navigate, setIsAuthenticated]);
+
   useEffect(() => {
     const observerOptions = {
       threshold: 0.1,
       rootMargin: "0px 0px -100px 0px",
     };
-
     const observerOptionsExit = {
       threshold: 0,
       rootMargin: "50px 0px 50px 0px",
     };
-
-    // Observer pour l'apparition des éléments
     const observerIn = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
         if (entry.isIntersecting) {
@@ -53,8 +76,6 @@ function Landing() {
         }
       });
     }, observerOptions);
-
-    // Observer pour la disparition des éléments
     const observerOut = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
         if (!entry.isIntersecting) {
@@ -63,14 +84,11 @@ function Landing() {
         }
       });
     }, observerOptionsExit);
-
-    // Observer les éléments à animer
     const animatedElements = document.querySelectorAll(".animate-on-scroll");
     animatedElements.forEach((el) => {
       observerIn.observe(el);
       observerOut.observe(el);
     });
-
     return () => {
       observerIn.disconnect();
       observerOut.disconnect();
@@ -79,7 +97,6 @@ function Landing() {
 
   useEffect(() => {
     document.body.classList.add("landing-page");
-
     return () => {
       document.body.classList.remove("landing-page");
     };
@@ -89,9 +106,7 @@ function Landing() {
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
       const atTop = currentScrollY <= topThreshold;
-
       setIsAtTop(atTop);
-
       if (atTop) {
         setIsHeaderVisible(true);
       } else if (currentScrollY < lastScrollY.current - scrollThreshold) {
@@ -99,17 +114,13 @@ function Landing() {
       } else if (currentScrollY > lastScrollY.current + scrollThreshold) {
         setIsHeaderVisible(false);
       }
-
       lastScrollY.current = currentScrollY;
     };
-
     const initialScrollY = window.scrollY;
     lastScrollY.current = initialScrollY;
     setIsAtTop(initialScrollY <= topThreshold);
     setIsHeaderVisible(initialScrollY <= topThreshold);
-
     window.addEventListener("scroll", handleScroll, { passive: true });
-
     return () => {
       window.removeEventListener("scroll", handleScroll);
     };
@@ -117,13 +128,15 @@ function Landing() {
 
   useEffect(() => {
     if (isAuthenticated) {
-      window.location.href = "/dashboard";
+      const urlParams = new URLSearchParams(window.location.search);
+      if (!urlParams.get("auth")) {
+        navigate("/home");
+      }
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, navigate]);
 
   return (
     <div className="landing-page">
-      {/* Header avec navbar */}
       <header
         className={`
           landing-header
@@ -147,9 +160,7 @@ function Landing() {
         </nav>
       </header>
 
-      {/* Contenu principal */}
       <main className="landing-main-content">
-        {/* Section landing */}
         <section className="hero-section">
           <div className="hero-content fade-in">
             <div className="hero-description">
@@ -176,7 +187,6 @@ function Landing() {
           </div>
         </section>
 
-        {/* Section des statistiques */}
         <section className="stats-section animate-on-scroll">
           <div className="stats-container">
             <div className="stat-item pulse-animation">
@@ -194,7 +204,6 @@ function Landing() {
           </div>
         </section>
 
-        {/* Section des services */}
         <section className="services-section animate-on-scroll">
           <h2 className="sections-title slide-up">
             {t("landing.services.title")}
@@ -246,7 +255,6 @@ function Landing() {
           </div>
         </section>
 
-        {/* Section des tutoriel */}
         <section className="tutorial-sections animate-on-scroll">
           <h2 className="slide-up">{t("landing.howItWorks.title")}</h2>
 
@@ -292,7 +300,6 @@ function Landing() {
           </div>
         </section>
 
-        {/* Section des témoignages */}
         <section className="testimonials-section animate-on-scroll">
           <h2 className="sections-title slide-up">
             {t("landing.testimonials.title")}
@@ -337,7 +344,6 @@ function Landing() {
           </div>
         </section>
 
-        {/* Section Call to Action */}
         <section className="cta-section animate-on-scroll">
           <div className="cta-content fade-in">
             <h2>{t("landing.cta.title")}</h2>
@@ -351,11 +357,6 @@ function Landing() {
             </div>
           </div>
         </section>
-
-        {/* Footer */}
-        {/* <footer className="footer-slide-up">
-          <h2>{t('landing.footer')}</h2>
-        </footer> */}
       </main>
       <AuthModal isOpen={showAuth} onClose={() => setShowAuth(false)} />
     </div>

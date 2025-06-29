@@ -275,71 +275,59 @@ export class AuthService {
     return currentUser;
   }
 
-  async validateOAuthUser(OAuthUser: CreateUserDto, userId?: string) {
-    if (userId) {
-      this.logger.logAuthEvent(
-        'User already logged in, linking new service',
-        userId,
-        {
-          email: OAuthUser.email,
-        },
-      );
-      const user = await this.userService.findOne(userId);
-      if (!user) throw new UnauthorizedException('User not found for linking.');
-      return user;
-    }
-
-    const existingUser = await this.userService.findByIdentifier(
+  async validateOAuthUser(OAuthUser: CreateUserDto, loggedInUserId?: string) {
+    const userWithOauthEmail = await this.userService.findByIdentifier(
       OAuthUser.email,
       true,
     );
-    if (existingUser) {
-      this.logger.logAuthEvent('User found with email', undefined, {
-        email: OAuthUser.email,
+
+    if (loggedInUserId) {
+      if (userWithOauthEmail && userWithOauthEmail.id !== loggedInUserId) {
+        throw new ConflictException(
+          'This email is already used by another account',
+        );
+      }
+
+      const userToLink = await this.userService.findOne(loggedInUserId);
+      if (!userToLink) {
+        throw new UnauthorizedException('Utilisateur à lier non trouvé.');
+      }
+      this.logger.logAuthEvent('Liaison de compte autorisée', loggedInUserId, {
+        oauthEmail: OAuthUser.email,
       });
-      return existingUser;
+      return userToLink;
     }
 
-    const existingUserByUsername = await this.userService.findByIdentifier(
-      OAuthUser.username,
-      false,
-    );
-    let finalUsername = OAuthUser.username;
-    if (existingUserByUsername) {
-      const timestamp = Date.now().toString().slice(-6);
-      finalUsername = `${OAuthUser.username}_${timestamp}`;
-      this.logger.logAuthEvent('Username already exists', undefined, {
-        username: OAuthUser.username,
-      });
+    if (userWithOauthEmail) {
+      return userWithOauthEmail;
     }
 
     try {
+      const { firstName, lastName, ...coreUserData } = OAuthUser;
+
       const newUser = await this.userService.create({
-        ...OAuthUser,
-        username: finalUsername,
+        ...coreUserData,
+        password: coreUserData.password || '',
       });
-      this.logger.logAuthEvent('New OAuth user created', newUser.id, {
-        email: OAuthUser.email,
-        username: finalUsername,
-      });
+
+      if (firstName || lastName) {
+        await this.prisma.userProfile.create({
+          data: {
+            userId: newUser.id,
+            firstName: firstName,
+            lastName: lastName,
+          },
+        });
+      }
+
       return newUser;
     } catch (error) {
       this.logger.error(
-        'Failed to create OAuth user',
+        'Error creating OAuth user',
         undefined,
         LogCategory.AUTH,
         { error: error.message },
       );
-      if (error.message?.includes('already exists')) {
-        const uniqueUsername = `${OAuthUser.username}_${Date.now()}`;
-        this.logger.logAuthEvent('Retrying with unique username', undefined, {
-          uniqueUsername,
-        });
-        return await this.userService.create({
-          ...OAuthUser,
-          username: uniqueUsername,
-        });
-      }
       throw error;
     }
   }
@@ -385,7 +373,7 @@ export class AuthService {
     const maxRetries = 3;
     const baseDelay = 2000;
     try {
-      const webhookUrl = `${process.env.FRONTEND_URL}/webhooks/outlook/handle-notification`;
+      const webhookUrl = `${process.env.FRONT}/webhooks/outlook/handle-notification`;
       const expirationDateTime = new Date(Date.now() + 4230 * 60 * 1000);
       this.logger.logAuthEvent(
         'Creating Outlook webhook subscription',
@@ -453,7 +441,7 @@ export class AuthService {
       }
       let errorDetails: any = {
         message: error.message,
-        webhookUrl: `${process.env.FRONTEND_URL}/webhooks/outlook/handle-notification`,
+        webhookUrl: `${process.env.FRONT}/webhooks/outlook/handle-notification`,
         userId,
         attempt: retryCount + 1,
         finalAttempt: true,
