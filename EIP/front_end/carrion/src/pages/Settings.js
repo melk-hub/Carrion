@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import apiService from "../services/api.js";
 import "../styles/Settings.css";
 import toast from "react-hot-toast";
+import Loading from '../components/Loading';
 
 function Settings() {
   const [goalSettings, setGoalSettings] = useState({
@@ -137,14 +138,7 @@ function Settings() {
   };
 
   if (loading) {
-    return (
-      <div className="settings-container">
-        <div className="loading-state">
-          <div className="loading-spinner"></div>
-          <p>Chargement des paramètres...</p>
-        </div>
-      </div>
-    );
+    return <Loading message="Chargement des paramètres..." />;
   }
 
   return (

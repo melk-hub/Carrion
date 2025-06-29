@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import "../styles/Notification.css";
 import { useLanguage } from '../contexts/LanguageContext';
 import { useNotifications } from '../contexts/NotificationContext';
+import Loading from "../components/Loading";
 
 function Notifications() {
   const { t } = useLanguage();
@@ -199,16 +200,7 @@ function Notifications() {
 
   // Affichage loading
   if (loading) {
-    return (
-      <div className="notifications-page">
-        <div className="notifications-container">
-          <div className="loading-state">
-            <div className="loading-spinner"></div>
-            <p>{t('notifications.loading')}</p>
-          </div>
-        </div>
-      </div>
-    )
+    return <Loading message={t('notifications.loading')} />
   }
 
   // Affichage erreur

@@ -181,15 +181,8 @@ function AuthModal({ isOpen, onClose, defaultTab }) {
                     onChange={handleChange}
                     required
                   />
-                  <span
-                    className="toggle-password"
-                    onClick={togglePasswordVisibility}
-                  >
-                    {showPassword ? (
-                      <FiEyeOff size={20} />
-                    ) : (
-                      <FiEye size={20} />
-                    )}
+                  <span className="toggle-password" onClick={togglePasswordVisibility}>
+                    {showPassword ? <FiEyeOff size={20} /> : <FiEye size={20} />}
                   </span>
                 </div>
                 {errorMessage && (
@@ -260,15 +253,8 @@ function AuthModal({ isOpen, onClose, defaultTab }) {
                         onChange={handleChange}
                         required
                       />
-                      <span
-                        className="toggle-password"
-                        onClick={togglePasswordVisibility}
-                      >
-                        {showPassword ? (
-                          <FiEyeOff size={20} />
-                        ) : (
-                          <FiEye size={20} />
-                        )}
+                      <span className="toggle-password" onClick={togglePasswordVisibility}>
+                        {showPassword ? <FiEyeOff size={20} /> : <FiEye size={20} />}
                       </span>
                     </div>
                   </div>
@@ -283,15 +269,8 @@ function AuthModal({ isOpen, onClose, defaultTab }) {
                         onChange={handleChange}
                         required
                       />
-                      <span
-                        className="toggle-password"
-                        onClick={togglePasswordVisibility}
-                      >
-                        {showPassword ? (
-                          <FiEyeOff size={20} />
-                        ) : (
-                          <FiEye size={20} />
-                        )}
+                      <span className="toggle-password" onClick={togglePasswordVisibility}>
+                        {showPassword ? <FiEyeOff size={20} /> : <FiEye size={20} />}
                       </span>
                     </div>
                   </div>

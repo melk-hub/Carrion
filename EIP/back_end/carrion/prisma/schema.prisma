@@ -74,6 +74,19 @@ model Notification {
   user          User       @relation("UserNotifications", fields: [userId], references: [id], onDelete: Cascade)
 }
 
+model Notification {
+  id            String     @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  userId        String     @db.Uuid
+  type          NotificationType
+  titleKey      String?
+  messageKey    String?
+  variables     Json?
+  language      String?    @default("fr")
+  createdAt     DateTime   @default(now())
+  read          Boolean    @default(false)
+  user          User       @relation("UserNotifications", fields: [userId], references: [id], onDelete: Cascade)
+}
+
 model jobApply {
   id            String    @id @default(uuid()) @db.Uuid
   title         String

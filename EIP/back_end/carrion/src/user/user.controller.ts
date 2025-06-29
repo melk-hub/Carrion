@@ -27,7 +27,7 @@ import {
 
 @ApiTags('User')
 @ApiBearerAuth()
-// @Roles(Role.USER)
+@Roles(Role.VISITOR)
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
@@ -94,5 +94,11 @@ export class UserController {
   @Post('profile')
   async updateProfile(@Req() req, @Body() updateUserDto: UpdateUserDto) {
     return this.userService.update(req.user.id, updateUserDto);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('all-users')
+  async getUsersWithStats() {
+    return this.userService.getUsersWithStats();
   }
 }

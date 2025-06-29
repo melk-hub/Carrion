@@ -64,6 +64,7 @@ export class SettingsService {
       const oldWeeklyGoal = existingSettings?.weeklyGoal || 10;
 
       if (!existingSettings) {
+        // Créer les paramètres si ils n'existent pas
         const result = await this.prisma.settings.create({
           data: {
             userId: userId,
@@ -73,6 +74,7 @@ export class SettingsService {
           select: { weeklyGoal: true },
         });
 
+        // Notification pour création initiale
         await this.notificationService.createNotification({
           userId: userId,
           titleKey: 'notifications.titles.goal.weekly',
@@ -86,12 +88,14 @@ export class SettingsService {
         return result;
       }
 
+      // Mettre à jour l'objectif existant
       const result = await this.prisma.settings.update({
         where: { userId: userId },
         data: { weeklyGoal },
         select: { weeklyGoal: true },
       });
 
+      // Notification pour modification si la valeur a changé
       if (oldWeeklyGoal !== weeklyGoal) {
         await this.notificationService.createNotification({
           userId: userId,
@@ -148,6 +152,7 @@ export class SettingsService {
           select: { weeklyGoal: true, monthlyGoal: true },
         });
 
+        // Notifications pour création initiale
         if (weeklyGoal !== undefined) {
           await this.notificationService.createNotification({
             userId: userId,
@@ -181,6 +186,7 @@ export class SettingsService {
         select: { weeklyGoal: true, monthlyGoal: true },
       });
 
+      // Notifications pour modifications si les valeurs ont changé
       if (weeklyGoal !== undefined && oldWeeklyGoal !== weeklyGoal) {
         await this.notificationService.createNotification({
           userId: userId,

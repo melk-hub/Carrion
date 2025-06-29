@@ -28,14 +28,14 @@
   },
   "navbar": {
     "home": "Accueil",
-    "applications": "Candidatures", 
+    "applications": "Candidatures",
     "archives": "Archives",
-    "statistics": "Statistiques",
-    "profile": "Mon profil",
+    "profile": "Profil",
     "settings": "Paramètres",
-    "logout": "Se déconnecter",
-    "reduceAnimations": "Réduire animations",
-    "notification": "Notifications"
+    "statistics": "Statistiques",
+    "notification": "Notifications",
+    "ranking": "Classement",
+    "logout": "Déconnexion"
   },
   "landing": {
     "testimonials": {
@@ -476,6 +476,60 @@
       "title": "Aucune notification",
       "noNotifications": "Vous n'avez pas de notifications pour le moment.",
       "noFilteredNotifications": "Aucune notification {{filter}} trouvée."
+    }
+  },
+  "ranking": {
+    "warnings": {
+      "noUserDataReceived": "Aucune donnée utilisateur reçue ou données invalides",
+      "noUsersFound": "Aucun utilisateur trouvé"
+    },
+    "errors": {
+      "fetchError": "Erreur lors de la récupération du classement",
+      "consoleError": "Erreur:"
+    },
+    "positions": {
+      "first": "1er",
+      "second": "2e",
+      "third": "3e",
+      "nth": "{{rank}}e"
+    },
+    "loading": {
+      "text": "Chargement du classement..."
+    },
+    "error": {
+      "title": "Erreur de chargement",
+      "retryButton": "Réessayer"
+    },
+    "empty": {
+      "title": "Aucun classement disponible",
+      "description": "Il n'y a actuellement aucune donnée de classement à afficher.",
+      "futureInfo": "Les classements apparaîtront une fois que les utilisateurs auront des candidatures.",
+      "refreshButton": "Actualiser"
+    },
+    "podium": {
+      "title": "Podium"
+    },
+    "stats": {
+      "applications": "Candidatures",
+      "totalApplications": "Total candidatures"
+    },
+    "badges": {
+      "itsYou": "C'est vous !",
+      "you": "Vous"
+    },
+    "complete": {
+      "title": "Classement Complet",
+      "refreshButton": "Actualiser",
+      "refreshTitle": "Actualiser le classement"
+    },
+    "userPosition": {
+      "text": "Votre position : {{rank}}e",
+      "goToButton": "Aller à ma position"
+    },
+    "pagination": {
+      "previous": "Précédent",
+      "next": "Suivant",
+      "info": "Page {{currentPage}} sur {{totalPages}} ({{usersShown}} utilisateurs affichés)"
     }
   }
 } 

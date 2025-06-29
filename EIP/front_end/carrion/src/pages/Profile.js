@@ -8,6 +8,7 @@ import { fr } from "date-fns/locale/fr";
 import toast from "react-hot-toast";
 import "react-datepicker/dist/react-datepicker.css";
 import "../styles/Profile.css";
+import Loading from "../components/Loading";
 
 import apiService from "../services/api";
 import { jobSectors } from "../data/jobSectors";
@@ -17,8 +18,6 @@ import ServicesCard from "../components/ServicesCard";
 import AddServiceModal from "../components/AddServiceModal";
 
 registerLocale("fr", fr);
-
-const Loader = () => <div className="loader"></div>;
 
 function Profile() {
   const [personalInfo, setPersonalInfo] = useState({
@@ -201,7 +200,7 @@ function Profile() {
   if (isLoading) {
     return (
       <main className="profile-page">
-        <Loader />
+        <Loading message="Chargement du profil..." />
       </main>
     );
   }

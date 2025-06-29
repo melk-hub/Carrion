@@ -16,6 +16,7 @@ import { Line, Doughnut } from 'react-chartjs-2';
 import { format, subDays, isToday, isThisWeek, isThisMonth, endOfWeek, endOfMonth } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import "../styles/Statistics.css";
+import Loading from '../components/Loading';
 
 ChartJS.register(
   CategoryScale,
@@ -322,14 +323,7 @@ function Statistics() {
   const goalProgress = calculateGoalProgress();
 
   if (loading) {
-    return (
-      <div className="carrion-statistics">
-        <div className="statistics-loading">
-          <div className="loading-spinner"></div>
-          <h2>Chargement des statistiques...</h2>
-        </div>
-      </div>
-    );
+    return <Loading message="Chargement des statistiques..." />;
   }
 
   const lineChartConfig = getLineChartConfig();
