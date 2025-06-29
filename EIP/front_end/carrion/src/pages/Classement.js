@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react"
 import axios from "axios"
 import "../styles/Classement.css"
 import { useLanguage } from "../contexts/LanguageContext"
+import Loading from "../components/Loading"
 
 const API_URL = process.env.REACT_APP_API_URL
 
@@ -144,16 +145,7 @@ function Ranking() {
 
   // loading
   if (loading) {
-    return (
-      <div className="ranking-page">
-        <div className="ranking-container">
-          <div className="ranking-loading-state">
-            <div className="ranking-loading-spinner"></div>
-            <p>{t('ranking.loading.text')}</p>
-          </div>
-        </div>
-      </div>
-    )
+    return <Loading message={t('ranking.loading.text')} />
   }
 
   // error

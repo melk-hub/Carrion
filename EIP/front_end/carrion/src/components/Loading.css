@@ -1,0 +1,75 @@
+/* ============================================================================= */
+/* CARRION LOADING COMPONENT - DESIGN UI/UX MODERNE ET PREMIUM                 */
+/* ============================================================================= */
+
+.carrion-loading {
+  min-height: 100vh;
+  background-image: url("../assets/svg/background.svg");
+  background-color: #fff9f0;
+  padding: 24px;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  color: #1f2937;
+  max-width: 1400px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.carrion-loading .loading-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  text-align: center;
+}
+
+.carrion-loading .loading-content h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #132238;
+  margin: 0;
+}
+
+.carrion-loading .loading-spinner {
+  width: 48px;
+  height: 48px;
+  border: 4px solid #f3f4f6;
+  border-top: 4px solid #fbb75f;
+  border-radius: 50%;
+  animation: carrion-spin 1.2s linear infinite;
+}
+
+@keyframes carrion-spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .carrion-loading {
+    padding: 16px;
+  }
+
+  .carrion-loading .loading-content h2 {
+    font-size: 1.25rem;
+  }
+
+  .carrion-loading .loading-spinner {
+    width: 40px;
+    height: 40px;
+    border-width: 3px;
+  }
+}
+
+@media (max-width: 480px) {
+  .carrion-loading .loading-content h2 {
+    font-size: 1.125rem;
+  }
+
+  .carrion-loading .loading-spinner {
+    width: 36px;
+    height: 36px;
+  }
+} 

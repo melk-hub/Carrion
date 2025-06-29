@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useLanguage } from '../contexts/LanguageContext';
+import Loading from './Loading';
 
 const AuthCallback = () => {
   const navigate = useNavigate();
@@ -72,9 +73,7 @@ const AuthCallback = () => {
   if (loading) {
     return (
       <div className="auth-callback-container">
-        <div className="loading-spinner">
-          <p>{t('auth.processing')}</p>
-        </div>
+        <Loading />
       </div>
     );
   }
