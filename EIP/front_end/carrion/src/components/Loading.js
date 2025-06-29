@@ -12,5 +12,7 @@ const Loading = ({ message = "Chargement..." }) => {
   );
 };
 
-export default Loading; 
+export default Loading;
+
+ 
  

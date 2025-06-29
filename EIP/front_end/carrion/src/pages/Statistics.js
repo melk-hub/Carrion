@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import apiService from "../services/api.js";
 import {
   Chart as ChartJS,
@@ -14,9 +14,9 @@ import {
 } from 'chart.js';
 import { Line, Doughnut } from 'react-chartjs-2';
 import { format, subDays, isToday, isThisWeek, isThisMonth, endOfWeek, endOfMonth } from 'date-fns';
-import { fr } from 'date-fns/locale';
 import "../styles/Statistics.css";
 import Loading from '../components/Loading';
+import { useLanguage } from '../contexts/LanguageContext';
 
 ChartJS.register(
   CategoryScale,
@@ -31,6 +31,7 @@ ChartJS.register(
 );
 
 function Statistics() {
+  const { t } = useLanguage();
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [timeRange, setTimeRange] = useState('7days');
@@ -39,6 +40,7 @@ function Statistics() {
     weeklyGoal: 5,
     monthlyGoal: 20
   });
+  const [userRanking, setUserRanking] = useState(null);
   
   // États pour le carousel des statuts
   const [currentStatusIndex, setCurrentStatusIndex] = useState(0);
@@ -49,6 +51,7 @@ function Statistics() {
   useEffect(() => {
     fetchStats();
     fetchGoalSettings();
+    fetchUserRanking();
   }, []);
 
   // Auto-scroll pour le carousel des statuts
@@ -105,8 +108,46 @@ function Statistics() {
     }
   };
 
-  // Préparer les données statistiques
-  const prepareStatsData = () => {
+  const fetchUserRanking = async () => {
+    try {
+      const [usersResponse, currentUserResponse] = await Promise.all([
+        apiService.get("/user/all-users", {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }),
+        apiService.get("/user/profile", {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        })
+      ]);
+
+      if (usersResponse.ok && currentUserResponse.ok) {
+        const allUsers = await usersResponse.json();
+        const currentUser = await currentUserResponse.json();
+
+        if (allUsers && Array.isArray(allUsers) && currentUser) {
+          // Trier les utilisateurs par nombre total de candidatures
+          const sortedUsers = allUsers.sort((a, b) => b.totalApplications - a.totalApplications);
+          
+          // Trouver le rang de l'utilisateur actuel
+          const userIndex = sortedUsers.findIndex(user => user.id === currentUser.id);
+          if (userIndex !== -1) {
+            setUserRanking({
+              rank: userIndex + 1,
+              totalUsers: allUsers.length,
+            });
+          }
+        }
+      }
+    } catch (error) {
+      console.error("Erreur lors du chargement du classement :", error);
+    }
+  };
+
+  // Mémoriser les données statistiques pour éviter les recalculs constants
+  const statsData = useMemo(() => {
     if (!stats || !stats.applicationsPerDay) return null;
 
     const now = new Date();
@@ -152,16 +193,15 @@ function Statistics() {
     };
 
     return { days, totals };
-  };
+  }, [stats, timeRange]);
 
-  const statsData = prepareStatsData();
-
-  const getLineChartConfig = () => {
+  // Mémoriser la configuration du graphique en ligne pour éviter les recalculs
+  const lineChartConfig = useMemo(() => {
     if (!statsData) return null;
 
     const labels = statsData.days.map(d => {
       if (timeRange === '7days') {
-        return format(new Date(d.date), 'EEE', { locale: fr });
+        return format(new Date(d.date), 'EEE');
       } else {
         return format(new Date(d.date), 'dd/MM');
       }
@@ -223,9 +263,10 @@ function Statistics() {
     };
 
     return { data, options };
-  };
+  }, [statsData, timeRange]);
 
-  const getStatusChartConfig = () => {
+  // Mémoriser la configuration du graphique de statuts pour éviter les recalculs
+  const statusChartInfo = useMemo(() => {
     if (!stats || !stats.statusDistribution) return null;
 
     const statusColors = {
@@ -244,22 +285,25 @@ function Statistics() {
 
     const data = {
       labels: labels.map(status => {
-        const statusLabels = {
-          APPLIED: 'Postulé',
-          PENDING: 'En attente',
-          INTERVIEW_SCHEDULED: 'Entretien',
-          OFFER_RECEIVED: 'Offre reçue',
-          REJECTED_BY_COMPANY: 'Refusé',
-          OFFER_ACCEPTED: 'Accepté',
-        };
-        return statusLabels[status] || status;
+        switch (status) {
+          case 'APPLIED': return 'Postulé';
+          case 'PENDING': return 'En attente';
+          case 'INTERVIEW_SCHEDULED': return 'Entretien';
+          case 'OFFER_RECEIVED': return 'Offre reçue';
+          case 'REJECTED_BY_COMPANY': return 'Refusé';
+          case 'OFFER_ACCEPTED': return 'Accepté';
+          default: return status;
+        }
       }),
-      datasets: [{
-        data: values,
-        backgroundColor: backgroundColors,
-        borderColor: '#ffffff',
-        borderWidth: 2,
-      }],
+      datasets: [
+        {
+          data: values,
+          backgroundColor: backgroundColors,
+          borderWidth: 0,
+          hoverBorderWidth: 2,
+          hoverBorderColor: '#ffffff',
+        },
+      ],
     };
 
     const options = {
@@ -287,9 +331,10 @@ function Statistics() {
     };
 
     return { data, options, total, values, labels: data.labels };
-  };
+  }, [stats]);
 
-  const calculateGoalProgress = () => {
+  // Mémoriser le calcul des progrès d'objectif pour éviter les recalculs constants
+  const goalProgress = useMemo(() => {
     if (!stats || !statsData) return { current: 0, target: 10, percentage: 0, timeLeft: '', period: 'semaine' };
 
     let current = 0;
@@ -318,16 +363,26 @@ function Statistics() {
     const percentage = Math.min((current / target) * 100, 100);
     
     return { current, target, percentage, timeLeft, period };
-  };
+  }, [stats, statsData, goalSettings, activeGoalType]);
 
-  const goalProgress = calculateGoalProgress();
+  // Fonction pour formater le classement avec traduction
+  const formatRanking = (ranking) => {
+    if (!ranking) return t("home.ranking.noRank");
+    
+    const { rank } = ranking;
+    const ordinalKey = rank.toString();
+    
+    // Vérifier si on a une traduction spécifique pour ce rang
+    const ordinal = t(`home.ranking.ordinals.${ordinalKey}`) !== `home.ranking.ordinals.${ordinalKey}` 
+      ? t(`home.ranking.ordinals.${ordinalKey}`)
+      : `${rank}${t("home.ranking.suffix")}`;
+    
+    return `${ordinal}`;
+  };
 
   if (loading) {
     return <Loading message="Chargement des statistiques..." />;
   }
-
-  const lineChartConfig = getLineChartConfig();
-  const statusChartInfo = getStatusChartConfig();
 
   return (
     <div className="carrion-statistics">
@@ -663,23 +718,21 @@ function Statistics() {
           <div className="chart-container">
             <div className="performance-insights">
               <div className="insight-item">
-                <span className="insight-label">Taux de réponse</span>
+                <span className="insight-label">{t("home.stats.totalApplications")}</span>
                 <span className="insight-value">
-                  {stats?.totalApplications > 0 
-                    ? Math.round((stats.interviewCount / stats.totalApplications) * 100) 
-                    : 0}%
+                  {stats?.totalApplications || 0}
                 </span>
               </div>
               <div className="insight-item">
-                <span className="insight-label">Candidatures par jour</span>
+                <span className="insight-label">{t("home.stats.todayApplications")}</span>
                 <span className="insight-value">
-                  {statsData ? Math.round(statsData.totals.total / 30 * 10) / 10 : 0}
+                  {stats?.applicationsToday || 0}
                 </span>
               </div>
               <div className="insight-item">
-                <span className="insight-label">Jours consécutifs</span>
+                <span className="insight-label">{t("home.stats.userRanking")}</span>
                 <span className="insight-value">
-                  {stats?.streak || 0}
+                  {formatRanking(userRanking)}
                 </span>
               </div>
               <div className="insight-item">

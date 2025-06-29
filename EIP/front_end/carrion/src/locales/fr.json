@@ -24,7 +24,64 @@
     "actions": "Actions",
     "details": "Détails",
     "hello": "Bienvenue",
-    "required": "Ce champ est requis"
+    "required": "Ce champ est requis",
+    "refresh": "Actualiser",
+    "retry": "Réessayer",
+    "previous": "Précédent",
+    "next": "Suivant"
+  },
+  "shared": {
+    "time": {
+      "unknown": "Date inconnue",
+      "now": "Maintenant",
+      "minutes": "{{minutes}}m",
+      "hours": "{{hours}}h",
+      "days": "{{days}}d",
+      "hoursAgo": "Il y a {{count}}h",
+      "daysAgo": "Il y a {{count}}j"
+    },
+    "status": {
+      "read": "Lu",
+      "unread": "Non lu",
+      "pending": "En attente",
+      "accepted": "Acceptée",
+      "rejected": "Refusée",
+      "interview": "Entretien",
+      "archived": "Archivée"
+    },
+    "stats": {
+      "total": "Total",
+      "pending": "En attente",
+      "accepted": "Acceptées",
+      "refused": "Refusées",
+      "applications": "Candidatures",
+      "totalApplications": "Total candidatures"
+    },
+    "empty": {
+      "title": "Aucune donnée",
+      "noNotifications": "Vous n'avez pas de notifications pour le moment.",
+      "noFilteredNotifications": "Aucune notification {{filter}} trouvée."
+    },
+    "errors": {
+      "fetchError": "Erreur lors de la récupération des données:",
+      "updateError": "Erreur lors de la mise à jour:",
+      "addError": "Erreur lors de l'ajout:",
+      "deleteError": "Erreur :"
+    },
+    "viewModes": {
+      "grid": "GRILLE",
+      "list": "LISTE",
+      "viewGrid": "Voir en grille",
+      "viewList": "Voir en liste"
+    },
+    "sorting": {
+      "label": "TRIER PAR",
+      "date": "Date",
+      "status": "Statut"
+    },
+    "unknown": "Inconnu",
+    "unknownPosition": "Poste non précisé",
+    "loading": "Chargement..."
   },
   "navbar": {
     "home": "Accueil",
@@ -35,38 +92,21 @@
     "statistics": "Statistiques",
     "notification": "Notifications",
     "ranking": "Classement",
-    "logout": "Déconnexion"
+    "logout": "Déconnexion",
+    "seeAll": "Voir toutes les notifications"
   },
   "landing": {
-    "testimonials": {
-      "title": "Ce que nos utilisateurs disent",
-      "testimonial1": {
-        "content": "Merci à Carrion, j'ai pu organiser toutes mes candidatures et trouver mon emploi idéal en 3 mois !",
-        "author": "Marie Dubois",
-        "position": "Développeur Frontend"
-      },
-      "testimonial2": {
-        "content": "L'interface est intuitive et les rappels automatiques m'ont permis d'éviter de perdre des opportunités importantes.",
-        "author": "Thomas Martin",
-        "position": "Ingénieur IT"
-      },
-      "testimonial3": {
-        "content": "Un outil essentiel pour tous les chercheurs d'emploi. Le suivi des objectifs m'a vraiment motivé !",
-        "author": "Sophie Laurent",
-        "position": "Designer UX/UI"
-      }
-    },
-    "cta": {
-      "title": "Prêt à transformer votre recherche d'emploi ?",
-      "subtitle": "Rejoignez des milliers d'utilisateurs qui ont déjà optimisé leur recherche avec Carrion",
-      "button": "Commencer gratuitement"
-    },
     "title": "La plateforme idéale pour gérer ses candidatures",
     "subtitle": "Simplifiez votre recherche d'emploi grâce à Carrion",
     "getStarted": "Démarrer sans attendre",
     "login": "Se connecter",
     "language": "Français",
     "footer": "Footer TBD",
+    "stats": {
+      "users": "Utilisateurs actifs",
+      "success": "Taux de réussite",
+      "support": "Support disponible"
+    },
     "services": {
       "title": "Nos Services",
       "tracking": {
@@ -116,6 +156,29 @@
         "title": "Optimisez Pour Réussir",
         "description": "Utilisez les informations de suivi pour ajuster votre approche et maximiser vos chances de succès dans votre recherche."
       }
+    },
+    "testimonials": {
+      "title": "Ce que nos utilisateurs disent",
+      "testimonial1": {
+        "content": "Merci à Carrion, j'ai pu organiser toutes mes candidatures et trouver mon emploi idéal en 3 mois !",
+        "author": "Marie Dubois",
+        "position": "Développeur Frontend"
+      },
+      "testimonial2": {
+        "content": "L'interface est intuitive et les rappels automatiques m'ont permis d'éviter de perdre des opportunités importantes.",
+        "author": "Thomas Martin",
+        "position": "Ingénieur IT"
+      },
+      "testimonial3": {
+        "content": "Un outil essentiel pour tous les chercheurs d'emploi. Le suivi des objectifs m'a vraiment motivé !",
+        "author": "Sophie Laurent",
+        "position": "Designer UX/UI"
+      }
+    },
+    "cta": {
+      "title": "Prêt à transformer votre recherche d'emploi ?",
+      "subtitle": "Rejoignez des milliers d'utilisateurs qui ont déjà optimisé leur recherche avec Carrion",
+      "button": "Commencer gratuitement"
     }
   },
   "auth": {
@@ -149,24 +212,59 @@
     "welcome": "Bienvenue sur Carrion !",
     "description": "Votre plateforme de gestion de candidatures",
     "getStarted": "Commencer",
-    "recentApplications": "Dernière candidature",
+    "recentApplications": "Candidatures récentes",
     "quickStats": "Statistiques rapides",
-    "totalApplications": "Total des candidatures",
+    "totalApplications": "Total candidatures",
     "pendingApplications": "En attente",
     "acceptedApplications": "Acceptées",
     "recentStatusChange": "Changement de statut récent",
     "ranking": "Classement",
     "rankingMessage": "Vous êtes premier ! Enfin je crois...",
     "recentActivity": "Activité récente",
-    "lastModifications": "Dernière modifications",
-    "noActivity": "Il n'y a pas un chat...",
+    "lastModifications": "Dernières modifications",
+    "noActivity": "Il n'y a pas âme qui vive...",
     "seeAllApplications": "Voir toutes les candidatures",
+    "seeAll": "Voir tout",
     "quickAccess": "Accès rapide",
-    "quickAccessDescription": "Accédez rapidement aux fonctionnalités",
+    "quickAccessDescription": "Accès rapide aux fonctionnalités",
     "myApplications": "Mes candidatures",
     "newApplications": "Nouvelles candidatures",
     "statistics": "Statistiques",
     "myInformation": "Mes informations",
+    "noApplications": "Aucune candidature",
+    "noApplicationsMessage": "Vos candidatures apparaîtront ici",
+    "stats": {
+      "totalApplications": "Total candidatures",
+      "todayApplications": "Aujourd'hui",
+      "userRanking": "Classement"
+    },
+    "ranking": {
+      "ordinals": {
+        "1": "1er",
+        "2": "2ème", 
+        "3": "3ème",
+        "4": "4ème",
+        "5": "5ème",
+        "6": "6ème",
+        "7": "7ème",
+        "8": "8ème",
+        "9": "9ème",
+        "10": "10ème",
+        "11": "11ème",
+        "12": "12ème",
+        "13": "13ème",
+        "14": "14ème",
+        "15": "15ème",
+        "16": "16ème",
+        "17": "17ème",
+        "18": "18ème",
+        "19": "19ème",
+        "20": "20ème"
+      },
+      "suffix": "ème",
+      "loading": "...",
+      "noRank": "-"
+    },
     "timeAgo": {
       "hours": "Il y a {{count}}h",
       "days": "Il y a {{count}}j"
@@ -177,19 +275,14 @@
     "addApplication": "AJOUTER UNE CANDIDATURE",
     "myApplications": "Mes candidatures",
     "unknownCompany": "Entreprise inconnue",
-    "unknownPosition": "Poste inconnu", 
     "unknownStatus": "Statut inconnu",
     "addButton": "Ajouter une candidature",
-    "label": "TRIER PAR",
-    "date": "Date",
-    "status": "Statut",
-    "viewGrid": "Voir en grille",
-    "viewList": "Voir en liste",
-    "empty": {
-      "title": "Aucune candidature trouvée",
-      "description": "Suivez vos candidatures et maximisez vos chances de succès",
-      "text": "Suivez vos candidatures et maximisez vos chances de succès",
-      "button": "Ajouter une candidature"
+    "banner": {
+      "title": "Trouvez votre emploi idéal",
+      "description": "Suivez vos candidatures et maximisez vos chances de succès"
+    },
+    "search": {
+      "placeholder": "Rechercher une candidature"
     },
     "filters": {
       "all": "Toutes",
@@ -218,37 +311,15 @@
       "ON": "Acceptée",
       "OFFER": "Offre reçue"
     },
-    "stats": {
-      "total": "Total",
-      "pending": "En attente",
-      "accepted": "Acceptées",
-      "refused": "Refusées"
-    },
-    "banner": {
-      "title": "Trouvez votre emploi idéal",
-      "description": "Suivez vos candidatures et maximisez vos chances de succès"
-    },
-    "search": {
-      "placeholder": "Rechercher une candidature"
-    },
-    "sorting": {
-      "label": "TRIER PAR :",
-      "date": "Date",
-      "status": "Statut"
-    },
-    "viewModes": {
-      "grid": "GRILLE",
-      "list": "LISTE"
+    "empty": {
+      "title": "Aucune candidature trouvée",
+      "description": "Suivez vos candidatures et maximisez vos chances de succès",
+      "text": "Suivez vos candidatures et maximisez vos chances de succès",
+      "button": "Ajouter une candidature"
     },
     "emptyState": {
       "title": "Aucune candidature trouvée",
       "description": "Commencez à suivre vos candidatures d'emploi en ajoutant votre première candidature"
-    },
-    "errors": {
-      "fetchError": "Erreur lors de la récupération des données:",
-      "updateError": "Erreur lors de la mise à jour de la candidature:",
-      "addError": "Erreur lors de l'ajout de la candidature:",
-      "deleteError": "Erreur :"
     }
   },
   "archives": {
@@ -259,30 +330,11 @@
     "search": {
       "placeholder": "Rechercher une candidature"
     },
-    "viewModes": {
-      "list": "Voir liste",
-      "grid": "Voir grille"
-    },
     "details": {
       "status": "Statut :",
       "applicationDate": "Date de candidature :",
       "seeDetails": "Voir les détails"
     },
-    "stats": {
-      "total": "Total",
-      "pending": "En attente",
-      "accepted": "Acceptées",
-      "refused": "Refusées"
-    },
-    "banner": {
-      "title": "Trouvez votre emploi idéal",
-      "description": "Suivez vos candidatures et maximisez vos chances de succès"
-    },
-    "label": "TRIER PAR",
-    "date": "Date",
-    "status": "Statut",
-    "viewGrid": "Voir en grille",
-    "viewList": "Voir en liste",
     "empty": {
       "title": "Aucune candidature archivée",
       "text": "Suivez vos candidatures et maximisez vos chances de succès"
@@ -308,9 +360,7 @@
     "today": "Aujourd'hui",
     "thisWeek": "Cette semaine",
     "thisMonth": "Ce mois-ci",
-    "total": "Total",
     "evolution": "Évolution sur les 30 derniers jours:",
-    "applications": "candidatures",
     "success": "Succès atteints:",
     "congratulations": "Bravo, tu as envoyé",
     "again": "Encore",
@@ -375,6 +425,8 @@
     "invalidSalary": "Salaire invalide"
   },
   "notifications": {
+    "title": "Notifications",
+    "loading": "Chargement des notifications...",
     "application": {
       "created": "Votre candidature chez {{company}} en tant que {{jobTitle}} a été enregistrée!",
       "deleted": "Votre candidature chez {{company}} en tant que {{jobTitle}} a été supprimée!",
@@ -432,8 +484,6 @@
     "noContractType": "Non spécifié",
     "weekly": "Objectif hebdomadaire fixé",
     "monthly": "Objectif mensuel fixé",
-    "title": "Notifications",
-    "loading": "Chargement des notifications...",
     "errors": {
       "title": "Erreur lors du chargement des notifications",
       "fetch": "Erreur lors de la récupération des notifications"
@@ -460,22 +510,6 @@
       "warning": "Alertes",
       "negative": "Erreurs",
       "info": "Informations"
-    },
-    "time": {
-      "unknown": "Date inconnue",
-      "now": "Maintenant",
-      "minutes": "{{minutes}}m",
-      "hours": "{{hours}}h",
-      "days": "{{days}}d"
-    },
-    "status": {
-      "read": "Lu",
-      "unread": "Non lu"
-    },
-    "empty": {
-      "title": "Aucune notification",
-      "noNotifications": "Vous n'avez pas de notifications pour le moment.",
-      "noFilteredNotifications": "Aucune notification {{filter}} trouvée."
     }
   },
   "ranking": {
@@ -509,10 +543,6 @@
     "podium": {
       "title": "Podium"
     },
-    "stats": {
-      "applications": "Candidatures",
-      "totalApplications": "Total candidatures"
-    },
     "badges": {
       "itsYou": "C'est vous !",
       "you": "Vous"
@@ -531,5 +561,37 @@
       "next": "Suivant",
       "info": "Page {{currentPage}} sur {{totalPages}} ({{usersShown}} utilisateurs affichés)"
     }
+  },
+  "dailyTip": {
+    "title": "Conseil du jour",
+    "moreButton": "Plus de conseils",
+    "tip1": "Personnalisez votre lettre de motivation pour chaque candidature. Les recruteurs apprécient les candidats qui montrent un réel intérêt pour leur entreprise.",
+    "tip2": "Utilisez des mots-clés pertinents dans votre CV en lien avec l'offre d'emploi. Cela améliore vos chances d'être repéré par les systèmes de tri automatique.",
+    "tip3": "Préparez 3-4 questions pertinentes à poser en fin d'entretien. Cela montre votre intérêt pour le poste et l'entreprise.",
+    "tip4": "Créez un portfolio en ligne pour présenter vos réalisations et projets. Un lien dans votre CV peut faire la différence.",
+    "tip5": "Suivez les entreprises qui vous intéressent sur LinkedIn. Cela vous tient informé de leurs actualités et opportunités.",
+    "tip6": "Relancez poliment vos candidatures après 1-2 semaines sans réponse. Un simple message peut relancer votre dossier.",
+    "tip7": "Adaptez votre CV à chaque poste en mettant en avant les compétences les plus pertinentes pour l'offre.",
+    "tip8": "Préparez des exemples concrets de vos réalisations avec la méthode STAR (Situation, Tâche, Action, Résultat).",
+    "tip9": "Optimisez votre profil LinkedIn avec une photo professionnelle et un résumé accrocheur. C'est souvent le premier contact avec les recruteurs.",
+    "tip10": "Entraînez-vous à présenter votre parcours en 2 minutes. Cette présentation courte est souvent demandée en début d'entretien.",
+    "tip11": "Renseignez-vous sur le nom de votre interlocuteur avant l'entretien. Personnaliser vos échanges crée une meilleure connexion.",
+    "tip12": "Tenez un tableau de bord de vos candidatures pour éviter les doublons et assurer un suivi efficace.",
+    "tip13": "Mettez en avant vos soft skills avec des exemples précis. Les compétences humaines sont de plus en plus recherchées.",
+    "tip14": "Préparez des versions courtes et longues de votre CV selon le type de candidature (spontanée ou en réponse à une offre).",
+    "tip15": "Utilisez Google Alertes pour être informé des nouvelles offres dans votre domaine et des actualités de vos entreprises cibles.",
+    "tip16": "Soignez votre e-réputation en vérifiant ce qui apparaît quand on tape votre nom sur Google. Supprimez le contenu non professionnel.",
+    "tip17": "Participez à des événements de networking dans votre secteur. Les recommandations internes augmentent vos chances d'être embauché.",
+    "tip18": "Préparez des questions sur la culture d'entreprise lors des entretiens. Cela montre que vous vous projetez sur le long terme.",
+    "tip19": "Mettez régulièrement à jour vos compétences avec des formations en ligne. Mentionnez vos certifications récentes.",
+    "tip20": "Créez plusieurs versions de votre CV pour différents types de postes tout en gardant une cohérence dans votre parcours.",
+    "tip21": "Préparez-vous aux questions difficiles comme 'Parlez-moi de vos faiblesses' en tournant vos réponses positivement.",
+    "tip22": "Utilisez des chiffres pour quantifier vos réalisations : X% d'augmentation, Y€ de budget géré, équipe de Z personnes.",
+    "tip23": "Arrivez 10-15 minutes en avance à vos entretiens. Cela vous permet de vous installer sereinement et de faire bonne impression.",
+    "tip24": "Préparez un plan B pour vos entretiens vidéo : testez votre connexion, l'éclairage et ayez un numéro de téléphone de secours.",
+    "tip25": "Envoyez un message de remerciement dans les 24h après l'entretien. Cela renforce votre motivation et votre professionnalisme.",
+    "tip26": "Analysez les offres d'emploi pour identifier les compétences les plus recherchées dans votre secteur et les développer.",
+    "tip27": "Créez un réseau de contacts diversifié : anciens collègues, professeurs, professionnels de votre secteur.",
+    "tip28": "Restez authentique lors des entretiens. Les recruteurs savent détecter les candidats qui jouent un rôle plutôt que d'être eux-mêmes."
   }
 } 
