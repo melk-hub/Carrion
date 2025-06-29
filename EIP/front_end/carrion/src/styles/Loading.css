@@ -1,7 +1,3 @@
-/* ============================================================================= */
-/* CARRION LOADING COMPONENT - DESIGN UI/UX MODERNE ET PREMIUM                 */
-/* ============================================================================= */
-
 .carrion-loading {
   min-height: 100vh;
   background-image: url("../assets/svg/background.svg");
@@ -73,3 +69,4 @@
     height: 36px;
   }
 } 
+ 
