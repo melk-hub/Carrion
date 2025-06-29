@@ -17,6 +17,7 @@ import { contractOptions } from "../data/contractOptions";
 import ServicesCard from "../components/ServicesCard";
 import AddServiceModal from "../components/AddServiceModal";
 import CustomDateInput from "../components/CustomDateInput";
+import CvCard from "../components/CvCard";
 
 registerLocale("fr", fr);
 
@@ -42,6 +43,8 @@ function Profile() {
   const [error, setError] = useState(null);
   const [uploadedImage, setUploadedImage] = useState(null);
   const [uploading, setUploading] = useState(false);
+  const [cvUrl, setCvUrl] = useState(null);
+  const [uploadingCv, setUploadingCv] = useState(false);
   const fileInputRef = useRef(null);
 
   const debouncedLoadCities = debounce((inputValue, callback) => {
@@ -61,6 +64,23 @@ function Profile() {
       }
     } catch (err) {
       toast.error(err.message);
+    }
+  }, []);
+
+  const fetchCvUrl = useCallback(async () => {
+    try {
+      const params = new URLSearchParams({
+        filename: "cv",
+      });
+      const res = await apiService.get(`/s3/download?${params.toString()}`);
+      if (res.ok) {
+        const { signedUrl } = await res.json();
+        if (signedUrl) {
+          setCvUrl(signedUrl);
+        }
+      }
+    } catch (error) {
+      console.error("Failed to load CV", error);
     }
   }, []);
 
@@ -111,11 +131,12 @@ function Profile() {
             contractSought: data.contractSought || [],
             sector: data.sector || [],
             locationSought: data.locationSought || [],
-            mageUrl: data.imageUrl,
+            imageUrl: data.imageUrl,
           });
         }
 
         await fetchConnectedServices();
+        await fetchCvUrl();
       } catch (err) {
         setError(err.message);
         toast.error(err.message);
@@ -125,7 +146,7 @@ function Profile() {
     };
 
     fetchProfileData();
-  }, [fetchConnectedServices]);
+  }, [fetchConnectedServices, fetchCvUrl]);
 
   const handleDisconnectService = async (serviceName) => {
     const serviceDisplayName = serviceName.includes("Google")
@@ -214,6 +235,68 @@ function Profile() {
       setUploading(false);
     }
   };
+
+  const handleCvUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    try {
+      setUploadingCv(true);
+
+      const params = new URLSearchParams({
+        filename: "cv",
+        contentType: file.type,
+      });
+      const res = await apiService.post(`/s3/upload?${params.toString()}`);
+      if (!res.ok) {
+        throw new Error("Échec de la génération de l'URL signée");
+      }
+
+      const { signedUrl } = await res.json();
+
+      const uploadRes = await fetch(signedUrl, {
+        method: "PUT",
+        headers: {
+          "Content-Type": file.type,
+        },
+        body: file,
+      });
+
+      if (!uploadRes.ok) {
+        throw new Error("Échec de l'envoi du CV sur S3");
+      }
+
+      // Récupérer la nouvelle URL du CV
+      await fetchCvUrl();
+      toast.success("CV téléchargé avec succès !");
+    } catch (error) {
+      toast.error(error.message);
+    } finally {
+      setUploadingCv(false);
+    }
+  };
+
+  const handleCvDelete = async () => {
+    if (!window.confirm("Êtes-vous sûr de vouloir supprimer votre CV ?")) {
+      return;
+    }
+
+    try {
+      const params = new URLSearchParams({
+        filename: "cv",
+      });
+      const res = await apiService.delete(`/s3/delete?${params.toString()}`);
+      if (res.ok) {
+        setCvUrl(null);
+        toast.success("CV supprimé avec succès !");
+      } else {
+        throw new Error("Échec de la suppression du CV");
+      }
+    } catch (error) {
+      toast.error(error.message);
+    }
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     const submissionData = {
@@ -238,20 +321,24 @@ function Profile() {
       error: "Échec de l'enregistrement du profil",
     });
   };
+
   const selectStyles = {
     input: (provided) => ({ ...provided, boxShadow: "none" }),
     menuPortal: (base) => ({ ...base, zIndex: 9999 }),
   };
+
   const getSelectedObjects = (options, values) => {
     if (!Array.isArray(values)) return [];
     return values
       .map((v) => options.find((o) => o.value === v))
       .filter(Boolean);
   };
+
   const getLocationObjects = (values) => {
     if (!Array.isArray(values)) return [];
     return values.map((v) => ({ label: v, value: v }));
   };
+
   if (isLoading) {
     return (
       <main className="profile-page">
@@ -259,9 +346,11 @@ function Profile() {
       </main>
     );
   }
+
   if (error) {
     return <main className="profile-page">Erreur: {error}</main>;
   }
+
   return (
     <>
       <main className="profile-page">
@@ -299,6 +388,7 @@ function Profile() {
                 {personalInfo.lastName || "Nom"}
               </h3>
             </section>
+
             <ServicesCard
               connectedServices={connectedServices}
               onAddService={() => setIsModalOpen(true)}
@@ -417,6 +507,12 @@ function Profile() {
                 </div>
               </div>
             </article>
+            <CvCard
+              cvUrl={cvUrl}
+              uploadingCv={uploadingCv}
+              onUpload={handleCvUpload}
+              onDelete={handleCvDelete}
+            />
             <article className="profile-card">
               <h2>Préférences de recherche</h2>
               <div className="profile-info-form">

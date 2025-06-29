@@ -41,17 +41,20 @@ export class AuthController {
   @Post('signin')
   @ApiOperation({ summary: 'User sign in' })
   async login(@Request() req, @Res() res) {
-    const token = await this.authService.login(req.user.id);
-    const body = req.body;
-    const tokenTime = body.rememberMe
+    const { rememberMe = false } = req.body;
+    const tokens = await this.authService.login(req.user.id, rememberMe);
+
+    const cookieMaxAge = rememberMe
       ? 1000 * 60 * 60 * 24 * 15
       : 1000 * 60 * 60 * 24;
-    res.cookie('access_token', token.accessToken, {
+
+    res.cookie('access_token', tokens.accessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'Strict',
-      maxAge: tokenTime,
+      maxAge: cookieMaxAge,
     });
+
     return res
       .status(HttpStatus.OK)
       .send({ message: 'User logged in successfully' });
