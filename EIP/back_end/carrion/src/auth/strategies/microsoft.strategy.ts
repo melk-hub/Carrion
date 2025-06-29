@@ -29,14 +29,14 @@ export class MicrosoftStrategy extends PassportStrategy(Strategy, 'microsoft') {
     profile: Profile & { _json?: any; userPrincipalName?: string },
     done: (err: any, user: any, info?: any) => void,
   ) {
-    const email =
+    const rawEmail =
       (profile.emails && profile.emails[0]?.value) ||
       profile.userPrincipalName ||
       profile._json?.mail;
 
     const providerId = profile.id;
 
-    if (!email || !providerId) {
+    if (!rawEmail || !providerId) {
       return done(
         new UnauthorizedException(
           'Could not retrieve essential information from Microsoft profile.',
@@ -44,6 +44,8 @@ export class MicrosoftStrategy extends PassportStrategy(Strategy, 'microsoft') {
         false,
       );
     }
+
+    const oauthEmail = rawEmail.toLowerCase();
 
     const { displayName, name } = profile;
     let loggedInUserId: string | undefined = undefined;
@@ -58,13 +60,13 @@ export class MicrosoftStrategy extends PassportStrategy(Strategy, 'microsoft') {
           isLinkFlow = true;
         }
       } catch (e) {
-        console.log(e);
+        console.error('Error verifying state token:', e.message);
       }
     }
 
     const oauthProfile: CreateUserDto = {
-      username: displayName || email.split('@')[0],
-      email: email,
+      username: displayName || oauthEmail.split('@')[0],
+      email: oauthEmail,
       password: '',
       hasProfile: true,
       firstName: name?.givenName || '',
@@ -81,6 +83,7 @@ export class MicrosoftStrategy extends PassportStrategy(Strategy, 'microsoft') {
 
       return done(null, {
         ...user,
+        oauthEmail: oauthEmail,
         accessToken,
         refreshToken,
         isLinkFlow,

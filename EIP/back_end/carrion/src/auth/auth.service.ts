@@ -77,7 +77,11 @@ export class AuthService {
           `The email address ${oauthProfile.email} is already used by another account.`,
         );
       }
-      return this.prisma.user.findUnique({ where: { id: loggedInUserId } });
+      const user = await this.prisma.user.findUnique({
+        where: { id: loggedInUserId },
+      });
+      if (!user) throw new UnauthorizedException('Logged in user not found.');
+      return user;
     }
 
     const userWithOauthEmail = await this.userService.findByIdentifier(
@@ -112,8 +116,14 @@ export class AuthService {
     days: number,
     name: 'Google_oauth2' | 'Microsoft_oauth2',
     providerId: string,
+    userEmail: string,
   ): Promise<void> {
     const expirationTime = this.calculateTokenExpiration(days);
+    this.logger.log(
+      `Saving token for OAuth email: ${userEmail}`,
+      LogCategory.AUTH,
+      { userId },
+    );
 
     await this.prisma.token.upsert({
       where: { name_providerId: { name, providerId } },
@@ -122,6 +132,7 @@ export class AuthService {
         refreshToken,
         tokenTimeValidity: expirationTime,
         userId,
+        userEmail,
       },
       create: {
         name,
@@ -130,106 +141,9 @@ export class AuthService {
         refreshToken,
         tokenTimeValidity: expirationTime,
         userId,
+        userEmail,
       },
     });
-  }
-
-  async initializeOutlookWebhookRenewals(): Promise<void> {
-    try {
-      const microsoftTokens = await this.prisma.token.findMany({
-        where: { name: 'Microsoft_oauth2', externalId: { not: null } },
-        include: { user: true },
-      });
-      this.logger.logAuthEvent(
-        `Initializing webhook renewals for ${microsoftTokens.length} Outlook subscriptions`,
-      );
-      for (const token of microsoftTokens) {
-        try {
-          const validToken = await this.getValidToken(
-            token.userId,
-            'Microsoft_oauth2',
-          );
-          if (validToken && token.externalId) {
-            await this.checkAndScheduleOutlookRenewal(
-              token.userId,
-              token.externalId,
-              validToken,
-            );
-          }
-        } catch (error) {
-          this.logger.warn(
-            `Failed to initialize webhook renewal for user ${token.userId}`,
-            LogCategory.WEBHOOK,
-            { error: error.message },
-          );
-        }
-      }
-    } catch (error) {
-      this.logger.error(
-        'Failed to initialize Outlook webhook renewals',
-        undefined,
-        LogCategory.WEBHOOK,
-        { error: error.message },
-      );
-    }
-  }
-
-  private async checkAndScheduleOutlookRenewal(
-    userId: string,
-    subscriptionId: string,
-    accessToken: string,
-  ): Promise<void> {
-    try {
-      const url = `https://graph.microsoft.com/v1.0/subscriptions/${subscriptionId}`;
-      const response = await firstValueFrom(
-        this.httpService.get(url, {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-            'Content-Type': 'application/json',
-          },
-        }),
-      );
-      const subscription = response.data;
-      if (subscription && subscription.expirationDateTime) {
-        const expirationDate = new Date(subscription.expirationDateTime);
-        const now = new Date();
-        const timeDiff = expirationDate.getTime() - now.getTime();
-        if (timeDiff <= 60 * 60 * 1000) {
-          await this.renewOutlookWebhook(userId, subscriptionId);
-        } else {
-          const renewalDelay = Math.max(timeDiff - 60 * 60 * 1000, 0);
-          setTimeout(
-            () => this.renewOutlookWebhook(userId, subscriptionId),
-            renewalDelay,
-          );
-        }
-      }
-    } catch (error) {
-      this.logger.warn(
-        `Subscription ${subscriptionId} may be invalid, will try to recreate`,
-        LogCategory.WEBHOOK,
-        { userId, error: error.message },
-      );
-      try {
-        const newSubscriptionId = await this.createOutlookWebhook(
-          accessToken,
-          userId,
-        );
-        if (newSubscriptionId) {
-          await this.updateMicrosoftTokenWithSubscription(
-            userId,
-            newSubscriptionId,
-          );
-        }
-      } catch (recreateError) {
-        this.logger.error(
-          'Failed to recreate invalid Outlook webhook',
-          undefined,
-          LogCategory.WEBHOOK,
-          { userId, error: recreateError.message },
-        );
-      }
-    }
   }
 
   async validateUser(
@@ -270,7 +184,7 @@ export class AuthService {
       ...createUserDto,
       password: hashedPassword,
     });
-    return await this.login(user.id);
+    return this.login(user.id);
   }
 
   async generateTokens(userId: string): Promise<any> {
@@ -289,16 +203,16 @@ export class AuthService {
       });
       if (!decoded || !decoded.sub) return null;
       const userId = decoded.sub;
-      const userToken = await this.prisma.token.findFirst({
-        where: { userId: userId },
-        orderBy: { createdAt: 'desc' },
-      });
-      if (!userToken || !userToken.refreshToken) return null;
+
+      const user = await this.userService.findOne(userId);
+      if (!user || !user.hashedRefreshToken) return null;
+
       const refreshTokenMatches = await argon2.verify(
-        userToken.refreshToken,
+        user.hashedRefreshToken,
         refreshToken,
       );
       if (!refreshTokenMatches) return null;
+
       const tokens = await this.generateTokens(userId);
       await this.userService.updateHashedRefreshToken(
         userId,
@@ -324,18 +238,18 @@ export class AuthService {
     userId: string,
     refreshToken: string,
   ): Promise<any> {
-    const userToken = await this.prisma.token.findFirst({
-      where: { userId: userId },
-      orderBy: { createdAt: 'desc' },
-    });
-    if (!userToken) throw new UnauthorizedException('Invalid Refresh Token');
+    const user = await this.userService.findOne(userId);
+    if (!user || !user.hashedRefreshToken) {
+      throw new UnauthorizedException('Access Denied');
+    }
     const refreshTokenMatches = await argon2.verify(
-      userToken.refreshToken,
+      user.hashedRefreshToken,
       refreshToken,
     );
-    if (!refreshTokenMatches)
-      throw new UnauthorizedException('Invalid Refresh Token');
-    return { id: userId };
+    if (!refreshTokenMatches) {
+      throw new UnauthorizedException('Access Denied');
+    }
+    return { id: user.id, email: user.email, role: user.role };
   }
 
   async validateCookie(token: string): Promise<any> {
@@ -347,7 +261,7 @@ export class AuthService {
         select: { id: true, email: true, role: true },
       });
     } catch (error) {
-      this.logger.error('Token validation error', undefined, LogCategory.AUTH, {
+      this.logger.warn('Cookie validation error', LogCategory.AUTH, {
         error: error.message,
       });
       return null;
@@ -388,7 +302,7 @@ export class AuthService {
         'Error creating Gmail webhook subscription',
         undefined,
         LogCategory.WEBHOOK,
-        { error: error.message },
+        { userId, error: error.response?.data || error.message },
       );
     }
   }
@@ -401,7 +315,7 @@ export class AuthService {
     const maxRetries = 3;
     const baseDelay = 2000;
     try {
-      const webhookUrl = `${process.env.FRONT}/webhooks/outlook/handle-notification`;
+      const webhookUrl = `${process.env.BACK}/webhook/outlook`;
       const expirationDateTime = new Date(Date.now() + 4230 * 60 * 1000);
       const response = await firstValueFrom(
         this.httpService.post(
@@ -428,6 +342,7 @@ export class AuthService {
           userId,
           { subscriptionId: response.data.id },
         );
+        this.scheduleOutlookWebhookRenewal(userId, response.data.id);
         return response.data.id;
       }
       throw new Error('Webhook created but no subscription ID returned');
@@ -446,7 +361,7 @@ export class AuthService {
         'Error creating Outlook webhook subscription - all retries exhausted',
         undefined,
         LogCategory.WEBHOOK,
-        { error: error.response?.data || error.message },
+        { userId, error: error.response?.data || error.message },
       );
     }
     return undefined;
@@ -463,7 +378,7 @@ export class AuthService {
     userId: string,
     subscriptionId: string,
   ): void {
-    const renewalTime = 4170 * 60 * 1000; // 69.5 hours
+    const renewalTime = (4230 - 360) * 60 * 1000;
     setTimeout(
       () => this.renewOutlookWebhook(userId, subscriptionId),
       renewalTime,
@@ -496,7 +411,7 @@ export class AuthService {
       this.scheduleOutlookWebhookRenewal(userId, subscriptionId);
     } catch (error) {
       this.logger.error(
-        'Failed to renew Outlook webhook',
+        'Failed to renew Outlook webhook. Attempting to recreate.',
         undefined,
         LogCategory.WEBHOOK,
         { userId, subscriptionId, error: error.message },
@@ -539,7 +454,7 @@ export class AuthService {
         'Failed to update Google token with history ID',
         undefined,
         LogCategory.AUTH,
-        { error: error.message },
+        { userId, error: error.message },
       );
     }
   }
@@ -558,7 +473,7 @@ export class AuthService {
         'Failed to update Microsoft token with subscription ID',
         undefined,
         LogCategory.AUTH,
-        { error: error.message },
+        { userId, error: error.message },
       );
     }
   }
@@ -573,7 +488,13 @@ export class AuthService {
     const token = await this.prisma.token.findFirst({
       where: { userId, name: 'Microsoft_oauth2' },
     });
-    if (!token?.refreshToken) return null;
+
+    if (!token?.refreshToken || !token.userEmail) {
+      this.logger.warn(
+        `Cannot refresh Microsoft token for user ${userId}: missing refresh token or OAuth email in token record.`,
+      );
+      return null;
+    }
     try {
       const params = new URLSearchParams({
         client_id: process.env.MICROSOFT_CLIENT_ID,
@@ -596,6 +517,7 @@ export class AuthService {
         expires_in / 86400,
         'Microsoft_oauth2',
         token.providerId,
+        token.userEmail,
       );
       return { accessToken: access_token, refreshToken: refresh_token };
     } catch (error) {
@@ -603,7 +525,7 @@ export class AuthService {
         'Failed to refresh Microsoft token',
         undefined,
         LogCategory.AUTH,
-        { error: error.response?.data || error.message },
+        { userId, error: error.response?.data || error.message },
       );
       return null;
     }
@@ -615,7 +537,13 @@ export class AuthService {
     const token = await this.prisma.token.findFirst({
       where: { userId, name: 'Google_oauth2' },
     });
-    if (!token?.refreshToken) return null;
+
+    if (!token?.refreshToken || !token.userEmail) {
+      this.logger.warn(
+        `Cannot refresh Google token for user ${userId}: missing refresh token or OAuth email in token record.`,
+      );
+      return null;
+    }
     try {
       const params = new URLSearchParams({
         client_id: process.env.GOOGLE_CLIENT_ID,
@@ -631,9 +559,10 @@ export class AuthService {
         userId,
         access_token,
         refresh_token || token.refreshToken,
-        expires_in / 86400,
+        expires_in / 3600 / 24,
         'Google_oauth2',
         token.providerId,
+        token.userEmail,
       );
       return { accessToken: access_token, refreshToken: refresh_token };
     } catch (error) {
@@ -641,7 +570,7 @@ export class AuthService {
         'Failed to refresh Google token',
         undefined,
         LogCategory.AUTH,
-        { error: error.response?.data || error.message },
+        { userId, error: error.response?.data || error.message },
       );
       return null;
     }
@@ -655,11 +584,17 @@ export class AuthService {
       where: { userId, name: tokenName },
     });
     if (!token) return null;
+
     if (
       new Date(token.tokenTimeValidity) > new Date(Date.now() + 5 * 60 * 1000)
     ) {
       return token.accessToken;
     }
+
+    this.logger.log(
+      `Token for user ${userId} expired or about to expire. Refreshing...`,
+      LogCategory.AUTH,
+    );
     const refreshed =
       tokenName === 'Microsoft_oauth2'
         ? await this.refreshMicrosoftToken(userId)
@@ -668,7 +603,8 @@ export class AuthService {
   }
 
   private isValidJwtFormat(token: string): boolean {
-    return token?.split('.').length === 3;
+    if (!token) return false;
+    return token.split('.').length === 3;
   }
 
   async initializeWebhookMonitoring(): Promise<void> {
@@ -677,8 +613,10 @@ export class AuthService {
         'Initializing webhook monitoring system...',
         LogCategory.WEBHOOK,
       );
-      await this.cleanupInvalidTokens();
-      await this.initializeOutlookWebhookRenewals();
+      setTimeout(async () => {
+        await this.cleanupInvalidTokens();
+      }, 10000);
+
       setInterval(
         async () => {
           await this.monitorWebhookHealth();
@@ -701,63 +639,62 @@ export class AuthService {
   }
 
   async monitorWebhookHealth(): Promise<void> {
+    this.logger.log('Running webhook health check...', LogCategory.WEBHOOK);
     try {
-      const usersWithMicrosoftTokens = (await Promise.race([
-        this.prisma.token.findMany({
-          where: { name: 'Microsoft_oauth2' },
-          include: { user: true },
-          take: 10,
-        }),
-        new Promise((_, reject) =>
-          setTimeout(() => reject(new Error('Database query timeout')), 5000),
-        ),
-      ])) as any[];
-      for (let i = 0; i < usersWithMicrosoftTokens.length; i++) {
-        const tokenRecord = usersWithMicrosoftTokens[i];
+      const tokensWithWebhooks = await this.prisma.token.findMany({
+        where: {
+          name: 'Microsoft_oauth2',
+          externalId: { not: null },
+        },
+        select: { userId: true, externalId: true },
+      });
+
+      for (const token of tokensWithWebhooks) {
         try {
-          if (tokenRecord.externalId) {
-            const isActive = await this.checkWebhookSubscription(
-              tokenRecord.userId,
-              tokenRecord.externalId,
+          const isActive = await this.checkWebhookSubscription(
+            token.userId,
+            token.externalId,
+          );
+          if (!isActive) {
+            this.logger.warn(
+              `Webhook subscription ${token.externalId} for user ${token.userId} is inactive or missing, attempting to recreate.`,
+              LogCategory.WEBHOOK,
             );
-            if (!isActive) {
-              this.logger.logAuthEvent(
-                'Webhook subscription is inactive, attempting to recreate',
-                tokenRecord.userId,
-                { subscriptionId: tokenRecord.externalId },
+            const validToken = await this.getValidToken(
+              token.userId,
+              'Microsoft_oauth2',
+            );
+            if (validToken) {
+              const newSubscriptionId = await this.createOutlookWebhook(
+                validToken,
+                token.userId,
               );
-              const validToken = await this.getValidToken(
-                tokenRecord.userId,
-                'Microsoft_oauth2',
-              );
-              if (validToken) {
-                const newSubscriptionId = await this.createOutlookWebhook(
-                  validToken,
-                  tokenRecord.userId,
+              if (newSubscriptionId) {
+                await this.updateMicrosoftTokenWithSubscription(
+                  token.userId,
+                  newSubscriptionId,
                 );
-                if (newSubscriptionId) {
-                  await this.updateMicrosoftTokenWithSubscription(
-                    tokenRecord.userId,
-                    newSubscriptionId,
-                  );
-                }
               }
+            } else {
+              this.logger.warn(
+                `Could not get valid token to recreate webhook for user ${token.userId}.`,
+                LogCategory.WEBHOOK,
+              );
             }
           }
-          if (i < usersWithMicrosoftTokens.length - 1) {
-            await new Promise((resolve) => setTimeout(resolve, 100));
-          }
-        } catch (tokenError) {
-          this.logger.warn(
-            'Error processing individual token in webhook monitoring',
+        } catch (innerError) {
+          this.logger.error(
+            `Error checking webhook for user ${token.userId}`,
+            undefined,
             LogCategory.WEBHOOK,
-            { userId: tokenRecord.userId, error: tokenError.message },
+            { error: innerError.message },
           );
         }
+        await new Promise((resolve) => setTimeout(resolve, 200));
       }
     } catch (error) {
       this.logger.error(
-        'Error during webhook health monitoring',
+        'Error during webhook health monitoring task',
         undefined,
         LogCategory.WEBHOOK,
         { error: error.message },
@@ -765,13 +702,19 @@ export class AuthService {
     }
   }
 
-  public async checkWebhookSubscription(
+  async checkWebhookSubscription(
     userId: string,
     subscriptionId: string,
   ): Promise<boolean> {
     try {
       const validToken = await this.getValidToken(userId, 'Microsoft_oauth2');
-      if (!validToken) return false;
+      if (!validToken) {
+        this.logger.warn(
+          `Could not get valid token to check subscription for user ${userId}.`,
+          LogCategory.WEBHOOK,
+        );
+        return false;
+      }
       const url = `https://graph.microsoft.com/v1.0/subscriptions/${subscriptionId}`;
       const response = await firstValueFrom(
         this.httpService.get(url, {
@@ -784,11 +727,13 @@ export class AuthService {
       }
       return false;
     } catch (error) {
-      if (error.response?.status === 404) return false;
+      if (error.response?.status === 404) {
+        return false;
+      }
       this.logger.warn(
-        'Failed to check webhook subscription status',
+        `Failed to check webhook subscription status for ${subscriptionId}. Assuming active for now.`,
         LogCategory.WEBHOOK,
-        { subscriptionId, error: error.message },
+        { error: error.message },
       );
       return true;
     }
@@ -796,24 +741,20 @@ export class AuthService {
 
   async cleanupInvalidTokens(): Promise<void> {
     try {
-      const tokens = await this.prisma.token.findMany({
-        where: { name: 'Microsoft_oauth2' },
-        take: 20,
+      const tokensToDelete = await this.prisma.token.findMany({
+        where: {
+          OR: [{ accessToken: '' }, { refreshToken: '' }],
+        },
+        select: { id: true },
       });
-      const tokensToDelete = tokens
-        .filter(
-          (token) =>
-            !(token.accessToken && this.isValidJwtFormat(token.accessToken)) &&
-            !(token.refreshToken && token.refreshToken.trim() !== ''),
-        )
-        .map((token) => token.id);
 
       if (tokensToDelete.length > 0) {
+        const ids = tokensToDelete.map((t) => t.id);
         await this.prisma.token.deleteMany({
-          where: { id: { in: tokensToDelete } },
+          where: { id: { in: ids } },
         });
         this.logger.log(
-          `Cleaned up ${tokensToDelete.length} invalid Microsoft tokens`,
+          `Cleaned up ${ids.length} invalid tokens (with empty strings).`,
           LogCategory.AUTH,
         );
       }

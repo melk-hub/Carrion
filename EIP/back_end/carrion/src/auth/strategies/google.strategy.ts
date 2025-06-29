@@ -16,7 +16,11 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
       clientID: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
       callbackURL: process.env.GOOGLE_REDIRECT_URI,
-      scope: ['email', 'profile'],
+      scope: [
+        'email',
+        'profile',
+        'https://www.googleapis.com/auth/gmail.readonly',
+      ],
     });
   }
 
@@ -37,6 +41,9 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
     }
 
     const { id: providerId, name, emails } = profile;
+
+    const oauthEmail = emails[0].value.toLowerCase();
+
     let loggedInUserId: string | undefined = undefined;
     let isLinkFlow = false;
     const state = req.query.state;
@@ -49,13 +56,13 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
           isLinkFlow = true;
         }
       } catch (e) {
-        console.log(e);
+        console.error('Error verifying state token:', e.message);
       }
     }
 
     const oauthProfile: CreateUserDto = {
-      username: name.givenName || emails[0].value.split('@')[0],
-      email: emails[0].value,
+      username: name.givenName || oauthEmail.split('@')[0],
+      email: oauthEmail,
       password: '',
       hasProfile: true,
       firstName: name.givenName || '',
@@ -72,6 +79,7 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
 
       return done(null, {
         ...user,
+        oauthEmail: oauthEmail,
         accessToken,
         refreshToken,
         isLinkFlow,

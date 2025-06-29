@@ -122,6 +122,8 @@ function Settings() {
         if (response.ok) {
           alert("Votre compte a été supprimé avec succès.");
           localStorage.removeItem("token");
+          localStorage.removeItem("access_token");
+          localStorage.removeItem("refresh_token");
           window.location.href = "/";
         } else {
           throw new Error("La suppression du compte a échoué.");

@@ -24,7 +24,6 @@ import {
   CustomLoggingService,
   LogCategory,
 } from 'src/common/services/logging.service';
-import { PrismaService } from 'src/prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
 
 @ApiTags('Authentication')
@@ -33,7 +32,6 @@ export class AuthController {
   constructor(
     private readonly authService: AuthService,
     private readonly logger: CustomLoggingService,
-    private readonly prisma: PrismaService,
     private readonly jwtService: JwtService,
   ) {}
 
@@ -112,8 +110,19 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   @Post('signout')
   @ApiOperation({ summary: 'User sign out' })
-  signOut(@Req() req) {
+  signOut(@Req() req, @Res() res) {
     this.authService.signOut(req.user.id);
+    res.clearCookie('access_token', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+    });
+    res.clearCookie('refresh_token', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+    });
+    return res.status(HttpStatus.OK).json({ message: 'Signout successful' });
   }
 
   @Public()
@@ -121,6 +130,11 @@ export class AuthController {
   @ApiOperation({ summary: 'Logout' })
   logout(@Response() res) {
     res.clearCookie('access_token', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+    });
+    res.clearCookie('refresh_token', {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',
@@ -133,11 +147,11 @@ export class AuthController {
   @ApiOperation({ summary: 'Check login status' })
   async checkAuth(@Request() req, @Response() res) {
     try {
-      const token = req.res.req.cookies['access_token'];
-      if (!token) return res.status(401).json({ message: 'Not authenticated' });
+      const token = req.cookies['access_token'];
+      if (!token) return res.status(200).json({ isAuthenticated: false });
       const user = await this.authService.validateCookie(token);
-      if (!user) return res.status(401).json({ message: 'Invalid token' });
-      return res.status(200).json({ message: 'Authenticated' });
+      if (!user) return res.status(200).json({ isAuthenticated: false });
+      return res.status(200).json({ isAuthenticated: true, user });
     } catch (error) {
       return res
         .status(500)
@@ -208,9 +222,10 @@ export class AuthController {
       user.id,
       user.accessToken,
       user.refreshToken || '',
-      7,
+      3650,
       'Google_oauth2',
       user.providerId,
+      user.oauthEmail,
     );
     await this.authService.createGmailWebhook(user.accessToken, user.id);
 
@@ -247,9 +262,10 @@ export class AuthController {
       user.id,
       user.accessToken,
       user.refreshToken || '',
-      7,
+      90,
       'Microsoft_oauth2',
       user.providerId,
+      user.oauthEmail,
     );
 
     const webhookId = await this.authService.createOutlookWebhook(
