@@ -12,10 +12,11 @@ import home from '../assets/home-button.png';
 import candidature from '../assets/candidate-profile.png';
 import archives from '../assets/archives.png';
 import bell  from "../assets/bell.png";
-import avatar from "../assets/avatar.png";
 import notification_icon from "../assets/notification.png";
 import statistics from '../assets/pie-chart.png';
 import podium from '../assets/podium.png';
+import ApiService from "../services/api";
+import { CircleUserRound } from "lucide-react";
 
 function Navbar({ sidebarCollapsed, setSidebarCollapsed, setIsAuthenticated }) {
   const navigate = useNavigate();
@@ -26,6 +27,7 @@ function Navbar({ sidebarCollapsed, setSidebarCollapsed, setIsAuthenticated }) {
   const API_URL = process.env.REACT_APP_API_URL;
 
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [uploadedImage, setUploadedImage] = useState(null);
   const dropdownRef = useRef(null);
 
   // Fonction pour obtenir le nom de la page actuelle
@@ -56,7 +58,7 @@ function Navbar({ sidebarCollapsed, setSidebarCollapsed, setIsAuthenticated }) {
   const navigateAndScrollTop = (path) => {
     navigate(path);
     window.scrollTo({ top: 0, behavior: 'smooth' });
-    
+
     // Si on navigue vers les notifications, rafraîchir le compteur
     if (path === '/notification') {
       setTimeout(fetchNotifications, 500);
@@ -87,6 +89,24 @@ function Navbar({ sidebarCollapsed, setSidebarCollapsed, setIsAuthenticated }) {
     };
   }, []);
 
+  useEffect(() => {
+    const fetchProfilePicture = async () => {
+      try {
+        const params = new URLSearchParams({
+          filename: "profile",
+        });
+        const res = await ApiService.get(`/s3/download?${params.toString()}`);
+        const { signedUrl } = await res.json();
+        if (signedUrl) {
+          setUploadedImage(signedUrl);
+        }
+      } catch (error) {
+        console.error("Failed to load profile picture", error);
+      }
+    };
+    fetchProfilePicture();
+  }, []);
+
   const handleToggleDropdown = () => {
     setIsDropdownOpen(prev => !prev);
   };
@@ -110,7 +130,7 @@ function Navbar({ sidebarCollapsed, setSidebarCollapsed, setIsAuthenticated }) {
         <div className="topbar-right">
           <LanguageDropdown className="dark-theme" style={{color: 'white'}}/>
           <div className="user-profile" ref={dropdownRef} onClick={handleToggleDropdown}>
-            <img src={avatar} alt="User" className="avatar" />
+            {uploadedImage? (<img src={uploadedImage} alt="User" className="avatar" />) : (<CircleUserRound size={120} color="#9ca3af" />)}
             {isDropdownOpen && (
               <ul className="dropdown-menu">
                 <li onClick={() => { navigateAndScrollTop('/profile'); setIsDropdownOpen(false); }}>{t('navbar.profile')}</li>
@@ -145,11 +165,11 @@ function Navbar({ sidebarCollapsed, setSidebarCollapsed, setIsAuthenticated }) {
           </li>
           <li onClick={() => navigate('/notification')} className={isActive('/notification') ? 'active' : ''}>
             <div className="notifications" style={{ position: 'relative' }}>
-              <img 
-                src={unreadCount > 0 ? notification_icon : bell} 
-                alt={unreadCount > 0 ? "Notification" : "Bell"} 
+              <img
+                src={unreadCount > 0 ? notification_icon : bell}
+                alt={unreadCount > 0 ? "Notification" : "Bell"}
                 className={`menu-icon notifications ${unreadCount > 0 ? 'has-unread' : ''}`}
-                style={{width: '25px', height: '25px'}} 
+                style={{width: '25px', height: '25px'}}
               />
               {unreadCount > 0 && (
                 <span className="notification-badge">
@@ -161,7 +181,7 @@ function Navbar({ sidebarCollapsed, setSidebarCollapsed, setIsAuthenticated }) {
           </li>
         </ul>
         <div className="motion-toggle">
-          <ToggleSwitch 
+          <ToggleSwitch
             isChecked={sidebarCollapsed}
             setIsChecked={toggleSidebar}
           />
