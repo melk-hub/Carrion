@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import InfosModal from "../components/InfosModal";
 import WeeklyGoalCard from "../components/WeeklyGoalCard";
 import DailyTipCard from "../components/DailyTipCard";
+import RecentApplicationsCard from "../components/RecentApplicationsCard";
 import AddApplicationModal from "../components/AddApplicationModal";
 import { useLanguage } from "../contexts/LanguageContext";
 import { useNotifications } from "../contexts/NotificationContext";
@@ -369,67 +370,7 @@ export default function Home() {
 
         <DailyTipCard />
 
-        {/* Recent Applications Card */}
-        <div className="card recent-applications">
-          <div className="card-header">
-            <h3>{t("home.recentApplications")}</h3>
-            <button
-              className="see-all-btn"
-              onClick={() => navigate("/dashboard")}
-            >
-              Voir tout
-            </button>
-          </div>
-          <div className="applications-list">
-            <div className="application-item">
-              <div className="company-logo">
-                <img
-                  src="https://cdn.shopify.com/assets/images/logos/shopify-bag.png"
-                  alt="Shopify"
-                />
-              </div>
-              <div className="application-info">
-                <h4>Shopify</h4>
-                <p>Stage - Product Owner</p>
-                <span className="status pending">En attente</span>
-              </div>
-              <div className="application-time">
-                <span>Il y a 17h</span>
-              </div>
-            </div>
-
-            <div className="application-item">
-              <div className="company-logo">
-                <img
-                  src="https://upload.wikimedia.org/wikipedia/commons/6/6a/Boursorama_Logo_2021.png"
-                  alt="Boursorama"
-                />
-              </div>
-              <div className="application-info">
-                <h4>Boursorama</h4>
-                <p>CDD - Développeur Full Stack Junior</p>
-                <span className="status accepted">Acceptée</span>
-              </div>
-              <div className="application-time">
-                <span>Il y a 5h</span>
-              </div>
-            </div>
-
-            <div className="application-item">
-              <div className="company-logo">
-                <div className="placeholder-logo">G</div>
-              </div>
-              <div className="application-info">
-                <h4>Google</h4>
-                <p>CDI - Software Engineer</p>
-                <span className="status interview">Entretien</span>
-              </div>
-              <div className="application-time">
-                <span>Il y a 2j</span>
-              </div>
-            </div>
-          </div>
-        </div>
+        <RecentApplicationsCard />
       </div>
 
       {/* Add Application Modal */}

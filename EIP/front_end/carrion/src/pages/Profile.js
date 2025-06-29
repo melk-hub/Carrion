@@ -28,6 +28,7 @@ function Profile() {
     school: "",
     city: null,
     phoneNumber: "",
+    imageUrl: "",
     portfolioLink: "",
     linkedin: "",
     contractSought: [],
@@ -40,6 +41,7 @@ function Profile() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [uploadedImage, setUploadedImage] = useState(null);
+  const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef(null);
 
   const debouncedLoadCities = debounce((inputValue, callback) => {
@@ -109,6 +111,7 @@ function Profile() {
             contractSought: data.contractSought || [],
             sector: data.sector || [],
             locationSought: data.locationSought || [],
+            mageUrl: data.imageUrl,
           });
         }
 
@@ -156,9 +159,60 @@ function Profile() {
     const { name, value } = e.target;
     setPersonalInfo((prev) => ({ ...prev, [name]: value }));
   };
-  const handleImageUpload = (e) => {
+
+  useEffect(() => {
+    const fetchProfilePicture = async () => {
+      try {
+        const params = new URLSearchParams({
+          filename: "profile",
+        });
+        const res = await apiService.get(`/s3/download?${params.toString()}`);
+        const { signedUrl } = await res.json();
+        if (signedUrl) {
+          setUploadedImage(signedUrl);
+        }
+      } catch (error) {
+        console.error("Failed to load profile picture", error);
+      }
+    };
+    fetchProfilePicture();
+  }, []);
+
+  const handleImageUpload = async (e) => {
     const file = e.target.files[0];
-    if (file) setUploadedImage(URL.createObjectURL(file));
+    if (!file) return;
+    setUploadedImage(URL.createObjectURL(file));
+    try {
+      setUploading(true);
+
+      const params = new URLSearchParams({
+        filename: "profile",
+        contentType: file.type,
+      });
+      const res = await apiService.post(`/s3/upload?${params.toString()}`);
+      if (!res.ok) {
+        throw new Error("Failed to get signed upload URL");
+      }
+      const { signedUrl } = await res.json();
+      const uploadRes = await fetch(signedUrl, {
+        method: "PUT",
+        headers: {
+          "Content-Type": file.type,
+        },
+        body: file,
+      });
+
+      if (!uploadRes.ok) {
+        throw new Error("Failed to upload image to S3");
+      }
+
+      toast.success("Image uploaded successfully!");
+    } catch (error) {
+      toast.error(error.message);
+      setUploadedImage(null);
+    } finally {
+      setUploading(false);
+    }
   };
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -220,6 +274,7 @@ function Profile() {
               <div
                 className="image-wrapper"
                 onClick={() => fileInputRef.current.click()}
+                style={{ cursor: "pointer" }}
               >
                 <input
                   type="file"
@@ -237,6 +292,7 @@ function Profile() {
                 ) : (
                   <CircleUserRound size={120} color="#9ca3af" />
                 )}
+                {uploading && <div>Uploading...</div>}
               </div>
               <h3 className="profile-name">
                 {personalInfo.firstName || "Votre"}{" "}

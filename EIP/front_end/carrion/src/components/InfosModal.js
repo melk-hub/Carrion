@@ -8,6 +8,7 @@ import debounce from "lodash.debounce";
 import DatePicker, { registerLocale } from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { fr } from "date-fns/locale/fr";
+import toast from "react-hot-toast";
 
 import ApiService from "../services/api";
 import { jobSectors } from "../data/jobSectors";
@@ -18,6 +19,7 @@ registerLocale("fr", fr);
 
 function InfosModal({ isOpen, onClose }) {
   const [activeStep, setActiveStep] = useState("step1");
+  const [resumeFile, setResumeFile] = useState(null);
   const [personalInfo, setPersonalInfo] = useState({
     lastName: "",
     firstName: "",
@@ -54,6 +56,7 @@ function InfosModal({ isOpen, onClose }) {
 
   const handleResumeUpload = (e) => {
     setPersonalInfo({ ...personalInfo, resume: e.target.files[0] });
+    setResumeFile(e.target.files[0]);
   };
 
   const handleDeleteResume = () => {
@@ -104,6 +107,35 @@ function InfosModal({ isOpen, onClose }) {
       const response = await ApiService.post("/user-profile", submissionData);
 
       if (response.ok) {
+        const file = resumeFile;
+        if (file) {
+          try {
+            const params = new URLSearchParams({
+              filename: "cv",
+              contentType: file.type,
+            });
+
+            const res = await ApiService.post(`/s3/upload?${params.toString()}`);
+
+            if (!res.ok) throw new Error("Échec de la génération de l'URL signée");
+
+            const { signedUrl } = await res.json();
+
+            const uploadRes = await fetch(signedUrl, {
+              method: "PUT",
+              headers: {
+                "Content-Type": file.type,
+              },
+              body: file,
+            });
+
+            if (!uploadRes.ok) throw new Error("Échec de l'envoi du CV sur S3");
+
+            toast.success("CV envoyé avec succès !");
+          } catch (err) {
+            toast.error(err.message);
+          }
+        }
         onClose();
       } else {
         const errorData = await response.json();
