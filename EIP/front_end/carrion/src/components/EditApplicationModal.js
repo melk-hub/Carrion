@@ -2,7 +2,7 @@
 import React from "react";
 import { useLanguage } from "../contexts/LanguageContext";
 import Select from "react-select";
-import "../styles/Modal.css";
+import "../styles/AddApplicationModal.css";
 
 function EditApplicationModal({
   application,
@@ -31,11 +31,11 @@ function EditApplicationModal({
   };
 
   return (
-    <div className="modal-overlay">
-      <div className="modal-container modern-modal">
-        <div className="modal-header">
-          <h2 className="modal-title">{t("modal.edit.title")}</h2>
-          <button className="modal-close-btn" onClick={onClose}>
+    <div className="app-modal-overlay">
+      <div className="app-modal-container">
+        <div className="app-modal-header">
+          <h2 className="app-modal-title">{t("modal.edit.title")}</h2>
+          <button className="app-modal-close-btn" onClick={onClose}>
             <svg
               width="24"
               height="24"
@@ -50,18 +50,18 @@ function EditApplicationModal({
           </button>
         </div>
 
-        <div className="modal-content">
-          <div className="form-grid">
-            {/* Première colonne */}
-            <div className="form-column">
-              <div className="form-group">
+        <div className="app-modal-content">
+          <div className="app-modal-grid">
+            {/* Colonne de Gauche */}
+            <div className="app-modal-column">
+              <div className="app-modal-form-group">
                 <label htmlFor="company" className="required-field">
                   {t("modal.add.company")}
                 </label>
                 <input
                   type="text"
                   id="company"
-                  className="modern-input"
+                  className="app-modal-input"
                   placeholder={t("modal.add.placeholders.company")}
                   value={application.company || ""}
                   onChange={(e) =>
@@ -70,14 +70,14 @@ function EditApplicationModal({
                   required
                 />
               </div>
-              <div className="form-group">
+              <div className="app-modal-form-group">
                 <label htmlFor="title" className="required-field">
                   {t("modal.add.title_job")}
                 </label>
                 <input
                   type="text"
                   id="title"
-                  className="modern-input"
+                  className="app-modal-input"
                   placeholder={t("modal.add.placeholders.title")}
                   value={application.title || ""}
                   onChange={(e) =>
@@ -86,12 +86,12 @@ function EditApplicationModal({
                   required
                 />
               </div>
-              <div className="form-group">
+              <div className="app-modal-form-group">
                 <label htmlFor="location">{t("modal.add.location")}</label>
                 <input
                   type="text"
                   id="location"
-                  className="modern-input"
+                  className="app-modal-input"
                   placeholder={t("modal.add.placeholders.location")}
                   value={application.location || ""}
                   onChange={(e) =>
@@ -101,16 +101,15 @@ function EditApplicationModal({
               </div>
             </div>
 
-            {/* Deuxième colonne */}
-            <div className="form-column">
-              <div className="form-group">
+            {/* Colonne de Droite */}
+            <div className="app-modal-column">
+              <div className="app-modal-form-group">
                 <label htmlFor="status" className="required-field">
                   {t("modal.add.status")}
                 </label>
-                {/* === CORRECTION ICI === */}
                 <Select
                   inputId="status"
-                  classNamePrefix="custom-select"
+                  classNamePrefix="app-modal-select"
                   options={statusOptions}
                   value={statusOptions.find(
                     (option) => option.value === application.status
@@ -118,21 +117,20 @@ function EditApplicationModal({
                   onChange={(option) =>
                     setApplication({ ...application, status: option.value })
                   }
-                  placeholder="Sélectionnez un statut..."
+                  placeholder={t("modal.add.placeholders.status")}
                   styles={selectStyles}
                   menuPortalTarget={document.body}
                   required
                 />
               </div>
 
-              <div className="form-group">
+              <div className="app-modal-form-group">
                 <label htmlFor="contractType">
                   {t("modal.add.contract_type")}
                 </label>
-                {/* === CORRECTION ICI === */}
                 <Select
                   inputId="contractType"
-                  classNamePrefix="custom-select"
+                  classNamePrefix="app-modal-select"
                   options={contractTypeOptions}
                   value={contractTypeOptions.find(
                     (option) => option.value === application.contractType
@@ -143,19 +141,19 @@ function EditApplicationModal({
                       contractType: option.value,
                     })
                   }
-                  placeholder="Sélectionnez un type..."
+                  placeholder={t("modal.add.placeholders.contract_type")}
                   styles={selectStyles}
                   menuPortalTarget={document.body}
                 />
               </div>
 
-              <div className="form-group">
+              <div className="app-modal-form-group">
                 <label htmlFor="salary">{t("modal.add.salary")}</label>
-                <div className="input-with-suffix">
+                <div className="app-modal-input-with-suffix">
                   <input
                     type="number"
                     id="salary"
-                    className="modern-input"
+                    className="app-modal-input"
                     placeholder={t("modal.add.placeholders.salary")}
                     value={application.salary || ""}
                     onChange={(e) =>
@@ -164,19 +162,19 @@ function EditApplicationModal({
                     min="0"
                     step="1000"
                   />
-                  <span className="input-suffix">€</span>
+                  <span className="app-modal-input-suffix">€</span>
                 </div>
               </div>
             </div>
           </div>
         </div>
 
-        <div className="modal-footer">
-          <button className="modal-button secondary" onClick={onClose}>
+        <div className="app-modal-footer">
+          <button className="app-modal-button secondary" onClick={onClose}>
             {t("common.cancel")}
           </button>
           <button
-            className="modal-button primary"
+            className="app-modal-button primary"
             onClick={onUpdate}
             disabled={
               !application.company || !application.title || !application.status

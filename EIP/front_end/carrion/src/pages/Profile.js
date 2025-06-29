@@ -16,6 +16,7 @@ import { contractOptions } from "../data/contractOptions";
 
 import ServicesCard from "../components/ServicesCard";
 import AddServiceModal from "../components/AddServiceModal";
+import CustomDateInput from "../components/CustomDateInput";
 
 registerLocale("fr", fr);
 
@@ -214,6 +215,41 @@ function Profile() {
           <h2>Mon compte</h2>
         </header>
         <div className="profile-container">
+          <aside className="profile-right-column">
+            <section className="profile-card profile-picture-card">
+              <div
+                className="image-wrapper"
+                onClick={() => fileInputRef.current.click()}
+              >
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  onChange={handleImageUpload}
+                  accept="image/*"
+                  style={{ display: "none" }}
+                />
+                {uploadedImage ? (
+                  <img
+                    src={uploadedImage}
+                    alt="Photo de profil"
+                    className="profile-img"
+                  />
+                ) : (
+                  <CircleUserRound size={120} color="#9ca3af" />
+                )}
+              </div>
+              <h3 className="profile-name">
+                {personalInfo.firstName || "Votre"}{" "}
+                {personalInfo.lastName || "Nom"}
+              </h3>
+            </section>
+            <ServicesCard
+              connectedServices={connectedServices}
+              onAddService={() => setIsModalOpen(true)}
+              onDisconnectService={handleDisconnectService}
+            />
+          </aside>
+
           <form
             className="profile-left-column"
             id="profile-form"
@@ -264,11 +300,15 @@ function Profile() {
                           birthDate: date,
                         }))
                       }
-                      className="form-group-input"
                       locale="fr"
                       dateFormat="dd/MM/yyyy"
                       showYearDropdown
+                      showMonthDropdown
                       dropdownMode="select"
+                      maxDate={new Date()}
+                      customInput={<CustomDateInput />}
+                      portalId="datepicker-portal"
+                      popperClassName="datepicker-force-top"
                     />
                   </div>
                   <div className="form-group">
@@ -405,40 +445,6 @@ function Profile() {
               </button>
             </div>
           </form>
-          <aside className="profile-right-column">
-            <section className="profile-card profile-picture-card">
-              <div
-                className="image-wrapper"
-                onClick={() => fileInputRef.current.click()}
-              >
-                <input
-                  type="file"
-                  ref={fileInputRef}
-                  onChange={handleImageUpload}
-                  accept="image/*"
-                  style={{ display: "none" }}
-                />
-                {uploadedImage ? (
-                  <img
-                    src={uploadedImage}
-                    alt="Photo de profil"
-                    className="profile-img"
-                  />
-                ) : (
-                  <CircleUserRound size={120} color="#9ca3af" />
-                )}
-              </div>
-              <h3 className="profile-name">
-                {personalInfo.firstName || "Votre"}{" "}
-                {personalInfo.lastName || "Nom"}
-              </h3>
-            </section>
-            <ServicesCard
-              connectedServices={connectedServices}
-              onAddService={() => setIsModalOpen(true)}
-              onDisconnectService={handleDisconnectService}
-            />
-          </aside>
         </div>
       </main>
       <AddServiceModal

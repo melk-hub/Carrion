@@ -1,4 +1,4 @@
-import React, { useState, useRef, forwardRef } from "react";
+import React, { useState, useRef } from "react";
 import "../styles/InfosModal.css";
 import { motion, AnimatePresence } from "framer-motion";
 import InputField from "./InputField";
@@ -12,20 +12,9 @@ import { fr } from "date-fns/locale/fr";
 import ApiService from "../services/api";
 import { jobSectors } from "../data/jobSectors";
 import { contractOptions } from "../data/contractOptions";
+import CustomDateInput from "./CustomDateInput";
 
 registerLocale("fr", fr);
-
-const CustomDateInput = forwardRef(({ value, onClick }, ref) => (
-  <button
-    type="button"
-    className="date-picker-custom-input"
-    onClick={onClick}
-    ref={ref}
-  >
-    {value || "jj/mm/aaaa"}
-  </button>
-));
-CustomDateInput.displayName = "CustomDateInput";
 
 function InfosModal({ isOpen, onClose }) {
   const [activeStep, setActiveStep] = useState("step1");
