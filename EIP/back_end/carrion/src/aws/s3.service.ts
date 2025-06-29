@@ -4,8 +4,9 @@ import {
   GetObjectCommand,
 } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
-import { Injectable } from '@nestjs/common';
+import { Injectable, BadRequestException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { PrismaService } from 'src/prisma/prisma.service';
 import { UserService } from 'src/user/user.service';
 
 @Injectable()
@@ -15,7 +16,8 @@ export class S3Service {
 
   constructor(
     private configService: ConfigService,
-    private userService: UserService
+    private userService: UserService,
+    private prismaService: PrismaService
   ) {
     this.bucket = this.configService.get('AWS_BUCKET_NAME');
     this.s3 = new S3Client({
@@ -37,7 +39,24 @@ export class S3Service {
 
     await this.userService.addDocument(userId, filename);
     const signedUrl = await getSignedUrl(this.s3, command, { expiresIn: 300 });
-    return { signedUrl, key };
+    if (filename == "profile") {
+      await this.prismaService.userProfile.update({
+        where: { userId },
+        data: {
+          imageUrl: key,
+        }
+      });
+    } else if (filename == "cv") {
+      await this.prismaService.userProfile.update({
+        where: {userId},
+        data: {
+          resume: key,
+        }
+      });
+    } else {
+      throw new BadRequestException('Filename must be "profile" or "cv"');
+    }
+    return { signedUrl };
   }
 
   async getSignedDownloadUrl(userId: string, filename: string) {

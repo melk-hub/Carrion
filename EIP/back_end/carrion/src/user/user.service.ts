@@ -173,7 +173,6 @@ export class UserService {
     const users = await this.prisma.user.findMany({
       include: {
         jobApplies: true,
-        Settings: true,
         userProfile: true,
       },
     });
@@ -196,7 +195,7 @@ export class UserService {
         email: user.email,
         firstName: user.userProfile?.firstName || '',
         lastName: user.userProfile?.lastName || '',
-        avatar: user.Settings?.imageUrl,
+        avatar: user.userProfile?.imageUrl,
         totalApplications,
         acceptedApplications,
         pendingApplications,
