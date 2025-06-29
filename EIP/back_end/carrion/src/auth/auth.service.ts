@@ -463,7 +463,7 @@ export class AuthService {
     userId: string,
     subscriptionId: string,
   ): void {
-    const renewalTime = 4170 * 60 * 1000;
+    const renewalTime = 4170 * 60 * 1000; // 69.5 hours
     setTimeout(
       () => this.renewOutlookWebhook(userId, subscriptionId),
       renewalTime,
