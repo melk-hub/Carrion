@@ -22,7 +22,56 @@
     "actions": "Actions",
     "details": "Details",
     "hello": "Welcome",
-    "required": "This field is required"
+    "required": "This field is required",
+    "refresh": "Refresh",
+    "retry": "Retry",
+    "previous": "Previous",
+    "next": "Next"
+  },
+  "shared": {
+    "time": {
+      "unknown": "Unknown date",
+      "now": "Now",
+      "minutes": "{{minutes}}m",
+      "hours": "{{hours}}h",
+      "days": "{{days}}d",
+      "hoursAgo": "{{count}}h ago",
+      "daysAgo": "{{count}}d ago"
+    },
+    "status": {
+      "read": "Read",
+      "unread": "Unread"
+    },
+    "stats": {
+      "total": "Total",
+      "pending": "Pending",
+      "accepted": "Accepted",
+      "refused": "Rejected",
+      "applications": "Applications",
+      "totalApplications": "Total applications"
+    },
+    "empty": {
+      "title": "No data",
+      "noNotifications": "You have no notifications at the moment.",
+      "noFilteredNotifications": "No {{filter}} notifications found."
+    },
+    "errors": {
+      "fetchError": "Error while fetching data:",
+      "updateError": "Error while updating:",
+      "addError": "Error while adding:",
+      "deleteError": "Error:"
+    },
+    "viewModes": {
+      "grid": "GRID",
+      "list": "LIST",
+      "viewGrid": "View in grid",
+      "viewList": "View in list"
+    },
+    "sorting": {
+      "label": "SORT BY",
+      "date": "Date",
+      "status": "Status"
+    }
   },
   "navbar": {
     "home": "Home",
@@ -153,24 +202,91 @@
     "welcome": "Welcome to Carrion!",
     "description": "Your application management platform",
     "getStarted": "Get Started",
-    "recentApplications": "Latest Application",
+    "recentApplications": "Recent Applications",
     "quickStats": "Quick Stats",
     "totalApplications": "Total Applications",
     "pendingApplications": "Pending",
     "acceptedApplications": "Accepted",
     "recentStatusChange": "Recent Status Change",
     "ranking": "Ranking",
-    "rankingMessage": "You're first! Well, I think...",
+    "rankingMessage": "You are first! I think...",
     "recentActivity": "Recent Activity",
-    "lastModifications": "Last modifications",
-    "noActivity": "Nothing to see here...",
+    "lastModifications": "Last Modifications",
+    "noActivity": "There's not a soul...",
     "seeAllApplications": "See all applications",
+    "seeAll": "See all",
     "quickAccess": "Quick Access",
-    "quickAccessDescription": "Quickly access features",
+    "quickAccessDescription": "Quick access to features",
     "myApplications": "My Applications",
     "newApplications": "New Applications",
     "statistics": "Statistics",
     "myInformation": "My Information",
+    "noApplications": "No applications",
+    "noApplicationsMessage": "Your applications will appear here",
+    "stats": {
+      "totalApplications": "Total applications",
+      "todayApplications": "Today",
+      "userRanking": "Ranking"
+    },
+    "ranking": {
+      "ordinals": {
+        "1": "1st",
+        "2": "2nd", 
+        "3": "3rd",
+        "4": "4th",
+        "5": "5th",
+        "6": "6th",
+        "7": "7th",
+        "8": "8th",
+        "9": "9th",
+        "10": "10th",
+        "11": "11th",
+        "12": "12th",
+        "13": "13th",
+        "14": "14th",
+        "15": "15th",
+        "16": "16th",
+        "17": "17th",
+        "18": "18th",
+        "19": "19th",
+        "20": "20th"
+      },
+      "suffix": "th",
+      "loading": "...",
+      "noRank": "-"
+    },
+    "dailyTip": {
+      "title": "Daily Tip",
+      "moreButton": "More tips",
+      "tip1": "Customize your cover letter for each application. Recruiters appreciate candidates who show genuine interest in their company.",
+      "tip2": "Use relevant keywords in your CV related to the job offer. This improves your chances of being spotted by automatic screening systems.",
+      "tip3": "Prepare 3-4 relevant questions to ask at the end of the interview. This shows your interest in the position and company.",
+      "tip4": "Create an online portfolio to showcase your achievements and projects. A link in your CV can make the difference.",
+      "tip5": "Follow companies that interest you on LinkedIn. This keeps you informed of their news and opportunities.",
+      "tip6": "Politely follow up on your applications after 1-2 weeks without response. A simple message can revive your application.",
+      "tip7": "Adapt your CV to each position by highlighting the most relevant skills for the offer.",
+      "tip8": "Prepare concrete examples of your achievements using the STAR method (Situation, Task, Action, Result).",
+      "tip9": "Optimize your LinkedIn profile with a professional photo and catchy summary. It's often the first contact with recruiters.",
+      "tip10": "Practice presenting your background in 2 minutes. This short presentation is often requested at the beginning of interviews.",
+      "tip11": "Research your interviewer's name before the interview. Personalizing your exchanges creates a better connection.",
+      "tip12": "Keep a dashboard of your applications to avoid duplicates and ensure effective follow-up.",
+      "tip13": "Highlight your soft skills with specific examples. Human skills are increasingly sought after.",
+      "tip14": "Prepare short and long versions of your CV depending on the type of application (spontaneous or in response to an offer).",
+      "tip15": "Use Google Alerts to be informed of new offers in your field and news from your target companies.",
+      "tip16": "Take care of your e-reputation by checking what appears when you type your name on Google. Remove non-professional content.",
+      "tip17": "Participate in networking events in your sector. Internal recommendations increase your chances of being hired.",
+      "tip18": "Prepare questions about company culture in interviews. This shows you're thinking long-term.",
+      "tip19": "Regularly update your skills with online training. Mention your recent certifications.",
+      "tip20": "Create multiple versions of your CV for different types of positions while maintaining consistency in your background.",
+      "tip21": "Prepare for difficult questions like 'Tell me about your weaknesses' by turning your answers positively.",
+      "tip22": "Use numbers to quantify your achievements: X% increase, Y€ budget management, team of Z people.",
+      "tip23": "Arrive 10-15 minutes early to your interviews. This allows you to settle in calmly and make a good impression.",
+      "tip24": "Prepare a plan B for your video interviews: test your connection, lighting and have a backup phone number.",
+      "tip25": "Send a thank you message within 24 hours after the interview. This reinforces your motivation and professionalism.",
+      "tip26": "Analyze job offers to identify the most sought-after skills in your sector and develop them.",
+      "tip27": "Create a diverse network of contacts: former colleagues, teachers, professionals in your sector.",
+      "tip28": "Stay authentic in interviews. Recruiters can detect candidates who are playing a role rather than being themselves."
+    },
     "timeAgo": {
       "hours": "{{count}}h ago",
       "days": "{{count}}d ago"
@@ -184,16 +300,12 @@
     "unknownPosition": "Unknown position",
     "unknownStatus": "Unknown status",
     "addButton": "Add an application",
-    "label": "SORT BY",
-    "date": "Date",
-    "status": "Status",
-    "viewGrid": "View in grid",
-    "viewList": "View in list",
-    "empty": {
-        "title": "No applications found",
-        "description": "Track your applications and maximize your chances of success",
-        "text": "Track your applications and maximize your chances of success",
-        "button": "Add an application"
+    "banner": {
+      "title": "Find your ideal job",
+      "description": "Track your applications and maximize your chances of success"
+    },
+    "search": {
+      "placeholder": "Search an application"
     },
     "filters": {
       "all": "All",
@@ -222,37 +334,15 @@
       "ON": "Accepted",
       "OFFER": "Offer received"
     },
-    "stats": {
-      "total": "Total",
-      "pending": "Pending",
-      "accepted": "Accepted",
-      "refused": "Rejected"
-    },
-    "banner": {
-      "title": "Find your ideal job",
-      "description": "Track your applications and maximize your chances of success"
-    },
-    "search": {
-      "placeholder": "Search an application"
-    },
-    "sorting": {
-      "label": "SORT BY:",
-      "date": "Date",
-      "status": "Status"
-    },
-    "viewModes": {
-      "grid": "GRID",
-      "list": "LIST"
+    "empty": {
+      "title": "No applications found",
+      "description": "Track your applications and maximize your chances of success",
+      "text": "Track your applications and maximize your chances of success",
+      "button": "Add an application"
     },
     "emptyState": {
       "title": "No applications found",
       "description": "Start tracking your job applications by adding your first application"
-    },
-    "errors": {
-      "fetchError": "Error while fetching data:",
-      "updateError": "Error while updating application:",
-      "addError": "Error while adding application:",
-      "deleteError": "Error:"
     }
   },
   "archives": {
@@ -262,10 +352,6 @@
     "restoreApplication": "Restore application",
     "search": {
       "placeholder": "Search an application"
-    },
-    "viewModes": {
-      "list": "List view",
-      "grid": "Grid view"
     },
     "details": {
       "status": "Status:",
@@ -305,9 +391,7 @@
     "today": "Today",
     "thisWeek": "This week",
     "thisMonth": "This month",
-    "total": "Total",
     "evolution": "Evolution based on the last 30 days:",
-    "applications": "applications",
     "success": "Success completed:",
     "congratulations": "Congratulations, you sent",
     "nextStep": "more applications to send before the next level",
@@ -364,6 +448,8 @@
     "invalidSalary": "Invalid salary"
   },
   "notifications": {
+    "title": "Notifications",
+    "loading": "Loading notifications...",
     "application": {
       "created": "Your application at {{company}} as {{jobTitle}} has been saved!",
       "deleted": "Your application at {{company}} as {{jobTitle}} has been deleted!",
@@ -421,8 +507,6 @@
     "noContractType": "Not specified",
     "weekly": "Weekly goal set",
     "monthly": "Monthly goal set",
-    "title": "Notifications",
-    "loading": "Loading notifications...",
     "errors": {
       "title": "Error loading notifications",
       "fetch": "Error fetching notifications"
@@ -449,22 +533,6 @@
       "warning": "Warnings",
       "negative": "Errors",
       "info": "Information"
-    },
-    "time": {
-      "unknown": "Unknown date",
-      "now": "Now",
-      "minutes": "{{minutes}}m",
-      "hours": "{{hours}}h",
-      "days": "{{days}}d"
-    },
-    "status": {
-      "read": "Read",
-      "unread": "Unread"
-    },
-    "empty": {
-      "title": "No notifications",
-      "noNotifications": "You have no notifications at the moment.",
-      "noFilteredNotifications": "No {{filter}} notifications found."
     }
   },
   "ranking": {
@@ -497,10 +565,6 @@
     },
     "podium": {
       "title": "Podium"
-    },
-    "stats": {
-      "applications": "Applications",
-      "totalApplications": "Total applications"
     },
     "badges": {
       "itsYou": "It's you!",

@@ -107,7 +107,6 @@ function EditApplicationModal({
                 <label htmlFor="status" className="required-field">
                   {t("modal.add.status")}
                 </label>
-                {/* === CORRECTION ICI === */}
                 <Select
                   inputId="status"
                   classNamePrefix="custom-select"
@@ -129,7 +128,6 @@ function EditApplicationModal({
                 <label htmlFor="contractType">
                   {t("modal.add.contract_type")}
                 </label>
-                {/* === CORRECTION ICI === */}
                 <Select
                   inputId="contractType"
                   classNamePrefix="custom-select"
