@@ -3,7 +3,7 @@ import { CircleUserRound } from "lucide-react";
 import DatePicker, { registerLocale } from "react-datepicker";
 import Select from "react-select";
 import AsyncSelect from "react-select/async";
-import debounce from "lodash.debounce";
+import debounce from "lodash/debounce";
 import { fr } from "date-fns/locale/fr";
 import toast from "react-hot-toast";
 import "react-datepicker/dist/react-datepicker.css";

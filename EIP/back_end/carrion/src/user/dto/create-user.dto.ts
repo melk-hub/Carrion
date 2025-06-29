@@ -26,7 +26,7 @@ export class CreateUserDto extends UserDto {
   firstName?: string;
 
   @ApiProperty({
-    name: 'firstName',
+    name: 'lastName',
     description: 'Did the user complete the information window',
     type: 'boolean',
     example: false,
