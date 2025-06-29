@@ -3,7 +3,6 @@ import {
   BrowserRouter as Router,
   Route,
   Routes,
-  useNavigate,
   useLocation,
   Navigate,
 } from "react-router-dom";
@@ -61,7 +60,6 @@ function App() {
 function AppLayout() {
   const { isAuthenticated, setIsAuthenticated, loadingAuth } = useAuth();
   const { t } = useLanguage();
-  const navigate = useNavigate();
   const location = useLocation();
   const [sidebarCollapsed, setSidebarCollapsed] = useState(true);
 
@@ -70,24 +68,6 @@ function AppLayout() {
       localStorage.setItem("lastPath", location.pathname);
     }
   }, [location, loadingAuth]);
-
-  useEffect(() => {
-    if (loadingAuth) {
-      console.log("Loading authentication...");
-      return;
-    }
-
-    if (isAuthenticated) {
-      const lastPath = localStorage.getItem("lastPath");
-      if (location.pathname === "/") {
-        navigate(lastPath && lastPath !== "/" ? lastPath : "/home", {
-          replace: true,
-        });
-      } else if (lastPath && lastPath === "/") {
-        navigate("/home", { replace: true });
-      }
-    }
-  }, [isAuthenticated, loadingAuth, navigate, location.pathname]);
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });

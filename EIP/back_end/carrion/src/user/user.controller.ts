@@ -10,6 +10,7 @@ import {
   Req,
   HttpStatus,
   HttpCode,
+  Res,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -86,8 +87,21 @@ export class UserController {
   })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiResponse({ status: 403, description: 'Forbidden resource' })
-  async remove(@Req() req) {
+  async remove(@Req() req, @Res() res) {
     await this.userService.remove(req.user.id);
+    res.clearCookie('access_token', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+    });
+    res.clearCookie('refresh_token', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+    });
+    return res
+      .status(HttpStatus.OK)
+      .json({ message: 'Delete account successful' });
   }
 
   @UseGuards(JwtAuthGuard)

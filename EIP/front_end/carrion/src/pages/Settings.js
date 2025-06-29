@@ -3,6 +3,7 @@ import apiService from "../services/api.js";
 import "../styles/Settings.css";
 import toast from "react-hot-toast";
 import Loading from "../components/Loading";
+import { useAuth } from "../AuthContext.js";
 
 function Settings() {
   const [goalSettings, setGoalSettings] = useState({
@@ -15,7 +16,7 @@ function Settings() {
 
   const [isDisconnecting, setIsDisconnecting] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
-  const API_URL = process.env.REACT_APP_API_URL;
+  const { logOut } = useAuth();
 
   useEffect(() => {
     fetchGoalSettings();
@@ -24,11 +25,7 @@ function Settings() {
   const fetchGoalSettings = async () => {
     try {
       setLoading(true);
-      const response = await apiService.get("/settings/goal", {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      });
+      const response = await apiService.get("/settings/goal");
 
       if (response.ok) {
         const data = await response.json();
@@ -109,30 +106,26 @@ function Settings() {
   const handleDeleteAccount = async () => {
     if (
       window.confirm(
-        "ATTENTION : Êtes-vous absolument sûr de vouloir supprimer votre compte ? Toutes vos données (candidatures, objectifs, etc.) seront définitivement perdues. Cette action est irréversible."
+        "ATTENTION : Êtes-vous absolument sûr de vouloir supprimer votre compte ? ..."
       )
     ) {
       setIsDeleting(true);
       try {
-        const response = await fetch(`${API_URL}/user/me`, {
-          method: "DELETE",
-          credentials: "include",
-        });
+        const response = await apiService.delete("/user/me");
 
         if (response.ok) {
-          alert("Votre compte a été supprimé avec succès.");
-          localStorage.removeItem("token");
-          localStorage.removeItem("access_token");
-          localStorage.removeItem("refresh_token");
-          window.location.href = "/";
+          toast.success("Votre compte a été supprimé avec succès.");
+
+          logOut();
         } else {
-          throw new Error("La suppression du compte a échoué.");
+          const errorData = await response.json();
+          throw new Error(
+            errorData.message || "La suppression du compte a échoué."
+          );
         }
       } catch (error) {
         console.error("Erreur lors de la suppression du compte :", error);
-        alert(
-          "Une erreur est survenue lors de la suppression. Veuillez réessayer."
-        );
+        toast.error(`Une erreur est survenue: ${error.message}`);
       } finally {
         setIsDeleting(false);
       }
