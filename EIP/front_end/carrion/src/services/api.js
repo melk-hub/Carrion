@@ -32,6 +32,15 @@ class ApiService {
       throw error;
     }
   }
+  _logoutCallback = () => {};
+
+  registerLogoutCallback(callback) {
+    this._logoutCallback = callback;
+  }
+
+  handleLogoutAndRedirect() {
+    this._logoutCallback();
+  }
 
   async handleTokenRefresh(originalRequest) {
     if (this.isRefreshing) {
@@ -50,27 +59,27 @@ class ApiService {
         credentials: "include",
       });
 
+      this.isRefreshing = false;
+
       if (refreshResponse.ok) {
-        this.isRefreshing = false;
         this.refreshSubscribers.forEach((callback) => callback());
         this.refreshSubscribers = [];
+
         return originalRequest();
       } else {
-        this.isRefreshing = false;
-        this.redirectToLogin();
+        this.handleLogoutAndRedirect();
         throw new Error("Token refresh failed");
       }
     } catch (error) {
       this.isRefreshing = false;
-      this.redirectToLogin();
+      this.handleLogoutAndRedirect();
       throw error;
     }
   }
 
   redirectToLogin() {
-    // Nettoyer le localStorage et rediriger vers login
-    localStorage.removeItem('lastPath');
-    window.location.href = '/';
+    localStorage.removeItem("lastPath");
+    window.location.href = "/";
   }
 
   async get(url, options = {}) {

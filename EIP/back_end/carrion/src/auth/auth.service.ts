@@ -158,11 +158,38 @@ export class AuthService {
     return user;
   }
 
-  async login(userId: string): Promise<any> {
-    const { accessToken, refreshToken } = await this.generateTokens(userId);
+  async login(
+    userId: string,
+    rememberMe = false,
+  ): Promise<{
+    id: string;
+    accessToken: string;
+    refreshToken: string;
+  }> {
+    const { accessToken, refreshToken } = await this.generateTokens(
+      userId,
+      rememberMe,
+    );
+
     const hashedRefreshToken = await argon2.hash(refreshToken);
     await this.userService.updateHashedRefreshToken(userId, hashedRefreshToken);
+
     return { id: userId, accessToken, refreshToken };
+  }
+
+  async generateTokens(
+    userId: string,
+    rememberMe = false,
+  ): Promise<{ accessToken: string; refreshToken: string }> {
+    const payload: AuthJwtPayload = { sub: userId };
+
+    const accessTokenExpiresIn = rememberMe ? '15d' : '1d'; // <-- HERE
+    const [accessToken, refreshToken] = await Promise.all([
+      this.jwtService.signAsync(payload, { expiresIn: accessTokenExpiresIn }),
+      this.jwtService.signAsync(payload, this.refreshTokenConfig),
+    ]);
+
+    return { accessToken, refreshToken };
   }
 
   async signUp(createUserDto: CreateUserDto): Promise<any> {
@@ -185,15 +212,6 @@ export class AuthService {
       password: hashedPassword,
     });
     return this.login(user.id);
-  }
-
-  async generateTokens(userId: string): Promise<any> {
-    const payload: AuthJwtPayload = { sub: userId };
-    const [accessToken, refreshToken] = await Promise.all([
-      this.jwtService.signAsync(payload),
-      this.jwtService.signAsync(payload, this.refreshTokenConfig),
-    ]);
-    return { accessToken, refreshToken };
   }
 
   async refreshTokens(refreshToken: string): Promise<any> {
