@@ -1,3 +1,4 @@
+/* Votre CSS d'origine */
 .settings-container {
   max-width: 900px;
   margin: 40px auto;
@@ -143,12 +144,33 @@
 }
 
 .success-message {
-  margin-top: 16px;
-  padding: 12px;
-  background-color: #c6f6d5;
-  color: #2f855a;
-  border-radius: 6px;
-  text-align: center;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 0.925rem;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+  animation: slideInUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.success-icon {
+  font-size: 1.4rem;
+  filter: grayscale(1);
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .feature-coming-soon {
@@ -184,77 +206,156 @@
 }
 
 .loading-state p {
-  margin-top: 16px;
-  font-size: 1rem;
-  color: #718096;
+  color: #64748b;
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin: 0;
 }
 
+/* --- MODIFICATIONS ET AJOUTS CI-DESSOUS --- */
+
+/* Style pour le conteneur de la section "Compte" */
 .account-actions {
   margin-top: 24px;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 24px; /* Espace entre les deux actions */
 }
 
+/* Style pour chaque ligne d'action (texte + bouton) */
 .action-item {
   display: flex;
-  justify-content: space-between;
+  justify-content: space-between; /* Aligne le texte à gauche, le bouton à droite */
   align-items: center;
-  gap: 20px;
-  padding: 16px;
-  background-color: #fdfdff;
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
+  flex-wrap: wrap; /* Permet le passage à la ligne sur mobile */
+  gap: 16px;
 }
 
-.action-item div {
-  flex-grow: 1;
-}
-
+/* Style pour le texte à gauche */
 .action-item strong {
-  font-size: 1rem;
+  font-size: 1.1rem;
   font-weight: 600;
-  color: #2d3748;
+  color: #1a202c;
+  display: block;
+  margin-bottom: 4px;
 }
 
 .action-description {
-  font-size: 0.875rem;
+  font-size: 0.9rem;
   color: #718096;
-  margin: 4px 0 0 0;
+  margin: 0;
 }
 
-.action-item button {
+/* Style du bouton secondaire (déconnexion) */
+.btn-secondary {
   padding: 8px 16px;
-  border: none;
+  font-weight: 600;
+  background-color: #fff;
+  color: #4a5568;
+  border: 1px solid #cbd5e0;
   border-radius: 6px;
   cursor: pointer;
-  font-weight: 500;
-  flex-shrink: 0;
-  transition: background-color 0.2s, opacity 0.2s;
-}
-
-.btn-secondary {
-  background-color: #edf2f7;
-  color: #4a5568;
-  border: 1px solid #e2e8f0;
+  transition: all 0.2s ease;
 }
 
 .btn-secondary:hover:not(:disabled) {
-  background-color: #e2e8f0;
+  background-color: #f7fafc;
+  border-color: #a0aec0;
 }
 
+/* Style du bouton de danger (suppression) */
 .btn-danger {
-  background-color: #fed7d7;
+  padding: 8px 16px;
+  font-weight: 600;
+  background-color: #fff;
   color: #c53030;
   border: 1px solid #fbb6b6;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
 .btn-danger:hover:not(:disabled) {
-  background-color: #fecaca;
+  background-color: #fff5f5;
   color: #9b2c2c;
+  border-color: #f56565;
 }
 
-.action-item button:disabled {
+/* État désactivé pour les boutons */
+.btn-secondary:disabled,
+.btn-danger:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+}
+
+/* ========== RESPONSIVE DESIGN ========== */
+@media (max-width: 1024px) {
+  /* Pas de changement spécifique nécessaire ici, flex-wrap s'en charge */
+}
+
+@media (max-width: 768px) {
+  .settings-container {
+    padding: 16px;
+  }
+
+  .settings-header {
+    padding: 24px 20px;
+    margin-bottom: 24px;
+  }
+
+  .settings-header h1 {
+    font-size: 1.875rem;
+  }
+
+  .settings-section {
+    padding: 20px 0;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .form-actions {
+    justify-content: stretch;
+  }
+
+  .btn-primary {
+    width: 100%;
+    padding: 16px 24px;
+  }
+
+  .section-header h2 {
+    font-size: 1.25rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .settings-container {
+    padding: 12px;
+  }
+
+  .settings-header {
+    padding: 20px 16px;
+  }
+
+  .settings-header h1 {
+    font-size: 1.625rem;
+  }
+
+  .settings-section {
+    padding: 16px 0;
+  }
+
+  .feature-coming-soon {
+    padding: 32px 20px;
+  }
+
+  .coming-soon-icon {
+    font-size: 3rem;
+  }
+
+  .form-group input {
+    padding: 12px 14px;
+  }
 }

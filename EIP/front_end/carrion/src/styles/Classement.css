@@ -799,7 +799,6 @@
     font-size: 0.75rem;
   }
 }
-
 .ranking-title-with-refresh {
   display: flex;
   align-items: center;
@@ -895,3 +894,4 @@
 .ranking-empty-state .ranking-retry-button:active {
   transform: translateY(0);
 }
+

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import apiService from "../services/api.js";
 import "../styles/Settings.css";
 import toast from "react-hot-toast";
-import Loading from '../components/Loading';
+import Loading from "../components/Loading";
 
 function Settings() {
   const [goalSettings, setGoalSettings] = useState({
@@ -156,7 +156,7 @@ function Settings() {
           </div>
           <div className="account-actions">
             <div className="action-item">
-              <div>
+              <div className="action-text">
                 <strong>Déconnecter les services</strong>
                 <p className="action-description">
                   Ceci révoquera l'accès à tous les services externes connectés
@@ -172,7 +172,7 @@ function Settings() {
               </button>
             </div>
             <div className="action-item">
-              <div>
+              <div className="action-text">
                 <strong>Supprimer le compte</strong>
                 <p className="action-description">
                   Cette action supprimera définitivement votre compte et toutes
