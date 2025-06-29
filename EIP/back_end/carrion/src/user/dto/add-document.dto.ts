@@ -13,5 +13,5 @@ export class AddDocumentDto {
   @Length(1, 255, {
     message: 'Document name must be between 1 and 255 characters',
   })
-  document: string;
+  resume: string;
 }

@@ -3,6 +3,7 @@ import {
   NotFoundException,
   ConflictException,
   BadRequestException,
+  Logger,
 } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -28,9 +29,11 @@ export class UserService {
 
   async create(createUserDto: CreateUserDto) {
     try {
+      const normalizedEmail = createUserDto.email.toLowerCase();
       return await this.prisma.user.create({
         data: {
           ...createUserDto,
+          email: normalizedEmail,
         },
       });
     } catch (error) {
@@ -44,8 +47,14 @@ export class UserService {
   }
 
   async findByIdentifier(identifier: string, isEmail: boolean) {
+    if (isEmail) {
+      const normalizedIdentifier = identifier.toLowerCase();
+      return await this.prisma.user.findUnique({
+        where: { email: normalizedIdentifier },
+      });
+    }
     return await this.prisma.user.findUnique({
-      where: isEmail ? { email: identifier } : { username: identifier },
+      where: { username: identifier },
     });
   }
 
@@ -78,6 +87,9 @@ export class UserService {
 
   async update(id: string, updateUserDto: UpdateUserDto) {
     try {
+      if (updateUserDto.email) {
+        updateUserDto.email = updateUserDto.email.toLowerCase();
+      }
       return await this.prisma.user.update({
         where: { id },
         data: updateUserDto,
@@ -97,9 +109,15 @@ export class UserService {
 
   async remove(id: string) {
     try {
-      return await this.prisma.user.delete({
+      const deletedUser = await this.prisma.user.delete({
         where: { id },
       });
+
+      Logger.warn(
+        `User with id ${id} and all related data have been deleted successfully.`,
+      );
+
+      return deletedUser;
     } catch (error) {
       if (error.code === 'P2025') {
         throw new NotFoundException(`User with id ${id} not found`);

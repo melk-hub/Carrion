@@ -31,9 +31,12 @@ export class OutlookController {
     private readonly userService: UserService,
   ) {
     // Clean up processed messages cache every 10 minutes
-    setInterval(() => {
-      this.processedMessages.clear();
-    }, 10 * 60 * 1000);
+    setInterval(
+      () => {
+        this.processedMessages.clear();
+      },
+      10 * 60 * 1000,
+    );
   }
 
   /**
@@ -85,7 +88,7 @@ export class OutlookController {
     @Req() req: any,
   ) {
     const startTime = Date.now();
-    
+
     // Check for validation token in different possible headers
     const validationToken =
       headers['validation-token'] ||
@@ -114,7 +117,7 @@ export class OutlookController {
           validationToken,
           willReturn: validationToken,
         });
-        
+
         // Microsoft expects just the validation token as plain text response
         return validationToken;
       }
@@ -129,15 +132,15 @@ export class OutlookController {
             queryParams: req.query,
           },
         );
-        
+
         // If we have any validation-related header or query param, return it
-        const possibleValidationToken = 
-          headers['validation-token'] || 
+        const possibleValidationToken =
+          headers['validation-token'] ||
           headers['validationtoken'] ||
           headers['x-validation-token'] ||
           req.query.validationToken ||
           req.query.ValidationToken;
-          
+
         if (possibleValidationToken) {
           this.logger.logWebhookEvent(
             'Found validation token in empty request',
@@ -148,7 +151,7 @@ export class OutlookController {
           );
           return possibleValidationToken;
         }
-        
+
         // For completely empty requests, Microsoft might expect a 200 with specific response
         this.logger.logWebhookEvent(
           'No validation token found - returning plain OK',
@@ -157,7 +160,7 @@ export class OutlookController {
             acceptHeader: headers['accept'],
           },
         );
-        
+
         // Return plain text response since Microsoft expects text/plain
         return 'OK';
       }
@@ -169,12 +172,13 @@ export class OutlookController {
         });
 
         // Process notifications in batches to prevent server overload
-        const CONCURRENT_LIMIT = await this.mailFilterService.getConcurrentEmailLimit();
-        
+        const CONCURRENT_LIMIT =
+          await this.mailFilterService.getConcurrentEmailLimit();
+
         for (let i = 0; i < processingPromises.length; i += CONCURRENT_LIMIT) {
           const batch = processingPromises.slice(i, i + CONCURRENT_LIMIT);
           await Promise.all(batch);
-          
+
           this.logger.logPerformance(
             'Outlook batch processing completed',
             Date.now() - startTime,
@@ -235,7 +239,7 @@ export class OutlookController {
       const messageId = resourceData.id;
       const subscriptionId = item.subscriptionId;
       const cacheKey = `${subscriptionId}-${messageId}`;
-      
+
       if (this.processedMessages.has(cacheKey)) {
         this.logger.warn(
           `Skipping already processed message. MessageId: ${messageId}, SubscriptionId: ${subscriptionId}`,
@@ -246,7 +250,7 @@ export class OutlookController {
 
       // Mark as being processed immediately to prevent race conditions
       this.processedMessages.add(cacheKey);
-      
+
       this.logger.log(
         `Processing new Outlook message. MessageId: ${messageId}, SubscriptionId: ${subscriptionId}`,
       );
@@ -303,19 +307,9 @@ export class OutlookController {
         { userId: user.id },
       );
 
-      // Process email through MailFilter service using the dedicated Outlook function
-      const result = await this.mailFilterService.processEmailAndCreateJobApplyFromOutlook(
+      await this.mailFilterService.processEmailAndCreateJobApplyFromOutlook(
         emailMessage,
         user.id,
-      );
-
-      this.logger.logEmailProcessing(
-        'Outlook email processed successfully',
-        {
-          subject: emailMessage.subject,
-          messageId: emailMessage.id,
-        },
-        { userId: user.id },
       );
     } catch (error) {
       this.logger.error(

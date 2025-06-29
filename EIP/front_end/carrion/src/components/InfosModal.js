@@ -1,4 +1,4 @@
-import React, { useState, useRef, forwardRef } from "react";
+import React, { useState, useRef } from "react";
 import "../styles/InfosModal.css";
 import { motion, AnimatePresence } from "framer-motion";
 import InputField from "./InputField";
@@ -13,20 +13,9 @@ import toast from "react-hot-toast";
 import ApiService from "../services/api";
 import { jobSectors } from "../data/jobSectors";
 import { contractOptions } from "../data/contractOptions";
+import CustomDateInput from "./CustomDateInput";
 
 registerLocale("fr", fr);
-
-const CustomDateInput = forwardRef(({ value, onClick }, ref) => (
-  <button
-    type="button"
-    className="date-picker-custom-input"
-    onClick={onClick}
-    ref={ref}
-  >
-    {value || "jj/mm/aaaa"}
-  </button>
-));
-CustomDateInput.displayName = "CustomDateInput";
 
 function InfosModal({ isOpen, onClose }) {
   const [activeStep, setActiveStep] = useState("step1");
@@ -158,7 +147,8 @@ function InfosModal({ isOpen, onClose }) {
   };
 
   const selectStyles = {
-    menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+    menuPortal: (base) => ({ ...base, zIndex: 10002 }),
+
     input: (provided) => ({ ...provided, boxShadow: "none" }),
   };
 
@@ -215,7 +205,7 @@ function InfosModal({ isOpen, onClose }) {
                         maxDate={new Date()}
                         customInput={<CustomDateInput />}
                         portalId="datepicker-portal"
-                        popperPlacement="auto"
+                        popperClassName="datepicker-force-top"
                       />
                     </div>
                     <div className="form-group">

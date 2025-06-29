@@ -16,13 +16,11 @@ export class SettingsService {
     });
 
     if (!settings) {
-      // Créer les paramètres par défaut si ils n'existent pas
       const newSettings = await this.prisma.settings.create({
         data: {
           userId: userId,
           weeklyGoal: 10,
           monthlyGoal: 30,
-          document: [],
         },
         select: { weeklyGoal: true },
       });
@@ -39,13 +37,11 @@ export class SettingsService {
     });
 
     if (!settings) {
-      // Créer les paramètres par défaut si ils n'existent pas
       const newSettings = await this.prisma.settings.create({
         data: {
           userId: userId,
           weeklyGoal: 10,
           monthlyGoal: 30,
-          document: [],
         },
         select: { weeklyGoal: true, monthlyGoal: true },
       });
@@ -74,7 +70,6 @@ export class SettingsService {
             userId: userId,
             weeklyGoal,
             monthlyGoal: 30,
-            document: [],
           },
           select: { weeklyGoal: true },
         });
@@ -153,7 +148,6 @@ export class SettingsService {
             userId: userId,
             weeklyGoal: weeklyGoal || 10,
             monthlyGoal: monthlyGoal || 30,
-            document: [],
           },
           select: { weeklyGoal: true, monthlyGoal: true },
         });
@@ -233,13 +227,11 @@ export class SettingsService {
     });
 
     if (!settings) {
-      // Créer les paramètres par défaut si ils n'existent pas
       return await this.prisma.settings.create({
         data: {
           userId: userId,
           weeklyGoal: 10,
           monthlyGoal: 30,
-          document: [],
         },
       });
     }

@@ -1,4 +1,4 @@
-import { IsBoolean, IsNotEmpty, IsString } from 'class-validator';
+import { IsBoolean, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { UserDto } from './user.dto';
 
@@ -13,6 +13,28 @@ export class CreateUserDto extends UserDto {
   @IsNotEmpty()
   @IsBoolean()
   hasProfile: boolean = false;
+
+  @ApiProperty({
+    name: 'firstName',
+    description: 'Did the user complete the information window',
+    type: 'boolean',
+    example: false,
+    default: false,
+  })
+  @IsOptional()
+  @IsString()
+  firstName?: string;
+
+  @ApiProperty({
+    name: 'lastName',
+    description: 'Did the user complete the information window',
+    type: 'boolean',
+    example: false,
+    default: false,
+  })
+  @IsOptional()
+  @IsString()
+  lastName?: string;
 }
 
 export class LoginDto {

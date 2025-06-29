@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "../AuthContext";
 import { useLanguage } from "../contexts/LanguageContext";
 import "../styles/AuthModal.css";
@@ -11,32 +11,29 @@ import { FiEye, FiEyeOff } from "react-icons/fi";
 function AuthModal({ isOpen, onClose, defaultTab }) {
   const [activeTab, setActiveTab] = useState(defaultTab || "login");
   const [direction, setDirection] = useState(1);
-  const [credentials, setCredentials] = useState({ identifier: '', password: '', confirmPassword: '', username: '', rememberMe: false });
+  const [credentials, setCredentials] = useState({
+    identifier: "",
+    password: "",
+    confirmPassword: "",
+    username: "",
+    rememberMe: false,
+  });
   const { setIsAuthenticated } = useAuth();
   const { t } = useLanguage();
   const navigate = useNavigate();
   const [errorMessage, setErrorMessage] = useState("");
-  const [searchParams] = useSearchParams();
   const API_URL = process.env.REACT_APP_API_URL;
   const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
     setActiveTab(defaultTab || "login");
-
-    const authError = searchParams.get("error");
-    if (authError) {
-      setErrorMessage(decodeURIComponent(authError));
-      navigate(window.location.pathname, { replace: true });
-    }
-  }, [defaultTab, searchParams, navigate]);
+  }, [defaultTab]);
 
   if (!isOpen) return null;
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-
     const newValue = type === "checkbox" ? checked : value;
-
     setCredentials((prevCredentials) => ({
       ...prevCredentials,
       [name]: newValue,
@@ -51,12 +48,14 @@ function AuthModal({ isOpen, onClose, defaultTab }) {
     if (tab === activeTab) return;
     setDirection(tab === "login" ? -1 : 1);
     setActiveTab(tab);
+    setErrorMessage("");
   };
 
   const handleClose = () => {
     setActiveTab(defaultTab || "login");
     setDirection(1);
     onClose();
+    setErrorMessage("");
   };
 
   const variants = {
@@ -67,8 +66,9 @@ function AuthModal({ isOpen, onClose, defaultTab }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setErrorMessage("");
+
     if (activeTab === "login") {
-      setErrorMessage("");
       try {
         const response = await fetch(`${API_URL}/auth/signin`, {
           method: "POST",
@@ -93,9 +93,10 @@ function AuthModal({ isOpen, onClose, defaultTab }) {
         setErrorMessage(t("auth.genericError"));
       }
     }
+
     if (activeTab === "register") {
       if (credentials.password !== credentials.confirmPassword) {
-        alert(t("auth.passwordMismatch"));
+        setErrorMessage(t("auth.passwordMismatch"));
         return;
       }
 
@@ -116,10 +117,11 @@ function AuthModal({ isOpen, onClose, defaultTab }) {
           navigate("/home");
         } else {
           const errorData = await response.json();
-          alert(errorData.message || t("auth.registerError"));
+          setErrorMessage(errorData.message || t("auth.registerError"));
         }
       } catch (err) {
         console.error(err);
+        setErrorMessage(t("auth.genericError"));
       }
     }
   };
@@ -191,10 +193,10 @@ function AuthModal({ isOpen, onClose, defaultTab }) {
                     type="checkbox"
                     id="rememberMe"
                     name="rememberMe"
-                    value={credentials.rememberMe}
-                    onClick={handleChange}
+                    checked={credentials.rememberMe}
+                    onChange={handleChange}
                   />
-                  <label htmlFor="remember">{t("auth.rememberMe")}</label>
+                  <label htmlFor="rememberMe">{t("auth.rememberMe")}</label>
                 </div>
                 <button type="submit" className="primary-btn">
                   {t("auth.signIn")}
@@ -229,7 +231,7 @@ function AuthModal({ isOpen, onClose, defaultTab }) {
                   <div>
                     <label>{t("auth.username")}</label>
                     <input
-                      type="username"
+                      type="text"
                       name="username"
                       placeholder={t("auth.username")}
                       value={credentials.username}
@@ -273,6 +275,9 @@ function AuthModal({ isOpen, onClose, defaultTab }) {
                     </div>
                   </div>
                 </div>
+                {errorMessage && (
+                  <p className="error-message">{errorMessage}</p>
+                )}
                 <button type="submit" className="primary-btn">
                   {t("auth.signUp")}
                 </button>

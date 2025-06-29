@@ -10,21 +10,21 @@ datasource db {
 }
 
 model User {
-  id                 String              @id @default(uuid()) @db.Uuid
-  username           String              @unique
-  email              String              @unique
+  id                 String             @id @default(uuid()) @db.Uuid
+  username           String             @unique
+  email              String             @unique
   password           String
-  hasProfile         Boolean             @default(false)
-  createdAt          DateTime            @default(now())
-  role               Role                @default(VISITOR)
-  jobApplies         jobApply[]          @relation("UserJobApplies")
-  archivedJobApplies ArchivedJobApply[]  @relation("UserArchivedJobApplies")
-  userProfile        UserProfile?        @relation("UserProfile")
-  Settings           Settings?           @relation("UserSettings")
-  hashedRefreshToken String?             @unique
-  tokens             Token[]             @relation("UserTokens")
-  userAchievements   UserAchievement[]   @relation("UserAchievements")
-  notifications      Notification[] @relation("UserNotifications")
+  hasProfile         Boolean            @default(false)
+  createdAt          DateTime           @default(now())
+  role               Role               @default(VISITOR)
+  jobApplies         jobApply[]         @relation("UserJobApplies")
+  archivedJobApplies ArchivedJobApply[] @relation("UserArchivedJobApplies")
+  userProfile        UserProfile?       @relation("UserProfile")
+  Settings           Settings?          @relation("UserSettings")
+  hashedRefreshToken String?            @unique
+  tokens             Token[]            @relation("UserTokens")
+  userAchievements   UserAchievement[]  @relation("UserAchievements")
+  notifications      Notification[]     @relation("UserNotifications")
 }
 
 model UserProfile {
@@ -52,15 +52,19 @@ model Token {
   name              String
   accessToken       String
   refreshToken      String
+  providerId        String
+  userEmail         String
   tokenTimeValidity DateTime
   externalId        String?
   createdAt         DateTime @default(now())
   userId            String   @db.Uuid
   user              User     @relation("UserTokens", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([name, providerId])
 }
 
 model Notification {
-  id            String     @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  id            String     @id @default(uuid()) @db.Uuid
   userId        String     @db.Uuid
   type          NotificationType
   titleKey      String?
@@ -88,8 +92,8 @@ model jobApply {
 }
 
 model ArchivedJobApply {
-  id            String   @id @default(uuid()) @db.Uuid
-  originalId    String   @db.Uuid
+  id            String    @id @default(uuid()) @db.Uuid
+  originalId    String    @db.Uuid
   title         String
   company       String
   location      String?
@@ -98,9 +102,9 @@ model ArchivedJobApply {
   imageUrl      String?
   contractType  String?
   interviewDate DateTime?
-  archivedAt    DateTime @default(now())
-  userId        String   @db.Uuid
-  user          User     @relation("UserArchivedJobApplies", fields: [userId], references: [id], onDelete: Cascade)
+  archivedAt    DateTime  @default(now())
+  userId        String    @db.Uuid
+  user          User      @relation("UserArchivedJobApplies", fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Settings {

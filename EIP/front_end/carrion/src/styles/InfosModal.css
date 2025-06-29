@@ -1,4 +1,3 @@
-/* ---- Styles Généraux de la Modale ---- */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -38,7 +37,6 @@
   margin-bottom: 2rem;
 }
 
-/* ---- Conteneur pour l'animation ---- */
 .form-content-wrapper {
   position: relative;
   overflow: hidden;
@@ -49,14 +47,12 @@
   width: 100%;
 }
 
-/* ---- Styles des formulaires ---- */
 .infos-modal .info-form {
   display: flex;
   flex-direction: column;
   gap: 1.75rem;
 }
 
-/* ---- Groupe de champ (label + input/select) ---- */
 .infos-modal .form-group {
   display: flex;
   flex-direction: column;
@@ -69,7 +65,6 @@
   color: #4a5568;
 }
 
-/* ---- Styles unifiés pour INPUT et SELECT ---- */
 .infos-modal .form-group input,
 .infos-modal .date-picker-custom-input {
   background-color: white;
@@ -91,7 +86,6 @@
   outline: none;
 }
 
-/* ---- Styles spécifiques à react-select ---- */
 .infos-modal .select__control {
   min-height: 48px !important;
   height: 48px !important;
@@ -110,8 +104,6 @@
   padding: 2px 0.85rem !important;
 }
 
-/* --- THE FIX IS HERE --- */
-/* All button styles are now prefixed with .infos-modal to make them specific */
 .infos-modal .button-group {
   display: flex;
   justify-content: flex-end;
@@ -130,7 +122,7 @@
   font-size: 0.9rem;
   cursor: pointer;
   transition: all 0.2s ease-in-out;
-  /* Resetting potentially inherited styles */
+
   margin: 0;
   width: auto;
   height: auto;
@@ -152,7 +144,6 @@
   background-color: #cbd5e0;
 }
 
-/* Special case for the single button on step 1 */
 .infos-modal .button-group-step1 {
   justify-content: center;
 }
@@ -160,7 +151,6 @@
   width: 50%;
 }
 
-/* ---- Other styles remain the same ---- */
 .select__input-container {
   padding: 0 !important;
   margin: 0 !important;
@@ -173,7 +163,7 @@
 }
 .select__menu {
   border-radius: 8px !important;
-  z-index: 9999;
+  z-index: 10002 !important;
 }
 .select__multi-value {
   background-color: #edf2f7;
@@ -273,8 +263,9 @@
   font-size: 0.8rem;
   cursor: pointer;
 }
+
 .react-datepicker-popper {
-  z-index: 9999 !important;
+  z-index: 10002 !important;
 }
 .react-datepicker {
   font-family: inherit !important;

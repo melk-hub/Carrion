@@ -14,63 +14,81 @@ import lucide_search_svg from "../assets/svg/search_lucide.svg";
 import lucide_calendar_svg from "../assets/svg/calendar_lucide.svg";
 import lucide_bar_chart_svg from "../assets/svg/bar_chart_lucide.svg";
 import lucide_folder_svg from "../assets/svg/folder_lucide.svg";
-import AuthModal from '../components/AuthModal';
-import LoginBtn from '../components/LoginBtn';
+import AuthModal from "../components/AuthModal";
+import LoginBtn from "../components/LoginBtn";
+import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 
 function Landing() {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, setIsAuthenticated } = useAuth();
   const { t } = useLanguage();
+  const navigate = useNavigate();
   const [isHeaderVisible, setIsHeaderVisible] = useState(true);
   const [isAtTop, setIsAtTop] = useState(true);
   const lastScrollY = useRef(0);
   const scrollThreshold = 5;
   const topThreshold = 5;
+  const [showAuth, setShowAuth] = useState(false);
 
   const handleLoginClick = () => {
     setShowAuth(true);
   };
 
-  const [showAuth, setShowAuth] = useState(false);
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const errorType = urlParams.get("error");
+    const successType = urlParams.get("auth");
 
-  // Animation sur scroll améliorée
+    if (errorType) {
+      let messageToDisplay = t("auth.genericError");
+      if (errorType === "permission_denied") {
+        messageToDisplay = t("auth.permissionDenied");
+      }
+      toast.error(messageToDisplay, { duration: 6000 });
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+
+    if (successType === "success") {
+      toast.success(t("auth.loginSuccessRedirect"));
+      setIsAuthenticated(true);
+      window.history.replaceState({}, document.title, window.location.pathname);
+
+      setTimeout(() => {
+        navigate("/home");
+      }, 1500);
+    }
+  }, [t, navigate, setIsAuthenticated]);
+
   useEffect(() => {
     const observerOptions = {
       threshold: 0.1,
-      rootMargin: '0px 0px -100px 0px'
+      rootMargin: "0px 0px -100px 0px",
     };
-
     const observerOptionsExit = {
       threshold: 0,
-      rootMargin: '50px 0px 50px 0px'
+      rootMargin: "50px 0px 50px 0px",
     };
-
-    // Observer pour l'apparition des éléments
     const observerIn = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
         if (entry.isIntersecting) {
-          entry.target.classList.add('animate-in-view');
-          entry.target.classList.remove('animate-out-view');
+          entry.target.classList.add("animate-in-view");
+          entry.target.classList.remove("animate-out-view");
         }
       });
     }, observerOptions);
-
-    // Observer pour la disparition des éléments
     const observerOut = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
         if (!entry.isIntersecting) {
-          entry.target.classList.add('animate-out-view');
-          entry.target.classList.remove('animate-in-view');
+          entry.target.classList.add("animate-out-view");
+          entry.target.classList.remove("animate-in-view");
         }
       });
     }, observerOptionsExit);
-
-    // Observer les éléments à animer
-    const animatedElements = document.querySelectorAll('.animate-on-scroll');
+    const animatedElements = document.querySelectorAll(".animate-on-scroll");
     animatedElements.forEach((el) => {
       observerIn.observe(el);
       observerOut.observe(el);
     });
-
     return () => {
       observerIn.disconnect();
       observerOut.disconnect();
@@ -79,7 +97,6 @@ function Landing() {
 
   useEffect(() => {
     document.body.classList.add("landing-page");
-
     return () => {
       document.body.classList.remove("landing-page");
     };
@@ -89,9 +106,7 @@ function Landing() {
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
       const atTop = currentScrollY <= topThreshold;
-
       setIsAtTop(atTop);
-
       if (atTop) {
         setIsHeaderVisible(true);
       } else if (currentScrollY < lastScrollY.current - scrollThreshold) {
@@ -99,32 +114,29 @@ function Landing() {
       } else if (currentScrollY > lastScrollY.current + scrollThreshold) {
         setIsHeaderVisible(false);
       }
-
       lastScrollY.current = currentScrollY;
     };
-
     const initialScrollY = window.scrollY;
     lastScrollY.current = initialScrollY;
     setIsAtTop(initialScrollY <= topThreshold);
     setIsHeaderVisible(initialScrollY <= topThreshold);
-
     window.addEventListener("scroll", handleScroll, { passive: true });
-
     return () => {
       window.removeEventListener("scroll", handleScroll);
     };
   }, []);
-  
 
   useEffect(() => {
     if (isAuthenticated) {
-      window.location.href = "/dashboard";
+      const urlParams = new URLSearchParams(window.location.search);
+      if (!urlParams.get("auth")) {
+        navigate("/home");
+      }
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, navigate]);
 
   return (
     <div className="landing-page">
-      {/* Header avec navbar */}
       <header
         className={`
           landing-header
@@ -140,69 +152,69 @@ function Landing() {
             </a>
           </div>
           <div className="navigation-actions">
-            <LanguageDropdown style={{color: 'black'}}/>
-            <div style={{width: '10vw', fontSize: '14px', maxHeight: '32px'}}>
-              <LoginBtn onClick={handleLoginClick}/>
+            <LanguageDropdown style={{ color: "black" }} />
+            <div style={{ width: "10vw", fontSize: "14px", maxHeight: "32px" }}>
+              <LoginBtn onClick={handleLoginClick} />
             </div>
           </div>
         </nav>
       </header>
 
-      {/* Contenu principal */}
       <main className="landing-main-content">
-        {/* Section landing */}
         <section className="hero-section">
           <div className="hero-content fade-in">
             <div className="hero-description">
-              <h1 className="text-slide-up">{t('landing.title')}</h1>
-              <p className="text-slide-up delay-1">
-                {t('landing.subtitle')}
-              </p>
-              <div style={{width: '37.5%'}}>
+              <h1 className="text-slide-up">{t("landing.title")}</h1>
+              <p className="text-slide-up delay-1">{t("landing.subtitle")}</p>
+              <div style={{ width: "37.5%" }}>
                 <PrimaryButton
-                    text={t('landing.getStarted')}
-                    onClick={handleLoginClick}
-                    size="large"
+                  text={t("landing.getStarted")}
+                  onClick={handleLoginClick}
+                  size="large"
                 />
               </div>
             </div>
             <div className="hero-image-container">
               <div className="main-image-wrapper">
-                <img src={landing_img} alt="Illustration de la page d'accueil" className="main-hero-image image-zoom-in" />
+                <img
+                  src={landing_img}
+                  alt="Illustration de la page d'accueil"
+                  className="main-hero-image image-zoom-in"
+                />
                 <div className="image-glow"></div>
               </div>
             </div>
           </div>
         </section>
 
-        {/* Section des statistiques */}
         <section className="stats-section animate-on-scroll">
           <div className="stats-container">
             <div className="stat-item pulse-animation">
               <h3 className="stat-number">10,000+</h3>
-              <p className="stat-label">{t('landing.stats.users')}</p>
+              <p className="stat-label">{t("landing.stats.users")}</p>
             </div>
             <div className="stat-item pulse-animation delay-1">
               <h3 className="stat-number">95%</h3>
-              <p className="stat-label">{t('landing.stats.success')}</p>
+              <p className="stat-label">{t("landing.stats.success")}</p>
             </div>
             <div className="stat-item pulse-animation delay-2">
               <h3 className="stat-number">24/7</h3>
-              <p className="stat-label">{t('landing.stats.support')}</p>
+              <p className="stat-label">{t("landing.stats.support")}</p>
             </div>
           </div>
         </section>
 
-        {/* Section des services */}
         <section className="services-section animate-on-scroll">
-          <h2 className="sections-title slide-up">{t('landing.services.title')}</h2>
+          <h2 className="sections-title slide-up">
+            {t("landing.services.title")}
+          </h2>
 
           <div className="services-content">
             <div className="service-box hover-lift card-slide-left">
               <img src={lucide_search_svg} alt="Icône de recherche" />
-              <h3>{t('landing.services.tracking.title')}</h3>
+              <h3>{t("landing.services.tracking.title")}</h3>
               <ul>
-                {t('landing.services.tracking.points').map((point, index) => (
+                {t("landing.services.tracking.points").map((point, index) => (
                   <li key={index}>{point}</li>
                 ))}
               </ul>
@@ -210,9 +222,9 @@ function Landing() {
 
             <div className="service-box hover-lift card-slide-right">
               <img src={lucide_calendar_svg} alt="Icône de calendrier" />
-              <h3>{t('landing.services.goals.title')}</h3>
+              <h3>{t("landing.services.goals.title")}</h3>
               <ul>
-                {t('landing.services.goals.points').map((point, index) => (
+                {t("landing.services.goals.points").map((point, index) => (
                   <li key={index}>{point}</li>
                 ))}
               </ul>
@@ -223,9 +235,9 @@ function Landing() {
                 src={lucide_bar_chart_svg}
                 alt="Icône de graphique en barre"
               />
-              <h3>{t('landing.services.reminders.title')}</h3>
+              <h3>{t("landing.services.reminders.title")}</h3>
               <ul>
-                {t('landing.services.reminders.points').map((point, index) => (
+                {t("landing.services.reminders.points").map((point, index) => (
                   <li key={index}>{point}</li>
                 ))}
               </ul>
@@ -233,9 +245,9 @@ function Landing() {
 
             <div className="service-box hover-lift card-slide-right">
               <img src={lucide_folder_svg} alt="Icône de recherche" />
-              <h3>{t('landing.services.documents.title')}</h3>
+              <h3>{t("landing.services.documents.title")}</h3>
               <ul>
-                {t('landing.services.documents.points').map((point, index) => (
+                {t("landing.services.documents.points").map((point, index) => (
                   <li key={index}>{point}</li>
                 ))}
               </ul>
@@ -243,9 +255,8 @@ function Landing() {
           </div>
         </section>
 
-        {/* Section des tutoriel */}
         <section className="tutorial-sections animate-on-scroll">
-          <h2 className="slide-up">{t('landing.howItWorks.title')}</h2>
+          <h2 className="slide-up">{t("landing.howItWorks.title")}</h2>
 
           <div className="tutorial-content">
             <div className="tutorial-box hover-lift tutorial-slide-left">
@@ -256,10 +267,8 @@ function Landing() {
                 />
               </div>
               <div className="text-box">
-                <h3>{t('landing.howItWorks.centralize.title')}</h3>
-                <p>
-                  {t('landing.howItWorks.centralize.description')}
-                </p>
+                <h3>{t("landing.howItWorks.centralize.title")}</h3>
+                <p>{t("landing.howItWorks.centralize.description")}</p>
               </div>
             </div>
 
@@ -271,10 +280,8 @@ function Landing() {
                 />
               </div>
               <div className="text-box">
-                <h3>{t('landing.howItWorks.track.title')}</h3>
-                <p>
-                  {t('landing.howItWorks.track.description')}
-                </p>
+                <h3>{t("landing.howItWorks.track.title")}</h3>
+                <p>{t("landing.howItWorks.track.description")}</p>
               </div>
             </div>
 
@@ -286,76 +293,72 @@ function Landing() {
                 />
               </div>
               <div className="text-box">
-                <h3>{t('landing.howItWorks.optimize.title')}</h3>
-                <p>
-                  {t('landing.howItWorks.optimize.description')}
-                </p>
+                <h3>{t("landing.howItWorks.optimize.title")}</h3>
+                <p>{t("landing.howItWorks.optimize.description")}</p>
               </div>
             </div>
           </div>
         </section>
 
-        {/* Section des témoignages */}
         <section className="testimonials-section animate-on-scroll">
-          <h2 className="sections-title slide-up">{t('landing.testimonials.title')}</h2>
-          
+          <h2 className="sections-title slide-up">
+            {t("landing.testimonials.title")}
+          </h2>
+
           <div className="testimonials-container">
             <div className="testimonial-card hover-lift card-slide-up">
               <div className="testimonial-content">
-                <p>"{t('landing.testimonials.testimonial1.content')}"</p>
+                <p>"{t("landing.testimonials.testimonial1.content")}"</p>
                 <div className="testimonial-author">
-                  <strong>{t('landing.testimonials.testimonial1.author')}</strong>
-                  <span>{t('landing.testimonials.testimonial1.position')}</span>
+                  <strong>
+                    {t("landing.testimonials.testimonial1.author")}
+                  </strong>
+                  <span>{t("landing.testimonials.testimonial1.position")}</span>
                 </div>
               </div>
             </div>
 
             <div className="testimonial-card hover-lift card-slide-up delay-1">
               <div className="testimonial-content">
-                <p>"{t('landing.testimonials.testimonial2.content')}"</p>
+                <p>"{t("landing.testimonials.testimonial2.content")}"</p>
                 <div className="testimonial-author">
-                  <strong>{t('landing.testimonials.testimonial2.author')}</strong>
-                  <span>{t('landing.testimonials.testimonial2.position')}</span>
+                  <strong>
+                    {t("landing.testimonials.testimonial2.author")}
+                  </strong>
+                  <span>{t("landing.testimonials.testimonial2.position")}</span>
                 </div>
               </div>
             </div>
 
             <div className="testimonial-card hover-lift card-slide-up delay-2">
               <div className="testimonial-content">
-                <p>"{t('landing.testimonials.testimonial3.content')}"</p>
+                <p>"{t("landing.testimonials.testimonial3.content")}"</p>
                 <div className="testimonial-author">
-                  <strong>{t('landing.testimonials.testimonial3.author')}</strong>
-                  <span>{t('landing.testimonials.testimonial3.position')}</span>
+                  <strong>
+                    {t("landing.testimonials.testimonial3.author")}
+                  </strong>
+                  <span>{t("landing.testimonials.testimonial3.position")}</span>
                 </div>
               </div>
             </div>
           </div>
         </section>
 
-        {/* Section Call to Action */}
         <section className="cta-section animate-on-scroll">
           <div className="cta-content fade-in">
-            <h2>{t('landing.cta.title')}</h2>
-            <p>{t('landing.cta.subtitle')}</p>
+            <h2>{t("landing.cta.title")}</h2>
+            <p>{t("landing.cta.subtitle")}</p>
             <div className="cta-button-container button-float">
               <PrimaryButton
-                text={t('landing.cta.button')}
+                text={t("landing.cta.button")}
                 onClick={handleLoginClick}
                 size="large"
               />
             </div>
           </div>
         </section>
-
-        {/* Footer */}
-        {/* <footer className="footer-slide-up">
-          <h2>{t('landing.footer')}</h2>
-        </footer> */}
       </main>
-      <AuthModal
-        isOpen={showAuth} 
-        onClose={() => setShowAuth(false)} 
-      />
+      <AuthModal isOpen={showAuth} onClose={() => setShowAuth(false)} />
     </div>
   );
 }

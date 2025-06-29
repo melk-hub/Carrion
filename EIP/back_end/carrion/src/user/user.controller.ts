@@ -61,7 +61,7 @@ export class UserController {
   @ApiResponse({ status: 404, description: 'User not found' })
   @ApiResponse({ status: 409, description: 'Document already exists' })
   async addDocument(@Req() req, @Body() addDocumentDto: AddDocumentDto) {
-    return this.userService.addDocument(req.user.id, addDocumentDto.document);
+    return this.userService.addDocument(req.user.id, addDocumentDto.resume);
   }
 
   @Patch(':id')
@@ -77,14 +77,17 @@ export class UserController {
     return this.userService.update(id, updateUserDto);
   }
 
-  @Roles(Role.ADMIN)
-  @Delete(':id')
-  @ApiOperation({ summary: 'Delete user (Admin only)' })
-  @ApiResponse({ status: 200, description: 'User deleted successfully' })
-  @ApiResponse({ status: 403, description: 'Forbidden - Admin role required' })
-  @ApiResponse({ status: 404, description: 'User not found' })
-  remove(@Param('id') id: string) {
-    return this.userService.remove(id);
+  @Delete('me')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiOperation({ summary: 'Delete current user account' })
+  @ApiResponse({
+    status: 204,
+    description: 'User account deleted successfully',
+  })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 403, description: 'Forbidden resource' })
+  async remove(@Req() req) {
+    await this.userService.remove(req.user.id);
   }
 
   @UseGuards(JwtAuthGuard)

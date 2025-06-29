@@ -7,7 +7,6 @@ import {
   Logger,
 } from '@nestjs/common';
 import { GmailService } from './gmail.service';
-// import { GoogleAuthGuard } from 'src/auth/guards/google/google-auth.guard';
 import { ApiOperation } from '@nestjs/swagger';
 import { Public } from 'src/auth/decorators/public.decorator';
 
