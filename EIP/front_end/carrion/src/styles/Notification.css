@@ -1,15 +1,8 @@
-/* ============================================================================= */
-/* CARRION NOTIFICATIONS - DESIGN UI/UX MODERNE ET PREMIUM                     */
-/* ============================================================================= */
-
-/* Isolation des styles pour éviter les conflits avec la navbar */
 .notifications-page,
 .notifications-page * {
-  /* Réinitialiser les animations qui pourraient venir de la navbar */
   animation: none !important;
 }
 
-/* Réactiver uniquement les animations spécifiques aux notifications */
 .notifications-page .unread-indicator-modern {
   animation: pulse-glow 2s infinite !important;
 }
@@ -41,7 +34,6 @@
   position: relative;
 }
 
-/* ========== HEADER PREMIUM ========== */
 .notifications-header {
   background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
   border: 1px solid #e2e8f0;
@@ -157,7 +149,6 @@
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1) !important;
 }
 
-/* ========== CONTROLS PREMIUM ========== */
 .notifications-controls {
   background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
   border: 1px solid #e2e8f0;
@@ -237,10 +228,9 @@
   gap: 16px;
 }
 
-/* ========== NOTIFICATION ITEM MODERNE ========== */
 .notification-item {
   background: #dddddd8d;
-  border: 1px solid #e2e8f0;
+  border: 3.5px solid #e2e8f0;
   border-radius: 16px;
   padding: 20px;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
@@ -257,7 +247,7 @@
 .notification-item.unread:hover {
   transform: translateY(-2px);
   box-shadow: 0 8px 25px rgba(251, 183, 95, 0.15);
-  background: linear-gradient(135deg, #fcefc3 0%, #ffc87f 100%);
+  background: white;
   cursor: pointer;
 }
 
@@ -267,8 +257,7 @@
 }
 
 .notification-item.unread {
-  background: linear-gradient(#ffc87f 0%, #fcefc3 200%);;
-  --notification-color: #fbb75f;
+  background: white;
 }
 
 .notification-item.selected {
@@ -277,7 +266,6 @@
   --notification-color: #132238;
 }
 
-/* ========== NOTIFICATION STATUS MODERNE ========== */
 .notification-status {
   display: flex;
   flex-direction: column;
@@ -364,7 +352,6 @@
   letter-spacing: 0.5px;
 }
 
-/* ========== ACTIONS MODERNES ========== */
 .notification-actions {
   display: flex;
   flex-direction: column;
@@ -411,7 +398,6 @@
   transform: scale(1.1);
 }
 
-/* ========== AMÉLIORATION DU CONTENU ========== */
 .notification-content {
   flex: 1;
   min-width: 0;
@@ -469,7 +455,6 @@
   margin-top: 8px;
 }
 
-/* ========== EMPTY STATE PREMIUM ========== */
 .empty-state {
   text-align: center;
   padding: 60px 24px;
@@ -527,7 +512,6 @@
   margin-right: auto;
 }
 
-/* ========== LOADING STATE PREMIUM ========== */
 .loading-state {
   display: flex;
   flex-direction: column;
@@ -558,7 +542,6 @@
   margin: 0;
 }
 
-/* ========== ERROR STATE PREMIUM ========== */
 .error-state {
   text-align: center;
   padding: 60px 24px;
@@ -627,7 +610,6 @@
   transition: all 0.2s ease;
 }
 
-/* ========== NOTIFICATION CHECKBOX ========== */
 .notification-checkbox {
   margin-top: 4px;
   position: relative;
@@ -661,7 +643,6 @@
   font-weight: bold;
 }
 
-/* ========== NOTIFICATION HEADER ========== */
 .notification-header {
   display: flex;
   justify-content: space-between;
@@ -670,7 +651,6 @@
   gap: 12px;
 }
 
-/* ========== RESPONSIVE DESIGN ========== */
 @media (max-width: 1024px) {
   .notifications-container {
     max-width: 900px;

@@ -1,5 +1,5 @@
 import React from 'react';
-import './Loading.css';
+import '../styles/Loading.css';
 
 const Loading = ({ message = "Chargement..." }) => {
   return (
@@ -12,4 +12,7 @@ const Loading = ({ message = "Chargement..." }) => {
   );
 };
 
-export default Loading; 
+export default Loading;
+
+ 
+ 
