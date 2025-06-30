@@ -16,9 +16,14 @@ function CvCard({ cvUrl, uploadingCv, onUpload, onDelete }) {
     fileInputRef.current?.click();
   };
 
+  const handleViewClick = () => {
+    if (cvUrl) {
+      window.open(cvUrl, "_blank", "noopener,noreferrer");
+    }
+  };
+
   return (
     <article className="profile-card cv-card">
-      {/* Input masqué pour l'upload */}
       <input
         type="file"
         ref={fileInputRef}
@@ -29,28 +34,27 @@ function CvCard({ cvUrl, uploadingCv, onUpload, onDelete }) {
 
       <h2>Mon CV</h2>
 
-      {/* ÉTAT : téléchargement en cours */}
       {uploadingCv ? (
         <div className="cv-loading-state">
           <LoaderCircle className="spinner" size={24} />
           <p>Téléchargement en cours...</p>
         </div>
-      ) : /* ÉTAT : un CV est présent */ cvUrl ? (
+      ) : cvUrl ? (
         <div className="cv-uploaded-state">
           <div className="cv-display">
             <FileText size={20} className="cv-icon" />
-            <span>CV téléchargé</span>
+            <span>CV présent</span>{" "}
           </div>
           <div className="cv-actions">
-            <a
-              href={cvUrl}
-              target="_blank"
-              rel="noopener noreferrer"
+            <button
+              type="button"
+              onClick={handleViewClick}
+              disabled={!cvUrl}
               className="cv-btn cv-btn-primary"
             >
               <Eye size={16} />
               <span>Visualiser</span>
-            </a>
+            </button>
             <button
               type="button"
               onClick={handleModifyClick}
@@ -70,15 +74,15 @@ function CvCard({ cvUrl, uploadingCv, onUpload, onDelete }) {
           </div>
         </div>
       ) : (
-        /* ÉTAT : aucun CV présent */
         <div className="cv-empty-state">
+          <p className="cv-empty-text">Aucun CV n'a été ajouté.</p>
           <button
             type="button"
             onClick={handleModifyClick}
             className="cv-btn cv-btn-primary"
           >
             <PlusCircle size={16} />
-            <span>Ajouter</span>
+            <span>Ajouter un CV</span>
           </button>
         </div>
       )}

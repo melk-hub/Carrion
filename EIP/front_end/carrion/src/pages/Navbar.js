@@ -16,7 +16,7 @@ import notification_icon from "../assets/notification.png";
 import statistics from '../assets/pie-chart.png';
 import podium from '../assets/podium.png';
 import ApiService from "../services/api";
-import { CircleUserRound } from "lucide-react";
+import avatar from "../assets/avatar.png"
 
 function Navbar({ sidebarCollapsed, setSidebarCollapsed, setIsAuthenticated }) {
   const navigate = useNavigate();
@@ -130,7 +130,7 @@ function Navbar({ sidebarCollapsed, setSidebarCollapsed, setIsAuthenticated }) {
         <div className="topbar-right">
           <LanguageDropdown className="dark-theme" style={{color: 'white'}}/>
           <div className="user-profile" ref={dropdownRef} onClick={handleToggleDropdown}>
-            {uploadedImage? (<img src={uploadedImage} alt="User" className="avatar" />) : (<CircleUserRound size={120} color="#9ca3af" />)}
+            {uploadedImage? (<img src={uploadedImage} alt="User" className="avatar" />) : (<img src={avatar} alt="User" className="avatar" />)}
             {isDropdownOpen && (
               <ul className="dropdown-menu">
                 <li onClick={() => { navigateAndScrollTop('/profile'); setIsDropdownOpen(false); }}>{t('navbar.profile')}</li>
