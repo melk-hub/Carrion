@@ -106,10 +106,8 @@ export const NotificationProvider = ({ children }) => {
   useEffect(() => {
     fetchNotifications();
     
-    // Polling toutes les 30 secondes
-    const interval = setInterval(fetchNotifications, 30000);
-    
-    return () => clearInterval(interval);
+    // Plus de polling automatique - l'utilisateur peut actualiser manuellement
+    // ou on peut ajouter un polling intelligent plus tard si nécessaire
   }, []);
 
   const value = {
