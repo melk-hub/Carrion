@@ -92,7 +92,7 @@ export class DynamicPerformanceConfig {
       },
       monitoring: {
         recommendation: 'Start with 15, monitor and auto-adjust',
-        keyMetrics: ['Error rate < 5%', 'Avg latency < 2s', 'OpenAI calls < 900/min']
+        keyMetrics: ['Error rate < 5%', 'Avg latency < 2s', 'ClaudeAI calls < 900/min']
       }
     };
   }
