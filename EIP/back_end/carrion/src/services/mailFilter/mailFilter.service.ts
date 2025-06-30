@@ -1,5 +1,4 @@
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
-import OpenAI from 'openai';
 import { CreateJobApplyDto } from 'src/jobApply/dto/jobApply.dto';
 import { JobApplyService } from 'src/jobApply/jobApply.service';
 import { ApplicationStatus } from 'src/jobApply/enum/application-status.enum';
@@ -17,48 +16,63 @@ import {
 import { OutlookMessage } from 'src/webhooks/mail/outlook.types';
 import { createHash } from 'crypto';
 import { UserService } from 'src/user/user.service';
+import Anthropic from '@anthropic-ai/sdk';
 
 function extractJsonFromString(str: string): any | null {
-  if (!str) return null;
+  if (!str) {
+    return null;
+  }
+
+  // Étape 1 : Essayer d'extraire le JSON d'un bloc markdown. C'est la méthode la plus fiable.
+  // La regex est améliorée pour accepter ` ``` ` ou ` ```json `
+  const match = str.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
+
+  if (match && match[1]) {
+    try {
+      // On a trouvé un bloc, on essaie de parser son contenu.
+      return JSON.parse(match[1]);
+    } catch (e) {
+      Logger.error(
+        `A JSON markdown block was found, but its content is invalid: ${e.message}`,
+        'MailFilterService-JSONUtil',
+      );
+      // Si le bloc trouvé est invalide, il est inutile de continuer.
+      return null;
+    }
+  }
+
+  // Étape 2 : Si aucun bloc markdown n'a été trouvé, essayer de parser la chaîne entière.
+  // Utile si Claude retourne UNIQUEMENT l'objet JSON, sans le markdown.
   try {
     const parsed = JSON.parse(str);
-    if (typeof parsed === 'object' && parsed !== null) return parsed;
-  } catch (e) {
+    if (typeof parsed === 'object' && parsed !== null) {
+      return parsed;
+    }
+    // Le JSON est valide mais ce n'est pas un objet (ex: juste une chaîne "ok")
     Logger.warn(
-      `Failed to parse JSON directly: ${e.message}`,
+      `The string was parsed as valid JSON, but it is not an object.`,
+      'MailFilterService-JSONUtil',
+    );
+    return null;
+  } catch (e) {
+    Logger.error(
+      `The string could not be parsed as valid JSON: ${e.message}`,
       'MailFilterService-JSONUtil',
     );
     return null;
   }
-  const match = str.match(/```json\s*([\s\S]*?)\s*```/);
-  if (match && match[1]) {
-    try {
-      return JSON.parse(match[1]);
-    } catch (e2) {
-      Logger.warn(
-        `Failed to parse JSON from markdown block: ${e2.message}`,
-        'MailFilterService-JSONUtil',
-      );
-      return null;
-    }
-  }
-  Logger.warn(
-    `Failed to parse JSON directly and no markdown block found. Input was: ${str.substring(0, 100)}...`,
-    'MailFilterService-JSONUtil',
-  );
-  return null;
 }
 
 @Injectable()
 export class MailFilterService {
   private readonly logger = new Logger(MailFilterService.name);
-  private openai: OpenAI;
+  private readonly claudeAI: Anthropic;
 
   // Deduplication system
   private processedEmails = new Set<string>();
   private readonly EMAIL_CACHE_TTL = 15 * 60 * 1000; // 15 minutes
 
-  // Response caching system for OpenAI calls
+  // Response caching system for claudeAI calls
   private responseCache = new Map<
     string,
     { response: ExtractedJobDataDto | null; timestamp: number }
@@ -149,7 +163,7 @@ export class MailFilterService {
     startTime: Date.now(),
     processedEmails: 0,
     preFilteredEmails: 0,
-    openaiCalls: 0,
+    claudeAICalls: 0,
     cacheHits: 0,
     duplicatesSkipped: 0,
     errors: 0,
@@ -167,8 +181,8 @@ export class MailFilterService {
     private readonly jobApplyService: JobApplyService,
     private readonly userService: UserService,
   ) {
-    this.openai = new OpenAI({
-      apiKey: process.env.OPENAI_API_KEY,
+    this.claudeAI = new Anthropic({
+      apiKey: process.env.ANTHROPIC_API_KEY,
     });
 
     // Clean up processed emails cache every 20 minutes
@@ -274,10 +288,10 @@ export class MailFilterService {
               ).toFixed(1) + '%'
             : '0%',
         cacheHitRate:
-          this.metrics.openaiCalls > 0
+          this.metrics.claudeAICalls > 0
             ? (
                 (this.metrics.cacheHits /
-                  (this.metrics.openaiCalls + this.metrics.cacheHits)) *
+                  (this.metrics.claudeAICalls + this.metrics.cacheHits)) *
                 100
               ).toFixed(1) + '%'
             : '0%',
@@ -596,7 +610,7 @@ Extraire des informations d'un email de candidature au format JSON :
     } catch (error) {
       this.metrics.errors++;
       this.logger.error(
-        `Erreur avec l'API OpenAI ou lors du traitement: ${error.message}`,
+        `Erreur avec l'API claudeAI ou lors du traitement: ${error.message}`,
         error.stack,
       );
       return error.message;
@@ -639,8 +653,8 @@ Extraire des informations d'un email de candidature au format JSON :
         this.logger.log(`Using cached response for similar email`);
         parsedData = cachedResponse;
       } else {
-        // Make OpenAI call with fallback mechanism
-        parsedData = await this.callOpenAIWithFallback(
+        // Make claudeAI call with fallback mechanism
+        parsedData = await this.callclaudeAIWithFallback(
           optimizedPrompt,
           emailContext,
           isComplex,
@@ -653,8 +667,10 @@ Extraire des informations d'un email de candidature au format JSON :
       }
 
       if (!parsedData) {
-        this.logger.error('Failed to get valid response from OpenAI or cache.');
-        return 'Erreur lors du parsing du JSON de la réponse OpenAI.';
+        this.logger.error(
+          'Failed to get valid response from claudeAI or cache.',
+        );
+        return 'Erreur lors du parsing du JSON de la réponse claudeAI.';
       } else if (!parsedData.title || !parsedData.company) {
         this.logger.warn(
           `Didn't create jobApply for this mail: ${emailSender + ' ' + emailSubject}`,
@@ -669,7 +685,7 @@ Extraire des informations d'un email de candidature au format JSON :
         )
       ) {
         this.logger.warn(
-          `Invalid or missing status from OpenAI: '${parsedData.status}'. Defaulting to PENDING.`,
+          `Invalid or missing status from claudeAI: '${parsedData.status}'. Defaulting to PENDING.`,
         );
         parsedData.status = ApplicationStatus.PENDING;
       }
@@ -735,7 +751,7 @@ Extraire des informations d'un email de candidature au format JSON :
       return this.createJobApply(parsedData, userId);
     } catch (error) {
       this.logger.error(
-        `Erreur avec l'API OpenAI ou lors du traitement: ${error.message}`,
+        `Erreur avec l'API claudeAI ou lors du traitement: ${error.message}`,
         error.stack,
       );
       return error.message;
@@ -743,9 +759,9 @@ Extraire des informations d'un email de candidature au format JSON :
   }
 
   /**
-   * Call OpenAI with fallback mechanism for better reliability
+   * Call claudeAI with fallback mechanism for better reliability
    */
-  private async callOpenAIWithFallback(
+  private async callclaudeAIWithFallback(
     prompt: string,
     emailContext: string,
     isComplex: boolean,
@@ -754,44 +770,54 @@ Extraire des informations d'un email de candidature au format JSON :
     const maxRetries = 2;
 
     try {
-      this.metrics.openaiCalls++;
+      this.metrics.claudeAICalls++;
 
-      const response = await this.openai.chat.completions.create({
-        model: 'gpt-4o-mini',
-        response_format: { type: 'json_object' },
+      const response = await this.claudeAI.messages.create({
+        model: 'claude-opus-4-20250514',
+        system: prompt,
         messages: [
           {
-            role: 'system',
-            content: prompt,
-          },
-          {
             role: 'user',
-            content: emailContext,
+            content: [
+              {
+                type: 'text',
+                text: emailContext,
+              },
+            ],
           },
         ],
-        temperature: 0.2,
-        max_tokens: isComplex ? 1000 : 600, // Dynamic token allocation
+        temperature: 1,
+        max_tokens: isComplex ? 1000 : 600,
       });
 
-      const rawResponse = response.choices[0].message.content;
+      const rawResponse = response.content[0];
       if (!rawResponse) {
-        throw new Error('OpenAI returned an empty response.');
+        throw new Error('ClaudeAI returned an empty response.');
       }
 
-      const parsedData: ExtractedJobDataDto | null =
-        extractJsonFromString(rawResponse);
+      if (rawResponse.type !== 'text') {
+        throw new Error(
+          `ClaudeAI returned an unexpected content block type: ${rawResponse.type}`,
+        );
+      }
+
+      console.log(rawResponse.text);
+
+      const parsedData: ExtractedJobDataDto | null = extractJsonFromString(
+        rawResponse.text,
+      );
 
       return parsedData;
     } catch (error) {
       this.logger.warn(
-        `OpenAI call failed (attempt ${retryCount + 1}): ${error.message}`,
+        `claudeAI call failed (attempt ${retryCount + 1}): ${error.message}`,
       );
 
       if (retryCount < maxRetries) {
         // Exponential backoff
         const delay = Math.pow(2, retryCount) * 1000;
         await new Promise((resolve) => setTimeout(resolve, delay));
-        return this.callOpenAIWithFallback(
+        return this.callclaudeAIWithFallback(
           prompt,
           emailContext,
           isComplex,
@@ -806,7 +832,7 @@ Extraire des informations d'un email de candidature au format JSON :
           emailContext.substring(0, 1000),
           false,
         );
-        return this.callOpenAIWithFallback(
+        return this.callclaudeAIWithFallback(
           simplifiedPrompt,
           emailContext.substring(0, 1000),
           false,
@@ -837,8 +863,8 @@ Extraire des informations d'un email de candidature au format JSON :
         parsedData.interviewDate &&
         parsedData.interviewDate !== 'null' &&
         parsedData.interviewDate.trim() !== ''
-        ? new Date(parsedData.interviewDate)
-        : undefined,
+          ? new Date(parsedData.interviewDate)
+          : undefined,
     };
 
     this.logger.log(
@@ -928,7 +954,7 @@ Extraire des informations d'un email de candidature au format JSON :
     } catch (error) {
       this.metrics.errors++;
       this.logger.error(
-        `Error with OpenAI API or during processing: ${error.message}`,
+        `Error with claudeAI API or during processing: ${error.message}`,
         error.stack,
       );
       return error.message;
@@ -1046,10 +1072,10 @@ Extraire des informations d'un email de candidature au format JSON :
             ).toFixed(1) + '%'
           : '0%',
       cacheHitRate:
-        this.metrics.openaiCalls > 0
+        this.metrics.claudeAICalls > 0
           ? (
               (this.metrics.cacheHits /
-                (this.metrics.openaiCalls + this.metrics.cacheHits)) *
+                (this.metrics.claudeAICalls + this.metrics.cacheHits)) *
               100
             ).toFixed(1) + '%'
           : '0%',
@@ -1067,7 +1093,7 @@ Extraire des informations d'un email de candidature au format JSON :
   Uptime: ${metrics.uptime}s
   Processed Emails: ${metrics.processedEmails}
   Pre-filtered Emails: ${metrics.preFilteredEmails}
-  OpenAI Calls: ${metrics.openaiCalls}
+  claudeAI Calls: ${metrics.claudeAICalls}
   Cache Hits: ${metrics.cacheHits} (${metrics.cacheHitRate}% hit rate)
   Duplicates Skipped: ${metrics.duplicatesSkipped}
   Errors: ${metrics.errors}
@@ -1155,7 +1181,7 @@ Extraire des informations d'un email de candidature au format JSON :
         keyMetrics: [
           'Error rate < 5%',
           'Avg latency < 2000ms',
-          'OpenAI calls < 900/min',
+          'claudeAI calls < 900/min',
           'Cache hit rate > 50%',
         ],
       },

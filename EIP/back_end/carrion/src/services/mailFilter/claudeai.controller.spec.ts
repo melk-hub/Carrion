@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { MailFilterController } from './mailFilter.controller';
 
-describe('OpenaiController', () => {
+describe('ClaudeAIController', () => {
   let controller: MailFilterController;
 
   beforeEach(async () => {
