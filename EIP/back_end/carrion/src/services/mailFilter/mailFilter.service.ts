@@ -773,7 +773,7 @@ Extraire des informations d'un email de candidature au format JSON :
       this.metrics.claudeAICalls++;
 
       const response = await this.claudeAI.messages.create({
-        model: 'claude-opus-4-20250514',
+        model: 'claude-sonnet-4-20250514',
         system: prompt,
         messages: [
           {
