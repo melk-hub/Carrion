@@ -31,6 +31,9 @@ function App() {
           <Router>
             <Toaster
               position="top-center"
+              containerStyle={{
+                zIndex: 2147483647,
+              }}
               toastOptions={{
                 duration: 4000,
                 style: {
@@ -70,7 +73,7 @@ function AppLayout() {
   }, [location, loadingAuth]);
 
   useEffect(() => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({ top: 0, behavior: "smooth" });
   }, [location.pathname]);
 
   if (loadingAuth) {
@@ -143,7 +146,7 @@ function AppLayout() {
             path="/statistics"
             element={
               isAuthenticated ? (
-                <Statistics sidebarCollapsed={sidebarCollapsed}/>
+                <Statistics sidebarCollapsed={sidebarCollapsed} />
               ) : (
                 <Navigate to="/" replace state={{ from: location }} />
               )
@@ -163,7 +166,7 @@ function AppLayout() {
             path="/notification"
             element={
               isAuthenticated ? (
-                <Notifications sidebarCollapsed={sidebarCollapsed}/>
+                <Notifications sidebarCollapsed={sidebarCollapsed} />
               ) : (
                 <Navigate to="/" replace state={{ from: location }} />
               )

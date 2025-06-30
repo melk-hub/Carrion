@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import "../styles/InfosModal.css";
 import { motion, AnimatePresence } from "framer-motion";
 import InputField from "./InputField";
@@ -9,17 +9,20 @@ import DatePicker, { registerLocale } from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { fr } from "date-fns/locale/fr";
 import toast from "react-hot-toast";
-
+import { Document, Page, pdfjs } from "react-pdf";
 import ApiService from "../services/api";
 import { jobSectors } from "../data/jobSectors";
 import { contractOptions } from "../data/contractOptions";
 import CustomDateInput from "./CustomDateInput";
+
+pdfjs.GlobalWorkerOptions.workerSrc = `/static/js/pdf.worker.mjs`;
 
 registerLocale("fr", fr);
 
 function InfosModal({ isOpen, onClose }) {
   const [activeStep, setActiveStep] = useState("step1");
   const [resumeFile, setResumeFile] = useState(null);
+  const [resumePreviewUrl, setResumePreviewUrl] = useState(null);
   const [personalInfo, setPersonalInfo] = useState({
     lastName: "",
     firstName: "",
@@ -31,7 +34,6 @@ function InfosModal({ isOpen, onClose }) {
     goal: "",
     sector: [],
     locationSought: [],
-    resume: null,
     linkedin: "",
     portfolioLink: "",
     personalDescription: "",
@@ -40,12 +42,30 @@ function InfosModal({ isOpen, onClose }) {
   const [direction, setDirection] = useState(1);
   const resumeInputRef = useRef(null);
   const citySelectRef = useRef(null);
+  const [, setUploadBoxWidth] = useState(0);
+  const uploadBoxRef = useRef(null);
 
   const debouncedLoadCities = debounce((inputValue, callback) => {
     ApiService.fetchAndFormatCities(inputValue).then((options) =>
       callback(options)
     );
   }, 500);
+
+  useEffect(() => {
+    if (resumeFile) {
+      const url = URL.createObjectURL(resumeFile);
+      setResumePreviewUrl(url);
+      return () => URL.revokeObjectURL(url);
+    } else {
+      setResumePreviewUrl(null);
+    }
+  }, [resumeFile]);
+
+  useEffect(() => {
+    if (uploadBoxRef.current) {
+      setUploadBoxWidth(uploadBoxRef.current.offsetWidth);
+    }
+  }, [isOpen, activeStep]);
 
   if (!isOpen) return null;
 
@@ -55,12 +75,17 @@ function InfosModal({ isOpen, onClose }) {
   };
 
   const handleResumeUpload = (e) => {
-    setPersonalInfo({ ...personalInfo, resume: e.target.files[0] });
-    setResumeFile(e.target.files[0]);
+    const file = e.target.files[0];
+    if (file) {
+      setResumeFile(file);
+    }
   };
 
   const handleDeleteResume = () => {
-    setPersonalInfo({ ...personalInfo, resume: null });
+    setResumeFile(null);
+    if (resumeInputRef.current) {
+      resumeInputRef.current.value = "";
+    }
   };
 
   const variants = {
@@ -71,6 +96,32 @@ function InfosModal({ isOpen, onClose }) {
 
   const handleNextStep = (e) => {
     e.preventDefault();
+
+    if (activeStep === "step1") {
+      if (!personalInfo.birthDate) {
+        toast.error("Veuillez renseigner votre date de naissance.");
+        return;
+      }
+      if (!personalInfo.city) {
+        toast.error("Veuillez sélectionner votre ville.");
+        return;
+      }
+      const today = new Date();
+      const birthDate = new Date(personalInfo.birthDate);
+      let age = today.getFullYear() - birthDate.getFullYear();
+      const monthDifference = today.getMonth() - birthDate.getMonth();
+      if (
+        monthDifference < 0 ||
+        (monthDifference === 0 && today.getDate() < birthDate.getDate())
+      ) {
+        age--;
+      }
+      if (age < 16) {
+        toast.error("Vous devez avoir au moins 16 ans pour vous inscrire.");
+        return;
+      }
+    }
+
     setDirection(1);
     if (activeStep === "step1") setActiveStep("step2");
     else if (activeStep === "step2") setActiveStep("step3");
@@ -89,6 +140,12 @@ function InfosModal({ isOpen, onClose }) {
       .filter(Boolean);
   };
 
+  const handleViewResume = () => {
+    if (resumePreviewUrl) {
+      window.open(resumePreviewUrl, "_blank");
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -101,7 +158,6 @@ function InfosModal({ isOpen, onClose }) {
         locationSought: personalInfo.locationSought.map(
           (option) => option.value
         ),
-        resume: null,
       };
 
       const response = await ApiService.post("/user-profile", submissionData);
@@ -115,40 +171,42 @@ function InfosModal({ isOpen, onClose }) {
               contentType: file.type,
             });
 
-            const res = await ApiService.post(`/s3/upload?${params.toString()}`);
-
-            if (!res.ok) throw new Error("Échec de la génération de l'URL signée");
-
+            const res = await ApiService.post(
+              `/s3/upload?${params.toString()}`
+            );
+            if (!res.ok)
+              throw new Error("Échec de la génération de l'URL signée");
             const { signedUrl } = await res.json();
 
             const uploadRes = await fetch(signedUrl, {
               method: "PUT",
-              headers: {
-                "Content-Type": file.type,
-              },
+              headers: { "Content-Type": file.type },
               body: file,
             });
-
             if (!uploadRes.ok) throw new Error("Échec de l'envoi du CV sur S3");
-
-            toast.success("CV envoyé avec succès !");
+            toast.success("Profil et CV sauvegardés avec succès !");
           } catch (err) {
             toast.error(err.message);
           }
+        } else {
+          toast.success("Profil sauvegardé avec succès !");
         }
         onClose();
       } else {
         const errorData = await response.json();
+        toast.error(
+          `Erreur de sauvegarde: ${errorData.message || "Erreur inconnue"}`
+        );
         console.error("Erreur de sauvegarde du profil:", errorData.message);
       }
     } catch (error) {
+      toast.error("Une erreur est survenue lors de la soumission.");
       console.error("Erreur lors de la soumission:", error);
     }
   };
 
   const selectStyles = {
     menuPortal: (base) => ({ ...base, zIndex: 10002 }),
-
     input: (provided) => ({ ...provided, boxShadow: "none" }),
   };
 
@@ -172,22 +230,29 @@ function InfosModal({ isOpen, onClose }) {
               >
                 <form className="info-form" onSubmit={handleNextStep}>
                   <div className="form-grid">
-                    <InputField
-                      label="Nom"
-                      name="lastName"
-                      value={personalInfo.lastName}
-                      onChange={handleChange}
-                      required
-                    />
-                    <InputField
-                      label="Prénom"
-                      name="firstName"
-                      value={personalInfo.firstName}
-                      onChange={handleChange}
-                      required
-                    />
                     <div className="form-group">
-                      <label htmlFor="birthDate">Date de naissance</label>
+                      <InputField
+                        name="lastName"
+                        label="Nom"
+                        value={personalInfo.lastName}
+                        onChange={handleChange}
+                        required
+                      />
+                    </div>
+                    <div className="form-group">
+                      <InputField
+                        name="firstName"
+                        label="Prénom"
+                        value={personalInfo.firstName}
+                        onChange={handleChange}
+                        required
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label htmlFor="birthDate">
+                        Date de naissance
+                        <span className="required-star">*</span>
+                      </label>
                       <DatePicker
                         id="birthDate"
                         selected={personalInfo.birthDate}
@@ -206,10 +271,13 @@ function InfosModal({ isOpen, onClose }) {
                         customInput={<CustomDateInput />}
                         portalId="datepicker-portal"
                         popperClassName="datepicker-force-top"
+                        required
                       />
                     </div>
                     <div className="form-group">
-                      <label htmlFor="city-select">Ville</label>
+                      <label htmlFor="city-select">
+                        Ville<span className="required-star">*</span>
+                      </label>
                       <AsyncSelect
                         id="city-select"
                         ref={citySelectRef}
@@ -231,23 +299,28 @@ function InfosModal({ isOpen, onClose }) {
                         noOptionsMessage={() => "Aucune ville trouvée"}
                         menuPortalTarget={document.body}
                         styles={selectStyles}
+                        required
                       />
                     </div>
-                    <InputField
-                      label="École / Université"
-                      name="school"
-                      value={personalInfo.school}
-                      onChange={handleChange}
-                      required
-                    />
-                    <InputField
-                      label="Numéro de téléphone"
-                      type="tel"
-                      name="phoneNumber"
-                      value={personalInfo.phoneNumber}
-                      onChange={handleChange}
-                      required
-                    />
+                    <div className="form-group">
+                      <InputField
+                        name="school"
+                        label="Université"
+                        value={personalInfo.school}
+                        onChange={handleChange}
+                        required
+                      />
+                    </div>
+                    <div className="form-group">
+                      <InputField
+                        type="tel"
+                        name="phoneNumber"
+                        label="Numéro de téléphone"
+                        value={personalInfo.phoneNumber}
+                        onChange={handleChange}
+                        required
+                      />
+                    </div>
                   </div>
                   <div className="button-group button-group-step1">
                     <button type="submit" className="primary-btn">
@@ -257,6 +330,7 @@ function InfosModal({ isOpen, onClose }) {
                 </form>
               </motion.div>
             )}
+
             {activeStep === "step2" && (
               <motion.div
                 key="step2"
@@ -393,6 +467,7 @@ function InfosModal({ isOpen, onClose }) {
                 </form>
               </motion.div>
             )}
+
             {activeStep === "step3" && (
               <motion.div
                 key="step3"
@@ -410,25 +485,43 @@ function InfosModal({ isOpen, onClose }) {
                       <div className="form-group">
                         <label>Ajoute ton CV ici:</label>
                         <div
+                          ref={uploadBoxRef}
                           className="upload-box"
-                          onClick={() => resumeInputRef.current.click()}
+                          onClick={
+                            resumeFile
+                              ? handleViewResume
+                              : () => resumeInputRef.current.click()
+                          }
+                          title={
+                            resumeFile
+                              ? "Cliquer pour visualiser le CV"
+                              : "Cliquer pour ajouter un CV"
+                          }
                         >
-                          {personalInfo.resume ? (
-                            <span>
-                              {personalInfo.resume.name.substring(0, 15)}...
-                            </span>
+                          {resumeFile ? (
+                            <Document
+                              file={resumePreviewUrl}
+                              onLoadError={console.error}
+                            >
+                              <Page
+                                pageNumber={1}
+                                height={
+                                  uploadBoxRef.current?.clientHeight * 0.95
+                                }
+                              />
+                            </Document>
                           ) : (
-                            <span>+</span>
+                            <span className="plus-sign">+</span>
                           )}
                           <input
                             type="file"
-                            accept=".pdf,.doc,.docx"
+                            accept=".pdf"
                             ref={resumeInputRef}
                             onChange={handleResumeUpload}
                             style={{ display: "none" }}
                           />
                         </div>
-                        {personalInfo.resume && (
+                        {resumeFile && (
                           <button
                             type="button"
                             className="delete-btn"
@@ -457,6 +550,8 @@ function InfosModal({ isOpen, onClose }) {
                         name="personalDescription"
                         value={personalInfo.personalDescription}
                         onChange={handleChange}
+                        as="textarea"
+                        rows={4}
                       />
                     </div>
                   </div>
@@ -481,5 +576,4 @@ function InfosModal({ isOpen, onClose }) {
     </div>
   );
 }
-
 export default InfosModal;
