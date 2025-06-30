@@ -184,17 +184,12 @@ function Profile() {
   useEffect(() => {
     const fetchProfilePicture = async () => {
       try {
-        const user = await apiService.get('/user-profile');
-        if (user.imageUrl) {
-          const params = new URLSearchParams({
-            filename: "profile",
-          });
-          const res = await apiService.get(`/s3/download?${params.toString()}`);
-          const { signedUrl } = await res.json();
-          if (signedUrl) {
-            setUploadedImage(signedUrl);
-          }
-        }
+        const params = new URLSearchParams({
+          filename: "profile",
+        });
+        const res = await apiService.get(`/s3/download?${params.toString()}`);
+        const { signedUrl } = await res.json();
+        setUploadedImage(signedUrl);
       } catch (error) {
         console.error("Failed to load profile picture", error);
       }

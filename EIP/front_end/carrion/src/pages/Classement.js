@@ -221,7 +221,7 @@ function Ranking() {
                   </div>
                   <div className="podium-info">
                     <h3>
-                      {topThreeUsers[1].firstName && topThreeUsers[1].lastName 
+                      {topThreeUsers[1].firstName && topThreeUsers[1].lastName
                         ? `${topThreeUsers[1].firstName} ${topThreeUsers[1].lastName}`
                         : topThreeUsers[1].username}
                     </h3>
@@ -258,7 +258,7 @@ function Ranking() {
                   </div>
                   <div className="podium-info">
                     <h3>
-                      {topThreeUsers[0].firstName && topThreeUsers[0].lastName 
+                      {topThreeUsers[0].firstName && topThreeUsers[0].lastName
                         ? `${topThreeUsers[0].firstName} ${topThreeUsers[0].lastName}`
                         : topThreeUsers[0].username}
                     </h3>
@@ -295,7 +295,7 @@ function Ranking() {
                   </div>
                   <div className="podium-info">
                     <h3>
-                      {topThreeUsers[2].firstName && topThreeUsers[2].lastName 
+                      {topThreeUsers[2].firstName && topThreeUsers[2].lastName
                         ? `${topThreeUsers[2].firstName} ${topThreeUsers[2].lastName}`
                         : topThreeUsers[2].username}
                     </h3>
@@ -318,8 +318,8 @@ function Ranking() {
           <div className="ranking-header-section">
             <div className="ranking-title-with-refresh">
             <h2>{t('ranking.complete.title')}</h2>
-              <button 
-                className="ranking-refresh-button" 
+              <button
+                className="ranking-refresh-button"
                 onClick={() => fetchRanking(1)}
                 disabled={loading}
                 title={t('ranking.complete.refreshTitle')}
@@ -364,7 +364,7 @@ function Ranking() {
 
                 <div className="ranking-user-info">
                   <h3>
-                    {user.firstName && user.lastName 
+                    {user.firstName && user.lastName
                       ? `${user.firstName} ${user.lastName}`
                       : user.username}
                     {currentUser?.id === user.id && <span className="ranking-you-badge">{t('ranking.badges.you')}</span>}
@@ -431,10 +431,10 @@ function Ranking() {
           )}
 
           <div className="ranking-pagination-info">
-            {t('ranking.pagination.info', { 
-              currentPage, 
-              totalPages, 
-              usersShown: users.length 
+            {t('ranking.pagination.info', {
+              currentPage,
+              totalPages,
+              usersShown: users.length
             })}
           </div>
         </div>

@@ -37,7 +37,7 @@ export class S3Service {
       ContentType: contentType,
     });
 
-    await this.userService.addDocument(userId, filename);
+    //await this.userService.addDocument(userId, filename); // à rajouter plus tard. pour l'instant on peut avoir que 1 cv et 1 photo de profil
     const signedUrl = await getSignedUrl(this.s3, command, { expiresIn: 300 });
     if (filename == "profile") {
       await this.prismaService.userProfile.update({
@@ -60,6 +60,12 @@ export class S3Service {
   }
 
   async getSignedDownloadUrl(userId: string, filename: string) {
+    const response = await this.prismaService.userProfile.findUnique({
+      where: {userId},
+      select: {imageUrl: true},
+    });
+    if (!response?.imageUrl)
+      return null;
     const key = `users/${userId}/${filename}`;
     const command = new GetObjectCommand({
       Bucket: this.bucket,
