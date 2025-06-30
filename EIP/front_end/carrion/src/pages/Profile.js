@@ -189,9 +189,7 @@ function Profile() {
         });
         const res = await apiService.get(`/s3/download?${params.toString()}`);
         const { signedUrl } = await res.json();
-        if (signedUrl) {
-          setUploadedImage(signedUrl);
-        }
+        setUploadedImage(signedUrl);
       } catch (error) {
         console.error("Failed to load profile picture", error);
       }
