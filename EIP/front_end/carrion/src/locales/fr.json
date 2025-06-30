@@ -206,7 +206,15 @@
     "passwordMismatch": "Les mots de passe ne correspondent pas !",
     "registerError": "Erreur lors de l'inscription.",
     "joinUs": "Nous rejoindre !",
-    "loginSuccessRedirect": "Vous êtes connecté !"
+    "loginSuccessRedirect": "Vous êtes connecté !",
+    "invalidEmail": "Veuillez saisir une adresse e-mail valide.",
+    "passwordInvalid": "Le mot de passe ne respecte pas tous les critères.",
+    "criteria": {
+      "length": "Au moins 8 caractères",
+      "letter": "Contient une lettre",
+      "number": "Contient un chiffre",
+      "special": "Contient un caractère spécial (@$!%*#?&)"
+    }
   },
 
   "home": {

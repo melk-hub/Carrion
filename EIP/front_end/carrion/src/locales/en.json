@@ -206,7 +206,15 @@
     "passwordMismatch": "Passwords do not match!",
     "registerError": "Registration error.",
     "joinUs": "Join us!",
-    "loginSuccessRedirect": "You are logged in!"
+    "loginSuccessRedirect": "You are logged in!",
+    "invalidEmail": "Please enter a valid email address.",
+    "passwordInvalid": "Password does not meet all the requirements.",
+    "criteria": {
+      "length": "At least 8 characters long",
+      "letter": "Contains at least one letter",
+      "number": "Contains at least one number",
+      "special": "Contains at least one special character (@$!%*#?&)"
+    }
   },
   "home": {
     "welcomeMessage": "Organize your job search with Carrion",

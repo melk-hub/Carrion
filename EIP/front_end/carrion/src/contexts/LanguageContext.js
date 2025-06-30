@@ -1,23 +1,21 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import frTranslations from '../locales/fr.json';
-import enTranslations from '../locales/en.json';
+import React, { createContext, useContext, useState, useEffect } from "react";
+import frTranslations from "../locales/fr.json";
+import enTranslations from "../locales/en.json";
 
 const LanguageContext = createContext();
 
 const translations = {
   fr: frTranslations,
-  en: enTranslations
+  en: enTranslations,
 };
 
 export const LanguageProvider = ({ children }) => {
   const [currentLanguage, setCurrentLanguage] = useState(() => {
-    // Get language from localStorage or default to French
-    return localStorage.getItem('language') || 'fr';
+    return localStorage.getItem("language") || "fr";
   });
 
   useEffect(() => {
-    // Save language preference to localStorage
-    localStorage.setItem('language', currentLanguage);
+    localStorage.setItem("language", currentLanguage);
   }, [currentLanguage]);
 
   const changeLanguage = (language) => {
@@ -27,39 +25,47 @@ export const LanguageProvider = ({ children }) => {
   };
 
   const t = (key, variables = {}) => {
-    const keys = key.split('.');
+    const keys = key.split(".");
     let value = translations[currentLanguage];
-    
-    for (const k of keys) {
-      if (value && typeof value === 'object') {
-        value = value[k];
-      } else {
-        // Fallback to French if key not found
-        value = translations.fr;
-        for (const k of keys) {
-          if (value && typeof value === 'object') {
-            value = value[k];
-          } else {
-            return key; // Return key if translation not found
-          }
+
+    const findTranslation = (lang, keysToFind) => {
+      let result = translations[lang];
+      for (const k of keysToFind) {
+        if (result && typeof result === "object" && k in result) {
+          result = result[k];
+        } else {
+          return null;
         }
-        break;
       }
+      return result;
+    };
+
+    value = findTranslation(currentLanguage, keys);
+
+    if (value === null) {
+      value = findTranslation("fr", keys);
     }
-    
-    let translation = value || key;
-    
-    // Replace variables in the format {{variable}} or {variable}
-    if (typeof translation === 'string' && variables && Object.keys(variables).length > 0) {
+
+    if (value === null) {
+      return key;
+    }
+
+    let translation = value;
+
+    if (
+      typeof translation === "string" &&
+      variables &&
+      Object.keys(variables).length > 0
+    ) {
       Object.entries(variables).forEach(([varKey, varValue]) => {
-        // Support both {{variable}} and {variable} formats
-        const regexDouble = new RegExp(`{{${varKey}}}`, 'g');
-        const regexSingle = new RegExp(`{${varKey}}`, 'g');
+        const regexDouble = new RegExp(`\\{\\{${varKey}\\}\\}`, "g");
+        const regexSingle = new RegExp(`\\{${varKey}\\}`, "g");
+
         translation = translation.replace(regexDouble, String(varValue));
         translation = translation.replace(regexSingle, String(varValue));
       });
     }
-    
+
     return translation;
   };
 
@@ -67,7 +73,7 @@ export const LanguageProvider = ({ children }) => {
     currentLanguage,
     changeLanguage,
     t,
-    availableLanguages: Object.keys(translations)
+    availableLanguages: Object.keys(translations),
   };
 
   return (
@@ -80,7 +86,7 @@ export const LanguageProvider = ({ children }) => {
 export const useLanguage = () => {
   const context = useContext(LanguageContext);
   if (!context) {
-    throw new Error('useLanguage must be used within a LanguageProvider');
+    throw new Error("useLanguage must be used within a LanguageProvider");
   }
   return context;
-}; 
+};
