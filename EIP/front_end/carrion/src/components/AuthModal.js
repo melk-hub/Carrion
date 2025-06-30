@@ -108,14 +108,11 @@ function AuthModal({ isOpen, onClose, defaultTab }) {
           onClose();
         } else {
           const errorData = await response.json();
-          setErrorMessage(
-            errorData.message ||
-              t("auth.loginError", "Identifiants incorrects.")
-          );
+          setErrorMessage(errorData.message || t("auth.loginError"));
         }
       } catch (err) {
         console.error(err);
-        setErrorMessage(t("auth.genericError", "Une erreur est survenue."));
+        setErrorMessage(t("auth.genericError"));
       }
     }
 
@@ -165,45 +162,25 @@ function AuthModal({ isOpen, onClose, defaultTab }) {
     </li>
   );
 
-  const texts = {
-    welcome: t("home.welcome", "Bienvenue sur Carrion !"),
-    joinUs: t("auth.joinUs", "Nous rejoindre !"),
-    signIn: t("auth.signIn", "Se connecter"),
-    signUp: t("auth.signUp", "S'inscrire"),
-    email: t("auth.email", "Email"),
-    emailOrUsername: t("auth.emailOrUsername", "Email ou nom d'utilisateur"),
-    username: t("auth.username", "Nom d'utilisateur"),
-    password: t("auth.password", "Mot de passe"),
-    confirmPassword: t("auth.confirmPassword", "Confirmer le mot de passe"),
-    rememberMe: t("auth.rememberMe", "Se souvenir de moi"),
-    criteria: {
-      length: t("auth.criteria.length", "Au moins 8 caractères"),
-      letter: t("auth.criteria.letter", "Contient une lettre"),
-      number: t("auth.criteria.number", "Contient un chiffre"),
-      special: t("auth.criteria.special", "Contient un caractère spécial"),
-    },
-  };
-
   return (
     <div className="modal-overlay">
       <div className="auth-modal">
         <button className="close-button" onClick={handleClose}>
           ×
         </button>
-        {/* On utilise les variables pré-calculées */}
-        <h1>{activeTab === "login" ? texts.welcome : texts.joinUs}</h1>
+        <h1>{activeTab === "login" ? t("home.welcome") : t("auth.joinUs")}</h1>
         <div className="tabs">
           <button
             className={activeTab === "login" ? "active" : ""}
             onClick={() => handleTabChange("login")}
           >
-            {texts.signIn}
+            {t("auth.signIn")}
           </button>
           <button
             className={activeTab === "register" ? "active" : ""}
             onClick={() => handleTabChange("register")}
           >
-            {texts.signUp}
+            {t("auth.signUp")}
           </button>
         </div>
         <hr />
@@ -219,21 +196,21 @@ function AuthModal({ isOpen, onClose, defaultTab }) {
               transition={{ duration: 0.25 }}
             >
               <form onSubmit={handleSubmit}>
-                <label>{texts.emailOrUsername}</label>
+                <label>{t("auth.emailOrUsername")}</label>
                 <input
                   type="text"
                   name="identifier"
-                  placeholder={texts.emailOrUsername}
+                  placeholder={t("auth.emailOrUsername")}
                   value={credentials.identifier}
                   onChange={handleChange}
                   required
                 />
-                <label>{texts.password}</label>
+                <label>{t("auth.password")}</label>
                 <div className="password-wrapper">
                   <input
                     type={showPassword ? "text" : "password"}
                     name="password"
-                    placeholder={texts.password}
+                    placeholder={t("auth.password")}
                     value={credentials.password}
                     onChange={handleChange}
                     required
@@ -260,10 +237,10 @@ function AuthModal({ isOpen, onClose, defaultTab }) {
                     checked={credentials.rememberMe}
                     onChange={handleChange}
                   />
-                  <label htmlFor="rememberMe">{texts.rememberMe}</label>
+                  <label htmlFor="rememberMe">{t("auth.rememberMe")}</label>
                 </div>
                 <button type="submit" className="primary-btn">
-                  {texts.signIn}
+                  {t("auth.signIn")}
                 </button>
               </form>
             </motion.div>
@@ -281,22 +258,22 @@ function AuthModal({ isOpen, onClose, defaultTab }) {
               <form onSubmit={handleSubmit}>
                 <div className="row-inputs">
                   <div>
-                    <label>{texts.email}</label>
+                    <label>{t("auth.email")}</label>
                     <input
                       type="email"
                       name="email"
-                      placeholder={texts.email}
+                      placeholder={t("auth.email")}
                       value={credentials.email}
                       onChange={handleChange}
                       required
                     />
                   </div>
                   <div>
-                    <label>{texts.username}</label>
+                    <label>{t("auth.username")}</label>
                     <input
                       type="text"
                       name="username"
-                      placeholder={texts.username}
+                      placeholder={t("auth.username")}
                       value={credentials.username}
                       onChange={handleChange}
                       required
@@ -305,12 +282,12 @@ function AuthModal({ isOpen, onClose, defaultTab }) {
                 </div>
                 <div className="row-inputs">
                   <div>
-                    <label>{texts.password}</label>
+                    <label>{t("auth.password")}</label>
                     <div className="password-wrapper">
                       <input
                         type={showPassword ? "text" : "password"}
                         name="password"
-                        placeholder={texts.password}
+                        placeholder={t("auth.password")}
                         value={credentials.password}
                         onChange={handleChange}
                         required
@@ -328,12 +305,12 @@ function AuthModal({ isOpen, onClose, defaultTab }) {
                     </div>
                   </div>
                   <div>
-                    <label>{texts.confirmPassword}</label>
+                    <label>{t("auth.confirmPassword")}</label>
                     <div className="password-wrapper">
                       <input
                         type={showPassword ? "text" : "password"}
                         name="confirmPassword"
-                        placeholder={texts.confirmPassword}
+                        placeholder={t("auth.confirmPassword")}
                         value={credentials.confirmPassword}
                         onChange={handleChange}
                         required
@@ -354,26 +331,26 @@ function AuthModal({ isOpen, onClose, defaultTab }) {
                 <ul className="password-criteria">
                   <ValidationCriterion
                     isValid={passwordCriteria.length}
-                    text={texts.criteria.length}
+                    text={t("auth.criteria.length")}
                   />
                   <ValidationCriterion
                     isValid={passwordCriteria.letter}
-                    text={texts.criteria.letter}
+                    text={t("auth.criteria.letter")}
                   />
                   <ValidationCriterion
                     isValid={passwordCriteria.number}
-                    text={texts.criteria.number}
+                    text={t("auth.criteria.number")}
                   />
                   <ValidationCriterion
                     isValid={passwordCriteria.special}
-                    text={texts.criteria.special}
+                    text={t("auth.criteria.special")}
                   />
                 </ul>
                 {errorMessage && (
                   <p className="error-message">{errorMessage}</p>
                 )}
                 <button type="submit" className="primary-btn">
-                  {texts.signUp}
+                  {t("auth.signUp")}
                 </button>
               </form>
             </motion.div>
