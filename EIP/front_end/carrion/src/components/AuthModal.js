@@ -92,7 +92,7 @@ function AuthModal({ isOpen, onClose, defaultTab }) {
 
     if (activeTab === "login") {
       try {
-        const response = await fetch(`${API_URL}/auth/login`, {
+        const response = await fetch(`${API_URL}/auth/signin`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
