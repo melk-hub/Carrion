@@ -162,7 +162,6 @@ export class MailFilterService {
   private metrics = {
     startTime: Date.now(),
     processedEmails: 0,
-    preFilteredEmails: 0,
     claudeAICalls: 0,
     cacheHits: 0,
     duplicatesSkipped: 0,
@@ -271,14 +270,6 @@ export class MailFilterService {
       'MailFilter Performance Metrics:',
       JSON.stringify({
         ...this.metrics,
-        preFilterEfficiency:
-          this.metrics.processedEmails > 0
-            ? (
-                (this.metrics.preFilteredEmails /
-                  this.metrics.processedEmails) *
-                100
-              ).toFixed(1) + '%'
-            : '0%',
         duplicateRate:
           this.metrics.processedEmails > 0
             ? (
@@ -395,84 +386,23 @@ export class MailFilterService {
   }
 
   /**
-   * Pre-filter emails to identify job-related content
+   * Pre-filter emails to identify job-related content - DISABLED
+   * All emails will now be processed by Claude AI
    */
+  /*
   private isJobRelatedEmail(
     emailText: string,
     emailSubject?: string,
     emailSender?: string,
   ): { isJobRelated: boolean; confidence: number; reason: string } {
-    const startTime = Date.now();
-    let score = 0;
-    const reasons: string[] = [];
-
-    // Check sender domain
-    if (emailSender) {
-      const domain = emailSender.match(/@([^>]+)/)?.[1]?.toLowerCase();
-      if (
-        domain &&
-        this.JOB_DOMAINS.some((jobDomain) => domain.includes(jobDomain))
-      ) {
-        score += 30;
-        reasons.push('job-domain');
-      }
-    }
-
-    // Check subject line
-    const subject = (emailSubject || '').toLowerCase();
-    const subjectKeywords = this.JOB_KEYWORDS.filter((keyword) =>
-      subject.includes(keyword.toLowerCase()),
-    );
-    if (subjectKeywords.length > 0) {
-      score += subjectKeywords.length * 15;
-      reasons.push(`subject-keywords: ${subjectKeywords.join(',')}`);
-    }
-
-    // Check email content
-    const content = emailText.toLowerCase();
-    const contentKeywords = this.JOB_KEYWORDS.filter((keyword) =>
-      content.includes(keyword.toLowerCase()),
-    );
-    if (contentKeywords.length > 0) {
-      score += contentKeywords.length * 5;
-      reasons.push(
-        `content-keywords: ${contentKeywords.slice(0, 5).join(',')}`,
-      );
-    }
-
-    // Check for negative indicators
-    const negativeIndicators = this.NEGATIVE_INDICATORS.filter(
-      (indicator) =>
-        content.includes(indicator.toLowerCase()) ||
-        subject.includes(indicator.toLowerCase()),
-    );
-    if (negativeIndicators.length > 0) {
-      score -= negativeIndicators.length * 20;
-      reasons.push(`negative: ${negativeIndicators.join(',')}`);
-    }
-
-    // Additional patterns
-    if (content.includes('candidat') && content.includes('poste')) score += 10;
-    if (content.includes('entretien') && content.includes('date')) score += 15;
-    if (content.includes('offer') && content.includes('position')) score += 10;
-    if (content.includes('interview') && content.includes('schedule'))
-      score += 15;
-
-    const confidence = Math.max(0, Math.min(100, score));
-    const isJobRelated = confidence >= 20; // Threshold for job-related emails
-
-    const processingTime = Date.now() - startTime;
-
-    this.logger.log(
-      `Pre-filter result: ${isJobRelated ? 'JOB' : 'NOT_JOB'} (${confidence}%) in ${processingTime}ms - ${reasons.join(', ')}`,
-    );
-
+    // Pre-filtering logic removed - all emails will be processed
     return {
-      isJobRelated,
-      confidence,
-      reason: reasons.join(', '),
+      isJobRelated: true,
+      confidence: 100,
+      reason: 'pre-filtering disabled',
     };
   }
+  */
 
   /**
    * Generate optimized prompt based on email content length and complexity
@@ -569,15 +499,9 @@ Extraire des informations d'un email de candidature au format JSON :
       );
     }
 
-    // Pre-filtering check
-    const preFilterResult = this.isJobRelatedEmail(bodyText, subject, sender);
-    if (!preFilterResult.isJobRelated) {
-      this.metrics.preFilteredEmails++;
-      this.logger.log(
-        `Gmail email pre-filtered out (confidence: ${preFilterResult.confidence}%): ${preFilterResult.reason}. Subject: "${subject}"`,
-      );
-      return `Email filtered out - not job related (confidence: ${preFilterResult.confidence}%)`;
-    }
+    this.logger.log(
+      `Processing Gmail email without pre-filtering. Subject: "${subject}", Sender: "${sender}"`,
+    );
 
     // Generate hash for deduplication
     const emailHash = this.generateEmailHash(bodyText, userId, subject, sender);
@@ -600,7 +524,6 @@ Extraire des informations d'un email de candidature au format JSON :
         userId,
         subject,
         sender,
-        preFilterResult.confidence,
       );
 
       const processingTime = Date.now() - startTime;
@@ -622,10 +545,9 @@ Extraire des informations d'un email de candidature au format JSON :
     userId: string,
     emailSubject?: string,
     emailSender?: string,
-    confidence?: number,
   ): Promise<string> {
     this.logger.log(
-      `Processing email for user ${userId}. Subject: "${emailSubject}", Sender: "${emailSender}", Confidence: ${confidence}%`,
+      `Processing email for user ${userId}. Subject: "${emailSubject}", Sender: "${emailSender}"`,
     );
 
     let emailContext = `Email Body:\n${emailText}\n`;
@@ -911,15 +833,9 @@ Extraire des informations d'un email de candidature au format JSON :
       );
     }
 
-    // Pre-filtering check
-    const preFilterResult = this.isJobRelatedEmail(bodyText, subject, sender);
-    if (!preFilterResult.isJobRelated) {
-      this.metrics.preFilteredEmails++;
-      this.logger.log(
-        `Outlook email pre-filtered out (confidence: ${preFilterResult.confidence}%): ${preFilterResult.reason}. Subject: "${subject}"`,
-      );
-      return `Email filtered out - not job related (confidence: ${preFilterResult.confidence}%)`;
-    }
+    this.logger.log(
+      `Processing Outlook email without pre-filtering. Subject: "${subject}", Sender: "${sender}"`,
+    );
 
     // Generate hash for deduplication
     const emailHash = this.generateEmailHash(bodyText, userId, subject, sender);
@@ -942,7 +858,6 @@ Extraire des informations d'un email de candidature au format JSON :
         userId,
         subject,
         sender,
-        preFilterResult.confidence,
       );
 
       const processingTime = Date.now() - startTime;
@@ -1008,10 +923,10 @@ Extraire des informations d'un email de candidature au format JSON :
     );
 
     this.logger.log(
-      'MailFilter Service initialized with optimizations enabled',
+      'MailFilter Service initialized - ALL EMAILS WILL BE PROCESSED BY AI',
     );
     this.logger.log(
-      `Pre-filter enabled with ${this.JOB_KEYWORDS.length} keywords and ${this.JOB_DOMAINS.length} domains`,
+      `Pre-filtering DISABLED - All emails will be sent to Claude AI for analysis`,
     );
   }
 
@@ -1024,7 +939,7 @@ Extraire des informations d'un email de candidature au format JSON :
     // Clear expired processed emails
     const expiredProcessedEmails = [];
     for (const email of this.processedEmails) {
-      const [hash, timestamp] = email.split(':');
+      const [, timestamp] = email.split(':');
       if (now - parseInt(timestamp) > this.EMAIL_CACHE_TTL) {
         expiredProcessedEmails.push(email);
       }
@@ -1055,13 +970,6 @@ Extraire des informations d'un email de candidature au format JSON :
   public getPerformanceMetrics(): any {
     return {
       ...this.metrics,
-      preFilterEfficiency:
-        this.metrics.processedEmails > 0
-          ? (
-              (this.metrics.preFilteredEmails / this.metrics.processedEmails) *
-              100
-            ).toFixed(1) + '%'
-          : '0%',
       duplicateRate:
         this.metrics.processedEmails > 0
           ? (
@@ -1090,7 +998,6 @@ Extraire des informations d'un email de candidature au format JSON :
     this.logger.log(`Performance Metrics:
   Uptime: ${metrics.uptime}s
   Processed Emails: ${metrics.processedEmails}
-  Pre-filtered Emails: ${metrics.preFilteredEmails}
   claudeAI Calls: ${metrics.claudeAICalls}
   Cache Hits: ${metrics.cacheHits} (${metrics.cacheHitRate}% hit rate)
   Duplicates Skipped: ${metrics.duplicatesSkipped}
@@ -1199,33 +1106,33 @@ Extraire des informations d'un email de candidature au format JSON :
       return {
         scale: 'Small',
         recommendation: 'Current limit of 5 is optimal',
-        expectedPeak: '~2-10 emails/minute',
+        expectedPeak: '~5-25 emails/minute (no pre-filtering)',
       };
     }
     if (userCount <= 500) {
       return {
         scale: 'Medium',
         recommendation: 'Limit of 10 handles typical enterprise load',
-        expectedPeak: '~10-50 emails/minute',
+        expectedPeak: '~25-125 emails/minute (no pre-filtering)',
       };
     }
     if (userCount <= 1000) {
       return {
         scale: 'Large',
         recommendation:
-          'Limit of 15 is OPTIMAL for 1000 users - Monitor and adjust',
-        expectedPeak: '~20-100 emails/minute',
+          'Limit of 15 is OPTIMAL for 1000 users - Monitor Claude AI usage',
+        expectedPeak: '~50-250 emails/minute (no pre-filtering)',
         scenarios: {
-          conservative: '3,000 emails/day (20 emails/user, 15% job-related)',
-          moderate: '10,000 emails/day (50 emails/user, 20% job-related)',
-          intensive: '25,000 emails/day (100 emails/user, 25% job-related)',
+          conservative: '15,000 emails/day (100% processed by AI)',
+          moderate: '50,000 emails/day (100% processed by AI)',
+          intensive: '125,000 emails/day (100% processed by AI)',
         },
       };
     }
     return {
       scale: 'Enterprise+',
-      recommendation: `Limit of ${this.getConcurrentEmailLimit()} for high-volume processing`,
-      expectedPeak: '100+ emails/minute',
+      recommendation: `Limit of ${this.getConcurrentEmailLimit()} for high-volume AI processing`,
+      expectedPeak: '250+ emails/minute (100% AI processed)',
     };
   }
 }
