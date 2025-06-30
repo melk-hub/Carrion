@@ -62,9 +62,9 @@ export class S3Service {
   async getSignedDownloadUrl(userId: string, filename: string) {
     const response = await this.prismaService.userProfile.findUnique({
       where: {userId},
-      select: {imageUrl: true},
+      select: {imageUrl: true, resume: true},
     });
-    if (!response?.imageUrl)
+    if (!response?.imageUrl && !response?.resume)
       return null;
     const key = `users/${userId}/${filename}`;
     const command = new GetObjectCommand({
