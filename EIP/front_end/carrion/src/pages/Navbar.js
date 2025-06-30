@@ -17,6 +17,7 @@ import statistics from '../assets/pie-chart.png';
 import podium from '../assets/podium.png';
 import ApiService from "../services/api";
 import { CircleUserRound } from "lucide-react";
+import avatar from "../assets/avatar.png"
 
 function Navbar({ sidebarCollapsed, setSidebarCollapsed, setIsAuthenticated }) {
   const navigate = useNavigate();
@@ -92,6 +93,11 @@ function Navbar({ sidebarCollapsed, setSidebarCollapsed, setIsAuthenticated }) {
   useEffect(() => {
     const fetchProfilePicture = async () => {
       try {
+        const user = await ApiService.get('/user-profile');
+        if (!user.imageUrl) {
+          setUploadedImage(avatar);
+          return;
+        }
         const params = new URLSearchParams({
           filename: "profile",
         });
