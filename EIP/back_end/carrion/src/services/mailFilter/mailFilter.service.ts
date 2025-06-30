@@ -801,8 +801,6 @@ Extraire des informations d'un email de candidature au format JSON :
         );
       }
 
-      console.log(rawResponse.text);
-
       const parsedData: ExtractedJobDataDto | null = extractJsonFromString(
         rawResponse.text,
       );
