@@ -1,9 +1,11 @@
 import React from 'react';
 import googleLogo from '../assets/google-logo.png';
+import { useLanguage } from '../contexts/LanguageContext';
 
 const GoogleLoginButton = () => {
     const GOOGLE_ID = process.env.REACT_APP_GOOGLE_CLIENT_ID;
     const redirectUri = process.env.REACT_APP_GOOGLE_REDIRECT_URI;
+    const { t } = useLanguage();
     if (!redirectUri) {
         throw new Error("Environment variable REACT_APP_GOOGLE_REDIRECT_URI is required but not defined.");
     }
@@ -25,7 +27,7 @@ const GoogleLoginButton = () => {
     return (
         <button type="button" className="google-login-button" onClick={handleGoogleLogin} style={{marginTop: "0", marginLeft: "3.5em", height: "2.5em"}}>
         <img src={googleLogo} alt="Google Logo" />
-        Se connecter avec Google
+        {t("auth.loginWithGoogle")}
         </button>
     );
 };

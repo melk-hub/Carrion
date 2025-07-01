@@ -1,8 +1,10 @@
 "use client"
 import React from 'react';
 import "../styles/Modal.css"
+import { useLanguage } from "../contexts/LanguageContext"
 
 function DetailsModal({ application, onClose, statusMap }) {
+  const { t } = useLanguage()
   const getStatusClass = (status) => {
     switch (status) {
       case "APPLIED":
@@ -20,7 +22,7 @@ function DetailsModal({ application, onClose, statusMap }) {
     <div className="modal-overlay">
       <div className="modal-container">
         <div className="modal-header">
-          <h2 className="modal-title">Détails de la candidature</h2>
+          <h2 className="modal-title">{t("dashboard.details.details")}</h2>
         </div>
 
         <div className="modal-content">
@@ -38,37 +40,37 @@ function DetailsModal({ application, onClose, statusMap }) {
 
           <div className="details-info">
             <div className="detail-row">
-              <span className="detail-label">Entreprise :</span>
+              <span className="detail-label">{t("dashboard.details.company")}</span>
               <span className="detail-value">{application.company || "Non spécifié"}</span>
             </div>
 
             <div className="detail-row">
-              <span className="detail-label">Poste :</span>
+              <span className="detail-label">{t("dashboard.details.position")}</span>
               <span className="detail-value">{application.title || "Non spécifié"}</span>
             </div>
 
             <div className="detail-row">
-              <span className="detail-label">Statut :</span>
+              <span className="detail-label">{t("dashboard.details.status")}</span>
               <span className={`detail-value ${getStatusClass(application.status)}`}>
                 {statusMap[application.status] || "Non spécifié"}
               </span>
             </div>
 
             <div className="detail-row">
-              <span className="detail-label">Date :</span>
+              <span className="detail-label">{t("dashboard.details.date")}</span>
               <span className="detail-value">{new Date(application.createdAt).toLocaleDateString("fr-FR")}</span>
             </div>
 
             {application.location && (
               <div className="detail-row">
-                <span className="detail-label">Lieu :</span>
+                <span className="detail-label">{t("dashboard.details.location")}</span>
                 <span className="detail-value">{application.location}</span>
               </div>
             )}
 
             {application.salary && (
               <div className="detail-row">
-                <span className="detail-label">Salaire :</span>
+                <span className="detail-label">{t("dashboard.details.salary")}</span>
                 <span className="detail-value">{application.salary} €</span>
               </div>
             )}
@@ -77,7 +79,7 @@ function DetailsModal({ application, onClose, statusMap }) {
 
         <div className="modal-footer">
           <button className="modal-button confirm" onClick={onClose}>
-            Fermer
+            {t("dashboard.details.close")}
           </button>
         </div>
       </div>

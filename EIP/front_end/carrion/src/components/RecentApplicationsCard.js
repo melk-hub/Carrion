@@ -37,7 +37,7 @@ const RecentApplicationsCard = ({ className = '' }) => {
           .sort((a, b) => {
             const dateA = new Date(a.createdAt);
             const dateB = new Date(b.createdAt);
-            return dateB - dateA; // Plus récent en premier
+            return dateB - dateA;
           })
           .slice(0, 3);
         
@@ -69,7 +69,7 @@ const RecentApplicationsCard = ({ className = '' }) => {
       return t('shared.time.now') || 'À l\'instant';
     } else if (diffInMinutes < 60) {
       return t('shared.time.minutes', { minutes: diffInMinutes }) || `Il y a ${diffInMinutes} min`;
-    } else if (diffInMinutes < 1440) { // 24 heures
+    } else if (diffInMinutes < 1440) {
       const hours = Math.floor(diffInMinutes / 60);
       return t('shared.time.hoursAgo', { count: hours }) || `Il y a ${hours}h`;
     } else {

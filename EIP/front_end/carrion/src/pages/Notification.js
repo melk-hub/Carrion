@@ -364,7 +364,7 @@ function Notifications() {
               <h3 className="empty-title">{t('notifications.empty.title')}</h3>
               <p className="empty-text">
                 {filter === "all"
-                  ? t('notifications.empty.noNotifications')
+                  ? t('shared.empty.noNotifications')
                   : t('notifications.empty.noFilteredNotifications', { filter: t(`notifications.filters.${filter.toLowerCase()}`) })}
               </p>
             </div>

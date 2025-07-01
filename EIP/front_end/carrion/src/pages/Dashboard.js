@@ -199,19 +199,19 @@ function Dashboard() {
 
         <div className="stats-container">
           <div className="stat-card">
-            <h3 className="stat-title">{t('dashboard.stats.total')}</h3>
+            <h3 className="stat-title">{t('shared.stats.total')}</h3>
             <p className="stat-value">{stats.total}</p>
           </div>
           <div className="stat-card pending">
-            <h3 className="stat-title">{t('dashboard.stats.pending')}</h3>
+            <h3 className="stat-title">{t('shared.stats.pending')}</h3>
             <p className="stat-value">{stats.pending}</p>
           </div>
           <div className="stat-card accepted">
-            <h3 className="stat-title">{t('dashboard.stats.accepted')}</h3>
+            <h3 className="stat-title">{t('shared.stats.accepted')}</h3>
             <p className="stat-value">{stats.accepted}</p>
           </div>
           <div className="stat-card refused">
-            <h3 className="stat-title">{t('dashboard.stats.refused')}</h3>
+            <h3 className="stat-title">{t('shared.stats.refused')}</h3>
             <p className="stat-value">{stats.refused}</p>
           </div>
         </div>
@@ -250,7 +250,7 @@ function Dashboard() {
           <div className="controls-right">
             <div className="sort-container">
               <label htmlFor="sort-select" className="sort-label">
-                {t('dashboard.label')} :
+                {t('shared.sorting.label')} :
               </label>
               <select
                 id="sort-select"
@@ -258,8 +258,8 @@ function Dashboard() {
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
               >
-                <option value="date">{t('dashboard.date')}</option>
-                <option value="status">{t('dashboard.status')}</option>
+                <option value="date">{t('shared.sorting.date')}</option>
+                <option value="status">{t('shared.sorting.status')}</option>
               </select>
             </div>
 
@@ -268,13 +268,13 @@ function Dashboard() {
                 className={`toggle-button ${viewMode === "grid" ? "active" : ""}`}
                 onClick={() => setViewMode("grid")}
               >
-                {t('dashboard.viewGrid')}
+                {t('shared.viewModes.grid')}
               </button>
               <button
                 className={`toggle-button ${viewMode === "list" ? "active" : ""}`}
                 onClick={() => setViewMode("list")}
               >
-                {t('dashboard.viewList')}
+                {t('shared.viewModes.list')}
               </button>
             </div>
 

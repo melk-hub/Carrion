@@ -11,7 +11,7 @@ const DailyTipCard = ({ className = '' }) => {
     
     // Cycle sur 28 jours pour couvrir un mois
     const tipNumber = ((dayOfMonth - 1) % 28) + 1;
-    const tipKey = `home.dailyTip.tip${tipNumber}`;
+    const tipKey = `dailyTip.tip${tipNumber}`;
     
     // Vérifier si la traduction existe et n'est pas la clé elle-même
     const translatedTip = t(tipKey);
@@ -59,7 +59,7 @@ const DailyTipCard = ({ className = '' }) => {
   return (
     <div className={`card tips-card ${className}`}>
       <div className="card-header">
-        <h3>💡 {t('home.dailyTip.title') || 'Conseil du jour'}</h3>
+        <h3>💡 {t('dailyTip.title') || 'Conseil du jour'}</h3>
       </div>
       <div className="tip-content">
         <p>
