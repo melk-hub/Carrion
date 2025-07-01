@@ -22,6 +22,7 @@ import { Toaster } from "react-hot-toast";
 import Settings from "./pages/Settings";
 import Notifications from "./pages/Notification";
 import Ranking from "./pages/Classement";
+import ResetPasswordPage from "./components/ResetPasswordPage";
 
 function App() {
   return (
@@ -181,6 +182,10 @@ function AppLayout() {
                 <Navigate to="/" replace state={{ from: location }} />
               )
             }
+          />
+          <Route
+            path="/reset-password/:token"
+            element={<ResetPasswordPage />}
           />
         </Routes>
       </main>

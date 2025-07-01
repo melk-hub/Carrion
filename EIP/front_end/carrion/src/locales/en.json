@@ -214,7 +214,11 @@
       "letter": "Contains at least one letter",
       "number": "Contains at least one number",
       "special": "Contains at least one special character (@$!%*#?&)"
-    }
+    },
+    "resetYourPassword": "Reset Your Password",
+    "forgotPasswordInstructions": "Please enter your email address. We will send you a link to reset your password.",
+    "sendResetLink": "Send Reset Link",
+    "resetLinkSent": "If an account is associated with this email, a reset link has been sent."
   },
   "home": {
     "welcomeMessage": "Organize your job search with Carrion",

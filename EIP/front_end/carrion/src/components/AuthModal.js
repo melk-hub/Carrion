@@ -24,6 +24,7 @@ function AuthModal({ isOpen, onClose, defaultTab }) {
   const { t } = useLanguage();
   const navigate = useNavigate();
   const [errorMessage, setErrorMessage] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
   const API_URL = process.env.REACT_APP_API_URL;
   const [showPassword, setShowPassword] = useState(false);
 
@@ -55,7 +56,9 @@ function AuthModal({ isOpen, onClose, defaultTab }) {
   }, [defaultTab]);
 
   useEffect(() => {
-    if (!isOpen) {
+    if (isOpen) {
+      setActiveTab(defaultTab || "login");
+    } else {
       setCredentials({
         identifier: "",
         password: "",
@@ -66,18 +69,22 @@ function AuthModal({ isOpen, onClose, defaultTab }) {
       });
       validatePassword("");
       setErrorMessage("");
+      setSuccessMessage("");
     }
-  }, [isOpen]);
+  }, [isOpen, defaultTab]);
 
   if (!isOpen) return null;
 
   const togglePasswordVisibility = () => setShowPassword((prev) => !prev);
+
   const handleTabChange = (tab) => {
     if (tab === activeTab) return;
     setDirection(tab === "login" ? -1 : 1);
     setActiveTab(tab);
     setErrorMessage("");
+    setSuccessMessage("");
   };
+
   const handleClose = () => onClose();
 
   const variants = {
@@ -89,6 +96,7 @@ function AuthModal({ isOpen, onClose, defaultTab }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setErrorMessage("");
+    setSuccessMessage("");
 
     if (activeTab === "login") {
       try {
@@ -98,6 +106,7 @@ function AuthModal({ isOpen, onClose, defaultTab }) {
           body: JSON.stringify({
             identifier: credentials.identifier,
             password: credentials.password,
+            rememberMe: credentials.rememberMe,
           }),
           credentials: "include",
         });
@@ -153,6 +162,25 @@ function AuthModal({ isOpen, onClose, defaultTab }) {
         setErrorMessage(t("auth.genericError"));
       }
     }
+
+    if (activeTab === "forgotPassword") {
+      try {
+        const response = await fetch(`${API_URL}/auth/forgot-password`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: credentials.email }),
+        });
+        const data = await response.json();
+        if (response.ok) {
+          setSuccessMessage(data.message || t("auth.resetLinkSent"));
+        } else {
+          setErrorMessage(data.message || t("auth.genericError"));
+        }
+      } catch (err) {
+        console.error(err);
+        setErrorMessage(t("auth.genericError"));
+      }
+    }
   };
 
   const ValidationCriterion = ({ isValid, text }) => (
@@ -162,28 +190,41 @@ function AuthModal({ isOpen, onClose, defaultTab }) {
     </li>
   );
 
+  const getModalTitle = () => {
+    if (activeTab === "forgotPassword") return t("auth.resetYourPassword");
+    if (activeTab === "login") return t("home.welcome");
+    return t("auth.joinUs");
+  };
+
   return (
     <div className="modal-overlay">
       <div className="auth-modal">
         <button className="close-button" onClick={handleClose}>
           ×
         </button>
-        <h1>{activeTab === "login" ? t("home.welcome") : t("auth.joinUs")}</h1>
-        <div className="tabs">
-          <button
-            className={activeTab === "login" ? "active" : ""}
-            onClick={() => handleTabChange("login")}
-          >
-            {t("auth.signIn")}
-          </button>
-          <button
-            className={activeTab === "register" ? "active" : ""}
-            onClick={() => handleTabChange("register")}
-          >
-            {t("auth.signUp")}
-          </button>
-        </div>
-        <hr />
+
+        <h1>{getModalTitle()}</h1>
+
+        {activeTab !== "forgotPassword" && (
+          <>
+            <div className="tabs">
+              <button
+                className={activeTab === "login" ? "active" : ""}
+                onClick={() => handleTabChange("login")}
+              >
+                {t("auth.signIn")}
+              </button>
+              <button
+                className={activeTab === "register" ? "active" : ""}
+                onClick={() => handleTabChange("register")}
+              >
+                {t("auth.signUp")}
+              </button>
+            </div>
+            <hr />
+          </>
+        )}
+
         <AnimatePresence mode="wait">
           {activeTab === "login" && (
             <motion.div
@@ -229,16 +270,30 @@ function AuthModal({ isOpen, onClose, defaultTab }) {
                 {errorMessage && (
                   <p className="error-message">{errorMessage}</p>
                 )}
-                <div style={{ marginTop: "3%" }}>
-                  <input
-                    type="checkbox"
-                    id="rememberMe"
-                    name="rememberMe"
-                    checked={credentials.rememberMe}
-                    onChange={handleChange}
-                  />
-                  <label htmlFor="rememberMe">{t("auth.rememberMe")}</label>
+
+                <div className="login-options">
+                  <div className="remember-me-wrapper">
+                    <input
+                      type="checkbox"
+                      id="rememberMe"
+                      name="rememberMe"
+                      checked={credentials.rememberMe}
+                      onChange={handleChange}
+                    />
+                    <label htmlFor="rememberMe">{t("auth.rememberMe")}</label>
+                  </div>
+                  <a
+                    href="#"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      handleTabChange("forgotPassword");
+                    }}
+                    className="forgot-password-link"
+                  >
+                    {t("auth.forgotPassword")}
+                  </a>
                 </div>
+
                 <button type="submit" className="primary-btn">
                   {t("auth.signIn")}
                 </button>
@@ -355,12 +410,66 @@ function AuthModal({ isOpen, onClose, defaultTab }) {
               </form>
             </motion.div>
           )}
+
+          {activeTab === "forgotPassword" && (
+            <motion.div
+              key="forgotPassword"
+              custom={direction}
+              variants={variants}
+              initial="enter"
+              animate="center"
+              exit="exit"
+              transition={{ duration: 0.25 }}
+            >
+              <form onSubmit={handleSubmit} style={{ marginTop: "2rem" }}>
+                <p className="forgot-password-instructions">
+                  {t("auth.forgotPasswordInstructions")}
+                </p>
+                <label>{t("auth.email")}</label>
+                <input
+                  type="email"
+                  name="email"
+                  placeholder={t("auth.email")}
+                  value={credentials.email}
+                  onChange={handleChange}
+                  required
+                />
+
+                {errorMessage && (
+                  <p className="error-message">{errorMessage}</p>
+                )}
+                {successMessage && (
+                  <p className="success-message">{successMessage}</p>
+                )}
+
+                <button type="submit" className="primary-btn">
+                  {t("auth.sendResetLink")}
+                </button>
+
+                <a
+                  href="#"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    handleTabChange("login");
+                  }}
+                  className="back-to-login-link"
+                >
+                  {t("auth.backToLogin")}
+                </a>
+              </form>
+            </motion.div>
+          )}
         </AnimatePresence>
-        <hr />
-        <div className="social-buttons">
-          <GoogleLoginButton />
-          <OutlookLoginButton />
-        </div>
+
+        {activeTab !== "forgotPassword" && (
+          <>
+            <hr />
+            <div className="social-buttons">
+              <GoogleLoginButton />
+              <OutlookLoginButton />
+            </div>
+          </>
+        )}
       </div>
     </div>
   );

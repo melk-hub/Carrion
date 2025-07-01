@@ -214,7 +214,11 @@
       "letter": "Contient une lettre",
       "number": "Contient un chiffre",
       "special": "Contient un caractère spécial (@$!%*#?&)"
-    }
+    },
+    "resetYourPassword": "Réinitialiser votre mot de passe",
+    "forgotPasswordInstructions": "Veuillez entrer votre adresse e-mail. Nous vous enverrons un lien pour réinitialiser votre mot de passe.",
+    "sendResetLink": "Envoyer le lien de réinitialisation",
+    "resetLinkSent": "Si un compte est associé à cet email, un lien de réinitialisation a été envoyé."
   },
 
   "home": {

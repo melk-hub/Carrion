@@ -180,9 +180,7 @@
 
 .password-criteria {
   display: grid;
-
   grid-template-columns: repeat(2, 1fr);
-
   gap: 8px 16px;
   list-style-type: none;
   padding: 0;
@@ -203,4 +201,66 @@
 
 .criterion.invalid {
   color: #f44336;
+}
+
+.login-options {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1rem;
+}
+
+.remember-me-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.remember-me-wrapper input[type="checkbox"] {
+  margin-top: 0;
+}
+
+.remember-me-wrapper label {
+  margin-top: 0;
+  cursor: pointer;
+}
+
+.forgot-password-link {
+  font-size: 0.9rem;
+  color: #132238;
+  text-decoration: none;
+}
+
+.forgot-password-link:hover {
+  text-decoration: underline;
+}
+
+.forgot-password-instructions {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  color: #666;
+  line-height: 1.5;
+}
+
+.back-to-login-link {
+  display: block;
+  text-align: center;
+  margin-top: 1rem;
+  color: #132238;
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+
+.back-to-login-link:hover {
+  text-decoration: underline;
+}
+
+.success-message {
+  color: #155724;
+  background-color: #d4edda;
+  border: 1px solid #c3e6cb;
+  border-radius: 8px;
+  padding: 12px;
+  margin: 15px 0;
+  text-align: center;
 }

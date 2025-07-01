@@ -10,6 +10,7 @@ import {
   UseGuards,
   Body,
   Response,
+  Param,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { AuthService } from './auth.service';
@@ -25,6 +26,8 @@ import {
   LogCategory,
 } from 'src/common/services/logging.service';
 import { JwtService } from '@nestjs/jwt';
+import { ResetPasswordDto } from './dto/reset-password.dto';
+import { ForgotPasswordDto } from './dto/forgot-password.dto';
 
 @ApiTags('Authentication')
 @Controller('auth')
@@ -304,5 +307,31 @@ export class AuthController {
       });
     }
     res.redirect(`${process.env.FRONT}/?auth=success`);
+  }
+
+  @Public()
+  @Post('forgot-password')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Send password reset link' })
+  async forgotPassword(
+    @Body() forgotPasswordDto: ForgotPasswordDto,
+  ): Promise<{ message: string }> {
+    await this.authService.forgotPassword(forgotPasswordDto.email);
+    return {
+      message:
+        'If an account with this email exists, a reset link has been sent.',
+    };
+  }
+
+  @Public()
+  @Post('reset-password/:token')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Reset user password' })
+  async resetPassword(
+    @Param('token') token: string,
+    @Body() resetPasswordDto: ResetPasswordDto,
+  ): Promise<{ message: string }> {
+    await this.authService.resetPassword(token, resetPasswordDto);
+    return { message: 'Your password has been reset successfully.' };
   }
 }
