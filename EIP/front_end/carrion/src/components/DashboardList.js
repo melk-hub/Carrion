@@ -8,14 +8,23 @@ function ApplicationList({ application, statusMap, onEdit, onDelete, onDetails, 
   
   const getStatusClass = (status) => {
     switch (status) {
-      case "APPLIED":
-        return "status-accepted"
       case "PENDING":
-        return "status-pending"
+      case "AWAITING_DECISION":
+      case "NEGOTIATION":
+      case "APPLIED":
+        return "status-pending";
+      case "INTERVIEW_SCHEDULED":
+      case "TECHNICAL_TEST":
+        return "status-interview";
       case "REJECTED_BY_COMPANY":
-        return "status-refused"
+      case "APPLICATION_WITHDRAWN":
+      case "OFFER_DECLINED":
+        return "status-refused";
+      case "OFFER_RECEIVED":
+      case "OFFER_ACCEPTED":
+        return "status-accepted";
       default:
-        return ""
+        return "status-pending";
     }
   }
 

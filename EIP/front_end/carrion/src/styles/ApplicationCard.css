@@ -14,7 +14,7 @@
 }
 
 .modern-application-card::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: 0;
@@ -45,6 +45,10 @@
 
 .modern-application-card.status-refused::before {
   background: linear-gradient(90deg, #ef4444, #f87171);
+}
+
+.modern-application-card.status-interview::before {
+  background: linear-gradient(90deg, #1212f1, #1307bb);
 }
 
 .modern-card-header {
@@ -166,12 +170,21 @@
 }
 
 @keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
 }
 
 .modern-status-badge.status-accepted {
-  background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(52, 211, 153, 0.1) 100%);
+  background: linear-gradient(
+    135deg,
+    rgba(16, 185, 129, 0.1) 0%,
+    rgba(52, 211, 153, 0.1) 100%
+  );
   color: #059669;
   border: 1px solid rgba(16, 185, 129, 0.2);
 }
@@ -181,7 +194,11 @@
 }
 
 .modern-status-badge.status-pending {
-  background: linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(251, 191, 36, 0.1) 100%);
+  background: linear-gradient(
+    135deg,
+    rgba(245, 158, 11, 0.1) 0%,
+    rgba(251, 191, 36, 0.1) 100%
+  );
   color: #d97706;
   border: 1px solid rgba(245, 158, 11, 0.2);
 }
@@ -191,13 +208,31 @@
 }
 
 .modern-status-badge.status-refused {
-  background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(248, 113, 113, 0.1) 100%);
+  background: linear-gradient(
+    135deg,
+    rgba(239, 68, 68, 0.1) 0%,
+    rgba(248, 113, 113, 0.1) 100%
+  );
   color: #dc2626;
   border: 1px solid rgba(239, 68, 68, 0.2);
 }
 
 .modern-status-badge.status-refused .status-indicator {
   background: linear-gradient(135deg, #ef4444, #f87171);
+}
+
+.modern-status-badge.status-interview {
+  background: linear-gradient(
+    135deg,
+    rgba(28, 31, 220, 0.1) 0%,
+    rgba(67, 56, 202, 0.1) 100%
+  );
+  color: #1c1fdc;
+  border: 1px solid rgba(46, 49, 232, 0.2);
+}
+
+.modern-status-badge.status-interview .status-indicator {
+  background: linear-gradient(135deg, #1c1fdc, #0a20ab);
 }
 
 .modern-card-content {
@@ -350,7 +385,7 @@
   .info-grid {
     grid-template-columns: 1fr 1fr;
   }
-  
+
   .secondary-actions {
     flex-direction: row;
   }
@@ -361,31 +396,31 @@
     margin: 0.5rem;
     min-height: 380px;
   }
-  
+
   .modern-card-header {
     padding: 1rem;
     flex-wrap: wrap;
     min-height: 100px;
   }
-  
+
   .company-logo-section {
     width: 3rem;
     height: 3rem;
   }
-  
+
   .modern-card-content {
     padding: 1rem;
   }
-  
+
   .modern-card-actions {
     padding: 1rem;
     padding-top: 0;
   }
-  
+
   .modern-company-name {
     font-size: 1rem;
   }
-  
+
   .modern-status-badge {
     width: 100%;
     justify-content: center;
@@ -419,12 +454,22 @@
   border-left-color: #ef4444;
 }
 
+.application-card.status-interview {
+  border-left-color: #171ff2;
+}
+
 .corner-curve {
   position: absolute;
   top: 0;
   right: 0;
   width: 100px;
   height: 100px;
-  background: radial-gradient(circle at top right, transparent 100%, transparent 100%, #fff 100%, #fff 100%);
+  background: radial-gradient(
+    circle at top right,
+    transparent 100%,
+    transparent 100%,
+    #fff 100%,
+    #fff 100%
+  );
   z-index: 100;
 }

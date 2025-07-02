@@ -123,6 +123,12 @@ function Dashboard() {
     APPLIED: t('dashboard.statuses.APPLIED'),
     PENDING: t('dashboard.statuses.PENDING'),
     REJECTED_BY_COMPANY: t('dashboard.statuses.REJECTED_BY_COMPANY'),
+    OFFER_RECEIVED: t('dashboard.statuses.OFFER_RECEIVED'),
+    OFFER_ACCEPTED: t('dashboard.statuses.OFFER_ACCEPTED'),
+    APPLICATION_WITHDRAWN: t('dashboard.statuses.APPLICATION_WITHDRAWN'),
+    INTERVIEW_SCHEDULED: t('dashboard.statuses.INTERVIEW_SCHEDULED'),
+    TECHNICAL_TEST: t('dashboard.statuses.TECHNICAL_TEST'),
+    OFFER_DECLINED: t('dashboard.statuses.OFFER_DECLINED'),
   }
 
   const handleStatusChange = (status) => {
@@ -188,9 +194,10 @@ function Dashboard() {
   // Statistiques
   const stats = {
     total: applications.length,
-    pending: applications.filter((app) => app.status === "PENDING").length,
-    accepted: applications.filter((app) => app.status === "APPLIED").length,
-    refused: applications.filter((app) => app.status === "REJECTED_BY_COMPANY").length,
+    pending: applications.filter((app) => app.status === "PENDING" || app.status === "AWAITING_DECISION" || app.status === "NEGOTIATION").length,
+    accepted: applications.filter((app) => app.status === "OFFER_RECEIVED" || app.status === "OFFER_ACCEPTED").length,
+    refused: applications.filter((app) => app.status === "REJECTED_BY_COMPANY" || app.status === "APPLICATION_WITHDRAWN" || app.status === "OFFER_DECLINED").length,
+    interview: applications.filter((app) => app.status === "INTERVIEW_SCHEDULED" || app.status === "TECHNICAL_TEST").length,
   }
 
   return (
@@ -213,6 +220,10 @@ function Dashboard() {
           <div className="stat-card refused">
             <h3 className="stat-title">{t('dashboard.stats.refused')}</h3>
             <p className="stat-value">{stats.refused}</p>
+          </div>
+          <div className="stat-card">
+            <h3 className="stat-title">{t('dashboard.stats.interview')}</h3>
+            <p className="stat-value">{stats.interview}</p>
           </div>
         </div>
 

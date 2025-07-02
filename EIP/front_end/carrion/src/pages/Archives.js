@@ -82,9 +82,7 @@ function Archives() {
 
   const handleDeArchiveApplication = async (id) => {
     try {
-      const response = await apiService.post(
-        `/job_applies/${id}/unarchive`
-      );
+      const response = await apiService.post(`/job_applies/${id}/unarchive`);
 
       if (!response.ok) {
         throw new Error(
@@ -118,6 +116,12 @@ function Archives() {
     APPLIED: t("dashboard.statuses.APPLIED"),
     PENDING: t("dashboard.statuses.PENDING"),
     REJECTED_BY_COMPANY: t("dashboard.statuses.REJECTED_BY_COMPANY"),
+    OFFER_RECEIVED: t("dashboard.statuses.OFFER_RECEIVED"),
+    OFFER_ACCEPTED: t("dashboard.statuses.OFFER_ACCEPTED"),
+    APPLICATION_WITHDRAWN: t("dashboard.statuses.APPLICATION_WITHDRAWN"),
+    INTERVIEW_SCHEDULED: t("dashboard.statuses.INTERVIEW_SCHEDULED"),
+    TECHNICAL_TEST: t("dashboard.statuses.TECHNICAL_TEST"),
+    OFFER_DECLINED: t("dashboard.statuses.OFFER_DECLINED"),
   };
 
   const handleStatusChange = (status) => {
@@ -165,10 +169,26 @@ function Archives() {
   // Statistiques
   const stats = {
     total: applications.length,
-    pending: applications.filter((app) => app.status === "PENDING").length,
-    accepted: applications.filter((app) => app.status === "APPLIED").length,
-    refused: applications.filter((app) => app.status === "REJECTED_BY_COMPANY")
-      .length,
+    pending: applications.filter(
+      (app) =>
+        app.status === "PENDING" ||
+        app.status === "AWAITING_DECISION" ||
+        app.status === "NEGOTIATION"
+    ).length,
+    accepted: applications.filter(
+      (app) =>
+        app.status === "OFFER_RECEIVED" || app.status === "OFFER_ACCEPTED"
+    ).length,
+    refused: applications.filter(
+      (app) =>
+        app.status === "REJECTED_BY_COMPANY" ||
+        app.status === "APPLICATION_WITHDRAWN" ||
+        app.status === "OFFER_DECLINED"
+    ).length,
+    interview: applications.filter(
+      (app) =>
+        app.status === "INTERVIEW_SCHEDULED" || app.status === "TECHNICAL_TEST"
+    ).length,
   };
 
   return (
@@ -199,8 +219,8 @@ function Archives() {
             <p className="banner-text">{t("archives.banner.description")}</p>
           </div>
           <div className="search-container">
-          <input
-            type="text"
+            <input
+              type="text"
               className="search-input"
               placeholder={t("archives.search.placeholder")}
               value={searchTerm}
@@ -238,7 +258,7 @@ function Archives() {
                 <option value="date">{t("archives.date")}</option>
                 <option value="status">{t("archives.status")}</option>
               </select>
-      </div>
+            </div>
 
             <div className="view-toggle">
               <button
@@ -259,7 +279,7 @@ function Archives() {
               </button>
             </div>
           </div>
-      </div>
+        </div>
 
         {viewMode === "grid" ? (
           <div className="applications-grid">
@@ -281,8 +301,8 @@ function Archives() {
                 <h3 className="empty-title">{t("archives.empty.title")}</h3>
                 <p className="empty-text">{t("archives.empty.text")}</p>
               </div>
-          )}
-        </div>
+            )}
+          </div>
         ) : (
           <div className="applications-list">
             {sortedAndFilteredApplications.length > 0 ? (
@@ -304,9 +324,9 @@ function Archives() {
                 <p className="empty-text">{t("archives.empty.text")}</p>
               </div>
             )}
-            </div>
-          )}
-        </div>
+          </div>
+        )}
+      </div>
 
       {popupType === "edit" && selectedApplication && (
         <EditApplicationModal

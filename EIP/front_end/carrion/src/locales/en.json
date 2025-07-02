@@ -329,10 +329,13 @@
       "APPLIED": "Applied",
       "ACCEPTED": "Accepted", 
       "REJECTED": "Rejected",
-      "INTERVIEW": "Interview",
+      "INTERVIEW_SCHEDULED": "Interview scheduled",
       "REJECTED_BY_COMPANY": "Rejected",
-      "ON": "Accepted",
-      "OFFER": "Offer received"
+      "APPLICATION_WITHDRAWN": "Application withdrawn",
+      "OFFER_DECLINED": "Offer declined",
+      "OFFER_ACCEPTED": "Offer accepted",
+      "OFFER_RECEIVED": "Offer received",
+      "TECHNICAL_TEST": "Technical test"
     },
     "empty": {
       "title": "No applications found",
