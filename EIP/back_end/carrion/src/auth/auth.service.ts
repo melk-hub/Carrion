@@ -21,6 +21,9 @@ import {
   LogCategory,
 } from 'src/common/services/logging.service';
 import { User } from '@prisma/client';
+import * as crypto from 'crypto';
+import * as SibApiV3Sdk from '@getbrevo/brevo';
+import { ResetPasswordDto } from './dto/reset-password.dto';
 
 @Injectable()
 export class AuthService {
@@ -109,6 +112,120 @@ export class AuthService {
     return newUser;
   }
 
+  async forgotPassword(email: string): Promise<void> {
+    const user = await this.prisma.user.findUnique({ where: { email } });
+
+    if (!user) {
+      this.logger.warn(
+        `Password reset attempt for non-existent email: ${email}`,
+        LogCategory.AUTH,
+      );
+      return;
+    }
+
+    const resetToken = crypto.randomBytes(32).toString('hex');
+    const passwordResetToken = crypto
+      .createHash('sha256')
+      .update(resetToken)
+      .digest('hex');
+
+    const passwordResetExpires = new Date(Date.now() + 3600000);
+
+    await this.prisma.user.update({
+      where: { email },
+      data: {
+        passwordResetToken,
+        passwordResetExpires,
+      },
+    });
+
+    try {
+      const resetUrl = `${process.env.FRONT}/reset-password/${resetToken}`;
+      this.logger.log(
+        `[API] Generated Reset URL: ${resetUrl}`,
+        LogCategory.AUTH,
+      );
+
+      const apiInstance = new SibApiV3Sdk.TransactionalEmailsApi();
+      apiInstance.setApiKey(
+        SibApiV3Sdk.TransactionalEmailsApiApiKeys.apiKey,
+        process.env.BREVO_API_KEY,
+      );
+
+      const sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail();
+      sendSmtpEmail.subject = 'Your Password Reset Request';
+      sendSmtpEmail.htmlContent = `<p>Click here to reset: <a href="${resetUrl}">Reset Password</a></p>`;
+      sendSmtpEmail.sender = {
+        name: 'Carrion',
+        email: 'your-validated-sender@example.com',
+      };
+      sendSmtpEmail.to = [{ email: user.email, name: user.username }];
+
+      await apiInstance.sendTransacEmail(sendSmtpEmail);
+
+      this.logger.log(
+        `Password reset email sent via API to ${email}`,
+        LogCategory.AUTH,
+      );
+    } catch (error) {
+      this.logger.error(
+        'Failed to send password reset email',
+        error.stack,
+        LogCategory.AUTH,
+        {
+          email,
+          brevoErrorBody: error.response?.body,
+        },
+      );
+
+      await this.prisma.user.update({
+        where: { email },
+        data: {
+          passwordResetToken: null,
+          passwordResetExpires: null,
+        },
+      });
+
+      throw new Error('Could not send reset password email.');
+    }
+  }
+
+  async resetPassword(
+    token: string,
+    resetPasswordDto: ResetPasswordDto,
+  ): Promise<void> {
+    const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
+
+    const user = await this.prisma.user.findUnique({
+      where: { passwordResetToken: hashedToken },
+    });
+
+    if (!user) {
+      throw new UnauthorizedException('Invalid token.');
+    }
+
+    if (user.passwordResetExpires < new Date()) {
+      throw new UnauthorizedException('Token has expired.');
+    }
+
+    const hashedPassword = await bcrypt.hash(resetPasswordDto.password, 10);
+
+    await this.prisma.user.update({
+      where: { id: user.id },
+      data: {
+        password: hashedPassword,
+        passwordResetToken: null,
+        passwordResetExpires: null,
+        hashedRefreshToken: null,
+      },
+    });
+
+    this.logger.log(
+      `Password has been reset for user ${user.id}`,
+      LogCategory.AUTH,
+    );
+  }
+
   async saveTokens(
     userId: string,
     accessToken: string,
@@ -183,7 +300,7 @@ export class AuthService {
   ): Promise<{ accessToken: string; refreshToken: string }> {
     const payload: AuthJwtPayload = { sub: userId };
 
-    const accessTokenExpiresIn = rememberMe ? '15d' : '1d'; // <-- HERE
+    const accessTokenExpiresIn = rememberMe ? '15d' : '1d';
     const [accessToken, refreshToken] = await Promise.all([
       this.jwtService.signAsync(payload, { expiresIn: accessTokenExpiresIn }),
       this.jwtService.signAsync(payload, this.refreshTokenConfig),
@@ -197,15 +314,19 @@ export class AuthService {
       createUserDto.email,
       true,
     );
+
+    if (existingUserByEmail) {
+      throw new ConflictException('A user with this email already exists.');
+    }
+
     const existingUsername = await this.userService.findByIdentifier(
       createUserDto.username,
       false,
     );
-    if (existingUserByEmail || existingUsername) {
-      throw new ConflictException(
-        'User with this email or username already exists',
-      );
+    if (existingUsername) {
+      throw new ConflictException('A user with this username already exists.');
     }
+
     const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
     const user = await this.userService.create({
       ...createUserDto,

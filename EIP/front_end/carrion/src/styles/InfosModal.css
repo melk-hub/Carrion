@@ -8,7 +8,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
+  z-index: 10010;
 }
 
 .infos-modal {
@@ -313,4 +313,41 @@
 }
 .react-datepicker__day--disabled {
   color: #a0aec0 !important;
+}
+
+.upload-box .file-name {
+  font-size: 0.8rem;
+  color: #2d3748;
+  padding: 0 10px;
+  text-align: center;
+  word-break: break-all;
+}
+
+.upload-box .plus-sign {
+  font-size: 2rem;
+  color: #a0aec0;
+}
+
+.required-star {
+  color: #e53e3e;
+  margin-left: 2px;
+}
+
+.upload-box {
+  background-color: #f7fafc;
+  overflow: hidden;
+  padding: 5px;
+  box-sizing: border-box;
+}
+
+.upload-box .react-pdf__Document {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  height: 100%;
+  width: 100%;
+}
+
+.upload-box .react-pdf__Page__canvas {
+  margin: 0 auto;
 }

@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsString, Matches, MinLength } from 'class-validator';
+import { passwordRegEX } from 'src/utils/constants';
 
 export class UserDto {
   @ApiProperty({
@@ -21,13 +22,14 @@ export class UserDto {
   @IsNotEmpty()
   email: string;
 
-  @ApiProperty({
-    name: 'password',
-    description: 'password of the user',
-    type: 'string',
-    example: 'mysecretpassword123',
-  })
   @IsString()
-  @IsNotEmpty()
+  @IsNotEmpty({ message: 'Le mot de passe ne peut pas être vide.' })
+  @MinLength(8, {
+    message: 'The password need to be at least 8 character long',
+  })
+  @Matches(passwordRegEX, {
+    message:
+      'The password need at least one digit, one letter and one special caractère (@$!%*#?&).',
+  })
   password: string;
 }
