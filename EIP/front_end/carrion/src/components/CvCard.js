@@ -8,10 +8,11 @@ import {
   LoaderCircle,
 } from "lucide-react";
 import "../styles/CvCard.css";
+import { useLanguage } from "../contexts/LanguageContext";
 
 function CvCard({ cvUrl, uploadingCv, onUpload, onDelete }) {
   const fileInputRef = useRef(null);
-
+  const { t } = useLanguage();
   const handleModifyClick = () => {
     fileInputRef.current?.click();
   };
@@ -32,18 +33,18 @@ function CvCard({ cvUrl, uploadingCv, onUpload, onDelete }) {
         style={{ display: "none" }}
       />
 
-      <h2>Mon CV</h2>
+      <h2>{t("profile.CV")}</h2>
 
       {uploadingCv ? (
         <div className="cv-loading-state">
           <LoaderCircle className="spinner" size={24} />
-          <p>Téléchargement en cours...</p>
+          <p>{t("common.loading")}</p>
         </div>
       ) : cvUrl ? (
         <div className="cv-uploaded-state">
           <div className="cv-display">
             <FileText size={20} className="cv-icon" />
-            <span>CV présent</span>{" "}
+            <span>{t("profile.upload")}</span>
           </div>
           <div className="cv-actions">
             <button
@@ -53,7 +54,7 @@ function CvCard({ cvUrl, uploadingCv, onUpload, onDelete }) {
               className="cv-btn cv-btn-primary"
             >
               <Eye size={16} />
-              <span>Visualiser</span>
+              <span>{t("profile.visualize")}</span>
             </button>
             <button
               type="button"
@@ -61,7 +62,7 @@ function CvCard({ cvUrl, uploadingCv, onUpload, onDelete }) {
               className="cv-btn cv-btn-secondary"
             >
               <UploadCloud size={16} />
-              <span>Modifier</span>
+              <span>{t("profile.modify")}</span>
             </button>
             <button
               type="button"
@@ -69,7 +70,7 @@ function CvCard({ cvUrl, uploadingCv, onUpload, onDelete }) {
               className="cv-btn cv-btn-danger"
             >
               <Trash2 size={16} />
-              <span>Supprimer</span>
+              <span>{t("profile.delete")}</span>
             </button>
           </div>
         </div>
@@ -82,7 +83,7 @@ function CvCard({ cvUrl, uploadingCv, onUpload, onDelete }) {
             className="cv-btn cv-btn-primary"
           >
             <PlusCircle size={16} />
-            <span>Ajouter un CV</span>
+            <span>{t("profile.add")}</span>
           </button>
         </div>
       )}

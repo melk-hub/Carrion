@@ -1,6 +1,6 @@
 import React from "react";
 import { X } from "lucide-react";
-
+import { useLanguage } from "../contexts/LanguageContext";
 import googleLogo from "../assets/google-logo.png";
 import outlookLogo from "../assets/outlook-logo.svg";
 
@@ -10,7 +10,7 @@ const AddServiceModal = ({ isOpen, onClose, connectedServices }) => {
   if (!isOpen) return null;
 
   const API_URL = process.env.REACT_APP_API_URL;
-
+  const { t } = useLanguage();
   const handleConnect = (serviceProvider) => {
     window.location.href = `${API_URL}/auth/${serviceProvider}/link`;
     onClose();
@@ -27,7 +27,7 @@ const AddServiceModal = ({ isOpen, onClose, connectedServices }) => {
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
         <header className="modal-header">
-          <h3>Connecter un nouveau service</h3>
+          <h3>{t("profile.connectService")}</h3>
           <button
             onClick={onClose}
             className="close-btn"
@@ -37,7 +37,7 @@ const AddServiceModal = ({ isOpen, onClose, connectedServices }) => {
           </button>
         </header>
         <div className="modal-body">
-          <p>Choisissez un service à connecter à votre compte Carrion.</p>
+          <p>{t("profile.chooseService")}</p>
           <div className="service-options">
             {!isGoogleConnected && (
               <button
@@ -49,7 +49,7 @@ const AddServiceModal = ({ isOpen, onClose, connectedServices }) => {
                   alt="Google"
                   className="service-option-icon"
                 />
-                <span>Connecter Gmail</span>
+                <span>{t("profile.connectGmail")}</span>
               </button>
             )}
 
@@ -63,12 +63,12 @@ const AddServiceModal = ({ isOpen, onClose, connectedServices }) => {
                   alt="Outlook"
                   className="service-option-icon"
                 />
-                <span>Connecter Outlook</span>
+                <span>{t("profile.connectOutlook")}</span>
               </button>
             )}
 
             {isGoogleConnected && isMicrosoftConnected && (
-              <p>Tous les services disponibles sont déjà connectés.</p>
+              <p>{t("profile.allConnected")}</p>
             )}
           </div>
         </div>

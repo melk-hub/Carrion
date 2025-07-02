@@ -176,27 +176,27 @@ function Archives() {
       <div className="container">
         <div className="stats-container">
           <div className="stat-card">
-            <h3 className="stat-title">{t("archives.stats.total")}</h3>
+            <h3 className="stat-title">{t("shared.stats.total")}</h3>
             <p className="stat-value">{stats.total}</p>
           </div>
           <div className="stat-card pending">
-            <h3 className="stat-title">{t("archives.stats.pending")}</h3>
+            <h3 className="stat-title">{t("shared.stats.pending")}</h3>
             <p className="stat-value">{stats.pending}</p>
           </div>
           <div className="stat-card accepted">
-            <h3 className="stat-title">{t("archives.stats.accepted")}</h3>
+            <h3 className="stat-title">{t("shared.stats.accepted")}</h3>
             <p className="stat-value">{stats.accepted}</p>
           </div>
           <div className="stat-card refused">
-            <h3 className="stat-title">{t("archives.stats.refused")}</h3>
+            <h3 className="stat-title">{t("shared.stats.refused")}</h3>
             <p className="stat-value">{stats.refused}</p>
           </div>
         </div>
 
         <div className="banner">
           <div className="banner-content">
-            <h2 className="banner-title">{t("archives.banner.title")}</h2>
-            <p className="banner-text">{t("archives.banner.description")}</p>
+            <h2 className="banner-title">{t("archives.title")}</h2>
+            <p className="banner-text">{t("archives.description")}</p>
           </div>
           <div className="search-container">
           <input
@@ -227,7 +227,7 @@ function Archives() {
           <div className="controls-right">
             <div className="sort-container">
               <label htmlFor="sort-select" className="sort-label">
-                {t("archives.label")} :
+                {t("shared.sorting.label")} :
               </label>
               <select
                 id="sort-select"
@@ -235,8 +235,8 @@ function Archives() {
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
               >
-                <option value="date">{t("archives.date")}</option>
-                <option value="status">{t("archives.status")}</option>
+                <option value="date">{t("shared.sorting.date")}</option>
+                <option value="status">{t("shared.sorting.status")}</option>
               </select>
       </div>
 
@@ -247,7 +247,7 @@ function Archives() {
                 }`}
                 onClick={() => setViewMode("grid")}
               >
-                {t("archives.viewGrid")}
+                {t("shared.viewModes.grid")}
               </button>
               <button
                 className={`toggle-button ${
@@ -255,7 +255,7 @@ function Archives() {
                 }`}
                 onClick={() => setViewMode("list")}
               >
-                {t("archives.viewList")}
+                {t("shared.viewModes.list")}
               </button>
             </div>
           </div>

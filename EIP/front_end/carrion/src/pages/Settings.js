@@ -4,6 +4,7 @@ import "../styles/Settings.css";
 import toast from "react-hot-toast";
 import Loading from "../components/Loading";
 import { useAuth } from "../AuthContext.js";
+import { useLanguage } from "../contexts/LanguageContext.js";
 
 function Settings() {
   const [goalSettings, setGoalSettings] = useState({
@@ -13,7 +14,7 @@ function Settings() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [success, setSuccess] = useState(false);
-
+  const { t } = useLanguage();
   const [isDisconnecting, setIsDisconnecting] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const { logOut } = useAuth();
@@ -79,7 +80,7 @@ function Settings() {
   const handleDisconnectAllServices = async () => {
     if (
       !window.confirm(
-        "Êtes-vous sûr de vouloir déconnecter TOUS vos services ? Vous devrez les relier manuellement pour retrouver les fonctionnalités associées."
+        t("settings.confirmDisconnect")
       )
     ) {
       return;
@@ -89,15 +90,15 @@ function Settings() {
     const disconnectPromise = apiService.delete("/user-profile/services/all");
 
     toast.promise(disconnectPromise, {
-      loading: "Déconnexion de tous les services...",
+      loading: t("settings.pendingDisconnect"),
       success: () => {
         setIsDisconnecting(false);
-        return "Tous les services ont été déconnectés avec succès.";
+        return t("settings.successDisconnect");
       },
       error: (err) => {
         setIsDisconnecting(false);
-        return `Une erreur est survenue: ${
-          err.message || "Veuillez réessayer."
+        return `t("settings.errorDisconnect") ${
+          err.message || t("settings.tryAgain")
         }`;
       },
     });
@@ -106,7 +107,7 @@ function Settings() {
   const handleDeleteAccount = async () => {
     if (
       window.confirm(
-        "ATTENTION : Êtes-vous absolument sûr de vouloir supprimer votre compte ? ..."
+        t("settings.confirmDeleteAccount")
       )
     ) {
       setIsDeleting(true);
@@ -114,13 +115,12 @@ function Settings() {
         const response = await apiService.delete("/user/me");
 
         if (response.ok) {
-          toast.success("Votre compte a été supprimé avec succès.");
-
+          toast.success(t("settings.sucessDeleteAccount"));
           logOut();
         } else {
           const errorData = await response.json();
           throw new Error(
-            errorData.message || "La suppression du compte a échoué."
+            errorData.message || t("settings.errorDeleteAccount")
           );
         }
       } catch (error) {
@@ -133,29 +133,28 @@ function Settings() {
   };
 
   if (loading) {
-    return <Loading message="Chargement des paramètres..." />;
+    return <Loading message={t("settings.loading")} />;
   }
 
   return (
     <div className="settings-container">
       <div className="settings-header">
-        <h1>Paramètres</h1>
-        <p>Configurez vos préférences et objectifs</p>
+        <h1>{t("settings.title")}</h1>
+        <p>{t("settings.description")}</p>
       </div>
 
       <div className="settings-content">
         <div className="settings-section">
           <div className="section-header">
-            <h2>Compte</h2>
-            <p>Gérez vos services connectés et votre compte</p>
+            <h2>{t("settings.account")}</h2>
+            <p>{t("settings.accountDescription")}</p>
           </div>
           <div className="account-actions">
             <div className="action-item">
               <div className="action-text">
-                <strong>Déconnecter les services</strong>
+                <strong>{t("settings.disconnectServices")}</strong>
                 <p className="action-description">
-                  Ceci révoquera l'accès à tous les services externes connectés
-                  (ex: Gmail, Outlook).
+                  {t("settings.disconnectServicesDescription")}
                 </p>
               </div>
               <button
@@ -163,15 +162,14 @@ function Settings() {
                 className="btn-secondary"
                 disabled={isDisconnecting}
               >
-                {isDisconnecting ? "Déconnexion..." : "Tout déconnecter"}
+                {isDisconnecting ? t("settings.disconnecting") : t("settings.disconnectEverything")}
               </button>
             </div>
             <div className="action-item">
               <div className="action-text">
-                <strong>Supprimer le compte</strong>
+                <strong>{t("settings.deleteAccount")}</strong>
                 <p className="action-description">
-                  Cette action supprimera définitivement votre compte et toutes
-                  vos données.
+                  {t("settings.deleteAccountDescription")}
                 </p>
               </div>
               <button
@@ -179,7 +177,7 @@ function Settings() {
                 className="btn-danger"
                 disabled={isDeleting}
               >
-                {isDeleting ? "Suppression..." : "Supprimer mon compte"}
+                {isDeleting ? t("settings.deletingAccount") : t("settings.deleteAccount")}
               </button>
             </div>
           </div>
@@ -187,13 +185,13 @@ function Settings() {
 
         <div className="settings-section">
           <div className="section-header">
-            <h2>Objectifs de candidatures</h2>
-            <p>Définissez vos objectifs de candidatures pour rester motivé</p>
+            <h2>{t("settings.objectives")}</h2>
+            <p>{t("settings.objectivesDescription")}</p>
           </div>
           <form onSubmit={saveGoalSettings} className="goal-form">
             <div className="form-grid">
               <div className="form-group">
-                <label htmlFor="weeklyGoal">Objectif hebdomadaire</label>
+                <label htmlFor="weeklyGoal">{t("settings.weeklyGoal")}</label>
                 <input
                   id="weeklyGoal"
                   type="number"
@@ -205,10 +203,10 @@ function Settings() {
                   }
                   required
                 />
-                <small>Nombre de candidatures par semaine</small>
+                <small>{t("settings.weeklyGoalDescription")}</small>
               </div>
               <div className="form-group">
-                <label htmlFor="monthlyGoal">Objectif mensuel</label>
+                <label htmlFor="monthlyGoal">{t("settings.monthlyGoal")}</label>
                 <input
                   id="monthlyGoal"
                   type="number"
@@ -220,7 +218,7 @@ function Settings() {
                   }
                   required
                 />
-                <small>Nombre de candidatures par mois</small>
+                <small>{t("settings.monthlyGoalDescription")}</small>
               </div>
             </div>
             <div className="form-actions">
@@ -228,16 +226,16 @@ function Settings() {
                 {saving ? (
                   <>
                     <div className="btn-spinner"></div>
-                    Sauvegarde...
+                    {t("settings.saving")}
                   </>
                 ) : (
-                  <>Sauvegarder</>
+                  <>{t("settings.save")}</>
                 )}
               </button>
             </div>
             {success && (
               <div className="success-message">
-                Paramètres sauvegardés avec succès !
+                {t("settings.successSave")}
               </div>
             )}
           </form>
@@ -245,21 +243,21 @@ function Settings() {
 
         <div className="settings-section">
           <div className="section-header">
-            <h2>Notifications</h2>
-            <p>Gérez vos préférences de notifications</p>
+            <h2>{t("settings.notifications")}</h2>
+            <p>{t("settings.notificationsDescription")}</p>
           </div>
           <div className="feature-coming-soon">
-            <p>Cette fonctionnalité sera bientôt disponible</p>
+            <p>{t("settings.availableSoon")}</p>
           </div>
         </div>
 
         <div className="settings-section">
           <div className="section-header">
-            <h2>Apparence</h2>
-            <p>Personnalisez l'interface de l'application</p>
+            <h2>{t("settings.appearance")}</h2>
+            <p>{t("settings.appearanceDescription")}</p>
           </div>
           <div className="feature-coming-soon">
-            <p>Cette fonctionnalité sera bientôt disponible</p>
+            <p>{t("settings.availableSoon")}</p>
           </div>
         </div>
       </div>

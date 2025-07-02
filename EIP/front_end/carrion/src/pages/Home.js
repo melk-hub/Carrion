@@ -333,7 +333,7 @@ export default function Home() {
               className="see-all-btn"
               onClick={() => navigate("/notification")}
             >
-              Voir plus
+              {t("home.seeMore")}
             </button>
           </div>
           <div className="timeline">
@@ -357,8 +357,7 @@ export default function Home() {
               <div className="timeline-item">
                 <div className="timeline-dot info">📋</div>
                 <div className="timeline-content">
-                  <h4>Aucune activité récente</h4>
-                  <p>Vos dernières notifications apparaîtront ici</p>
+                  <h4>{t("home.noActivity")}</h4>
                   <span className="timeline-time">-</span>
                 </div>
               </div>

@@ -44,10 +44,10 @@
       "read": "Lu",
       "unread": "Non lu",
       "pending": "En attente",
-      "accepted": "Acceptée",
-      "rejected": "Refusée",
+      "accepted": "Acceptées",
+      "rejected": "Refusées",
       "interview": "Entretien",
-      "archived": "Archivée"
+      "archived": "Archivées"
     },
     "stats": {
       "total": "Total",
@@ -59,7 +59,7 @@
     },
     "empty": {
       "title": "Aucune donnée",
-      "noNotifications": "Vous n'avez pas de notifications pour le moment.",
+      "noNotifications": "Vous n'avez pas de notifications pour le moment",
       "noFilteredNotifications": "Aucune notification {{filter}} trouvée."
     },
     "errors": {
@@ -205,8 +205,10 @@
     "genericError": "Une erreur est survenue. Veuillez réessayer plus tard.",
     "passwordMismatch": "Les mots de passe ne correspondent pas !",
     "registerError": "Erreur lors de l'inscription.",
-    "joinUs": "Nous rejoindre !"
+    "joinUs": "Nous rejoindre !",
+    "loginSuccessRedirect": "Vous êtes connecté !"
   },
+
   "home": {
     "welcomeMessage": "Organisez votre recherche d'emploi avec Carrion",
     "welcome": "Bienvenue sur Carrion !",
@@ -218,13 +220,13 @@
     "pendingApplications": "En attente",
     "acceptedApplications": "Acceptées",
     "recentStatusChange": "Changement de statut récent",
-    "ranking": "Classement",
     "rankingMessage": "Vous êtes premier ! Enfin je crois...",
     "recentActivity": "Activité récente",
     "lastModifications": "Dernières modifications",
-    "noActivity": "Il n'y a pas âme qui vive...",
+    "noActivity": "Aucune activité récente",
     "seeAllApplications": "Voir toutes les candidatures",
     "seeAll": "Voir tout",
+    "seeMore": "Voir plus",
     "quickAccess": "Accès rapide",
     "quickAccessDescription": "Accès rapide aux fonctionnalités",
     "myApplications": "Mes candidatures",
@@ -233,6 +235,7 @@
     "myInformation": "Mes informations",
     "noApplications": "Aucune candidature",
     "noApplicationsMessage": "Vos candidatures apparaîtront ici",
+    "error": "Erreur de chargement: ",
     "stats": {
       "totalApplications": "Total candidatures",
       "todayApplications": "Aujourd'hui",
@@ -268,8 +271,17 @@
     "timeAgo": {
       "hours": "Il y a {{count}}h",
       "days": "Il y a {{count}}j"
+    },
+    "objectives": {
+      "weekly": "Objectif hebdomadaire",
+      "applications": "Candidatures cette semaine",
+      "daysLeft": "jours restants",
+      "accomplished": "Réalisé",
+      "remaining": "Restant",
+      "progress": "Progression"
     }
   },
+
   "dashboard": {
     "title": "Aperçu de vos candidatures",
     "addApplication": "AJOUTER UNE CANDIDATURE",
@@ -320,20 +332,23 @@
     "emptyState": {
       "title": "Aucune candidature trouvée",
       "description": "Commencez à suivre vos candidatures d'emploi en ajoutant votre première candidature"
+    },
+    "details": {
+      "details": "Détails de la candidature:",
+      "company": "Entreprise: ",
+      "position": "Poste: ",
+      "status": "Statut: ",
+      "date": "Date de candidature: ",
+      "location": "Lieu: ",
+      "salary": "Salaire: ",
+      "close": "Fermer"
     }
   },
   "archives": {
     "title": "Aperçu de vos candidatures archivées",
     "description": "Consultez vos anciennes candidatures",
-    "noArchives": "Aucune candidature trouvée",
-    "restoreApplication": "Restaurer la candidature",
     "search": {
       "placeholder": "Rechercher une candidature"
-    },
-    "details": {
-      "status": "Statut :",
-      "applicationDate": "Date de candidature :",
-      "seeDetails": "Voir les détails"
     },
     "empty": {
       "title": "Aucune candidature archivée",
@@ -354,22 +369,40 @@
       "applicationsByMonth": "Candidatures par mois",
       "applicationsByCompany": "Candidatures par entreprise"
     },
-    "noData": "Aucune candidature trouvée pour afficher les statistiques",
+    "noData": "Aucune candidature trouvée",
+    "noDataDescription": "Commences à envoyer des candidatures pour voir tes statistiques!",
     "loading": "Chargement des statistiques...",
     "streak": "Jours consécutifs",
     "today": "Aujourd'hui",
-    "thisWeek": "Cette semaine",
-    "thisMonth": "Ce mois-ci",
-    "evolution": "Évolution sur les 30 derniers jours:",
+    "thisWeek": "cette semaine",
+    "thisMonth": "ce mois-ci",
+    "lastWeek": "la semaine dernière",
+    "weekAverage": "Moyenne hebdomadaire",
+    "monthAverage": "Moyenne mensuelle",
+    "evolution": "Évolution des tes candidatures",
     "success": "Succès atteints:",
     "congratulations": "Bravo, tu as envoyé",
     "again": "Encore",
-    "nextStep": "candidatures à envoyer avant le prochain palier",
+    "nextStep": "Candidatures à envoyer avant le prochain palier",
     "finish": "Tu as atteint tous les paliers !",
     "personalGoal": "Ton objectif personnel:",
-    "objective": "Objectif:",
+    "objective": "Objectif",
     "accomplished": "Réalisé:",
-    "remaining": "Restant:"
+    "remaining": "Restant:",
+    "days": "j",
+    "repartition": "Répartition par statut",
+    "weekly": "hebdomadaire",
+    "monthly": "mensuel",
+    "week": "Semaine",
+    "month": "Mois",
+    "performance": "Performances",
+    "streakRecord": "Record de série",
+    "weeklyComparison": "Comparaison hebdomadaire",
+    "detailedStats": "Statistiques détaillées",
+    "interview": "Entretien décrochés",
+    "lastApplication": "Dernière candidature",
+    "bestStreak": "Meilleure série",
+    "offersReceived": "Offres reçues"
   },
   "modal": {
     "add": {
@@ -424,6 +457,7 @@
     "invalidDate": "Date invalide",
     "invalidSalary": "Salaire invalide"
   },
+
   "notifications": {
     "title": "Notifications",
     "loading": "Chargement des notifications...",
@@ -510,8 +544,26 @@
       "warning": "Alertes",
       "negative": "Erreurs",
       "info": "Informations"
+    },
+    "time": {
+      "now": "A l'instant",
+      "minutes": "{{minutes}}m",
+      "hours": "{{hours}}h",
+      "days": "{{days}}j",
+      "unknown": "Inconnu"
+    },
+    "status": {
+      "read": "Lu",
+      "unread": "Non lu",
+      "pending": "En attente",
+      "archived": "Archivée"
+    },
+    "empty": {
+      "title": "Aucune notification",
+      "noFilteredNotifications": "Vous n'avez pas de notifications pour le moment."
     }
   },
+
   "ranking": {
     "warnings": {
       "noUserDataReceived": "Aucune donnée utilisateur reçue ou données invalides",
@@ -560,8 +612,81 @@
       "previous": "Précédent",
       "next": "Suivant",
       "info": "Page {{currentPage}} sur {{totalPages}} ({{usersShown}} utilisateurs affichés)"
+    },
+    "stats": {
+      "applications": "Candidatures",
+      "totalApplications": "Total des candidatures"
     }
   },
+
+  "profile": {
+    "loading": "Chargement du profil...",
+    "personalInfo": "Informations personnelles",
+    "phone": "Numéro de téléphone",
+    "school": "École / Université",
+    "search": "Rechercher votre ville",
+    "picture": "Photo de profil",
+    "CV": "Mon CV",
+    "upload": "CV téléchargé",
+    "visualize": "Visualiser mon CV",
+    "modify": "Modifier mon CV",
+    "delete": "Supprimer mon CV",
+    "add": "Ajouter un CV",
+    "preferences": "Préférences de recherche",
+    "contractType": "Type de contrat",
+    "selectContract": "Sélectionner un type de contrat",
+    "sector": "Secteur d'activité",
+    "selectSector": "Sélectionner un secteur d'activité",
+    "location": "Lieu de travail souhaité",
+    "searchOrCreate": "Rechercher ou créer une ville",
+    "saveChanges": "Enregistrer les modifications",
+    "services": "Services connectés",
+    "noServices": "Aucun service connecté",
+    "addService": "Ajouter un service",
+    "connectService": "Connecter un nouveau service",
+    "chooseService": "Choisissez un service à connecter à votre compte Carrion",
+    "connectGmail": "Connecter Gmail",
+    "connectOutlook": "Connecter Outlook",
+    "allConnected": "Tous les services sont connectés"
+  },
+
+  "settings": {
+    "loading": "Chargement des paramètres...",
+    "title": "Paramètres",
+    "description": "Configurez vos préférences et objectifs",
+    "confirmDisconnect": "Êtes-vous sûr de vouloir déconnecter TOUS vos services ? Vous devrez les relier manuellement pour retrouver les fonctionnalités associées.",
+    "pendingDisconnect": "Déconnexion de tous les services en cours...",
+    "sucessDisconnect": "Tous les services ont été déconnectés avec succès.",
+    "errorDisconnect": "Erreur lors de la déconnexion des services.",
+    "tryAgain": "Veuillez réessayer.",
+    "deleteAccount": "Supprimer mon compte",
+    "deleteAccountDescription": "Supprimer votre compte Carrion supprimera toutes vos données.",
+    "confirmDeleteAccount": "Êtes-vous sûr de vouloir supprimer votre compte ? Cette action est irréversible et supprimera toutes vos données.",
+    "deletingAccount": "Suppression du compte en cours...",
+    "successDeleteAccount": "Votre compte a été supprimé avec succès.",
+    "errorDeleteAccount": "La suppression du compte a échoué.",
+    "account": "Compte",
+    "accountDescription": "Gérez vos services connectés et votre compte",
+    "disconnectServices": "Déconnecter tous les services",
+    "disconnectServicesDescription": "Ceci révoquera l'accès à tous les services connectés.",
+    "disconnecting": "Déconnexion en cours...",
+    "disconnectEverything": "Déconnecter tous tes services",
+    "objectives": "Objectifs de candidatures",
+    "objectivesDescription": "Définissez vos objectifs de candidatures pour rester motivé",
+    "weeklyGoal": "Objectif hebdomadaire",
+    "weeklyGoalDescription": "Nombre de candidatures à envoyer par semaine",
+    "monthlyGoal": "Objectif mensuel",
+    "monthlyGoalDescription": "Nombre de candidatures à envoyer par mois",
+    "save": "Enregistrer tes objectifs",
+    "saving": "Enregistrement de tes objectifs en cours...",
+    "successSave": "Vos objectifs ont été enregistrés avec succès.",
+    "notifications": "Notifications",
+    "notificationsDescription": "Gérez vos préférences de notifications",
+    "availableSoon": "Cette fonctionnalité sera bientôt disponible !",
+    "appearance": "Apparence",
+    "appearanceDescription": "Personnalisez l'apparence de Carrion"
+  },
+
   "dailyTip": {
     "title": "Conseil du jour",
     "moreButton": "Plus de conseils",
@@ -594,4 +719,4 @@
     "tip27": "Créez un réseau de contacts diversifié : anciens collègues, professeurs, professionnels de votre secteur.",
     "tip28": "Restez authentique lors des entretiens. Les recruteurs savent détecter les candidats qui jouent un rôle plutôt que d'être eux-mêmes."
   }
-} 
+}

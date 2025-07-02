@@ -144,27 +144,47 @@ function Navbar({ sidebarCollapsed, setSidebarCollapsed, setIsAuthenticated }) {
       <div className={`sidebar ${sidebarCollapsed ? 'collapsed' : ''}`}>
         <ul className="navbar-menu">
           <li onClick={() => navigateAndScrollTop('/home')} className={isActive('/home') ? 'active' : ''}>
-            <img src={home} alt="Home" className="menu-icon" style={{width: '20px', height: '20px'}}/>
+            <div className="tooltip">
+              <img src={home} alt="Home" className="menu-icon" style={{width: '20px', height: '20px'}} />
+              {sidebarCollapsed && <span className="tooltip-text">{t('navbar.home')}</span>}
+            </div>
             <span className="menu-text">{t('navbar.home')}</span>
           </li>
+
           <li onClick={() => navigateAndScrollTop('/dashboard')} className={isActive('/dashboard') ? 'active' : ''}>
-            <img src={candidature} alt="Candidature" className="menu-icon" style={{width: '20px', height: '20px'}}/>
+            <div className="tooltip">
+              <img src={candidature} alt="Candidature" className="menu-icon" style={{width: '20px', height: '20px'}} />
+              {sidebarCollapsed && <span className="tooltip-text">{t('navbar.applications')}</span>}
+            </div>
             <span className="menu-text">{t('navbar.applications')}</span>
           </li>
+
           <li onClick={() => navigateAndScrollTop('/archives')} className={isActive('/archives') ? 'active' : ''}>
-            <img src={archives} alt="Archives" className="menu-icon" style={{width: '20px', height: '20px'}}/>
+            <div className="tooltip">
+              <img src={archives} alt="Archives" className="menu-icon" style={{width: '20px', height: '20px'}} />
+              {sidebarCollapsed && <span className="tooltip-text">{t('navbar.archives')}</span>}
+            </div>
             <span className="menu-text">{t('navbar.archives')}</span>
           </li>
+
           <li onClick={() => navigate('/statistics')} className={isActive('/statistics') ? 'active' : ''}>
-            <img src={statistics} alt="Statistics" className="menu-icon" style={{width: '20px', height: '20px'}}/>
+            <div className="tooltip">
+              <img src={statistics} alt="Statistics" className="menu-icon" style={{width: '20px', height: '20px'}} />
+              {sidebarCollapsed && <span className="tooltip-text">{t('navbar.statistics')}</span>}
+            </div>
             <span className="menu-text">{t('navbar.statistics')}</span>
           </li>
+
           <li onClick={() => navigate('/ranking')} className={isActive('/ranking') ? 'active' : ''}>
-            <img src={podium} alt="Podium" className="menu-icon" style={{width: '20px', height: '20px'}}/>
+            <div className="tooltip">
+              <img src={podium} alt="Podium" className="menu-icon" style={{width: '20px', height: '20px'}} />
+              {sidebarCollapsed && <span className="tooltip-text">{t('navbar.ranking')}</span>}
+            </div>
             <span className="menu-text">{t('navbar.ranking')}</span>
           </li>
+
           <li onClick={() => navigate('/notification')} className={isActive('/notification') ? 'active' : ''}>
-            <div className="notifications" style={{ position: 'relative' }}>
+            <div className="tooltip notifications" style={{ position: 'relative' }}>
               <img
                 src={unreadCount > 0 ? notification_icon : bell}
                 alt={unreadCount > 0 ? "Notification" : "Bell"}
@@ -176,6 +196,7 @@ function Navbar({ sidebarCollapsed, setSidebarCollapsed, setIsAuthenticated }) {
                   {unreadCount > 99 ? '99+' : unreadCount}
                 </span>
               )}
+              {sidebarCollapsed && <span className="tooltip-text">{t('navbar.notification')}</span>}
             </div>
             <span className="menu-text">{t('navbar.notification')}</span>
           </li>

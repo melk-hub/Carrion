@@ -103,7 +103,7 @@ const WeeklyGoalCard = ({ showGoToStatsButton = false }) => {
     const now = new Date();
     const endWeek = endOfWeek(now, { weekStartsOn: 1 });
     const daysLeft = Math.ceil((endWeek - now) / (1000 * 60 * 60 * 24));
-    const timeLeft = `${daysLeft} jour${daysLeft > 1 ? 's' : ''} restant${daysLeft > 1 ? 's' : ''}`;
+    const timeLeft = `${daysLeft} ${t("home.objectives.daysLeft")}`;
 
     const percentage = Math.min((current / target) * 100, 100);
     
@@ -114,7 +114,7 @@ const WeeklyGoalCard = ({ showGoToStatsButton = false }) => {
     return (
       <div className="weekly-goal-card loading">
         <div className="loading-spinner"></div>
-        <p>Chargement...</p>
+        <p>{t("common.loading")}</p>
       </div>
     );
   }
@@ -123,11 +123,11 @@ const WeeklyGoalCard = ({ showGoToStatsButton = false }) => {
     return (
       <div className="weekly-goal-card">
         <div className="card-header">
-          <h3>Objectif hebdomadaire</h3>
+          <h3>{t("home.objectives.weekly")}</h3>
         </div>
         <div className="goal-progress-content" style={{ justifyContent: 'center' }}>
           <p style={{ color: '#ef4444', textAlign: 'center', margin: '0 0 16px 0' }}>
-            Erreur de chargement: {error}
+            {t("home.error")} {error}
           </p>
           <button 
             onClick={() => {
@@ -143,7 +143,7 @@ const WeeklyGoalCard = ({ showGoToStatsButton = false }) => {
               cursor: 'pointer'
             }}
           >
-            Réessayer
+            {t("common.retry")}
           </button>
         </div>
       </div>
@@ -153,7 +153,7 @@ const WeeklyGoalCard = ({ showGoToStatsButton = false }) => {
   return (
     <div className="weekly-goal-card">
       <div className="card-header">
-        <h3>Objectif hebdomadaire</h3>
+        <h3>{t("home.objectives.weekly")}</h3>
         {showGoToStatsButton && (
           <button 
             className="see-all-btn"
@@ -199,7 +199,7 @@ const WeeklyGoalCard = ({ showGoToStatsButton = false }) => {
             {goalProgress.current} / {goalProgress.target}
           </div>
           <div className="goal-subtitle">
-            candidatures cette semaine
+            {t("home.objectives.applications")}
           </div>
           <div className="time-remaining">
             {goalProgress.timeLeft}
@@ -209,15 +209,15 @@ const WeeklyGoalCard = ({ showGoToStatsButton = false }) => {
         <div className="goal-stats-row">
           <div className="goal-stat-item">
             <span className="stat-number">{goalProgress.current}</span>
-            <span className="stat-label">Réalisé</span>
+            <span className="stat-label">{t("home.objectives.accomplished")}</span>
           </div>
           <div className="goal-stat-item">
             <span className="stat-number">{Math.max(goalProgress.target - goalProgress.current, 0)}</span>
-            <span className="stat-label">Restant</span>
+            <span className="stat-label">{t("home.objectives.remaining")}</span>
           </div>
           <div className="goal-stat-item">
             <span className="stat-number">{Math.round(goalProgress.percentage)}%</span>
-            <span className="stat-label">Progression</span>
+            <span className="stat-label">{t("home.objectives.progress")}</span>
           </div>
         </div>
       </div>

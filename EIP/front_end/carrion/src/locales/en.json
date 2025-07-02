@@ -8,8 +8,10 @@
     "save": "Save",
     "delete": "Delete",
     "edit": "Edit",
+    "archive": "Archive",
+    "dearchive": "Unarchive",
     "add": "Add",
-    "update": "Update",
+    "update": "Edit",
     "close": "Close",
     "confirm": "Confirm",
     "yes": "Yes",
@@ -40,7 +42,12 @@
     },
     "status": {
       "read": "Read",
-      "unread": "Unread"
+      "unread": "Unread",
+      "pending": "Pending",
+      "accepted": "Accepted",
+      "rejected": "Rejected",
+      "interview": "Interview",
+      "archived": "Archived"
     },
     "stats": {
       "total": "Total",
@@ -52,8 +59,8 @@
     },
     "empty": {
       "title": "No data",
-      "noNotifications": "You have no notifications at the moment.",
-      "noFilteredNotifications": "No {{filter}} notifications found."
+      "noNotifications": "You have no notifications at the moment",
+      "noFilteredNotifications": "No notification found for {{filter}}."
     },
     "errors": {
       "fetchError": "Error while fetching data:",
@@ -64,38 +71,41 @@
     "viewModes": {
       "grid": "GRID",
       "list": "LIST",
-      "viewGrid": "View in grid",
-      "viewList": "View in list"
+      "viewGrid": "View as grid",
+      "viewList": "View as list"
     },
     "sorting": {
       "label": "SORT BY",
       "date": "Date",
       "status": "Status"
-    }
+    },
+    "unknown": "Unknown",
+    "unknownPosition": "Unspecified position",
+    "loading": "Loading..."
   },
   "navbar": {
     "home": "Home",
     "applications": "Applications",
     "archives": "Archives",
-    "statistics": "Statistics",
-    "profile": "My Profile",
+    "profile": "Profile",
     "settings": "Settings",
-    "logout": "Logout",
-    "reduceAnimations": "Reduce animations",
+    "statistics": "Statistics",
     "notification": "Notifications",
-    "ranking": "Ranking"
+    "ranking": "Ranking",
+    "logout": "Logout",
+    "seeAll": "View all notifications"
   },
   "landing": {
     "title": "The ideal platform to manage your applications",
     "subtitle": "Simplify your job search with Carrion",
     "getStarted": "Get started now",
-    "login": "Sign in",
-    "language": "English",
+    "login": "Log in",
+    "language": "French",
     "footer": "Footer TBD",
     "stats": {
       "users": "Active users",
       "success": "Success rate",
-      "support": "Support available"
+      "support": "Available support"
     },
     "services": {
       "title": "Our Services",
@@ -112,55 +122,55 @@
         "points": [
           "Set and track your job search goals.",
           "Receive targeted advice to stay on track.",
-          "Achieve your professional goals on time."
+          "Reach your career goals on time."
         ]
       },
       "reminders": {
         "title": "Personalized reminders and notifications",
         "points": [
           "Receive automatic reminders (follow-ups, interviews...).",
-          "Be alerted to important next steps.",
+          "Get alerts for upcoming important steps.",
           "Stay perfectly organized and proactive."
         ]
       },
       "documents": {
-        "title": "Professional documents space",
+        "title": "Professional document space",
         "points": [
-          "Centralize all your key documents (CV, letters, portfolios...)",
-          "Easily manage and find your important files",
-          "Access everything, everywhere, to simplify all your steps"
+          "Centralize all your key documents (CV, letters, portfolios...).",
+          "Easily manage and find your important files.",
+          "Access everything, anywhere, to simplify your process."
         ]
       }
     },
     "howItWorks": {
       "title": "How does it work?",
       "centralize": {
-        "title": "Centralize Easily",
+        "title": "Easily Centralize",
         "description": "Add your applications (internships or jobs) and essential documents. Carrion simplifies your organization from the start."
       },
       "track": {
         "title": "Track Your Progress",
-        "description": "Visualize the progress of each step thanks to our automated tracking. Assess where you are at a glance."
+        "description": "Visualize each step's progress thanks to our automated tracking. See where you stand at a glance."
       },
       "optimize": {
         "title": "Optimize to Succeed",
-        "description": "Use tracking information to adjust your approach and maximize your chances of success in your search."
+        "description": "Use tracking insights to adjust your approach and maximize your chances of success."
       }
     },
     "testimonials": {
       "title": "What our users say",
       "testimonial1": {
-        "content": "Thanks to Carrion, I was able to organize all my applications and land my dream job in just 3 months!",
+        "content": "Thanks to Carrion, I was able to organize all my applications and land my ideal job in 3 months!",
         "author": "Marie Dubois",
         "position": "Frontend Developer"
       },
       "testimonial2": {
-        "content": "The interface is intuitive and automatic reminders helped me avoid forgetting important follow-ups.",
+        "content": "The interface is intuitive and the automatic reminders helped me avoid missing important opportunities.",
         "author": "Thomas Martin",
-        "position": "IT Project Manager"
+        "position": "IT Engineer"
       },
       "testimonial3": {
-        "content": "An essential tool for all job seekers. Goal tracking really motivated me!",
+        "content": "An essential tool for every job seeker. Goal tracking really kept me motivated!",
         "author": "Sophie Laurent",
         "position": "UX/UI Designer"
       }
@@ -183,46 +193,48 @@
     "birthDate": "Birth Date",
     "rememberMe": "Remember Me",
     "forgotPassword": "Forgot Password?",
-    "dontHaveAccount": "Don't have an account yet?",
+    "dontHaveAccount": "Don't have an account?",
     "alreadyHaveAccount": "Already have an account?",
     "loginWithGoogle": "Login with Google",
     "loginWithOutlook": "Login with Outlook",
-    "authenticationFailed": "Authentication Failed",
-    "authenticationSuccess": "Authentication Successful",
+    "authenticationFailed": "Authentication failed",
+    "authenticationSuccess": "Authentication successful",
     "backToLogin": "Back to Login",
-    "joinUs": "Join us!",
     "emailOrUsername": "Email / Username",
-    "loginError": "Invalid credentials.",
+    "loginError": "Incorrect credentials.",
     "genericError": "An error occurred. Please try again later.",
     "passwordMismatch": "Passwords do not match!",
-    "registerError": "Registration error."
+    "registerError": "Registration error.",
+    "joinUs": "Join us!",
+    "loginSuccessRedirect": "You are logged in!"
   },
   "home": {
     "welcomeMessage": "Organize your job search with Carrion",
     "welcome": "Welcome to Carrion!",
     "description": "Your application management platform",
-    "getStarted": "Get Started",
-    "recentApplications": "Recent Applications",
-    "quickStats": "Quick Stats",
-    "totalApplications": "Total Applications",
+    "getStarted": "Get started",
+    "recentApplications": "Recent applications",
+    "quickStats": "Quick statistics",
+    "totalApplications": "Total applications",
     "pendingApplications": "Pending",
     "acceptedApplications": "Accepted",
-    "recentStatusChange": "Recent Status Change",
-    "ranking": "Ranking",
-    "rankingMessage": "You are first! I think...",
-    "recentActivity": "Recent Activity",
-    "lastModifications": "Last Modifications",
-    "noActivity": "There's not a soul...",
+    "recentStatusChange": "Recent status change",
+    "rankingMessage": "You are first! Well, I think...",
+    "recentActivity": "Recent activity",
+    "lastModifications": "Last modifications",
+    "noActivity": "No activity yet",
     "seeAllApplications": "See all applications",
     "seeAll": "See all",
-    "quickAccess": "Quick Access",
+    "seeMore": "See more",
+    "quickAccess": "Quick access",
     "quickAccessDescription": "Quick access to features",
-    "myApplications": "My Applications",
-    "newApplications": "New Applications",
+    "myApplications": "My applications",
+    "newApplications": "New applications",
     "statistics": "Statistics",
-    "myInformation": "My Information",
+    "myInformation": "My information",
     "noApplications": "No applications",
     "noApplicationsMessage": "Your applications will appear here",
+    "error": "Loading error",
     "stats": {
       "totalApplications": "Total applications",
       "todayApplications": "Today",
@@ -231,7 +243,7 @@
     "ranking": {
       "ordinals": {
         "1": "1st",
-        "2": "2nd", 
+        "2": "2nd",
         "3": "3rd",
         "4": "4th",
         "5": "5th",
@@ -255,49 +267,25 @@
       "loading": "...",
       "noRank": "-"
     },
-    "dailyTip": {
-      "title": "Daily Tip",
-      "moreButton": "More tips",
-      "tip1": "Customize your cover letter for each application. Recruiters appreciate candidates who show genuine interest in their company.",
-      "tip2": "Use relevant keywords in your CV related to the job offer. This improves your chances of being spotted by automatic screening systems.",
-      "tip3": "Prepare 3-4 relevant questions to ask at the end of the interview. This shows your interest in the position and company.",
-      "tip4": "Create an online portfolio to showcase your achievements and projects. A link in your CV can make the difference.",
-      "tip5": "Follow companies that interest you on LinkedIn. This keeps you informed of their news and opportunities.",
-      "tip6": "Politely follow up on your applications after 1-2 weeks without response. A simple message can revive your application.",
-      "tip7": "Adapt your CV to each position by highlighting the most relevant skills for the offer.",
-      "tip8": "Prepare concrete examples of your achievements using the STAR method (Situation, Task, Action, Result).",
-      "tip9": "Optimize your LinkedIn profile with a professional photo and catchy summary. It's often the first contact with recruiters.",
-      "tip10": "Practice presenting your background in 2 minutes. This short presentation is often requested at the beginning of interviews.",
-      "tip11": "Research your interviewer's name before the interview. Personalizing your exchanges creates a better connection.",
-      "tip12": "Keep a dashboard of your applications to avoid duplicates and ensure effective follow-up.",
-      "tip13": "Highlight your soft skills with specific examples. Human skills are increasingly sought after.",
-      "tip14": "Prepare short and long versions of your CV depending on the type of application (spontaneous or in response to an offer).",
-      "tip15": "Use Google Alerts to be informed of new offers in your field and news from your target companies.",
-      "tip16": "Take care of your e-reputation by checking what appears when you type your name on Google. Remove non-professional content.",
-      "tip17": "Participate in networking events in your sector. Internal recommendations increase your chances of being hired.",
-      "tip18": "Prepare questions about company culture in interviews. This shows you're thinking long-term.",
-      "tip19": "Regularly update your skills with online training. Mention your recent certifications.",
-      "tip20": "Create multiple versions of your CV for different types of positions while maintaining consistency in your background.",
-      "tip21": "Prepare for difficult questions like 'Tell me about your weaknesses' by turning your answers positively.",
-      "tip22": "Use numbers to quantify your achievements: X% increase, Y€ budget management, team of Z people.",
-      "tip23": "Arrive 10-15 minutes early to your interviews. This allows you to settle in calmly and make a good impression.",
-      "tip24": "Prepare a plan B for your video interviews: test your connection, lighting and have a backup phone number.",
-      "tip25": "Send a thank you message within 24 hours after the interview. This reinforces your motivation and professionalism.",
-      "tip26": "Analyze job offers to identify the most sought-after skills in your sector and develop them.",
-      "tip27": "Create a diverse network of contacts: former colleagues, teachers, professionals in your sector.",
-      "tip28": "Stay authentic in interviews. Recruiters can detect candidates who are playing a role rather than being themselves."
-    },
     "timeAgo": {
       "hours": "{{count}}h ago",
       "days": "{{count}}d ago"
+    },
+    "objectives": {
+      "weekly": "Weekly goal",
+      "applications": "Applications this week",
+      "daysLeft": "days left",
+      "accomplished": "Accomplished",
+      "remaining": "Remaining",
+      "progress": "Progress"
     }
   },
+
   "dashboard": {
     "title": "Overview of your applications",
     "addApplication": "ADD AN APPLICATION",
     "myApplications": "My applications",
     "unknownCompany": "Unknown company",
-    "unknownPosition": "Unknown position",
     "unknownStatus": "Unknown status",
     "addButton": "Add an application",
     "banner": {
@@ -305,11 +293,11 @@
       "description": "Track your applications and maximize your chances of success"
     },
     "search": {
-      "placeholder": "Search an application"
+      "placeholder": "Search for an application"
     },
     "filters": {
       "all": "All",
-      "pending": "Waiting for response",
+      "pending": "Awaiting response",
       "accepted": "Accepted",
       "rejected": "Rejected"
     },
@@ -325,9 +313,9 @@
       "interviewDate": "Interview date"
     },
     "statuses": {
-      "PENDING": "Waiting for response",
+      "PENDING": "Awaiting response",
       "APPLIED": "Applied",
-      "ACCEPTED": "Accepted", 
+      "ACCEPTED": "Accepted",
       "REJECTED": "Rejected",
       "INTERVIEW": "Interview",
       "REJECTED_BY_COMPANY": "Rejected",
@@ -343,98 +331,119 @@
     "emptyState": {
       "title": "No applications found",
       "description": "Start tracking your job applications by adding your first application"
+    },
+    "details": {
+      "details": "Details of the application:",
+      "company": "Company: ",
+      "position": "Position: ",
+      "status": "Status: ",
+      "date": "Application date: ",
+      "location": "Location: ",
+      "salary": "Salary: ",
+      "close": "Close"
     }
   },
   "archives": {
-    "title": "My Archives",
+    "title": "Overview of your archived applications",
     "description": "View your old applications",
-    "noArchives": "No applications found",
-    "restoreApplication": "Restore application",
     "search": {
-      "placeholder": "Search an application"
+      "placeholder": "Search for an application"
     },
-    "details": {
-      "status": "Status:",
-      "applicationDate": "Application date:",
-      "seeDetails": "See details"
-    },
-    "fakeData": {
-      "companyA": "Company A",
-      "companyB": "Company B", 
-      "companyC": "Company C",
-      "companyD": "Company D",
-      "companyE": "Company E",
-      "companyF": "Company F",
-      "frontendDeveloper": "Frontend Developer",
-      "backendEngineer": "Backend Engineer",
-      "uiuxDesigner": "UI/UX Designer",
-      "backendDeveloper": "Backend Developer",
-      "itProjectManager": "IT Project Manager",
-      "devopsConsultant": "DevOps Consultant",
-      "today": "Today"
+    "empty": {
+      "title": "No archived applications",
+      "text": "Track your applications and maximize your chances of success"
     }
   },
   "statistics": {
-    "title": "Statistics of your applications",
-    "description": "Visualize your application statistics",
-    "totalApplications": "Total applications",
-    "acceptedApplications": "Accepted applications",
-    "rejectedApplications": "Rejected applications",
-    "pendingApplications": "Pending applications",
-    "applicationsByStatus": "Applications by status",
-    "applicationsByMonth": "Applications by month",
-    "applicationsByCompany": "Applications by company",
-    "applicationsByContractType": "Applications by contract type",
-    "noData": "No applications found to display statistics",
+    "title": "Your application statistics",
+    "description": "Analyze your performance and optimize your job search",
+    "kpiCards": {
+      "totalApplications": "Total applications",
+      "acceptedApplications": "Accepted applications",
+      "pendingApplications": "Pending applications",
+      "rejectedApplications": "Rejected applications"
+    },
+    "charts": {
+      "applicationsByStatus": "Applications by status",
+      "applicationsByMonth": "Applications by month",
+      "applicationsByCompany": "Applications by company"
+    },
+    "noData": "No applications found",
+    "noDataDescription": "Start sending applications to see your statistics!",
     "loading": "Loading statistics...",
-    "streak": "Streak",
+    "streak": "Consecutive days",
     "today": "Today",
-    "thisWeek": "This week",
-    "thisMonth": "This month",
-    "evolution": "Evolution based on the last 30 days:",
-    "success": "Success completed:",
-    "congratulations": "Congratulations, you sent",
-    "nextStep": "more applications to send before the next level",
-    "finish": "You completed all the levels !",
+    "thisWeek": "this week",
+    "thisMonth": "this month",
+    "lastWeek": "last week",
+    "weekAverage": "Weekly average",
+    "monthAverage": "Monthly average",
+    "evolution": "Evolution of your applications",
+    "success": "Achievements reached:",
+    "congratulations": "Congrats, you have sent",
+    "again": "Still",
+    "nextStep": "Applications to send before the next milestone",
+    "finish": "You have reached all milestones!",
     "personalGoal": "Your personal goal:",
-    "goal": "Goal:",
-    "accomplished": "Accomplished:",
-    "remaining": "Remaining:"
+    "objective": "Objective",
+    "accomplished": "Achieved:",
+    "remaining": "Remaining:",
+    "days": "d",
+    "repartition": "Repartition by status",
+    "weekly": "weekly",
+    "monthly": "monthly",
+    "week": "Week",
+    "month": "Month",
+    "performance": "Performances",
+    "streakRecord": "Streak record",
+    "weeklyComparison": "Weekly comparison",
+    "detailedStats": "Detailed statistics",
+    "interview": "Interview gotten",
+    "lastApplication": "Last application",
+    "bestStreak": "Best streak",
+    "offersReceived": "Offers received"
   },
   "modal": {
     "add": {
       "title": "Add an application",
-      "company": "Company", 
-      "title_job": "Job title",
+      "company": "Company",
+      "title_job": "Position",
       "status": "Status",
+      "contract_type": "Contract type",
       "location": "Location",
       "salary": "Salary",
-      "logo_url": "Logo URL",
-      "contract_type": "Contract type",
-      "website": "Website",
       "interview_date": "Interview date",
+      "logo_url": "Logo URL",
+      "website": "Website",
       "placeholders": {
-        "company": "Enter the company name",
-        "title": "Enter the job title",
-        "location": "City or workplace",
-        "salary": "Salary offered per month",
+        "company": "Enter company name",
+        "title": "Enter job title",
+        "location": "City, region or remote",
+        "salary": "Monthly amount",
         "logo_url": "https://example.com",
         "website": "Company website URL",
         "interviewDateTime": "Select date and time",
-        "interviewDate": "Interview date"
+        "interviewDate": "Select interview date and time"
+      },
+      "contract_types": {
+        "full_time": "Full-time",
+        "part_time": "Part-time",
+        "internship": "Internship",
+        "contract": "Contract",
+        "freelance": "Freelance"
       }
     },
     "edit": {
-      "title": "Edit the application"
+      "title": "Edit application"
     }
   },
   "contractTypes": {
-    "CDI": "CDI (Indeterminate contract)",
-    "CDD": "CDD (Determinate contract)",
+    "CDI": "Permanent contract (CDI)",
+    "CDD": "Fixed-term contract (CDD)",
     "FREELANCE": "Freelance / Independent",
     "INTERNSHIP": "Internship",
-    "APPRENTICESHIP": "Apprenticeship / Training",
-    "TEMPORARY": "Temporary mission",
+    "APPRENTICESHIP": "Apprenticeship / Work-study",
+    "TEMPORARY": "Temporary assignment",
     "PART_TIME": "Part-time",
     "FULL_TIME": "Full-time"
   },
@@ -451,17 +460,17 @@
     "title": "Notifications",
     "loading": "Loading notifications...",
     "application": {
-      "created": "Your application at {{company}} as {{jobTitle}} has been saved!",
-      "deleted": "Your application at {{company}} as {{jobTitle}} has been deleted!",
+      "created": "Your application at {{company}} for {{jobTitle}} has been saved!",
+      "deleted": "Your application at {{company}} for {{jobTitle}} has been deleted!",
       "updated": {
-        "base": "Your application at {{company}} as {{jobTitle}} has been modified: "
+        "base": "Your application at {{company}} for {{jobTitle}} has been updated: "
       },
-      "archived": "Your application at {{company}} as {{jobTitle}} has been archived!",
-      "unarchived": "Your application at {{company}} as {{jobTitle}} has been unarchived!"
+      "archived": "Your application at {{company}} for {{jobTitle}} has been archived!",
+      "unarchived": "Your application at {{company}} for {{jobTitle}} has been unarchived!"
     },
     "archive": {
-      "deleted": "Your application at {{company}} as {{jobTitle}} has been deleted!",
-      "updated": "Your application at {{company}} as {{jobTitle}} has been modified!"
+      "deleted": "Your archived application at {{company}} for {{jobTitle}} has been deleted!",
+      "updated": "Your archived application at {{company}} for {{jobTitle}} has been updated!"
     },
     "goal": {
       "weekly": {
@@ -477,13 +486,13 @@
       "application": {
         "created": "Application creation",
         "deleted": "Application deletion",
-        "updated": "Application modification",
-        "archived": "Application archiving",
-        "unarchived": "Application unarchiving"
+        "updated": "Application update",
+        "archived": "Application archived",
+        "unarchived": "Application unarchived"
       },
       "archive": {
         "deleted": "Archived application deletion",
-        "updated": "Archived application modification"
+        "updated": "Archived application update"
       },
       "goal": {
         "weekly": "Weekly goal set",
@@ -493,13 +502,13 @@
       }
     },
     "changes": {
-      "status": " Status: {{from}} to {{to}}",
-      "location": " Location: {{from}} to {{to}}",
-      "salary": " Salary: {{from}} to {{to}}",
-      "contractType": " Contract type: {{from}} to {{to}}",
-      "interview": " Interview date: {{from}} to {{to}}",
-      "title": " Position: {{from}} to {{to}}",
-      "company": " Company: {{from}} to {{to}}"
+      "status": " Status: from {{from}} to {{to}}",
+      "location": " Location: from {{from}} to {{to}}",
+      "salary": " Salary: from {{from}} to {{to}}",
+      "contractType": " Contract type: from {{from}} to {{to}}",
+      "interview": " Interview date: from {{from}} to {{to}}",
+      "title": " Position: from {{from}} to {{to}}",
+      "company": " Company: from {{from}} to {{to}}"
     },
     "noLocation": "Not specified",
     "noSalary": "Not specified",
@@ -533,15 +542,32 @@
       "warning": "Warnings",
       "negative": "Errors",
       "info": "Information"
+    },
+    "time": {
+      "now": "Just now",
+      "minutes": "{{minutes}}m",
+      "hours": "{{hours}}h",
+      "days": "{{days}}d",
+      "unknown": "Unknown"
+    },
+    "status": {
+      "read": "Read",
+      "unread": "Unread",
+      "pending": "Pending",
+      "archived": "Archived"
+    },
+    "empty": {
+      "title": "No notifications",
+      "noFilteredNotifications": "You have no notifications at the moment."
     }
   },
   "ranking": {
     "warnings": {
-      "noUserDataReceived": "No user data received or invalid data",
+      "noUserDataReceived": "No user data received or data invalid",
       "noUsersFound": "No users found"
     },
     "errors": {
-      "fetchError": "Error retrieving ranking",
+      "fetchError": "Error fetching ranking",
       "consoleError": "Error:"
     },
     "positions": {
@@ -573,7 +599,7 @@
     "complete": {
       "title": "Complete Ranking",
       "refreshButton": "Refresh",
-      "refreshTitle": "Refresh ranking"
+      "refreshTitle": "Refresh the ranking"
     },
     "userPosition": {
       "text": "Your position: {{rank}}th",
@@ -583,6 +609,111 @@
       "previous": "Previous",
       "next": "Next",
       "info": "Page {{currentPage}} of {{totalPages}} ({{usersShown}} users shown)"
+    },
+    "stats": {
+      "applications": "Applications",
+      "totalApplications": "Total applications"
     }
+  },
+
+  "profile": {
+    "loading": "Loading profile...",
+    "personalInfo": "Personal Informations",
+    "phone": "Phone number",
+    "school": "School / University",
+    "search": "Search your city",
+    "picture": "Profile picture",
+    "CV": "My CV",
+    "upload": "CV uploaded",
+    "visualize": "Visualize my CV",
+    "modify": "Modify my CV",
+    "delete": "Delete my CV",
+    "add": "Add a CV",
+    "preferences": "Seache preferences",
+    "contractType": "Contract type",
+    "selectContract": "Select your contract type",
+    "sector": "Sector of activity",
+    "selectSector": "Select your sector of activity",
+    "location": "Location preferences",
+    "searchOrCreate": "Search or create a location",
+    "saveChanges": "Save changes",
+    "services": "Connected services",
+    "noServices": "No connected services",
+    "addService": "Add a service",
+    "connectService": "Connect a new service",
+    "chooseService": "Choose a service to connect to your Carrion account",
+    "connectGmail": "Connect Gmail",
+    "connectOutlook": "Connect Outlook",
+    "allConnected": "All services are connected"
+  },
+
+  "settings": {
+    "loading": "Loading settings...",
+    "title": "Settings",
+    "description": "Manage your preferences and objectives",
+    "confirmDisconnect": "Are you sure you want to disconnect ALL your services ? You will have to reconnect them manually in order to get back all the functionnalities associated.",
+    "pendingDisconnect": "Disconnecting every services...",
+    "successDisconnect": "All your services have been successfully disconnected.",
+    "errorDisconnect": "An error occurred while disconnecting your services.",
+    "tryAgain": "Please try again.",
+    "deleteAccount": "Delete my account",
+    "deleteAccountDescription": "This will permanently delete your account and all your data.",
+    "confirmDeleteAccount": "Are you sure you want to delete your account? This action is irreversible and will delete all your data.",
+    "deletingAccount": "Deleting your account...",
+    "successDeleteAccount": "Your account has been successfully deleted.",
+    "errorDeleteAccount": "An error occurred while deleting your account.",
+    "account": "Account",
+    "accountDescription": "Manage your connected services and your account",
+    "disconnectServices": "Disconnect all services",
+    "disconnectServicesDescription": "This will remove all your connected services.",
+    "disconnecting": "Disconnecting...",
+    "disconnectEverything": "Disconnect all your services",
+    "objectives": "Applications objectives",
+    "objectivesDescription": "Set your weekly and monthly application goals to stay motivated",
+    "weeklyGoal": "Weekly goal",
+    "weeklyGoalDescription": "Number of applications to send this week",
+    "monthlyGoal": "Monthly goal",
+    "monthlyGoalDescription": "Number of applications to send this month",
+    "save": "Save your objectives",
+    "saving": "Saving your objectives...",
+    "successSave": "Your objectives have been successfully saved.",
+    "notifications": "Notifications",
+    "notificationsDescription": "Manage your notification preferences",
+    "availableSoon": "This feature will be available soon",
+    "appearance": "Appearance",
+    "appearanceDescription": "Customize the look of Carrion"
+  },
+
+  "dailyTip": {
+    "title": "Tip of the day",
+    "moreButton": "More tips",
+    "tip1": "Customize your cover letter for each application. Recruiters appreciate candidates who show genuine interest in their company.",
+    "tip2": "Use relevant keywords in your CV related to the job offer. It improves your chances of being spotted by automatic screening systems.",
+    "tip3": "Prepare 3-4 relevant questions to ask at the end of the interview. It shows your interest in the position and company.",
+    "tip4": "Create an online portfolio to showcase your achievements and projects. A link in your CV can make a difference.",
+    "tip5": "Follow companies you are interested in on LinkedIn. It keeps you informed about their news and opportunities.",
+    "tip6": "Politely follow up on your applications after 1-2 weeks without a response. A simple message can revive your file.",
+    "tip7": "Adapt your CV for each position by highlighting the most relevant skills for the offer.",
+    "tip8": "Prepare concrete examples of your achievements using the STAR method (Situation, Task, Action, Result).",
+    "tip9": "Optimize your LinkedIn profile with a professional photo and catchy summary. It is often the first contact with recruiters.",
+    "tip10": "Practice presenting your background in 2 minutes. This short presentation is often requested at the start of the interview.",
+    "tip11": "Find out your interviewer's name before the interview. Personalizing your exchanges creates a better connection.",
+    "tip12": "Keep a dashboard of your applications to avoid duplicates and ensure effective tracking.",
+    "tip13": "Highlight your soft skills with precise examples. Human skills are increasingly sought after.",
+    "tip14": "Prepare short and long versions of your CV depending on the application type (spontaneous or in response to an offer).",
+    "tip15": "Use Google Alerts to be informed of new offers in your field and news about your target companies.",
+    "tip16": "Manage your e-reputation by checking what appears when searching your name on Google. Remove unprofessional content.",
+    "tip17": "Attend networking events in your sector. Internal recommendations increase your chances of being hired.",
+    "tip18": "Prepare questions about company culture during interviews. It shows you project yourself for the long term.",
+    "tip19": "Regularly update your skills with online training. Mention your recent certifications.",
+    "tip20": "Create several versions of your CV for different types of jobs while keeping coherence in your background.",
+    "tip21": "Prepare for difficult questions like 'Tell me about your weaknesses' by turning your answers positively.",
+    "tip22": "Use numbers to quantify your achievements: X% increase, Y€ budget managed, team of Z people.",
+    "tip23": "Arrive 10-15 minutes early to your interviews. It allows you to settle calmly and make a good impression.",
+    "tip24": "Prepare a plan B for video interviews: test your connection, lighting, and have a backup phone number.",
+    "tip25": "Send a thank-you message within 24 hours after the interview. It strengthens your motivation and professionalism.",
+    "tip26": "Analyze job offers to identify the most sought-after skills in your sector and develop them.",
+    "tip27": "Create a diverse contact network: former colleagues, professors, professionals in your sector.",
+    "tip28": "Stay authentic during interviews. Recruiters can spot candidates who play a role rather than being themselves."
   }
-} 
+}

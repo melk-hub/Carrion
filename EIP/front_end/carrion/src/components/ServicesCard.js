@@ -1,7 +1,7 @@
 import React from "react";
 import { X } from "lucide-react";
 import "../styles/ServicesCard.css";
-
+import { useLanguage } from "../contexts/LanguageContext";
 import googleLogo from "../assets/google-logo.png";
 import outlookLogo from "../assets/outlook-logo.svg";
 
@@ -33,10 +33,11 @@ const ServicesCard = ({
     if (name === "Microsoft_oauth2") return "Microsoft Outlook";
     return name;
   };
+  const { t } = useLanguage();
 
   return (
     <article className="profile-card services-card">
-      <h2>Services Connectés</h2>
+      <h2>{t("profile.services")}</h2>
       <div className="services-list">
         {connectedServices.length > 0 ? (
           connectedServices.map((service) => (
@@ -59,11 +60,11 @@ const ServicesCard = ({
             </div>
           ))
         ) : (
-          <p className="no-services-message">Aucun service connecté.</p>
+          <p className="no-services-message">{t("profile.noServices")}</p>
         )}
       </div>
       <button className="add-service-btn" onClick={onAddService}>
-        Ajouter un service
+        {t("profile.addService")}
       </button>
     </article>
   );

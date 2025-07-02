@@ -363,7 +363,7 @@ button {
   width: 40px;
   height: 40px;
   background-color: #132238;
-  z-index: 1000;
+  z-index: 100;
   transition: left 0.3s ease;
 }
 
@@ -379,10 +379,40 @@ button {
   height: 40px;
   border-top-left-radius: 40px;
   background-color: rgb(255, 245, 232);
-  z-index: 1001;
+  z-index: 100;
   transition: left 0.3s ease;
 }
 
 .sidebar.collapsed ~ .corner-curve {
   left: 60px;
+}
+
+.tooltip {
+  position: relative;
+  display: inline-block;
+}
+
+.tooltip .tooltip-text {
+  visibility: hidden;
+  width: max-content;
+  max-width: 200px;
+  background-color: #1f2a44;
+  text-align: center;
+  border-radius: 6px;
+  padding: 5px 10px;
+  font-size: 14px;
+  font-weight: 500;
+  position: absolute;
+  left: 40px;
+  top: 50%;
+  transform: translateY(-50%);
+  white-space: nowrap;
+  z-index: 2000;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.tooltip:hover .tooltip-text {
+  visibility: visible;
+  opacity: 1;
 }

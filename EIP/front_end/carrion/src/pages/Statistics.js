@@ -349,7 +349,7 @@ function Statistics() {
       const now = new Date();
       const endWeek = endOfWeek(now, { weekStartsOn: 1 });
       const daysLeft = Math.ceil((endWeek - now) / (1000 * 60 * 60 * 24));
-      timeLeft = `${daysLeft} jour${daysLeft > 1 ? 's' : ''} restant${daysLeft > 1 ? 's' : ''}`;
+      timeLeft = `${daysLeft}`;
     } else {
       current = statsData.totals.thisMonth;
       target = goalSettings.monthlyGoal;
@@ -357,7 +357,7 @@ function Statistics() {
       const now = new Date();
       const endMonth = endOfMonth(now);
       const daysLeft = Math.ceil((endMonth - now) / (1000 * 60 * 60 * 24));
-      timeLeft = `${daysLeft} jour${daysLeft > 1 ? 's' : ''} restant${daysLeft > 1 ? 's' : ''}`;
+      timeLeft = `${daysLeft}`;
     }
 
     const percentage = Math.min((current / target) * 100, 100);
@@ -381,7 +381,7 @@ function Statistics() {
   };
 
   if (loading) {
-    return <Loading message="Chargement des statistiques..." />;
+    return <Loading message={t("statistics.loading")}/>;
   }
 
   return (
@@ -390,27 +390,27 @@ function Statistics() {
         <div className="kpi-grid">
           <div className="kpi-card">
             <div className="kpi-value">{statsData.totals.today}</div>
-            <div className="kpi-label">Aujourd'hui</div>
+            <div className="kpi-label">{t("statistics.today")}</div>
           </div>
           <div className="kpi-card">
             <div className="kpi-value">{statsData.totals.thisWeek}</div>
-            <div className="kpi-label">Cette semaine</div>
+            <div className="kpi-label">{t("statistics.thisWeek")}</div>
           </div>
           <div className="kpi-card">
             <div className="kpi-value">{statsData.totals.thisMonth}</div>
-            <div className="kpi-label">Ce mois</div>
+            <div className="kpi-label">{t("statistics.thisMonth")}</div>
           </div>
           <div className="kpi-card">
             <div className="kpi-value">{statsData.totals.total}</div>
-            <div className="kpi-label">Total</div>
+            <div className="kpi-label">{t("shared.stats.total")}</div>
           </div>
           <div className="kpi-card">
             <div className="kpi-value">{statsData.totals.weekAverage}</div>
-            <div className="kpi-label">Moyenne/semaine</div>
+            <div className="kpi-label">{t("statistics.weekAverage")}</div>
           </div>
           <div className="kpi-card">
             <div className="kpi-value">{stats.streak || 0}</div>
-            <div className="kpi-label">Série actuelle</div>
+            <div className="kpi-label">{t("statistics.streak")}</div>
           </div>
         </div>
       )}
@@ -420,19 +420,19 @@ function Statistics() {
         {/* Evolution Chart */}
         <div className="chart-card">
           <div className="chart-header">
-            <h3>Évolution des candidatures</h3>
+            <h3>{t("statistics.evolution")}</h3>
             <div className="time-range-selector">
               <button 
                 className={timeRange === '7days' ? 'active' : ''}
                 onClick={() => setTimeRange('7days')}
               >
-                7j
+                7{t("statistics.days")}
               </button>
               <button 
                 className={timeRange === '30days' ? 'active' : ''}
                 onClick={() => setTimeRange('30days')}
               >
-                30j
+                30{t("statistics.days")}
               </button>
               <button 
                 className={timeRange === '3months' ? 'active' : ''}
@@ -453,8 +453,8 @@ function Statistics() {
               <Line data={lineChartConfig.data} options={lineChartConfig.options} />
             ) : (
               <div className="empty-state">
-                <p>Aucune donnée disponible</p>
-                <small>Commencez à postuler pour voir vos statistiques !</small>
+                <p>{t("statistics.noData")}</p>
+                <small>{t("statistics.noDataDescription")}</small>
               </div>
             )}
           </div>
@@ -463,7 +463,7 @@ function Statistics() {
         {/* Status Distribution Chart */}
         <div className="chart-card">
           <div className="chart-header">
-            <h3>Répartition par statut</h3>
+            <h3>{t("statistics.repartition")}</h3>
           </div>
           <div className="chart-container">
             {statusChartInfo && statusChartInfo.data && statusChartInfo.data.datasets.length > 0 && statusChartInfo.total > 0 ? (
@@ -482,12 +482,12 @@ function Statistics() {
               {(() => {
                     const statusEntries = Object.entries(stats.statusDistribution);
                     const statusLabels = {
-                      APPLIED: 'Postulé',
-                      PENDING: 'En attente',
-                      INTERVIEW_SCHEDULED: 'Entretien',
-                      OFFER_RECEIVED: 'Offre reçue',
-                      REJECTED_BY_COMPANY: 'Refusé',
-                      OFFER_ACCEPTED: 'Accepté',
+                      APPLIED: t("dashboard.statuses.APPLIED"),
+                      PENDING: t('dashboard.statuses.PENDING'),
+                      INTERVIEW_SCHEDULED: t('dashboard.statuses.INTERVIEW'),
+                      OFFER_RECEIVED: t('dashboard.statuses.OFFER'),
+                      REJECTED_BY_COMPANY: t('dashboard.statuses.REJECTED_BY_COMPANY'),
+                      OFFER_ACCEPTED: t('dashboard.statuses.ACCEPTED'),
                     };
                     const statusColors = {
                       APPLIED: '#fbb75f',
@@ -558,7 +558,6 @@ function Statistics() {
                                     setCurrentStatusIndex(prev => prev - 1);
                                   }
                                 }
-                                
                                 setIsDragging(false);
                                 setStartX(0);
                                 setCurrentX(0);
@@ -624,8 +623,8 @@ function Statistics() {
                 <div className="no-data-icon">
                   📊
                 </div>
-                <h3>Aucune candidature</h3>
-                <p>Commencez à postuler pour voir la répartition de vos candidatures par statut</p>
+                <h3>{t('statistics.noData')}</h3>
+                <p>{t('statistics.noDataDescription')}</p>
               </div>
             )}
           </div>
@@ -634,19 +633,19 @@ function Statistics() {
         {/* Goal Progress */}
         <div className="chart-card">
           <div className="chart-header">
-            <h3>Objectif {activeGoalType === 'weekly' ? 'hebdomadaire' : 'mensuel'}</h3>
+            <h3>{t('statistics.objective')} {activeGoalType === 'weekly' ? t('statistics.weekly') : t('statistics.monthly')}</h3>
             <div className="goal-type-selector">
               <button 
                 className={activeGoalType === 'weekly' ? 'active' : ''}
                 onClick={() => setActiveGoalType('weekly')}
               >
-                Semaine
+                {t('statistics.week')}
               </button>
               <button 
                 className={activeGoalType === 'monthly' ? 'active' : ''}
                 onClick={() => setActiveGoalType('monthly')}
               >
-                Mois
+                {t('statistics.month')}
               </button>
             </div>
           </div>
@@ -685,25 +684,25 @@ function Statistics() {
                   {goalProgress.current} / {goalProgress.target}
                 </div>
                 <div className="goal-subtitle">
-                  candidatures cette {activeGoalType === 'weekly' ? 'semaine' : 'mois'}
+                  {t('ranking.stats.applications')} {activeGoalType === 'weekly' ? t('statistics.thisWeek') : t('statistics.thisMonth')}
                 </div>
                 <div className="time-remaining">
-                  {goalProgress.timeLeft}
+                  {goalProgress.timeLeft}  {t("home.objectives.daysLeft")}
                 </div>
               </div>
 
               <div className="goal-stats-row">
                 <div className="goal-stat-item">
                   <span className="stat-number">{goalProgress.current}</span>
-                  <span className="stat-label">Réalisé</span>
+                  <span className="stat-label">{t('home.objectives.accomplished')}</span>
                 </div>
                 <div className="goal-stat-item">
                   <span className="stat-number">{Math.max(goalProgress.target - goalProgress.current, 0)}</span>
-                  <span className="stat-label">Restant</span>
+                  <span className="stat-label">{t('home.objectives.remaining')}</span>
                 </div>
                 <div className="goal-stat-item">
                   <span className="stat-number">{Math.round((goalProgress.current / Math.max(goalProgress.target, 1)) * 100)}%</span>
-                  <span className="stat-label">Progression</span>
+                  <span className="stat-label">{t('home.objectives.progress')}</span>
                 </div>
               </div>
             </div>
@@ -713,7 +712,7 @@ function Statistics() {
         {/* Performance Insights */}
         <div className="chart-card">
           <div className="chart-header">
-            <h3>Performance</h3>
+            <h3>{t('statistics.performance')}</h3>
           </div>
           <div className="chart-container">
             <div className="performance-insights">
@@ -736,7 +735,7 @@ function Statistics() {
                 </span>
               </div>
               <div className="insight-item">
-                <span className="insight-label">Record de série</span>
+                <span className="insight-label">{t('statistics.streakRecord')}</span>
                 <span className="insight-value">
                   {stats?.bestStreak || stats?.streak || 0}
                 </span>
@@ -748,12 +747,12 @@ function Statistics() {
         {/* Weekly Comparison */}
         <div className="chart-card">
           <div className="chart-header">
-            <h3>Comparaison hebdomadaire</h3>
+            <h3>{t('statistics.weeklyComparison')}</h3>
           </div>
           <div className="chart-container">
             <div className="weekly-comparison">
               <div className="comparison-item">
-                <span className="comparison-label">Cette semaine</span>
+                <span className="comparison-label">{t('statistics.thisWeek')}</span>
                 <span className="comparison-value">{statsData?.totals.thisWeek || 0}</span>
                 <div className="comparison-bar">
                   <div 
@@ -763,7 +762,7 @@ function Statistics() {
                 </div>
               </div>
               <div className="comparison-item">
-                <span className="comparison-label">Semaine dernière</span>
+                <span className="comparison-label">{t('statistics.lastWeek')}</span>
                 <span className="comparison-value">
                   {statsData ? statsData.days.filter(d => {
                     const weekAgo = new Date();
@@ -799,36 +798,36 @@ function Statistics() {
         {/* Additional Stats */}
         <div className="chart-card">
           <div className="chart-header">
-            <h3>Statistiques détaillées</h3>
+            <h3>{t('statistics.detailedStats')}</h3>
           </div>
           <div className="chart-container">
             <div className="advanced-stats">
               <div className="stat-row">
-                <span className="comparison-label">Entretiens obtenus</span>
+                <span className="comparison-label">{t('statistics.interview')}</span>
                 <span className="stat-value">{stats?.interviewCount || 0}</span>
               </div>
               <div className="stat-row">
-                <span className="comparison-label">Dernière candidature</span>
+                <span className="comparison-label">{t('statistics.lastApplication')}</span>
                 <span className="stat-value">
                   {stats?.lastApplicationDate 
                     ? format(new Date(stats.lastApplicationDate), 'dd/MM/yyyy') 
-                    : 'Aucune'}
+                    : ''}
                 </span>
               </div>
               <div className="stat-row">
-                <span className="comparison-label">Moyenne mensuelle</span>
+                <span className="comparison-label">{t('statistics.monthAverage')}</span>
                 <span className="stat-value">{statsData?.totals.monthAverage || 0}</span>
               </div>
               <div className="stat-row">
-                <span className="comparison-label">Total candidatures</span>
+                <span className="comparison-label">{t('shared.stats.totalApplications')}</span>
                 <span className="stat-value">{stats?.totalApplications || 0}</span>
               </div>
               <div className="stat-row">
-                <span className="comparison-label">Meilleure série</span>
-                <span className="stat-value">{stats?.bestStreak || stats?.streak || 0} jours</span>
+                <span className="comparison-label">{t('statistics.bestStreak')}</span>
+                <span className="stat-value">{stats?.bestStreak || stats?.streak || 0} {t("statistics.days")}</span>
               </div>
               <div className="stat-row">
-                <span className="comparison-label">Offres reçues</span>
+                <span className="comparison-label">{t('statistics.offersReceived')}</span>
                 <span className="stat-value">{stats?.statusDistribution?.OFFER_RECEIVED || 0}</span>
               </div>
             </div>

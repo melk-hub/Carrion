@@ -9,15 +9,14 @@ import toast from "react-hot-toast";
 import "react-datepicker/dist/react-datepicker.css";
 import "../styles/Profile.css";
 import Loading from "../components/Loading";
-
 import apiService from "../services/api";
 import { jobSectors } from "../data/jobSectors";
 import { contractOptions } from "../data/contractOptions";
-
 import ServicesCard from "../components/ServicesCard";
 import AddServiceModal from "../components/AddServiceModal";
 import CustomDateInput from "../components/CustomDateInput";
 import CvCard from "../components/CvCard";
+import { useLanguage } from '../contexts/LanguageContext';
 
 registerLocale("fr", fr);
 
@@ -46,6 +45,7 @@ function Profile() {
   const [cvUrl, setCvUrl] = useState(null);
   const [uploadingCv, setUploadingCv] = useState(false);
   const fileInputRef = useRef(null);
+  const { t } = useLanguage();
 
   const debouncedLoadCities = debounce((inputValue, callback) => {
     apiService
@@ -340,7 +340,7 @@ function Profile() {
   if (isLoading) {
     return (
       <main className="profile-page">
-        <Loading message="Chargement du profil..." />
+        <Loading message={t("profile.loading")} />
       </main>
     );
   }
@@ -352,9 +352,6 @@ function Profile() {
   return (
     <>
       <main className="profile-page">
-        <header className="profile-header">
-          <h2>Mon compte</h2>
-        </header>
         <div className="profile-container">
           <aside className="profile-right-column">
             <section className="profile-card profile-picture-card">
@@ -373,7 +370,7 @@ function Profile() {
                 {uploadedImage ? (
                   <img
                     src={uploadedImage}
-                    alt="Photo de profil"
+                    alt={t("profile.picture")}
                     className="profile-img"
                   />
                 ) : (
@@ -400,11 +397,11 @@ function Profile() {
             onSubmit={handleSubmit}
           >
             <article className="profile-card">
-              <h2>Informations personnelles</h2>
+              <h2>{t("profile.personalInfo")} </h2>
               <div className="profile-info-form">
                 <div className="form-grid">
                   <div className="form-group">
-                    <label htmlFor="lastName">Nom</label>
+                    <label htmlFor="lastName">{t("auth.lastName")}</label>
                     <input
                       id="lastName"
                       type="text"
@@ -414,7 +411,7 @@ function Profile() {
                     />
                   </div>
                   <div className="form-group">
-                    <label htmlFor="firstName">Prénom</label>
+                    <label htmlFor="firstName">{t("auth.firstName")}</label>
                     <input
                       id="firstName"
                       type="text"
@@ -424,7 +421,7 @@ function Profile() {
                     />
                   </div>
                   <div className="form-group">
-                    <label htmlFor="phoneNumber">Numéro de téléphone</label>
+                    <label htmlFor="phoneNumber">{t("profile.phone")}</label>
                     <input
                       id="phoneNumber"
                       type="tel"
@@ -434,7 +431,7 @@ function Profile() {
                     />
                   </div>
                   <div className="form-group">
-                    <label htmlFor="birthDate">Date de naissance</label>
+                    <label htmlFor="birthDate">{t("auth.birthDate")}</label>
                     <DatePicker
                       id="birthDate"
                       selected={personalInfo.birthDate}
@@ -456,12 +453,12 @@ function Profile() {
                     />
                   </div>
                   <div className="form-group">
-                    <label htmlFor="city">Localisation</label>
+                    <label htmlFor="city">{t("dashboard.applicationForm.location")}</label>
                     <AsyncSelect
                       inputId="city"
                       cacheOptions
                       classNamePrefix="select"
-                      placeholder="Recherchez votre ville..."
+                      placeholder={t("profile.search")}
                       loadOptions={debouncedLoadCities}
                       value={personalInfo.city}
                       onChange={(selected) =>
@@ -473,7 +470,7 @@ function Profile() {
                     />
                   </div>
                   <div className="form-group">
-                    <label htmlFor="school">École / Université</label>
+                    <label htmlFor="school">{t("profile.school")}</label>
                     <input
                       id="school"
                       type="text"
@@ -483,7 +480,7 @@ function Profile() {
                     />
                   </div>
                   <div className="form-group full-width">
-                    <label htmlFor="portfolioLink">Site web (Portfolio)</label>
+                    <label htmlFor="portfolioLink">{t("modal.add.website")}</label>
                     <input
                       id="portfolioLink"
                       type="text"
@@ -512,16 +509,16 @@ function Profile() {
               onDelete={handleCvDelete}
             />
             <article className="profile-card">
-              <h2>Préférences de recherche</h2>
+              <h2>{t("profile.preferences")}</h2>
               <div className="profile-info-form">
                 <div className="form-grid">
                   <div className="form-group">
-                    <label htmlFor="contractSought">Types de contrat</label>
+                    <label htmlFor="contractSought">{t("profile.contractType")}</label>
                     <Select
                       inputId="contractSought"
                       isMulti
                       classNamePrefix="select"
-                      placeholder="Sélectionnez..."
+                      placeholder={t("profile.selectContract")}
                       options={contractOptions}
                       value={getSelectedObjects(
                         contractOptions,
@@ -540,12 +537,12 @@ function Profile() {
                     />
                   </div>
                   <div className="form-group">
-                    <label htmlFor="sector">Secteurs de recherche</label>
+                    <label htmlFor="sector">{t("profile.sector")}</label>
                     <Select
                       inputId="sector"
                       isMulti
                       classNamePrefix="select"
-                      placeholder="Sélectionnez..."
+                      placeholder={t("profile.selectSector")}
                       options={jobSectors}
                       value={getSelectedObjects(
                         jobSectors,
@@ -563,7 +560,7 @@ function Profile() {
                   </div>
                   <div className="form-group full-width">
                     <label htmlFor="locationSought">
-                      Localisations souhaitées
+                      {t("profile.location")}
                     </label>
                     <AsyncSelect
                       inputId="locationSought"
@@ -571,7 +568,7 @@ function Profile() {
                       isCreatable
                       cacheOptions
                       classNamePrefix="select"
-                      placeholder="Recherchez ou créez..."
+                      placeholder={t("profile.searchOrCreate")}
                       loadOptions={debouncedLoadCities}
                       value={getLocationObjects(personalInfo.locationSought)}
                       onChange={(selected) =>
@@ -591,7 +588,7 @@ function Profile() {
             </article>
             <div className="form-actions-global">
               <button type="submit" className="save-button">
-                Enregistrer les modifications
+                {t("profile.saveChanges")}
               </button>
             </div>
           </form>
