@@ -8,10 +8,13 @@ import {
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { S3Service } from 'src/aws/s3.service';
 
 @Injectable()
 export class UserService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly s3Service: S3Service) {}
 
   async updateHashedRefreshToken(userId: string, hashedRefreshToken: string) {
     try {
@@ -220,5 +223,47 @@ export class UserService {
         rejectedApplications,
       };
     });
+  }
+
+  async getUsersRanking() {
+    const users = await this.prisma.user.findMany({
+      include: {
+        jobApplies: true,
+        userProfile: true,
+      },
+    });
+
+    const usersWithAvatars = await Promise.all(users.map(async (user) => {
+      const totalApplications = user.jobApplies.length;
+      const acceptedApplications = user.jobApplies.filter(
+        (app) => app.status === 'APPLIED',
+      ).length;
+      const pendingApplications = user.jobApplies.filter(
+        (app) => app.status === 'PENDING',
+      ).length;
+      const rejectedApplications = user.jobApplies.filter(
+        (app) => app.status === 'REJECTED_BY_COMPANY',
+      ).length;
+
+      let avatarUrl: string | null = null;
+      if (user.userProfile?.imageUrl) {
+        const res = await this.s3Service.getSignedDownloadUrl(user.id, "profile");
+        avatarUrl = res.signedUrl;
+      }
+
+      return {
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        firstName: user.userProfile?.firstName || '',
+        lastName: user.userProfile?.lastName || '',
+        avatar: avatarUrl,
+        totalApplications,
+        acceptedApplications,
+        pendingApplications,
+        rejectedApplications,
+      };
+    }));
+    return usersWithAvatars;
   }
 }

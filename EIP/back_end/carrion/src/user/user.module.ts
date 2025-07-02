@@ -8,6 +8,7 @@ import { AuthModule } from 'src/auth/auth.module';
 import { HttpModule } from '@nestjs/axios';
 import { CustomLoggingService } from 'src/common/services/logging.service';
 import { AuthService } from 'src/auth/auth.service';
+import { S3Module } from 'src/aws/s3.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { AuthService } from 'src/auth/auth.service';
     PrismaModule,
     forwardRef(() => AuthModule),
     HttpModule,
+    forwardRef(() => S3Module),
   ],
   controllers: [UserController],
   providers: [

@@ -15,6 +15,7 @@ import { CustomLoggingService } from 'src/common/services/logging.service';
 import { UserService } from 'src/user/user.service';
 import { AuthService } from 'src/auth/auth.service';
 import { JwtModule } from '@nestjs/jwt';
+import { S3Module } from 'src/aws/s3.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { JwtModule } from '@nestjs/jwt';
     PrismaModule,
     UserModule,
     MailFilterModule,
+    S3Module,
   ],
   controllers: [OutlookController],
   providers: [
