@@ -26,7 +26,7 @@ function Ranking() {
       setLoading(true)
       setError(null)
 
-      const response = await axios.get(`${API_URL}/user/all-users`, {
+      const response = await axios.get(`${API_URL}/user/all-users-ranking`, {
         withCredentials: true,
       })
 

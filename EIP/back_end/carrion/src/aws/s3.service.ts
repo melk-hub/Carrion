@@ -7,7 +7,6 @@ import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { UserService } from 'src/user/user.service';
 
 @Injectable()
 export class S3Service {
@@ -16,7 +15,6 @@ export class S3Service {
 
   constructor(
     private configService: ConfigService,
-    private userService: UserService,
     private prismaService: PrismaService
   ) {
     this.bucket = this.configService.get('AWS_BUCKET_NAME');

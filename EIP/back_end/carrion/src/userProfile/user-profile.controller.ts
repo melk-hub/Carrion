@@ -101,4 +101,23 @@ export class UserProfileController {
       await this.userProfileService.disconnectService(userId, serviceName);
     }
   }
+
+  @ApiOperation({ summary: "Get the current user's profile picture" })
+  @ApiResponse({
+    status: 200,
+    description: "Returns the user's profile picture.",
+  })
+  @ApiResponse({ status: 404, description: 'Profile picture not found.' })
+  @Get('imageUrl')
+  async getUserProfilePicture(@Req() req: Request) {
+    const userId = req.query.userId || (req.user as any).id;
+    const profilePicture =
+      await this.userProfileService.getUserProfilePicture(userId);
+
+    if (!profilePicture) {
+      throw new NotFoundException('User profile picture not found.');
+    }
+    return profilePicture;
+  }
+
 }

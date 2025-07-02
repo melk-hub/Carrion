@@ -115,4 +115,10 @@ export class UserController {
   async getUsersWithStats() {
     return this.userService.getUsersWithStats();
   }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('all-users-ranking')
+  async getUsersRanking() {
+    return this.userService.getUsersRanking();
+  }
 }
