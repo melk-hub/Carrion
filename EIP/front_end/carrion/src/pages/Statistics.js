@@ -349,7 +349,7 @@ function Statistics() {
       const now = new Date();
       const endWeek = endOfWeek(now, { weekStartsOn: 1 });
       const daysLeft = Math.ceil((endWeek - now) / (1000 * 60 * 60 * 24));
-      timeLeft = `${daysLeft} ${t("home.objectives.daysLeft")}`;
+      timeLeft = `${daysLeft}`;
     } else {
       current = statsData.totals.thisMonth;
       target = goalSettings.monthlyGoal;
@@ -357,7 +357,7 @@ function Statistics() {
       const now = new Date();
       const endMonth = endOfMonth(now);
       const daysLeft = Math.ceil((endMonth - now) / (1000 * 60 * 60 * 24));
-      timeLeft = `${daysLeft} ${t("home.objectives.daysLeft")}`;
+      timeLeft = `${daysLeft}`;
     }
 
     const percentage = Math.min((current / target) * 100, 100);
@@ -687,7 +687,7 @@ function Statistics() {
                   {t('ranking.stats.applications')} {activeGoalType === 'weekly' ? t('statistics.thisWeek') : t('statistics.thisMonth')}
                 </div>
                 <div className="time-remaining">
-                  {goalProgress.timeLeft}
+                  {goalProgress.timeLeft}  {t("home.objectives.daysLeft")}
                 </div>
               </div>
 

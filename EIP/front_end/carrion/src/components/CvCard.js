@@ -55,7 +55,7 @@ function CvCard({ cvUrl, uploadingCv, onUpload, onDelete }) {
             >
               <Eye size={16} />
               <span>{t("profile.visualize")}</span>
-            </a>
+            </button>
             <button
               type="button"
               onClick={handleModifyClick}

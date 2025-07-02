@@ -205,7 +205,8 @@
     "genericError": "Une erreur est survenue. Veuillez réessayer plus tard.",
     "passwordMismatch": "Les mots de passe ne correspondent pas !",
     "registerError": "Erreur lors de l'inscription.",
-    "joinUs": "Nous rejoindre !"
+    "joinUs": "Nous rejoindre !",
+    "loginSuccessRedirect": "Vous êtes connecté !"
   },
 
   "home": {

@@ -205,7 +205,8 @@
     "genericError": "An error occurred. Please try again later.",
     "passwordMismatch": "Passwords do not match!",
     "registerError": "Registration error.",
-    "joinUs": "Join us!"
+    "joinUs": "Join us!",
+    "loginSuccessRedirect": "You are logged in!"
   },
   "home": {
     "welcomeMessage": "Organize your job search with Carrion",
