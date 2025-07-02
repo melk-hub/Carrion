@@ -5,8 +5,9 @@ import {
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { AuthGuard } from '@nestjs/passport';
-import { IS_PUBLIC_KEY } from 'src/auth/decorators/public.decorator';
+import { IS_PUBLIC_KEY } from '../../decorators/public.decorator';
 import { AuthService } from '../../auth.service';
+import { CookieUtils } from '../../utils/cookie.utils';
 
 @Injectable()
 export class JwtAuthGuard extends AuthGuard('jwt') {
@@ -42,20 +43,18 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
 
           if (tokens) {
             // Mettre à jour les cookies avec les nouveaux tokens
-            response.cookie('access_token', tokens.accessToken, {
-              httpOnly: true,
-              secure: process.env.NODE_ENV === 'production',
-              sameSite: 'strict',
-              maxAge: 1000 * 60 * 60 * 24 * 7, // 7 jours au lieu de 1
-            });
+            response.cookie(
+              'access_token',
+              tokens.accessToken,
+              CookieUtils.getAccessTokenCookieOptions(false), // refresh = pas rememberMe
+            );
 
             if (tokens.refreshToken) {
-              response.cookie('refresh_token', tokens.refreshToken, {
-                httpOnly: true,
-                secure: process.env.NODE_ENV === 'production',
-                sameSite: 'strict',
-                maxAge: 1000 * 60 * 60 * 24 * 30, // 30 jours
-              });
+              response.cookie(
+                'refresh_token',
+                tokens.refreshToken,
+                CookieUtils.getRefreshTokenCookieOptions(),
+              );
             }
 
             // Attacher l'utilisateur à la requête

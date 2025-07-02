@@ -28,6 +28,7 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
+import { CookieUtils } from './utils/cookie.utils';
 
 @ApiTags('Authentication')
 @Controller('auth')
@@ -47,16 +48,16 @@ export class AuthController {
     const { rememberMe = false } = req.body;
     const tokens = await this.authService.login(req.user.id, rememberMe);
 
-    const cookieMaxAge = rememberMe
-      ? 1000 * 60 * 60 * 24 * 15
-      : 1000 * 60 * 60 * 24;
-
-    res.cookie('access_token', tokens.accessToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'Strict',
-      maxAge: cookieMaxAge,
-    });
+    res.cookie(
+      'access_token',
+      tokens.accessToken,
+      CookieUtils.getAccessTokenCookieOptions(rememberMe),
+    );
+    res.cookie(
+      'refresh_token',
+      tokens.refreshToken,
+      CookieUtils.getRefreshTokenCookieOptions(),
+    );
 
     return res
       .status(HttpStatus.OK)
@@ -68,12 +69,17 @@ export class AuthController {
   @ApiOperation({ summary: 'User signup' })
   async signUp(@Body() userInfo: CreateUserDto, @Res() res) {
     const token = await this.authService.signUp(userInfo);
-    res.cookie('access_token', token.accessToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'Strict',
-      maxAge: 1000 * 60 * 60 * 24,
-    });
+    res.cookie(
+      'access_token',
+      token.accessToken,
+      CookieUtils.getAccessTokenCookieOptions(false),
+    );
+    res.cookie(
+      'refresh_token',
+      token.refreshToken,
+      CookieUtils.getRefreshTokenCookieOptions(),
+    );
+
     return res
       .status(HttpStatus.OK)
       .send({ message: 'User created successfully' });
@@ -85,29 +91,37 @@ export class AuthController {
   async refreshAccessToken(@Req() req, @Res() res) {
     try {
       const refreshToken = req.cookies?.['refresh_token'];
-      if (!refreshToken)
+      if (!refreshToken) {
+        this.logger.warn('No refresh token provided', LogCategory.AUTH);
         return res.status(401).json({ message: 'No refresh token provided' });
-      const tokens = await this.authService.refreshTokens(refreshToken);
-      if (!tokens)
-        return res.status(401).json({ message: 'Invalid refresh token' });
-      res.cookie('access_token', tokens.accessToken, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'strict',
-        maxAge: 1000 * 60 * 60 * 24 * 7,
-      });
-      if (tokens.refreshToken) {
-        res.cookie('refresh_token', tokens.refreshToken, {
-          httpOnly: true,
-          secure: process.env.NODE_ENV === 'production',
-          sameSite: 'strict',
-          maxAge: 1000 * 60 * 60 * 24 * 30,
-        });
       }
+
+      const tokens = await this.authService.refreshTokens(refreshToken);
+      if (!tokens) {
+        this.logger.warn('Invalid refresh token attempt', LogCategory.AUTH);
+        return res.status(401).json({ message: 'Invalid refresh token' });
+      }
+
+      res.cookie(
+        'access_token',
+        tokens.accessToken,
+        CookieUtils.getAccessTokenCookieOptions(false),
+      );
+
+      if (tokens.refreshToken) {
+        res.cookie(
+          'refresh_token',
+          tokens.refreshToken,
+          CookieUtils.getRefreshTokenCookieOptions(),
+        );
+      }
+
+      this.logger.log('Token refreshed successfully', LogCategory.AUTH);
       return res.status(200).json({ message: 'Token refreshed successfully' });
     } catch (error) {
       this.logger.error('Token refresh error', undefined, LogCategory.AUTH, {
         error: error.message,
+        stack: error.stack,
       });
       return res.status(401).json({ message: 'Token refresh failed' });
     }
@@ -118,16 +132,11 @@ export class AuthController {
   @ApiOperation({ summary: 'User sign out' })
   signOut(@Req() req, @Res() res) {
     this.authService.signOut(req.user.id);
-    res.clearCookie('access_token', {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-    });
-    res.clearCookie('refresh_token', {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-    });
+    res.clearCookie('access_token', CookieUtils.getClearCookieOptions());
+    res.clearCookie(
+      'refresh_token',
+      CookieUtils.getClearCookieOptions('/auth'),
+    );
     return res.status(HttpStatus.OK).json({ message: 'Signout successful' });
   }
 
@@ -135,16 +144,11 @@ export class AuthController {
   @Get('logout')
   @ApiOperation({ summary: 'Logout' })
   logout(@Response() res) {
-    res.clearCookie('access_token', {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-    });
-    res.clearCookie('refresh_token', {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-    });
+    res.clearCookie('access_token', CookieUtils.getClearCookieOptions());
+    res.clearCookie(
+      'refresh_token',
+      CookieUtils.getClearCookieOptions('/auth'),
+    );
     return res.status(HttpStatus.OK).json({ message: 'Logout successful' });
   }
 
@@ -240,19 +244,17 @@ export class AuthController {
     }
 
     const tokens = await this.authService.login(user.id);
-    res.cookie('access_token', tokens.accessToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      maxAge: 1000 * 60 * 60 * 24 * 7,
-    });
+    res.cookie(
+      'access_token',
+      tokens.accessToken,
+      CookieUtils.getAccessTokenCookieOptions(false),
+    );
     if (tokens.refreshToken) {
-      res.cookie('refresh_token', tokens.refreshToken, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'strict',
-        maxAge: 1000 * 60 * 60 * 24 * 30,
-      });
+      res.cookie(
+        'refresh_token',
+        tokens.refreshToken,
+        CookieUtils.getRefreshTokenCookieOptions(),
+      );
     }
     res.redirect(`${process.env.FRONT}/?auth=success`);
   }
@@ -292,19 +294,17 @@ export class AuthController {
     }
 
     const tokens = await this.authService.login(user.id);
-    res.cookie('access_token', tokens.accessToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      maxAge: 1000 * 60 * 60 * 24 * 7,
-    });
+    res.cookie(
+      'access_token',
+      tokens.accessToken,
+      CookieUtils.getAccessTokenCookieOptions(false),
+    );
     if (tokens.refreshToken) {
-      res.cookie('refresh_token', tokens.refreshToken, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'strict',
-        maxAge: 1000 * 60 * 60 * 24 * 30,
-      });
+      res.cookie(
+        'refresh_token',
+        tokens.refreshToken,
+        CookieUtils.getRefreshTokenCookieOptions(),
+      );
     }
     res.redirect(`${process.env.FRONT}/?auth=success`);
   }

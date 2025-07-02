@@ -340,35 +340,87 @@ export class AuthService {
       const decoded = this.jwtService.verify(refreshToken, {
         secret: this.refreshTokenConfig.secret,
       });
-      if (!decoded || !decoded.sub) return null;
-      const userId = decoded.sub;
+      if (!decoded || !decoded.sub) {
+        this.logger.warn('Invalid refresh token structure', LogCategory.AUTH);
+        return null;
+      }
 
+      const userId = decoded.sub;
       const user = await this.userService.findOne(userId);
-      if (!user || !user.hashedRefreshToken) return null;
+      if (!user || !user.hashedRefreshToken) {
+        this.logger.warn(
+          'User not found or no refresh token stored',
+          LogCategory.AUTH,
+          {
+            userId,
+            hasUser: !!user,
+            hasRefreshToken: !!user?.hashedRefreshToken,
+          },
+        );
+        return null;
+      }
 
       const refreshTokenMatches = await argon2.verify(
         user.hashedRefreshToken,
         refreshToken,
       );
-      if (!refreshTokenMatches) return null;
 
-      const tokens = await this.generateTokens(userId);
+      if (!refreshTokenMatches) {
+        this.logger.error(
+          'SECURITY ALERT: Refresh token reuse detected - possible token theft',
+          undefined,
+          LogCategory.AUTH,
+          {
+            userId,
+            tokenJti: decoded.jti,
+            issuedAt: decoded.iat,
+            currentTime: Math.floor(Date.now() / 1000),
+          },
+        );
+
+        await this.userService.updateHashedRefreshToken(userId, null);
+        this.logger.warn(
+          'All refresh tokens invalidated for user due to security breach',
+          LogCategory.AUTH,
+          { userId },
+        );
+        return null;
+      }
+
+      const newTokens = await this.generateTokens(userId);
+      
       await this.userService.updateHashedRefreshToken(
         userId,
-        await argon2.hash(tokens.refreshToken),
+        await argon2.hash(newTokens.refreshToken),
       );
+
+      this.logger.log('Refresh token rotated successfully', LogCategory.AUTH, {
+        userId,
+        oldTokenJti: decoded.jti,
+      });
+
       return {
-        accessToken: tokens.accessToken,
-        refreshToken: tokens.refreshToken,
+        accessToken: newTokens.accessToken,
+        refreshToken: newTokens.refreshToken,
         userId: userId,
       };
     } catch (error) {
-      this.logger.error(
-        'Refresh token validation failed',
-        undefined,
-        LogCategory.AUTH,
-        { error: error.message },
-      );
+      if (error.name === 'TokenExpiredError') {
+        this.logger.warn('Refresh token expired', LogCategory.AUTH, {
+          error: error.message,
+        });
+      } else if (error.name === 'JsonWebTokenError') {
+        this.logger.warn('Malformed refresh token', LogCategory.AUTH, {
+          error: error.message,
+        });
+      } else {
+        this.logger.error(
+          'Unexpected error during refresh token validation',
+          error.stack,
+          LogCategory.AUTH,
+          { error: error.message },
+        );
+      }
       return null;
     }
   }
