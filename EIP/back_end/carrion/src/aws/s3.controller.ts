@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Query, UseGuards, Req } from '@nestjs/common';
+import { Controller, Get, Post, Query, UseGuards, Req, Delete, BadRequestException } from '@nestjs/common';
 import { S3Service } from './s3.service';
 import { JwtAuthGuard } from '../auth/guards/jwt/jwt-auth.guard';
 import { Request } from 'express';
@@ -26,5 +26,18 @@ export class S3Controller {
   ) {
     const userId = req.user.id;
     return this.s3Service.getSignedDownloadUrl(userId, filename);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Delete('delete')
+  async deleteFile(@Req() req, @Query('filename') filename: string) {
+    if (filename == "cv") {
+      this.s3Service.deleteCV(req.user.id);
+    } else if (filename == "profile") {
+      this.s3Service.deleteProfilePicture(req.user.id);
+    } else {
+      throw new BadRequestException('File to delete must be "cv" or "profile"');
+    }
+    return { message: `Deleted file: ${filename}` };
   }
 }
