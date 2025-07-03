@@ -76,7 +76,7 @@ function CvCard({ cvUrl, uploadingCv, onUpload, onDelete }) {
         </div>
       ) : (
         <div className="cv-empty-state">
-          <p className="cv-empty-text">Aucun CV n'a été ajouté.</p>
+          <p className="cv-empty-text">{t("profile.noCV")}</p>
           <button
             type="button"
             onClick={handleModifyClick}

@@ -2,10 +2,12 @@ import {
   S3Client,
   PutObjectCommand,
   GetObjectCommand,
+  DeleteObjectCommand,
 } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
-import { Injectable, BadRequestException } from '@nestjs/common';
+import { Injectable, BadRequestException, NotFoundException, ForbiddenException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { NotificationService } from 'src/notification/notification.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
@@ -15,7 +17,7 @@ export class S3Service {
 
   constructor(
     private configService: ConfigService,
-    private prismaService: PrismaService
+    private prismaService: PrismaService,
   ) {
     this.bucket = this.configService.get('AWS_BUCKET_NAME');
     this.s3 = new S3Client({
@@ -72,5 +74,68 @@ export class S3Service {
 
     const signedUrl = await getSignedUrl(this.s3, command, { expiresIn: 300 });
     return { signedUrl };
+  }
+
+  async deleteCV(
+    userId: string,
+  ): Promise<{ message: string }> {
+    try {
+      const user = await this.prismaService.userProfile.findUnique({
+        where: { userId: userId },
+        select: { resume: true },
+      });
+
+      if (!user?.resume) {
+        throw new BadRequestException("There is no résumé to delete");
+      }
+
+      const deleteParams = {
+        Bucket: this.bucket,
+        Key: `users/${userId}/cv`,
+      };
+
+      await this.s3.send(new DeleteObjectCommand(deleteParams));
+
+      await this.prismaService.userProfile.update({
+        where: { userId: userId },
+        data: { resume: null },
+      });
+
+      return { message: 'Résumé deleted successfully' };
+    } catch (error) {
+      throw new Error(`Error deleting résumé: ${error.message}`);
+    }
+  }
+
+  async deleteProfilePicture(
+    userId: string,
+  ): Promise<{ message: string }> {
+    try {
+      const user = await this.prismaService.userProfile.findUnique({
+        where: { userId: userId },
+        select: { imageUrl: true },
+      });
+
+      if (!user?.imageUrl) {
+        throw new BadRequestException("There is no profile picture to delete");
+      }
+
+      const deleteParams = {
+        Bucket: this.bucket,
+        Key: `users/${userId}/profile`,
+      };
+
+      await this.s3.send(new DeleteObjectCommand(deleteParams));
+      console.log(`Profile picture deleted successfully from bucket ${this.bucket}.`);
+
+      await this.prismaService.userProfile.update({
+        where: { userId: userId },
+        data: {imageUrl: null},
+      });
+
+      return { message: 'Profile picture deleted successfully' };
+    } catch (error) {
+      throw new Error(`Error deleting profile picture: ${error.message}`);
+    }
   }
 }

@@ -234,6 +234,28 @@ function Profile() {
     }
   };
 
+  const handleDeleteProfilePicture = async (e) => {
+    e.stopPropagation();
+    if (!window.confirm(t("profile.removePictureConfirmation"))) {
+      return;
+    }
+
+    try {
+      const params = new URLSearchParams({
+        filename: "profile",
+      });
+      const res = await apiService.delete(`/s3/delete?${params.toString()}`);
+      if (res.ok) {
+        setUploadedImage(null);
+        toast.success(t("profile.removePictureSuccess"));
+      } else {
+        throw new Error(t("profile.removePictureError"));
+      }
+    } catch (error) {
+      toast.error(error.message);
+    }
+  };
+
   const handleCvUpload = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -264,7 +286,6 @@ function Profile() {
         throw new Error("Échec de l'envoi du CV sur S3");
       }
 
-      // Récupérer la nouvelle URL du CV
       await fetchCvUrl();
       toast.success("CV téléchargé avec succès !");
     } catch (error) {
@@ -355,11 +376,7 @@ function Profile() {
         <div className="profile-container">
           <aside className="profile-right-column">
             <section className="profile-card profile-picture-card">
-              <div
-                className="image-wrapper"
-                onClick={() => fileInputRef.current.click()}
-                style={{ cursor: "pointer" }}
-              >
+              <div className="image-wrapper" onClick={() => fileInputRef.current.click()}>
                 <input
                   type="file"
                   ref={fileInputRef}
@@ -368,19 +385,28 @@ function Profile() {
                   style={{ display: "none" }}
                 />
                 {uploadedImage ? (
-                  <img
-                    src={uploadedImage}
-                    alt={t("profile.picture")}
-                    className="profile-img"
-                  />
+                  <>
+                    <img
+                      src={uploadedImage}
+                      alt={t("profile.picture")}
+                      className="profile-img"
+                    />
+                    <button
+                      onClick={handleDeleteProfilePicture}
+                      className="delete-button"
+                      title={t("profile.removePicture")}
+                      type="button"
+                    >
+                      ×
+                    </button>
+                  </>
                 ) : (
                   <CircleUserRound size={120} color="#9ca3af" />
                 )}
                 {uploading && <div>Uploading...</div>}
               </div>
               <h3 className="profile-name">
-                {personalInfo.firstName || "Votre"}{" "}
-                {personalInfo.lastName || "Nom"}
+                {personalInfo.firstName || ""} {personalInfo.lastName || ""}
               </h3>
             </section>
 
