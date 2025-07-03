@@ -644,6 +644,7 @@
     "modify": "Modifier mon CV",
     "delete": "Supprimer mon CV",
     "add": "Ajouter un CV",
+    "noCV": "Aucun CV n'a été ajouté",
     "preferences": "Préférences de recherche",
     "contractType": "Type de contrat",
     "selectContract": "Sélectionner un type de contrat",
@@ -659,7 +660,11 @@
     "chooseService": "Choisissez un service à connecter à votre compte Carrion",
     "connectGmail": "Connecter Gmail",
     "connectOutlook": "Connecter Outlook",
-    "allConnected": "Tous les services sont connectés"
+    "allConnected": "Tous les services sont connectés",
+    "removePicture": "Supprimer la photo de profil",
+    "removePictureConfirmation": "Êtes-vous sûr de vouloir supprimer votre photo de profil ?",
+    "removePictureSuccess": "Photo de profil supprimée avec succès!",
+    "removePictureError": "Erreur lors de la suppression de la photo de profil."
   },
 
   "settings": {

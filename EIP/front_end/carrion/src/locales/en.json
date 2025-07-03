@@ -641,6 +641,7 @@
     "modify": "Modify my CV",
     "delete": "Delete my CV",
     "add": "Add a CV",
+    "noCV": "No CV uploaded",
     "preferences": "Seache preferences",
     "contractType": "Contract type",
     "selectContract": "Select your contract type",
@@ -656,7 +657,11 @@
     "chooseService": "Choose a service to connect to your Carrion account",
     "connectGmail": "Connect Gmail",
     "connectOutlook": "Connect Outlook",
-    "allConnected": "All services are connected"
+    "allConnected": "All services are connected",
+    "removePicture": "Remove profile picture",
+    "removePictureConfirmation": "Are you sure you want to remove your profile picture?",
+    "removePictureSuccess": "Your profile picture has been successfully removed!",
+    "removePictureError": "An error occurred while removing your profile picture."
   },
 
   "settings": {
