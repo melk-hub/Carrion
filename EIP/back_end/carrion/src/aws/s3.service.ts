@@ -95,14 +95,12 @@ export class S3Service {
       };
 
       await this.s3.send(new DeleteObjectCommand(deleteParams));
-      console.log(`Résumé deleted successfully from bucket ${this.bucket}.`);
 
       await this.prismaService.userProfile.update({
         where: { userId: userId },
         data: { resume: null },
       });
 
-      console.log(userId);
       return { message: 'Résumé deleted successfully' };
     } catch (error) {
       throw new Error(`Error deleting résumé: ${error.message}`);

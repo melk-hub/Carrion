@@ -242,10 +242,7 @@ export default function Home() {
         throw new Error(`${t('dashboard.errors.addError')} ${response.status}`);
       }
 
-      // Close modal and show success
-      closeAddModal();
-      console.log('Application added successfully');
-      
+      closeAddModal();      
     } catch (error) {
       console.error(t('dashboard.errors.addError'), error);
     }
