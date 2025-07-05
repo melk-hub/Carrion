@@ -1,4 +1,10 @@
-import { Module, forwardRef, Global } from '@nestjs/common';
+import {
+  Module,
+  forwardRef,
+  Global,
+  NestModule,
+  MiddlewareConsumer,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { LocalStrategy } from './strategies/local.strategy';
@@ -20,6 +26,7 @@ import { UserModule } from 'src/user/user.module';
 import { HttpModule } from '@nestjs/axios';
 import { UserProfileModule } from 'src/userProfile/user-profile.module';
 import { CustomLoggingService } from 'src/common/services/logging.service';
+import { GoogleRedirectMiddleware } from './middleware/google-redirect.middleware';
 
 @Global()
 @Module({
@@ -54,4 +61,8 @@ import { CustomLoggingService } from 'src/common/services/logging.service';
   ],
   exports: [AuthService, CustomLoggingService],
 })
-export class AuthModule {}
+export class AuthModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(GoogleRedirectMiddleware).forRoutes('auth/google/callback');
+  }
+}
