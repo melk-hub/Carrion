@@ -11,6 +11,7 @@ import {
   Body,
   Response,
   Param,
+  Logger,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { AuthService } from './auth.service';
@@ -21,10 +22,6 @@ import { GoogleAuthGuard } from './guards/google/google-auth.guard';
 import { CreateUserDto } from 'src/user/dto/create-user.dto';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { MicrosoftAuthGuard } from './guards/microsoft/microsoft-auth.guard';
-import {
-  CustomLoggingService,
-  LogCategory,
-} from 'src/common/services/logging.service';
 import { JwtService } from '@nestjs/jwt';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
@@ -34,7 +31,6 @@ import { ForgotPasswordDto } from './dto/forgot-password.dto';
 export class AuthController {
   constructor(
     private readonly authService: AuthService,
-    private readonly logger: CustomLoggingService,
     private readonly jwtService: JwtService,
   ) {}
 
@@ -64,8 +60,8 @@ export class AuthController {
   @Post('signup')
   @ApiOperation({ summary: 'User signup' })
   async signUp(@Body() userInfo: CreateUserDto, @Res() res) {
-    const token = await this.authService.signUp(userInfo);
-    res.cookie('access_token', token.accessToken, {
+    const tokens = await this.authService.signUp(userInfo);
+    res.cookie('access_token', tokens.accessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'Strict',
@@ -103,9 +99,7 @@ export class AuthController {
       }
       return res.status(200).json({ message: 'Token refreshed successfully' });
     } catch (error) {
-      this.logger.error('Token refresh error', undefined, LogCategory.AUTH, {
-        error: error.message,
-      });
+      Logger.error(error);
       return res.status(401).json({ message: 'Token refresh failed' });
     }
   }
@@ -220,25 +214,23 @@ export class AuthController {
   async googleCallback(@Req() req, @Res() res) {
     const user = req.user as any;
     if (!user || user.redirected) return;
-
-    const oneHourInDays = 1 / 24;
-
+    const twentyFiveMinutesInDays = 25 / (60 * 24);
     await this.authService.saveTokens(
       user.id,
       user.accessToken,
       user.refreshToken || '',
-      oneHourInDays,
+      twentyFiveMinutesInDays,
       'Google_oauth2',
       user.providerId,
       user.oauthEmail,
     );
-
-    await this.authService.createGmailWebhook(user.accessToken, user.id);
-
-    if (user.isLinkFlow) {
-      return res.redirect(`${process.env.FRONT}/profile?link_success=google`);
+    try {
+      await this.authService.createGmailWebhook(user.accessToken, user.id);
+    } catch (error) {
+      Logger.error(error);
     }
-
+    if (user.isLinkFlow)
+      return res.redirect(`${process.env.FRONT}/profile?link_success=google`);
     const tokens = await this.authService.login(user.id);
     res.cookie('access_token', tokens.accessToken, {
       httpOnly: true,
@@ -263,36 +255,25 @@ export class AuthController {
   async microsoftCallback(@Req() req, @Res() res) {
     const user = req.user as any;
     if (!user || user.redirected) return;
-
-    const expiresInDays = user.expires_in / (60 * 60 * 24);
-
+    const twentyFiveMinutesInDays = 25 / (60 * 24);
     await this.authService.saveTokens(
       user.id,
       user.accessToken,
       user.refreshToken || '',
-      expiresInDays,
+      twentyFiveMinutesInDays,
       'Microsoft_oauth2',
       user.providerId,
       user.oauthEmail,
     );
-
-    const webhookId = await this.authService.createOutlookWebhook(
-      user.accessToken,
-      user.id,
-    );
-    if (webhookId) {
-      await this.authService.updateMicrosoftTokenWithSubscription(
-        user.id,
-        webhookId,
-      );
+    try {
+      await this.authService.createOutlookWebhook(user.accessToken, user.id);
+    } catch (error) {
+      Logger.error(error);
     }
-
-    if (user.isLinkFlow) {
+    if (user.isLinkFlow)
       return res.redirect(
         `${process.env.FRONT}/profile?link_success=microsoft`,
       );
-    }
-
     const tokens = await this.authService.login(user.id);
     res.cookie('access_token', tokens.accessToken, {
       httpOnly: true,

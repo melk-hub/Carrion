@@ -38,7 +38,6 @@ export class GmailService {
       return;
     }
 
-
     const validAccessToken = await this.authService.getValidToken(
       tokenRecord.userId,
       'Google_oauth2',
@@ -50,6 +49,8 @@ export class GmailService {
       );
       return;
     }
+
+    await this.authService.checkAndRenewWebhook(tokenRecord, validAccessToken);
 
     const oauth2Client = new google.auth.OAuth2();
     oauth2Client.setCredentials({ access_token: validAccessToken });
@@ -66,10 +67,7 @@ export class GmailService {
         history.data.historyId,
       );
 
-      if (!history.data.history) {
-        this.logger.log('No history changes found');
-        return;
-      }
+      if (!history.data.history) return;
 
       const messageIds = new Set<string>();
       for (const historyRecord of history.data.history) {
@@ -80,16 +78,9 @@ export class GmailService {
         }
       }
 
-      if (messageIds.size === 0) {
-        this.logger.log('History found, but no new messages to process.');
-        return;
-      }
+      if (messageIds.size === 0) return;
 
       const uniqueMessageIds = Array.from(messageIds);
-      this.logger.log(
-        `Found ${uniqueMessageIds.length} unique messages to process`,
-      );
-
       const messageProcessingPromises = uniqueMessageIds.map((messageId) =>
         this.processMessage(gmail, messageId, tokenRecord.userId),
       );
@@ -102,7 +93,6 @@ export class GmailService {
       ) {
         const batch = messageProcessingPromises.slice(i, i + CONCURRENT_LIMIT);
         await Promise.all(batch);
-        this.logger.log(`Processed batch of ${batch.length} emails`);
       }
     } catch (error) {
       this.logger.error(
@@ -125,7 +115,6 @@ export class GmailService {
       });
       const message = messageRes.data;
       const gmailMessage: GmailMessage = this.mapToGmailMessage(message);
-
       await this.mailFilter.processEmailAndCreateJobApplyFromGmail(
         gmailMessage,
         userId,
@@ -139,14 +128,10 @@ export class GmailService {
 
   mapToGmailMessage(sourceData: any): GmailMessage {
     if (!sourceData?.id || !sourceData?.payload) {
-      this.logger.error(
-        'Source message data is missing essential "id" or "payload"',
-        JSON.stringify(sourceData),
-      );
       throw new Error('Invalid message structure received from API.');
     }
     const sourcePayload = sourceData.payload;
-    const gmailMessage: GmailMessage = {
+    return {
       id: sourceData.id,
       threadId: sourceData.threadId ?? '',
       snippet: sourceData.snippet ?? '',
@@ -166,6 +151,5 @@ export class GmailService {
         parts: sourcePayload.parts ? sourcePayload.parts : undefined,
       },
     };
-    return gmailMessage;
   }
 }
