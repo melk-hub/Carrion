@@ -194,7 +194,7 @@ function Dashboard() {
   // Statistiques
   const stats = {
     total: applications.length,
-    pending: applications.filter((app) => app.status === "PENDING" || app.status === "AWAITING_DECISION" || app.status === "NEGOTIATION").length,
+    pending: applications.filter((app) => app.status === "PENDING" || app.status === "NEGOTIATION").length,
     accepted: applications.filter((app) => app.status === "OFFER_RECEIVED" || app.status === "OFFER_ACCEPTED").length,
     refused: applications.filter((app) => app.status === "REJECTED_BY_COMPANY" || app.status === "APPLICATION_WITHDRAWN" || app.status === "OFFER_DECLINED").length,
     interview: applications.filter((app) => app.status === "INTERVIEW_SCHEDULED" || app.status === "TECHNICAL_TEST").length,

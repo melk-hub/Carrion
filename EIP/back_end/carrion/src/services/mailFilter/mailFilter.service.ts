@@ -493,7 +493,7 @@ EXPECTED FORMAT EXAMPLE:
   "location": "string|null",
   "salary": "string|null",
   "contractType": "Full-time|Part-time|Internship|Contract|Freelance|null",
-  "status": "PENDING|APPLIED|INTERVIEW_SCHEDULED|TECHNICAL_TEST|AWAITING_DECISION|OFFER_RECEIVED|NEGOTIATION|OFFER_ACCEPTED|REJECTED_BY_COMPANY|OFFER_DECLINED|APPLICATION_WITHDRAWN",
+  "status": "PENDING|APPLIED|INTERVIEW_SCHEDULED|TECHNICAL_TEST|OFFER_RECEIVED|NEGOTIATION|OFFER_ACCEPTED|REJECTED_BY_COMPANY|OFFER_DECLINED|APPLICATION_WITHDRAWN",
   "interviewDate": "YYYY-MM-DDTHH:mm:ss.sssZ|null",
   "offerReference": "string|null"
 }
@@ -521,7 +521,6 @@ MANDATORY: Only the JSON markdown block above
 - **APPLIED**: Application already sent
 - **INTERVIEW_SCHEDULED**: Interview invitation / appointment scheduled 
 - **TECHNICAL_TEST**: Technical test
-- **AWAITING_DECISION**: Awaiting decision
 - **OFFER_RECEIVED**: Offer received
 - **NEGOTIATION**: Negotiation
 - **OFFER_ACCEPTED**: Offer accepted / firm proposal / application retained

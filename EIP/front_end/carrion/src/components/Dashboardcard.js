@@ -21,7 +21,6 @@ function ApplicationCard({
   const getStatusClass = (status) => {
     switch (status) {
       case "PENDING":
-      case "AWAITING_DECISION":
       case "NEGOTIATION":
       case "APPLIED":
         return "status-pending";

@@ -172,7 +172,6 @@ function Archives() {
     pending: applications.filter(
       (app) =>
         app.status === "PENDING" ||
-        app.status === "AWAITING_DECISION" ||
         app.status === "NEGOTIATION"
     ).length,
     accepted: applications.filter(
