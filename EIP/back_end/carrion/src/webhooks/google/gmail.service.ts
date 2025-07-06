@@ -57,43 +57,88 @@ export class GmailService {
     const gmail = google.gmail({ version: 'v1', auth: oauth2Client });
 
     try {
-      const history = await gmail.users.history.list({
-        userId: 'me',
-        startHistoryId: historyId,
-      });
-
-      await this.authService.updateGoogleTokenWithHistoryId(
-        tokenRecord.userId,
-        history.data.historyId,
+      // Get the last known historyId from database (stored in externalId)
+      const lastKnownHistoryId = tokenRecord.externalId;
+      this.logger.log(
+        `Retrieving history from ${lastKnownHistoryId || 'beginning'} to ${historyId}`,
       );
 
-      if (!history.data.history) return;
+      const history = await gmail.users.history.list({
+        userId: 'me',
+        startHistoryId: lastKnownHistoryId || historyId, // Use last known or fallback to current
+      });
+
+      // Update the stored historyId with the new one
+      await this.authService.updateGoogleTokenWithHistoryId(
+        tokenRecord.userId,
+        historyId.toString(), // Convert to string for database storage
+      );
+
+      if (!history.data.history) {
+        this.logger.log(
+          `No history data found between ${lastKnownHistoryId} and ${historyId}`,
+        );
+        return;
+      }
+
+      this.logger.log(
+        `Processing ${history.data.history.length} history records between ${lastKnownHistoryId} and ${historyId}`,
+      );
 
       const messageIds = new Set<string>();
       for (const historyRecord of history.data.history) {
+        // Log all available events for debugging
+        this.logger.log(
+          `History record contains: ${JSON.stringify({
+            messagesAdded: !!historyRecord.messagesAdded,
+            messagesDeleted: !!historyRecord.messagesDeleted,
+            labelsAdded: !!historyRecord.labelsAdded,
+            labelsRemoved: !!historyRecord.labelsRemoved,
+            messagesAddedCount: historyRecord.messagesAdded?.length || 0,
+            messagesDeletedCount: historyRecord.messagesDeleted?.length || 0,
+            labelsAddedCount: historyRecord.labelsAdded?.length || 0,
+            labelsRemovedCount: historyRecord.labelsRemoved?.length || 0,
+          })}`,
+        );
+
         // ONLY process newly added messages - ignore read/delete/label events
         if (historyRecord.messagesAdded) {
           for (const messageAdded of historyRecord.messagesAdded) {
             if (messageAdded.message?.id) {
               messageIds.add(messageAdded.message.id);
-              this.logger.debug(`New message added: ${messageAdded.message.id}`);
+              this.logger.log(`New message added: ${messageAdded.message.id}`);
             }
           }
         }
-        
+
         // Optional: Log other events but don't process them
         if (historyRecord.messagesDeleted) {
-          this.logger.debug(`Messages deleted (ignored): ${historyRecord.messagesDeleted.length}`);
+          this.logger.log(
+            `Messages deleted (ignored): ${historyRecord.messagesDeleted.length}`,
+          );
         }
         if (historyRecord.labelsAdded) {
-          this.logger.debug(`Labels added (ignored): ${historyRecord.labelsAdded.length}`);
+          this.logger.log(
+            `Labels added (ignored): ${historyRecord.labelsAdded.length}`,
+          );
         }
         if (historyRecord.labelsRemoved) {
-          this.logger.debug(`Labels removed (ignored): ${historyRecord.labelsRemoved.length}`);
+          this.logger.log(
+            `Labels removed (ignored): ${historyRecord.labelsRemoved.length}`,
+          );
         }
       }
 
-      if (messageIds.size === 0) return;
+      if (messageIds.size === 0) {
+        this.logger.warn(
+          `No new messages found to process in history update for ${emailAddress}`,
+        );
+        return;
+      }
+
+      this.logger.log(
+        `Found ${messageIds.size} new messages to process: ${Array.from(messageIds).join(', ')}`,
+      );
 
       const uniqueMessageIds = Array.from(messageIds);
       const messageProcessingPromises = uniqueMessageIds.map((messageId) =>
@@ -122,21 +167,35 @@ export class GmailService {
     messageId: string,
     userId: string,
   ): Promise<void> {
+    this.logger.log(`Processing message ${messageId} for user ${userId}`);
+
     try {
       const messageRes = await gmail.users.messages.get({
         userId: 'me',
         id: messageId,
         format: 'full',
       });
+
+      this.logger.log(`Retrieved message ${messageId} from Gmail API`);
+
       const message = messageRes.data;
       const gmailMessage: GmailMessage = this.mapToGmailMessage(message);
-      await this.mailFilter.processEmailAndCreateJobApplyFromGmail(
-        gmailMessage,
-        userId,
+
+      this.logger.log(`Mapped message ${messageId} to GmailMessage format`);
+
+      const result =
+        await this.mailFilter.processEmailAndCreateJobApplyFromGmail(
+          gmailMessage,
+          userId,
+        );
+
+      this.logger.log(
+        `MailFilter processing result for message ${messageId}: ${result}`,
       );
     } catch (error) {
       this.logger.error(
         `Error processing message ${messageId}: ${error.message}`,
+        error.stack,
       );
     }
   }

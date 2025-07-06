@@ -1530,11 +1530,32 @@ If validation fails → return null
   }> {
     const similarJobs = [];
 
+    this.logger.log(
+      `Comparing new job "${parsedData.title}" at "${parsedData.company}" with ${existingJobs.length} existing jobs`,
+    );
+
     for (const existingJob of existingJobs) {
       const similarity = this.calculateJobSimilarity(parsedData, existingJob);
-      if (similarity > 0.5) {
+
+      this.logger.log(
+        `Similarity with "${existingJob.title}" at "${existingJob.company}": ${(similarity * 100).toFixed(1)}%`,
+      );
+
+      if (similarity > 0.75) {
+        const companySimilarity = this.stringSimilarity(
+          parsedData.company?.toLowerCase() || '',
+          existingJob.company?.toLowerCase() || '',
+        );
+
+        if (companySimilarity < 0.5) {
+          this.logger.log(
+            `Rejecting match due to different companies: "${parsedData.company}" vs "${existingJob.company}" (${(companySimilarity * 100).toFixed(1)}% similar)`,
+          );
+          continue; // Skip this job if companies are too different
+        }
+
         let action: 'updated' | 'created' | 'ignored' = 'ignored';
-        if (similarity > 0.7) {
+        if (similarity > 0.8) {
           try {
             const updateJobApply: UpdateJobApply = {
               location: parsedData.location,
@@ -1577,6 +1598,12 @@ If validation fails → return null
       }
     }
 
+    if (similarJobs.length === 0) {
+      this.logger.log(
+        `No similar jobs found. Creating new job for "${parsedData.title}" at "${parsedData.company}"`,
+      );
+    }
+
     return {
       foundSimilar: similarJobs.length > 0,
       similarJobs: similarJobs.sort((a, b) => b.similarity - a.similarity),
@@ -1590,24 +1617,22 @@ If validation fails → return null
     let score = 0;
     let maxScore = 0;
 
-    // Comparaison entreprise (poids: 40%)
-    maxScore += 0.4;
+    maxScore += 0.5;
     if (parsedData.company && existingJob.company) {
       const companySimilarity = this.stringSimilarity(
         parsedData.company.toLowerCase(),
         existingJob.company.toLowerCase(),
       );
-      score += companySimilarity * 0.4;
+      score += companySimilarity * 0.5;
     }
 
-    // Comparaison titre (poids: 40%)
-    maxScore += 0.4;
+    maxScore += 0.3;
     if (parsedData.title && existingJob.title) {
       const titleSimilarity = this.stringSimilarity(
         parsedData.title.toLowerCase(),
         existingJob.title.toLowerCase(),
       );
-      score += titleSimilarity * 0.4;
+      score += titleSimilarity * 0.3;
     }
 
     // Comparaison localisation (poids: 10%)
@@ -1632,7 +1657,13 @@ If validation fails → return null
       score += 0.1; // Bonus si les deux sont null
     }
 
-    return maxScore > 0 ? score / maxScore : 0;
+    const finalScore = maxScore > 0 ? score / maxScore : 0;
+
+    this.logger.debug(
+      `Similarity calculation: Company(${((score / maxScore) * 0.5 * 100).toFixed(1)}%) + Title(${((score / maxScore) * 0.3 * 100).toFixed(1)}%) = ${(finalScore * 100).toFixed(1)}%`,
+    );
+
+    return finalScore;
   }
 
   private stringSimilarity(str1: string, str2: string): number {

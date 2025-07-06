@@ -177,6 +177,37 @@ export class EmailPreFilterService {
     const mediumIndicators: string[] = [];
     const exclusionFound: string[] = [];
 
+    // SPECIAL CASE: LinkedIn job application confirmation emails
+    // These emails contain "unsubscribe" but are legitimate recruitment emails
+    const isLinkedInJobConfirmation = this.isLinkedInJobConfirmation(
+      subjectLower,
+      senderLower,
+      emailTextLower,
+    );
+
+    if (isLinkedInJobConfirmation) {
+      this.stats.processedByClaude++;
+      this.logger.log(
+        `LinkedIn job confirmation detected - bypassing normal filtering. Subject: "${subject}"`,
+      );
+      return {
+        shouldProcess: true,
+        score: 25, // High score for LinkedIn confirmations
+        confidence: 0.95,
+        reason:
+          'LinkedIn job application confirmation email - automatically processed',
+        details: {
+          senderCheck: { isValid: true, reason: 'LinkedIn job confirmation' },
+          contentScore: 25,
+          mlPrediction: true,
+          strongIndicators: ['linkedin-job-confirmation'],
+          mediumIndicators: [],
+          exclusionFound: [],
+          finalScore: 25,
+        },
+      };
+    }
+
     // 1. Check for obvious exclusions first (highest priority)
     for (const pattern of this.config.exclusionPatterns.obvious) {
       if (
@@ -311,13 +342,15 @@ export class EmailPreFilterService {
 
   getFilteringStats(): FilteringStats {
     const runtime = Date.now() - this.stats.startTime;
-    const processingRate = this.stats.totalEmails > 0
-      ? this.stats.processedByClaude / this.stats.totalEmails
-      : 0;
-    const filteringEfficiency = this.stats.totalEmails > 0
-      ? this.stats.filteredOut / this.stats.totalEmails
-      : 0;
-    
+    const processingRate =
+      this.stats.totalEmails > 0
+        ? this.stats.processedByClaude / this.stats.totalEmails
+        : 0;
+    const filteringEfficiency =
+      this.stats.totalEmails > 0
+        ? this.stats.filteredOut / this.stats.totalEmails
+        : 0;
+
     return {
       ...this.stats,
       runtime,
@@ -376,5 +409,48 @@ export class EmailPreFilterService {
         );
       }
     }
+  }
+
+  private isLinkedInJobConfirmation(
+    subject: string,
+    sender: string,
+    emailText: string,
+  ): boolean {
+    // Check if it's from LinkedIn
+    const isLinkedInSender = sender.includes('linkedin.com');
+
+    // Check for job application confirmation patterns
+    const jobConfirmationPatterns = [
+      'candidature a été envoyée',
+      'candidature envoyée',
+      'application sent',
+      'application submitted',
+      'votre candidature a été envoyée',
+      'your application has been sent',
+    ];
+
+    const hasJobConfirmation = jobConfirmationPatterns.some(
+      (pattern) => subject.includes(pattern) || emailText.includes(pattern),
+    );
+
+    // Check for job-related content
+    const jobContentPatterns = [
+      'développeur',
+      'developer',
+      'stage',
+      'internship',
+      'poste',
+      'position',
+      'job',
+      'emploi',
+      'alternance',
+      'apprenticeship',
+    ];
+
+    const hasJobContent = jobContentPatterns.some(
+      (pattern) => subject.includes(pattern) || emailText.includes(pattern),
+    );
+
+    return isLinkedInSender && hasJobConfirmation && hasJobContent;
   }
 }
