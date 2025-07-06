@@ -264,13 +264,13 @@ export class AuthController {
     const user = req.user as any;
     if (!user || user.redirected) return;
 
-    const oneHourInDays = 1 / 24;
+    const expiresInDays = user.expires_in / (60 * 60 * 24);
 
     await this.authService.saveTokens(
       user.id,
       user.accessToken,
       user.refreshToken || '',
-      oneHourInDays,
+      expiresInDays,
       'Microsoft_oauth2',
       user.providerId,
       user.oauthEmail,

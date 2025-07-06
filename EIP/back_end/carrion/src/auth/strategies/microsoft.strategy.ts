@@ -26,27 +26,19 @@ export class MicrosoftStrategy extends PassportStrategy(Strategy, 'microsoft') {
     req: any,
     accessToken: string,
     refreshToken: string,
-    params: { expires_in: number },
     profile: Profile & { _json?: any; userPrincipalName?: string },
   ): Promise<any> {
-    const rawEmail =
-      (profile.emails && profile.emails[0]?.value) ||
-      profile.userPrincipalName ||
-      profile._json?.mail;
     const providerId = profile.id;
+
+    const rawEmail = profile.userPrincipalName;
 
     if (!rawEmail || !providerId) {
       throw new UnauthorizedException(
-        'Could not retrieve essential information from Microsoft profile.',
+        'Could not retrieve essential information from Microsoft profile. The profile object is incomplete.',
       );
     }
 
-    const expiresInSeconds = params.expires_in;
-    if (typeof expiresInSeconds !== 'number') {
-      throw new UnauthorizedException(
-        'Could not determine token expiration time.',
-      );
-    }
+    const expiresInSeconds = 3600;
 
     const oauthEmail = rawEmail.toLowerCase();
     const { displayName, name } = profile;
