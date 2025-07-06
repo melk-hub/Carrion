@@ -38,6 +38,7 @@ export class GmailService {
       return;
     }
 
+
     const validAccessToken = await this.authService.getValidToken(
       tokenRecord.userId,
       'Google_oauth2',

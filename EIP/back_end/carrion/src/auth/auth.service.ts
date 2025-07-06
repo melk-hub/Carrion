@@ -128,15 +128,11 @@ export class AuthService {
       .createHash('sha256')
       .update(resetToken)
       .digest('hex');
-
     const passwordResetExpires = new Date(Date.now() + 3600000);
 
     await this.prisma.user.update({
       where: { email },
-      data: {
-        passwordResetToken,
-        passwordResetExpires,
-      },
+      data: { passwordResetToken, passwordResetExpires },
     });
 
     try {
@@ -162,7 +158,6 @@ export class AuthService {
       sendSmtpEmail.to = [{ email: user.email, name: user.username }];
 
       await apiInstance.sendTransacEmail(sendSmtpEmail);
-
       this.logger.log(
         `Password reset email sent via API to ${email}`,
         LogCategory.AUTH,
@@ -177,15 +172,10 @@ export class AuthService {
           brevoErrorBody: error.response?.body,
         },
       );
-
       await this.prisma.user.update({
         where: { email },
-        data: {
-          passwordResetToken: null,
-          passwordResetExpires: null,
-        },
+        data: { passwordResetToken: null, passwordResetExpires: null },
       });
-
       throw new Error('Could not send reset password email.');
     }
   }
@@ -195,21 +185,16 @@ export class AuthService {
     resetPasswordDto: ResetPasswordDto,
   ): Promise<void> {
     const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
-
     const user = await this.prisma.user.findUnique({
       where: { passwordResetToken: hashedToken },
     });
-
     if (!user) {
       throw new UnauthorizedException('Invalid token.');
     }
-
     if (user.passwordResetExpires < new Date()) {
       throw new UnauthorizedException('Token has expired.');
     }
-
     const hashedPassword = await bcrypt.hash(resetPasswordDto.password, 10);
-
     await this.prisma.user.update({
       where: { id: user.id },
       data: {
@@ -219,7 +204,6 @@ export class AuthService {
         hashedRefreshToken: null,
       },
     });
-
     this.logger.log(
       `Password has been reset for user ${user.id}`,
       LogCategory.AUTH,
@@ -247,18 +231,23 @@ export class AuthService {
       update: {
         accessToken,
         refreshToken,
-        tokenTimeValidity: expirationTime,
-        userId,
         userEmail,
+
+        tokenTimeValidity: expirationTime,
+
+        accessTokenValidity: expirationTime,
       },
       create: {
+        userId,
         name,
         providerId,
         accessToken,
         refreshToken,
-        tokenTimeValidity: expirationTime,
-        userId,
         userEmail,
+
+        tokenTimeValidity: expirationTime,
+
+        accessTokenValidity: expirationTime,
       },
     });
   }
@@ -278,19 +267,13 @@ export class AuthService {
   async login(
     userId: string,
     rememberMe = false,
-  ): Promise<{
-    id: string;
-    accessToken: string;
-    refreshToken: string;
-  }> {
+  ): Promise<{ id: string; accessToken: string; refreshToken: string }> {
     const { accessToken, refreshToken } = await this.generateTokens(
       userId,
       rememberMe,
     );
-
     const hashedRefreshToken = await argon2.hash(refreshToken);
     await this.userService.updateHashedRefreshToken(userId, hashedRefreshToken);
-
     return { id: userId, accessToken, refreshToken };
   }
 
@@ -299,13 +282,11 @@ export class AuthService {
     rememberMe = false,
   ): Promise<{ accessToken: string; refreshToken: string }> {
     const payload: AuthJwtPayload = { sub: userId };
-
     const accessTokenExpiresIn = rememberMe ? '15d' : '1d';
     const [accessToken, refreshToken] = await Promise.all([
       this.jwtService.signAsync(payload, { expiresIn: accessTokenExpiresIn }),
       this.jwtService.signAsync(payload, this.refreshTokenConfig),
     ]);
-
     return { accessToken, refreshToken };
   }
 
@@ -314,11 +295,9 @@ export class AuthService {
       createUserDto.email,
       true,
     );
-
     if (existingUserByEmail) {
       throw new ConflictException('A user with this email already exists.');
     }
-
     const existingUsername = await this.userService.findByIdentifier(
       createUserDto.username,
       false,
@@ -326,7 +305,6 @@ export class AuthService {
     if (existingUsername) {
       throw new ConflictException('A user with this username already exists.');
     }
-
     const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
     const user = await this.userService.create({
       ...createUserDto,
@@ -342,16 +320,13 @@ export class AuthService {
       });
       if (!decoded || !decoded.sub) return null;
       const userId = decoded.sub;
-
       const user = await this.userService.findOne(userId);
       if (!user || !user.hashedRefreshToken) return null;
-
       const refreshTokenMatches = await argon2.verify(
         user.hashedRefreshToken,
         refreshToken,
       );
       if (!refreshTokenMatches) return null;
-
       const tokens = await this.generateTokens(userId);
       await this.userService.updateHashedRefreshToken(
         userId,
@@ -627,7 +602,6 @@ export class AuthService {
     const token = await this.prisma.token.findFirst({
       where: { userId, name: 'Microsoft_oauth2' },
     });
-
     if (!token?.refreshToken || !token.userEmail) {
       this.logger.warn(
         `Cannot refresh Microsoft token for user ${userId}: missing refresh token or OAuth email in token record.`,
@@ -676,7 +650,6 @@ export class AuthService {
     const token = await this.prisma.token.findFirst({
       where: { userId, name: 'Google_oauth2' },
     });
-
     if (!token?.refreshToken || !token.userEmail) {
       this.logger.warn(
         `Cannot refresh Google token for user ${userId}: missing refresh token or OAuth email in token record.`,
@@ -723,13 +696,11 @@ export class AuthService {
       where: { userId, name: tokenName },
     });
     if (!token) return null;
-
     if (
-      new Date(token.tokenTimeValidity) > new Date(Date.now() + 5 * 60 * 1000)
+      new Date(token.accessTokenValidity) > new Date(Date.now() + 5 * 60 * 1000)
     ) {
       return token.accessToken;
     }
-
     this.logger.log(
       `Token for user ${userId} expired or about to expire. Refreshing...`,
       LogCategory.AUTH,
@@ -755,7 +726,6 @@ export class AuthService {
       setTimeout(async () => {
         await this.cleanupInvalidTokens();
       }, 10000);
-
       setInterval(
         async () => {
           await this.monitorWebhookHealth();
@@ -781,13 +751,9 @@ export class AuthService {
     this.logger.log('Running webhook health check...', LogCategory.WEBHOOK);
     try {
       const tokensWithWebhooks = await this.prisma.token.findMany({
-        where: {
-          name: 'Microsoft_oauth2',
-          externalId: { not: null },
-        },
+        where: { name: 'Microsoft_oauth2', externalId: { not: null } },
         select: { userId: true, externalId: true },
       });
-
       for (const token of tokensWithWebhooks) {
         try {
           const isActive = await this.checkWebhookSubscription(
@@ -881,17 +847,12 @@ export class AuthService {
   async cleanupInvalidTokens(): Promise<void> {
     try {
       const tokensToDelete = await this.prisma.token.findMany({
-        where: {
-          OR: [{ accessToken: '' }, { refreshToken: '' }],
-        },
+        where: { OR: [{ accessToken: '' }, { refreshToken: '' }] },
         select: { id: true },
       });
-
       if (tokensToDelete.length > 0) {
         const ids = tokensToDelete.map((t) => t.id);
-        await this.prisma.token.deleteMany({
-          where: { id: { in: ids } },
-        });
+        await this.prisma.token.deleteMany({ where: { id: { in: ids } } });
         this.logger.log(
           `Cleaned up ${ids.length} invalid tokens (with empty strings).`,
           LogCategory.AUTH,

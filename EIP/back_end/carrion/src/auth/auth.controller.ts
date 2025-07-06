@@ -46,18 +46,15 @@ export class AuthController {
   async login(@Request() req, @Res() res) {
     const { rememberMe = false } = req.body;
     const tokens = await this.authService.login(req.user.id, rememberMe);
-
     const cookieMaxAge = rememberMe
       ? 1000 * 60 * 60 * 24 * 15
       : 1000 * 60 * 60 * 24;
-
     res.cookie('access_token', tokens.accessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'Strict',
       maxAge: cookieMaxAge,
     });
-
     return res
       .status(HttpStatus.OK)
       .send({ message: 'User logged in successfully' });
@@ -224,15 +221,18 @@ export class AuthController {
     const user = req.user as any;
     if (!user || user.redirected) return;
 
+    const oneHourInDays = 1 / 24;
+
     await this.authService.saveTokens(
       user.id,
       user.accessToken,
       user.refreshToken || '',
-      3650,
+      oneHourInDays,
       'Google_oauth2',
       user.providerId,
       user.oauthEmail,
     );
+
     await this.authService.createGmailWebhook(user.accessToken, user.id);
 
     if (user.isLinkFlow) {
@@ -264,11 +264,13 @@ export class AuthController {
     const user = req.user as any;
     if (!user || user.redirected) return;
 
+    const oneHourInDays = 1 / 24;
+
     await this.authService.saveTokens(
       user.id,
       user.accessToken,
       user.refreshToken || '',
-      90,
+      oneHourInDays,
       'Microsoft_oauth2',
       user.providerId,
       user.oauthEmail,

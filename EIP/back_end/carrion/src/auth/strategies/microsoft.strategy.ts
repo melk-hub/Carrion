@@ -26,28 +26,31 @@ export class MicrosoftStrategy extends PassportStrategy(Strategy, 'microsoft') {
     req: any,
     accessToken: string,
     refreshToken: string,
+    params: { expires_in: number },
     profile: Profile & { _json?: any; userPrincipalName?: string },
-    done: (err: any, user: any, info?: any) => void,
-  ) {
+  ): Promise<any> {
     const rawEmail =
       (profile.emails && profile.emails[0]?.value) ||
       profile.userPrincipalName ||
       profile._json?.mail;
-
     const providerId = profile.id;
 
     if (!rawEmail || !providerId) {
-      return done(
-        new UnauthorizedException(
-          'Could not retrieve essential information from Microsoft profile.',
-        ),
-        false,
+      throw new UnauthorizedException(
+        'Could not retrieve essential information from Microsoft profile.',
+      );
+    }
+
+    const expiresInSeconds = params.expires_in;
+    if (typeof expiresInSeconds !== 'number') {
+      throw new UnauthorizedException(
+        'Could not determine token expiration time.',
       );
     }
 
     const oauthEmail = rawEmail.toLowerCase();
-
     const { displayName, name } = profile;
+
     let loggedInUserId: string | undefined = undefined;
     let isLinkFlow = false;
     const state = req.query.state;
@@ -73,24 +76,21 @@ export class MicrosoftStrategy extends PassportStrategy(Strategy, 'microsoft') {
       lastName: name?.familyName || '',
     };
 
-    try {
-      const user = await this.authService.validateOAuthUser(
-        'Microsoft_oauth2',
-        providerId,
-        oauthProfile,
-        loggedInUserId,
-      );
+    const user = await this.authService.validateOAuthUser(
+      'Microsoft_oauth2',
+      providerId,
+      oauthProfile,
+      loggedInUserId,
+    );
 
-      return done(null, {
-        ...user,
-        oauthEmail: oauthEmail,
-        accessToken,
-        refreshToken,
-        isLinkFlow,
-        providerId,
-      });
-    } catch (err) {
-      return done(err, false);
-    }
+    return {
+      ...user,
+      oauthEmail: oauthEmail,
+      accessToken,
+      refreshToken,
+      isLinkFlow,
+      providerId,
+      expires_in: expiresInSeconds,
+    };
   }
 }
