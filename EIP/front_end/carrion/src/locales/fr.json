@@ -330,10 +330,13 @@
       "APPLIED": "Postulée",
       "ACCEPTED": "Acceptée", 
       "REJECTED": "Refusée",
-      "INTERVIEW": "Entretien",
+      "INTERVIEW_SCHEDULED": "Entretien planifié",
       "REJECTED_BY_COMPANY": "Refusée",
-      "ON": "Acceptée",
-      "OFFER": "Offre reçue"
+      "APPLICATION_WITHDRAWN": "Postulation annulée",
+      "OFFER_DECLINED": "Offre rejetée",
+      "OFFER_ACCEPTED": "Offre acceptée",
+      "OFFER_RECEIVED": "Offre reçue",
+      "TECHNICAL_TEST": "Test technique"
     },
     "empty": {
       "title": "Aucune candidature trouvée",

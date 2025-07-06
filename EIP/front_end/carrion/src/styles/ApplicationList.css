@@ -10,7 +10,7 @@
 }
 
 .modern-application-list-item::before {
-  content: '';
+  content: "";
   position: absolute;
   left: 0;
   top: 0;
@@ -41,6 +41,10 @@
 
 .modern-application-list-item.status-refused::before {
   background: linear-gradient(180deg, #ef4444, #f87171);
+}
+
+.modern-application-card-list.status-interview::before {
+  background: linear-gradient(90deg, #1212f1, #1307bb);
 }
 
 .modern-list-content {
@@ -181,7 +185,11 @@
 }
 
 .modern-status-badge-list.status-accepted {
-  background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(52, 211, 153, 0.1) 100%);
+  background: linear-gradient(
+    135deg,
+    rgba(16, 185, 129, 0.1) 0%,
+    rgba(52, 211, 153, 0.1) 100%
+  );
   color: #059669;
   border: 1px solid rgba(16, 185, 129, 0.2);
 }
@@ -191,7 +199,11 @@
 }
 
 .modern-status-badge-list.status-pending {
-  background: linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(251, 191, 36, 0.1) 100%);
+  background: linear-gradient(
+    135deg,
+    rgba(245, 158, 11, 0.1) 0%,
+    rgba(251, 191, 36, 0.1) 100%
+  );
   color: #d97706;
   border: 1px solid rgba(245, 158, 11, 0.2);
 }
@@ -201,13 +213,31 @@
 }
 
 .modern-status-badge-list.status-refused {
-  background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(248, 113, 113, 0.1) 100%);
+  background: linear-gradient(
+    135deg,
+    rgba(239, 68, 68, 0.1) 0%,
+    rgba(248, 113, 113, 0.1) 100%
+  );
   color: #dc2626;
   border: 1px solid rgba(239, 68, 68, 0.2);
 }
 
 .modern-status-badge-list.status-refused .status-indicator-list {
   background: linear-gradient(135deg, #ef4444, #f87171);
+}
+
+.modern-status-badge-list.status-interview {
+  background: linear-gradient(
+    135deg,
+    rgba(28, 31, 220, 0.1) 0%,
+    rgba(67, 56, 202, 0.1) 100%
+  );
+  color: #1c1fdc;
+  border: 1px solid rgba(46, 49, 232, 0.2);
+}
+
+.modern-status-badge-list.status-interview .status-indicator-list {
+  background: linear-gradient(135deg, #1c1fdc, #0a20ab);
 }
 
 .modern-list-details {
@@ -321,13 +351,18 @@
 }
 
 .modern-list-button::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.3),
+    transparent
+  );
   transition: left 0.4s;
 }
 
@@ -387,11 +422,13 @@
 }
 
 .modern-list-button.secondary .list-button-icon {
-  filter: brightness(0) saturate(100%) invert(27%) sepia(7%) saturate(1481%) hue-rotate(202deg) brightness(95%) contrast(86%);
+  filter: brightness(0) saturate(100%) invert(27%) sepia(7%) saturate(1481%)
+    hue-rotate(202deg) brightness(95%) contrast(86%);
 }
 
 .modern-list-button.danger .list-button-icon {
-  filter: brightness(0) saturate(100%) invert(22%) sepia(98%) saturate(2969%) hue-rotate(346deg) brightness(97%) contrast(94%);
+  filter: brightness(0) saturate(100%) invert(22%) sepia(98%) saturate(2969%)
+    hue-rotate(346deg) brightness(97%) contrast(94%);
 }
 
 .modern-list-button:hover .list-button-icon {
@@ -399,8 +436,13 @@
 }
 
 @keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
 }
 /* Keep old styles for backward compatibility */
 .application-list-item {
@@ -426,4 +468,8 @@
 
 .application-list-item.status-refused {
   border-left-color: #ef4444;
+}
+
+.application-list-item.status-interview {
+  border-left-color: #171ff2;
 }
