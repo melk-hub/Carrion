@@ -1,10 +1,4 @@
-import {
-  Controller,
-  Get,
-  Post,
-  UseGuards,
-  Request,
-} from '@nestjs/common';
+import { Controller, Get, Post, UseGuards, Request } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/guards/jwt/jwt-auth.guard';
 import { AchievementsService } from './achievements.service';
 
@@ -44,4 +38,4 @@ export class AchievementsController {
   async getUserStats(@Request() req) {
     return this.achievementsService.getUserStats(req.user.id);
   }
-} 
+}

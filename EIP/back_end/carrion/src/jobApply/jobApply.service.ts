@@ -452,7 +452,8 @@ export class JobApplyService {
         updateJobApplyDto.location &&
         updateJobApplyDto.location !== jobApply.location
       ) {
-        variables.locationStart = jobApply.location || 'notifications.noLocation';
+        variables.locationStart =
+          jobApply.location || 'notifications.noLocation';
         variables.locationEnd = updateJobApplyDto.location;
         hasChanges = true;
       }
@@ -461,7 +462,8 @@ export class JobApplyService {
         updateJobApplyDto.salary !== jobApply.salary
       ) {
         variables.salaryStart = jobApply.salary || 'notifications.noSalary';
-        variables.salaryEnd = updateJobApplyDto.salary || 'notifications.noSalary';
+        variables.salaryEnd =
+          updateJobApplyDto.salary || 'notifications.noSalary';
         hasChanges = true;
       }
       if (
@@ -476,7 +478,8 @@ export class JobApplyService {
         updateJobApplyDto.contractType &&
         updateJobApplyDto.contractType !== jobApply.contractType
       ) {
-        variables.contractTypeStart = jobApply.contractType || 'notifications.noContractType';
+        variables.contractTypeStart =
+          jobApply.contractType || 'notifications.noContractType';
         variables.contractTypeEnd = updateJobApplyDto.contractType;
         hasChanges = true;
       }
@@ -488,7 +491,8 @@ export class JobApplyService {
         variables.interviewStart = jobApply.interviewDate
           ? jobApply.interviewDate.toLocaleDateString('fr-FR')
           : 'notifications.noInterview';
-        variables.interviewEnd = updateJobApplyDto.interviewDate.toLocaleDateString('fr-FR');
+        variables.interviewEnd =
+          updateJobApplyDto.interviewDate.toLocaleDateString('fr-FR');
         hasChanges = true;
       }
 

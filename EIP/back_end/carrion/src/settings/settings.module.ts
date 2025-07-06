@@ -10,4 +10,4 @@ import { NotificationModule } from '../notification/notification.module';
   providers: [SettingsService],
   exports: [SettingsService],
 })
-export class SettingsModule {} 
+export class SettingsModule {}

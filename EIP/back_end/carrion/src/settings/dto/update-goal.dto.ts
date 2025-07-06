@@ -29,4 +29,4 @@ export class UpdateGoalDto {
   @Min(1)
   @Max(500)
   monthlyGoal?: number;
-} 
+}

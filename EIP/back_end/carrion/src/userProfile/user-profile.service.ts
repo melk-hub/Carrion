@@ -93,8 +93,8 @@ export class UserProfileService {
 
   async getUserProfilePicture(userId: string) {
     const profilePicture = await this.prisma.userProfile.findUnique({
-      where: {userId: userId},
-      select: {imageUrl: true},
+      where: { userId: userId },
+      select: { imageUrl: true },
     });
     return profilePicture;
   }

@@ -84,4 +84,4 @@ export class SettingsController {
   async getUserSettings(@Request() req) {
     return this.settingsService.getUserSettings(req.user.id);
   }
-} 
+}

@@ -20,10 +20,7 @@ export class AchievementsService {
         isActive: true,
         createdAt: true,
       },
-      orderBy: [
-        { category: 'asc' },
-        { points: 'asc' }
-      ]
+      orderBy: [{ category: 'asc' }, { points: 'asc' }],
     });
   }
 
@@ -43,23 +40,27 @@ export class AchievementsService {
             points: true,
             isActive: true,
             createdAt: true,
-          }
-        }
+          },
+        },
       },
-      orderBy: { unlockedAt: 'desc' }
+      orderBy: { unlockedAt: 'desc' },
     });
   }
 
   async checkAndUnlockAchievements(userId: string, statsData: any) {
     const userAchievements = await this.getUserAchievements(userId);
-    const unlockedAchievementIds = userAchievements.map(ua => ua.achievementId);
-    
-    const availableAchievements = await this.prisma.carrionAchievement.findMany({
-      where: {
-        isActive: true,
-        id: { notIn: unlockedAchievementIds }
-      }
-    });
+    const unlockedAchievementIds = userAchievements.map(
+      (ua) => ua.achievementId,
+    );
+
+    const availableAchievements = await this.prisma.carrionAchievement.findMany(
+      {
+        where: {
+          isActive: true,
+          id: { notIn: unlockedAchievementIds },
+        },
+      },
+    );
 
     const newlyUnlocked = [];
 
@@ -69,7 +70,7 @@ export class AchievementsService {
           data: {
             userId,
             achievementId: achievement.id,
-            unlockedAt: new Date()
+            unlockedAt: new Date(),
           },
           include: {
             achievement: {
@@ -84,11 +85,11 @@ export class AchievementsService {
                 points: true,
                 isActive: true,
                 createdAt: true,
-              }
-            }
-          }
+              },
+            },
+          },
         });
-        
+
         newlyUnlocked.push(userAchievement);
       }
     }
@@ -110,13 +111,13 @@ export class AchievementsService {
           return statsData.offersCount >= achievement.threshold;
         }
         break;
-      
+
       case 'CONSECUTIVE':
         if (achievement.condition.includes('consecutive_days')) {
           return statsData.consecutiveDays >= achievement.threshold;
         }
         break;
-      
+
       case 'PERCENTAGE':
         if (achievement.condition.includes('interview_rate')) {
           return statsData.interviewRate >= achievement.threshold;
@@ -125,28 +126,31 @@ export class AchievementsService {
           return statsData.responseRate >= achievement.threshold;
         }
         break;
-      
+
       case 'ACTION':
         if (achievement.condition.includes('registration')) {
           return true; // L'utilisateur existe, donc il est inscrit
         }
         break;
-      
+
       default:
         return false;
     }
-    
+
     return false;
   }
 
   async getUserStats(userId: string) {
     const achievements = await this.getUserAchievements(userId);
-    const totalPoints = achievements.reduce((sum, ua) => sum + ua.achievement.points, 0);
-    
+    const totalPoints = achievements.reduce(
+      (sum, ua) => sum + ua.achievement.points,
+      0,
+    );
+
     return {
       totalAchievements: achievements.length,
       totalPoints,
-      achievements: achievements.map(ua => ua.achievement)
+      achievements: achievements.map((ua) => ua.achievement),
     };
   }
-} 
+}

@@ -9,4 +9,4 @@ import { PrismaModule } from '../prisma/prisma.module';
   providers: [AchievementsService],
   exports: [AchievementsService],
 })
-export class AchievementsModule {} 
+export class AchievementsModule {}

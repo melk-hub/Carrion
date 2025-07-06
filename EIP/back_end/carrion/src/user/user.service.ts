@@ -14,7 +14,8 @@ import { S3Service } from 'src/aws/s3.service';
 export class UserService {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly s3Service: S3Service) {}
+    private readonly s3Service: S3Service,
+  ) {}
 
   async updateHashedRefreshToken(userId: string, hashedRefreshToken: string) {
     try {
@@ -233,37 +234,42 @@ export class UserService {
       },
     });
 
-    const usersWithAvatars = await Promise.all(users.map(async (user) => {
-      const totalApplications = user.jobApplies.length;
-      const acceptedApplications = user.jobApplies.filter(
-        (app) => app.status === 'APPLIED',
-      ).length;
-      const pendingApplications = user.jobApplies.filter(
-        (app) => app.status === 'PENDING',
-      ).length;
-      const rejectedApplications = user.jobApplies.filter(
-        (app) => app.status === 'REJECTED_BY_COMPANY',
-      ).length;
+    const usersWithAvatars = await Promise.all(
+      users.map(async (user) => {
+        const totalApplications = user.jobApplies.length;
+        const acceptedApplications = user.jobApplies.filter(
+          (app) => app.status === 'APPLIED',
+        ).length;
+        const pendingApplications = user.jobApplies.filter(
+          (app) => app.status === 'PENDING',
+        ).length;
+        const rejectedApplications = user.jobApplies.filter(
+          (app) => app.status === 'REJECTED_BY_COMPANY',
+        ).length;
 
-      let avatarUrl: string | null = null;
-      if (user.userProfile?.imageUrl) {
-        const res = await this.s3Service.getSignedDownloadUrl(user.id, "profile");
-        avatarUrl = res.signedUrl;
-      }
+        let avatarUrl: string | null = null;
+        if (user.userProfile?.imageUrl) {
+          const res = await this.s3Service.getSignedDownloadUrl(
+            user.id,
+            'profile',
+          );
+          avatarUrl = res.signedUrl;
+        }
 
-      return {
-        id: user.id,
-        username: user.username,
-        email: user.email,
-        firstName: user.userProfile?.firstName || '',
-        lastName: user.userProfile?.lastName || '',
-        avatar: avatarUrl,
-        totalApplications,
-        acceptedApplications,
-        pendingApplications,
-        rejectedApplications,
-      };
-    }));
+        return {
+          id: user.id,
+          username: user.username,
+          email: user.email,
+          firstName: user.userProfile?.firstName || '',
+          lastName: user.userProfile?.lastName || '',
+          avatar: avatarUrl,
+          totalApplications,
+          acceptedApplications,
+          pendingApplications,
+          rejectedApplications,
+        };
+      }),
+    );
     return usersWithAvatars;
   }
 }

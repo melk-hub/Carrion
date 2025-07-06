@@ -13,18 +13,18 @@ export class EmailAnalysisResult {
   emailId: string;
   timestamp: Date;
   userId: string;
-  
+
   // Informations email
   emailSubject: string;
   emailSender: string;
   emailBodyPreview: string; // Premiers 500 caractères
-  
+
   // Résultat pré-filtrage
   preFilterResult: PreFilterResult;
-  
+
   // Données extraites par Claude AI (si passé le pré-filtrage)
   extractedData?: ExtractedJobDataDto;
-  
+
   // Comparaison avec jobs existants
   existingJobsComparison?: {
     foundSimilar: boolean;
@@ -36,11 +36,11 @@ export class EmailAnalysisResult {
       action: 'updated' | 'created' | 'ignored';
     }>;
   };
-  
+
   // Métriques de performance
   processingTime: number; // en ms
   claudeAIUsed: boolean;
-  
+
   // Réflexion détaillée du système
   systemReflection: {
     preFilterDecision: string;
@@ -48,7 +48,7 @@ export class EmailAnalysisResult {
     claudeAIReasoning?: string;
     finalDecision: string;
   };
-  
+
   // Résultat final
   finalResult: string;
   jobApplyId?: string;
@@ -60,20 +60,20 @@ export class DashboardStatsDto {
   emailsProcessedByClaudeAI: number;
   jobApplicationsCreated: number;
   jobApplicationsUpdated: number;
-  
+
   filteringEfficiency: {
     senderFiltering: number;
     contentFiltering: number;
     mlFiltering: number;
     claudeAIUsage: number;
   };
-  
+
   performanceMetrics: {
     averageProcessingTime: number;
     claudeAICostSavings: number;
     errorRate: number;
   };
-  
+
   recentAnalyses: EmailAnalysisResult[];
 }
 
@@ -87,4 +87,4 @@ export class ExistingJobComparisonDto {
   createdAt: Date;
   similarity: number;
   matchReason: string;
-} 
+}

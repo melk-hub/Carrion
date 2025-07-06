@@ -5,7 +5,12 @@ import {
   DeleteObjectCommand,
 } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
-import { Injectable, BadRequestException, NotFoundException, ForbiddenException } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  NotFoundException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NotificationService } from 'src/notification/notification.service';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -29,7 +34,11 @@ export class S3Service {
     });
   }
 
-  async getSignedUploadUrl(userId: string, filename: string, contentType: string) {
+  async getSignedUploadUrl(
+    userId: string,
+    filename: string,
+    contentType: string,
+  ) {
     const key = `users/${userId}/${filename}`;
     const command = new PutObjectCommand({
       Bucket: this.bucket,
@@ -39,19 +48,19 @@ export class S3Service {
 
     //await this.userService.addDocument(userId, filename); // à rajouter plus tard. pour l'instant on peut avoir que 1 cv et 1 photo de profil
     const signedUrl = await getSignedUrl(this.s3, command, { expiresIn: 300 });
-    if (filename == "profile") {
+    if (filename == 'profile') {
       await this.prismaService.userProfile.update({
         where: { userId },
         data: {
           imageUrl: key,
-        }
+        },
       });
-    } else if (filename == "cv") {
+    } else if (filename == 'cv') {
       await this.prismaService.userProfile.update({
-        where: {userId},
+        where: { userId },
         data: {
           resume: key,
-        }
+        },
       });
     } else {
       throw new BadRequestException('Filename must be "profile" or "cv"');
@@ -76,9 +85,7 @@ export class S3Service {
     return { signedUrl };
   }
 
-  async deleteCV(
-    userId: string,
-  ): Promise<{ message: string }> {
+  async deleteCV(userId: string): Promise<{ message: string }> {
     try {
       const user = await this.prismaService.userProfile.findUnique({
         where: { userId: userId },
@@ -86,7 +93,7 @@ export class S3Service {
       });
 
       if (!user?.resume) {
-        throw new BadRequestException("There is no résumé to delete");
+        throw new BadRequestException('There is no résumé to delete');
       }
 
       const deleteParams = {
@@ -107,9 +114,7 @@ export class S3Service {
     }
   }
 
-  async deleteProfilePicture(
-    userId: string,
-  ): Promise<{ message: string }> {
+  async deleteProfilePicture(userId: string): Promise<{ message: string }> {
     try {
       const user = await this.prismaService.userProfile.findUnique({
         where: { userId: userId },
@@ -117,7 +122,7 @@ export class S3Service {
       });
 
       if (!user?.imageUrl) {
-        throw new BadRequestException("There is no profile picture to delete");
+        throw new BadRequestException('There is no profile picture to delete');
       }
 
       const deleteParams = {
@@ -126,11 +131,13 @@ export class S3Service {
       };
 
       await this.s3.send(new DeleteObjectCommand(deleteParams));
-      console.log(`Profile picture deleted successfully from bucket ${this.bucket}.`);
+      console.log(
+        `Profile picture deleted successfully from bucket ${this.bucket}.`,
+      );
 
       await this.prismaService.userProfile.update({
         where: { userId: userId },
-        data: {imageUrl: null},
+        data: { imageUrl: null },
       });
 
       return { message: 'Profile picture deleted successfully' };

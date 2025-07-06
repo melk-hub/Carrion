@@ -11,15 +11,7 @@ import { DashboardMailController } from './dashboard.controller';
 @Module({
   imports: [PrismaModule, JobApplyModule, UserModule, NotificationModule],
   controllers: [DashboardMailController],
-  providers: [
-    JobApplyService,
-    MailFilterService,
-    EmailPreFilterService,
-  ],
-  exports: [
-    JobApplyService,
-    MailFilterService,
-    EmailPreFilterService,
-  ],
+  providers: [JobApplyService, MailFilterService, EmailPreFilterService],
+  exports: [JobApplyService, MailFilterService, EmailPreFilterService],
 })
 export class MailFilterModule {}
