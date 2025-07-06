@@ -5,10 +5,21 @@ import { PrismaModule } from 'src/prisma/prisma.module';
 import { JobApplyModule } from 'src/jobApply/jobApply.module';
 import { UserModule } from 'src/user/user.module';
 import { NotificationModule } from 'src/notification/notification.module';
+import { EmailPreFilterService } from './prefilter.service';
+import { DashboardMailController } from './dashboard.controller';
 
 @Module({
   imports: [PrismaModule, JobApplyModule, UserModule, NotificationModule],
-  providers: [JobApplyService, MailFilterService, PrismaModule],
-  exports: [JobApplyService, MailFilterService],
+  controllers: [DashboardMailController],
+  providers: [
+    JobApplyService,
+    MailFilterService,
+    EmailPreFilterService,
+  ],
+  exports: [
+    JobApplyService,
+    MailFilterService,
+    EmailPreFilterService,
+  ],
 })
 export class MailFilterModule {}

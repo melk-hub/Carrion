@@ -9,14 +9,16 @@ import {
   GmailMessagePart,
   GmailHeader,
 } from 'src/webhooks/mail/gmail.types';
-import {
-  JobApplyParams,
-  UpdateJobApply,
-} from 'src/jobApply/interface/jobApply.interface';
+import { UpdateJobApply } from 'src/jobApply/interface/jobApply.interface';
 import { OutlookMessage } from 'src/webhooks/mail/outlook.types';
 import { createHash } from 'crypto';
 import { UserService } from 'src/user/user.service';
 import Anthropic from '@anthropic-ai/sdk';
+import { EmailPreFilterService } from './prefilter.service';
+import {
+  EmailAnalysisResult,
+  ExistingJobComparisonDto,
+} from './dto/dashboard-response.dto';
 
 function extractJsonFromString(str: string): any | null {
   if (!str) {
@@ -176,9 +178,14 @@ export class MailFilterService {
   private userCountCache: { count: number; timestamp: number } | null = null;
   private readonly USER_COUNT_CACHE_TTL = 10 * 60 * 1000; // 10 minutes
 
+  // Stockage analyses pour dashboard
+  private recentAnalyses: EmailAnalysisResult[] = [];
+  private readonly MAX_RECENT_ANALYSES = 100;
+
   constructor(
     private readonly jobApplyService: JobApplyService,
     private readonly userService: UserService,
+    private readonly preFilterService: EmailPreFilterService,
   ) {
     this.claudeAI = new Anthropic({
       apiKey: process.env.ANTHROPIC_API_KEY,
@@ -299,8 +306,9 @@ export class MailFilterService {
     userId: string,
     emailSubject?: string,
     emailSender?: string,
+    messageId?: string,
   ): string {
-    const content = `${userId}|${emailSubject || ''}|${emailSender || ''}|${emailText}`;
+    const content = `${userId}|${emailSubject || ''}|${emailSender || ''}|${messageId || Date.now()}|${emailText}`;
     return createHash('sha256').update(content).digest('hex');
   }
 
@@ -410,45 +418,151 @@ export class MailFilterService {
   private generateOptimizedPrompt(
     emailText: string,
     isComplex: boolean = false,
+    existingJobs: ExistingJobComparisonDto[] = [],
   ): string {
-    const basePrompt = `Tu es un assistant expert en recrutement et en analyse d'emails de candidature.
-**PREMIÈRE VALIDATION OBLIGATOIRE** : Vérifie que le contenu est bien lié au recrutement/candidature. Si ce n'est pas le cas, renvoie null.
+    const existingJobsContext =
+      existingJobs.length > 0
+        ? `
 
-Extraire des informations d'un email de candidature au format JSON :
+## USER'S EXISTING JOBS
+To improve accuracy, here are the user's existing applications:
+${existingJobs.map((job) => `- ${job.title} at ${job.company} (${job.status})`).join('\n')}
+
+Use this information to:
+- Detect potential duplicates
+- Improve company name consistency
+- Identify status updates`
+        : '';
+
+    const basePrompt = `You are an expert in recruitment email analysis with 10 years of experience. You extract job application information with precision.
+
+## MANDATORY PRELIMINARY VALIDATION
+STEP 1: Verify that the email concerns recruitment/job application
+- If NON-RECRUITMENT → return exactly: null
+- If UNCERTAIN → return exactly: null  
+- If RECRUITMENT → continue analysis
+
+## RECRUITMENT EMAIL TYPES TO PROCESS
+Application confirmation
+Interview invitation
+Job offer/proposal
+Application rejection  
+Request for additional documents
+Post-interview feedback
+Internship/apprenticeship proposal
+
+## EMAIL TYPES TO EXCLUDE
+Generic job newsletters
+Training/coaching advertisements
+Technical emails (password, etc.)
+Commercial/marketing emails
+Event/webinar confirmations
+Commercial prospecting emails${existingJobsContext}
+
+## STRICT OUTPUT FORMAT - CRITICAL
+You must return ONLY a valid JSON object in a markdown block. NO text before or after!
+
+EXPECTED FORMAT EXAMPLE:
+\`\`\`json
 {
-  "company": "Nom de l'entreprise (string, obligatoire)",
-  "title": "Intitulé du poste (string, obligatoire)",
-  "location": "Lieu du poste (string, optionnel)",
-  "salary": "Salaire (string, optionnel)",
-  "contractType": "EXCLUSIVEMENT une de ces 5 valeurs: 'Full-time', 'Part-time', 'Internship', 'Contract', 'Freelance', ou null",
-  "status": "Statut parmi (${Object.values(ApplicationStatus).join(', ')})",
-  "interviewDate": "Date d'entretien au format ISO 8601 (optionnel)"
+  "company": "string",
+  "title": "string", 
+  "location": "string|null",
+  "salary": "string|null",
+  "contractType": "Full-time|Part-time|Internship|Contract|Freelance|null",
+  "status": "PENDING|APPLIED|INTERVIEW_SCHEDULED|TECHNICAL_TEST|AWAITING_DECISION|OFFER_RECEIVED|NEGOTIATION|OFFER_ACCEPTED|REJECTED_BY_COMPANY|OFFER_DECLINED|APPLICATION_WITHDRAWN",
+  "interviewDate": "YYYY-MM-DDTHH:mm:ss.sssZ|null",
+  "offerReference": "string|null"
 }
+\`\`\`
 
-**RÈGLES STRICTES** :
-- Si pas de recrutement → renvoie null
-- Informations en anglais pour title et contractType
-- Ne pas inventer de données manquantes
-- Company, title, status sont OBLIGATOIRES`;
+FORBIDDEN: Explanatory text, markdown titles (##), comments
+FORBIDDEN: "## VALIDATION", "## ANALYSIS", etc.
+MANDATORY: Only the JSON markdown block above
+
+## STRICT EXTRACTION RULES
+
+### Company (MANDATORY)
+- Exact company name (not department/subsidiary)
+- If email signature → use company name from signature
+- If email domain → extract company name from domain
+- Examples: "Carrion Corp", "Google", "BNP Paribas"
+
+### Title (MANDATORY)  
+- Exact job title in English
+- No obscure abbreviations
+- Examples: "Software Developer", "Marketing Manager", "Data Scientist"
+
+### Status (MANDATORY - BUSINESS LOGIC)
+- **PENDING**: Application received, awaiting response
+- **APPLIED**: Application already sent
+- **INTERVIEW_SCHEDULED**: Interview invitation / appointment scheduled 
+- **TECHNICAL_TEST**: Technical test
+- **AWAITING_DECISION**: Awaiting decision
+- **OFFER_RECEIVED**: Offer received
+- **NEGOTIATION**: Negotiation
+- **OFFER_ACCEPTED**: Offer accepted / firm proposal / application retained
+- **REJECTED_BY_COMPANY**: Explicit rejection by company
+- **OFFER_DECLINED**: Explicit application refusal
+- **APPLICATION_WITHDRAWN**: Application withdrawn
+
+### ContractType (Strict normalization)
+- **Full-time**: CDI, full-time, permanent
+- **Part-time**: Part-time, partial CDI  
+- **Internship**: Internship, apprenticeship
+- **Contract**: CDD, temporary mission, freelance project
+- **Freelance**: Consultant, self-employed, freelance
+- **null**: If type not mentioned
+
+### Salary (Uniform format)
+- Keep currency and period: "45000 EUR/year", "2500 EUR/month"  
+- Ranges: "40000-50000 EUR/year"
+- null if not mentioned
+
+### InterviewDate (Strict ISO format)
+- Format: "2024-03-15T14:30:00.000Z"
+- null if no precise date
+- Extract time if mentioned
+
+### Location (Geographic normalization)
+- Format: "City, Country" or "City, Region, Country"
+- Examples: "Paris, France", "Remote", "Lyon, Auvergne-Rhône-Alpes, France"
+- null if remote work not specified
+
+## FINAL VALIDATION
+Before returning JSON:
+1. company AND title are non-null and non-empty
+2. status is in allowed enum  
+3. contractType is in allowed enum or null
+4. interviewDate is valid ISO 8601 or null
+5. JSON is syntactically correct
+
+If validation fails → return null
+
+## SPECIFIC INSTRUCTIONS
+- DO NOT invent missing information
+- DO NOT hallucinate data  
+- ALWAYS prefer null if uncertain
+- RESPECT exactly the requested JSON format
+- INCLUDE JSON quotes and commas`;
 
     if (isComplex) {
       return (
         basePrompt +
         `
-**ANALYSE APPROFONDIE** : Email complexe détecté. Analyse attentivement tout le contexte.`
+
+**ANALYSE APPROFONDIE** : Email complexe détecté. Analyse attentivement tout le contexte et les nuances.`
       );
     }
 
     return (
       basePrompt +
       `
+
 **ANALYSE RAPIDE** : Email simple détecté. Extraction directe des informations principales.`
     );
   }
 
-  /**
-   * Determine if email content is complex and needs detailed analysis
-   */
   private isComplexEmail(emailText: string): boolean {
     const indicators = [
       emailText.length > 2000,
@@ -500,11 +614,17 @@ Extraire des informations d'un email de candidature au format JSON :
     }
 
     this.logger.log(
-      `Processing Gmail email without pre-filtering. Subject: "${subject}", Sender: "${sender}"`,
+      `Processing Gmail email. Subject: "${subject}", Sender: "${sender}"`,
     );
 
-    // Generate hash for deduplication
-    const emailHash = this.generateEmailHash(bodyText, userId, subject, sender);
+    // Generate hash for deduplication (including Gmail message ID for uniqueness)
+    const emailHash = this.generateEmailHash(
+      bodyText,
+      userId,
+      subject,
+      sender,
+      gmailMessage.id,
+    );
 
     // Check if email was already processed
     if (this.isEmailAlreadyProcessed(emailHash)) {
@@ -546,23 +666,77 @@ Extraire des informations d'un email de candidature au format JSON :
     emailSubject?: string,
     emailSender?: string,
   ): Promise<string> {
+    const startTime = Date.now();
+    const emailId = this.generateEmailHash(
+      emailText,
+      userId,
+      emailSubject,
+      emailSender,
+    );
     this.logger.log(
       `Processing email for user ${userId}. Subject: "${emailSubject}", Sender: "${emailSender}"`,
     );
 
-    let emailContext = `Email Body:\n${emailText}\n`;
-    if (emailSubject) {
-      emailContext += `\nEmail Subject: ${emailSubject}\n`;
-    }
-    if (emailSender) {
-      emailContext += `\nEmail Sender: ${emailSender}\n`;
-    }
+    // Smart pre-filtering before Claude AI
+    const preFilterResult =
+      await this.preFilterService.shouldProcessWithClaudeAI(
+        emailText,
+        emailSubject || '',
+        emailSender || '',
+      );
+
+    // Créer analyse pour dashboard
+    const analysis: EmailAnalysisResult = {
+      emailId,
+      timestamp: new Date(),
+      userId,
+      emailSubject: emailSubject || '',
+      emailSender: emailSender || '',
+      emailBodyPreview: emailText.substring(0, 500),
+      preFilterResult,
+      processingTime: 0,
+      claudeAIUsed: false,
+      systemReflection: {
+        preFilterDecision: this.generatePreFilterDecision(preFilterResult),
+        contentAnalysis: this.generateContentAnalysis(
+          emailText,
+          emailSubject,
+          emailSender,
+        ),
+        finalDecision: '',
+      },
+      finalResult: '',
+    };
 
     try {
+      if (!preFilterResult.shouldProcess) {
+        analysis.systemReflection.finalDecision = `Email filtré: ${preFilterResult.reason}`;
+        analysis.finalResult = `Email filtered: ${preFilterResult.reason} (confidence: ${preFilterResult.confidence})`;
+        analysis.processingTime = Date.now() - startTime;
+        this.addAnalysisToHistory(analysis);
+        this.logger.log(`Email pre-filtered out: ${preFilterResult.reason}`);
+        return analysis.finalResult;
+      }
+
+      this.logger.log(
+        `Email passed pre-filtering with confidence ${preFilterResult.confidence}`,
+      );
+
+      const existingJobs = await this.getExistingJobsForComparison(userId);
+      console.log('existingJobs', existingJobs);
+      let emailContext = `Email Body:\n${emailText}\n`;
+      if (emailSubject) {
+        emailContext += `\nEmail Subject: ${emailSubject}\n`;
+      }
+      if (emailSender) {
+        emailContext += `\nEmail Sender: ${emailSender}\n`;
+      }
+
       const isComplex = this.isComplexEmail(emailText);
       const optimizedPrompt = this.generateOptimizedPrompt(
         emailText,
         isComplex,
+        existingJobs,
       );
 
       // Check cache first
@@ -574,13 +748,19 @@ Extraire des informations d'un email de candidature au format JSON :
       if (cachedResponse) {
         this.logger.log(`Using cached response for similar email`);
         parsedData = cachedResponse;
+        analysis.systemReflection.claudeAIReasoning =
+          'Réponse trouvée en cache';
       } else {
         // Make claudeAI call with fallback mechanism
+        analysis.claudeAIUsed = true;
         parsedData = await this.callclaudeAIWithFallback(
           optimizedPrompt,
           emailContext,
           isComplex,
         );
+
+        analysis.systemReflection.claudeAIReasoning =
+          this.generateClaudeAIReasoning(parsedData, isComplex, existingJobs);
 
         // Cache the response
         if (parsedData) {
@@ -588,16 +768,29 @@ Extraire des informations d'un email de candidature au format JSON :
         }
       }
 
+      analysis.extractedData = parsedData;
+
       if (!parsedData) {
+        analysis.systemReflection.finalDecision = 'Échec extraction Claude AI';
+        analysis.finalResult =
+          'Erreur lors du parsing du JSON de la réponse claudeAI.';
+        analysis.processingTime = Date.now() - startTime;
+        this.addAnalysisToHistory(analysis);
         this.logger.error(
           'Failed to get valid response from claudeAI or cache.',
         );
-        return 'Erreur lors du parsing du JSON de la réponse claudeAI.';
+        return analysis.finalResult;
       } else if (!parsedData.title || !parsedData.company) {
+        analysis.systemReflection.finalDecision =
+          'Données insuffisantes extraites';
+        analysis.finalResult =
+          'Email analyzed but no valid job application data found';
+        analysis.processingTime = Date.now() - startTime;
+        this.addAnalysisToHistory(analysis);
         this.logger.warn(
           `Didn't create jobApply for this mail: ${emailSender + ' ' + emailSubject}`,
         );
-        return 'Email analyzed but no valid job application data found';
+        return analysis.finalResult;
       }
 
       if (
@@ -612,66 +805,43 @@ Extraire des informations d'un email de candidature au format JSON :
         parsedData.status = ApplicationStatus.PENDING;
       }
 
-      const jobApplyParam: JobApplyParams = {
-        title: parsedData.title,
-        company: parsedData.company,
-        contractType: parsedData.contractType
-          ? parsedData.contractType
-          : undefined,
-        location: parsedData.location ? parsedData.location : undefined,
-      };
-
-      // Enhanced logging for duplicate detection debugging
-      this.logger.log(
-        `Checking for duplicates with params: ${JSON.stringify(jobApplyParam)}`,
-      );
-
-      const existingJobApply = await this.jobApplyService.getJobApplyByParam(
+      // Comparaison avec jobs existants
+      const jobComparison = await this.compareWithExistingJobs(
+        parsedData,
         userId,
-        jobApplyParam,
+        existingJobs,
       );
+      analysis.existingJobsComparison = jobComparison;
 
-      if (existingJobApply) {
-        this.logger.warn(
-          `Job apply already exists for user ${userId} with title ${parsedData.title} and company ${parsedData.company}. Updating status.`,
-        );
-        this.logger.log(
-          `Existing job apply details: ${JSON.stringify({
-            id: existingJobApply.id,
-            title: existingJobApply.title,
-            company: existingJobApply.company,
-            contractType: existingJobApply.contractType,
-            location: existingJobApply.location,
-          })}`,
-        );
-
-        const updateJobApply: UpdateJobApply = {
-          location: parsedData.location,
-          salary: Number.parseInt(parsedData.salary),
-          status: parsedData.status,
-          interviewDate:
-            parsedData.interviewDate &&
-            parsedData.interviewDate !== 'null' &&
-            parsedData.interviewDate.trim() !== ''
-              ? new Date(parsedData.interviewDate)
-              : null,
-          contractType: parsedData.contractType,
-        };
-
-        await this.jobApplyService.updateJobApplyByMail(
-          existingJobApply.id,
-          userId,
-          updateJobApply,
-        );
-        return existingJobApply.id;
+      if (jobComparison.foundSimilar) {
+        const similarJob = jobComparison.similarJobs[0];
+        if (similarJob.action === 'updated') {
+          analysis.systemReflection.finalDecision = `Existing job updated: ${similarJob.title} at ${similarJob.company}`;
+          analysis.finalResult = `Job application updated successfully (ID: ${similarJob.id})`;
+          analysis.jobApplyId = similarJob.id;
+        } else {
+          analysis.systemReflection.finalDecision = `Similar job found but no action taken: ${similarJob.title} at ${similarJob.company}`;
+          analysis.finalResult = `Similar job found but no action taken (ID: ${similarJob.id})`;
+        }
+      } else {
+        const newJobResult = await this.createJobApply(parsedData, userId);
+        analysis.systemReflection.finalDecision = `New job created: ${parsedData.title} at ${parsedData.company}`;
+        analysis.finalResult = newJobResult;
+        // Extract ID from result
+        const idMatch = newJobResult.match(/ID: ([^)]+)/);
+        if (idMatch) {
+          analysis.jobApplyId = idMatch[1];
+        }
       }
 
-      this.logger.log(
-        `No existing job apply found. Creating new one with params: ${JSON.stringify(jobApplyParam)}`,
-      );
-
-      return this.createJobApply(parsedData, userId);
+      analysis.processingTime = Date.now() - startTime;
+      this.addAnalysisToHistory(analysis);
+      return analysis.finalResult;
     } catch (error) {
+      analysis.systemReflection.finalDecision = `Erreur: ${error.message}`;
+      analysis.finalResult = error.message;
+      analysis.processingTime = Date.now() - startTime;
+      this.addAnalysisToHistory(analysis);
       this.logger.error(
         `Erreur avec l'API claudeAI ou lors du traitement: ${error.message}`,
         error.stack,
@@ -708,8 +878,8 @@ Extraire des informations d'un email de candidature au format JSON :
             ],
           },
         ],
-        temperature: 1,
-        max_tokens: isComplex ? 1000 : 600,
+        temperature: 0.3,
+        max_tokens: isComplex ? 1200 : 800,
       });
 
       const rawResponse = response.content[0];
@@ -1099,6 +1269,334 @@ Extraire des informations d'un email de candidature au format JSON :
     if (errorRate < 0.01 && avgLatency < 500)
       return 'EXCELLENT - Can increase concurrency';
     return 'GOOD - Current settings optimal';
+  }
+
+  // Methods for analysis and dashboard
+  private generatePreFilterDecision(preFilterResult: any): string {
+    if (!preFilterResult.shouldProcess) {
+      return `FILTERED: ${preFilterResult.reason} (Confidence: ${Math.round(preFilterResult.confidence * 100)}%)`;
+    }
+    return `PASSED: ${preFilterResult.reason} (Confidence: ${Math.round(preFilterResult.confidence * 100)}%)`;
+  }
+
+  private generateContentAnalysis(
+    emailText: string,
+    subject?: string,
+    sender?: string,
+  ): string {
+    const analysis = [];
+
+    // Length analysis
+    if (emailText.length < 100) {
+      analysis.push('Very short email');
+    } else if (emailText.length > 2000) {
+      analysis.push('Long/complex email');
+    } else {
+      analysis.push('Normal length');
+    }
+
+    // Keywords analysis (both French and English)
+    const jobKeywords = [
+      'candidature',
+      'entretien',
+      'interview',
+      'recrutement',
+      'recruitment',
+      'poste',
+      'position',
+      'emploi',
+      'job',
+      'application',
+    ];
+    const foundKeywords = jobKeywords.filter((keyword) =>
+      (emailText + ' ' + (subject || '')).toLowerCase().includes(keyword),
+    );
+
+    if (foundKeywords.length > 0) {
+      analysis.push(`Job keywords: ${foundKeywords.join(', ')}`);
+    } else {
+      analysis.push('No job keywords detected');
+    }
+
+    // Sender analysis
+    if (sender?.includes('linkedin.com') || sender?.includes('indeed.com')) {
+      analysis.push('Sender: Job platform');
+    } else if (sender?.includes('no-reply') || sender?.includes('noreply')) {
+      analysis.push('Sender: Automatic email');
+    } else {
+      analysis.push('Sender: Personal/company email');
+    }
+
+    return analysis.join(' | ');
+  }
+
+  private generateClaudeAIReasoning(
+    extractedData: ExtractedJobDataDto | null,
+    isComplex: boolean,
+    existingJobs: ExistingJobComparisonDto[],
+  ): string {
+    if (!extractedData) {
+      return 'Claude AI: Unable to extract valid data';
+    }
+
+    const reasoning = [];
+
+    reasoning.push(`Analysis ${isComplex ? 'complex' : 'simple'}`);
+
+    if (extractedData.company && extractedData.title) {
+      reasoning.push(
+        `Company: ${extractedData.company}, Position: ${extractedData.title}`,
+      );
+    }
+
+    if (extractedData.status) {
+      reasoning.push(`Status detected: ${extractedData.status}`);
+    }
+
+    if (existingJobs.length > 0) {
+      reasoning.push(`Compared with ${existingJobs.length} existing jobs`);
+    }
+
+    return reasoning.join(' | ');
+  }
+
+  private async getExistingJobsForComparison(
+    userId: string,
+  ): Promise<ExistingJobComparisonDto[]> {
+    try {
+      // Récupérer les jobs existants de l'utilisateur
+      const existingJobs = await this.jobApplyService.getAllJobApplies(userId);
+
+      // Convertir au format ExistingJobComparisonDto (limiter à 50 récents pour performance)
+      const jobsForComparison: ExistingJobComparisonDto[] = existingJobs
+        .sort(
+          (a, b) =>
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+        )
+        .slice(0, 50)
+        .map((job) => ({
+          id: job.id,
+          title: job.title,
+          company: job.company,
+          location: job.location || null,
+          status: job.status,
+          contractType: job.contractType || null,
+          createdAt: job.createdAt,
+          similarity: 0, // Valeur par défaut, sera calculée lors de la comparaison
+          matchReason: '', // Valeur par défaut, sera définie lors de la comparaison
+        }));
+
+      this.logger.log(
+        `Found ${jobsForComparison.length} existing jobs for user ${userId}`,
+      );
+      return jobsForComparison;
+    } catch (error) {
+      this.logger.warn(
+        `Could not fetch existing jobs for user ${userId}: ${error.message}`,
+      );
+      return [];
+    }
+  }
+
+  private async compareWithExistingJobs(
+    parsedData: ExtractedJobDataDto,
+    userId: string,
+    existingJobs: ExistingJobComparisonDto[],
+  ): Promise<{
+    foundSimilar: boolean;
+    similarJobs: Array<{
+      id: string;
+      title: string;
+      company: string;
+      similarity: number;
+      action: 'updated' | 'created' | 'ignored';
+    }>;
+  }> {
+    const similarJobs = [];
+
+    for (const existingJob of existingJobs) {
+      const similarity = this.calculateJobSimilarity(parsedData, existingJob);
+      if (similarity > 0.5) {
+        let action: 'updated' | 'created' | 'ignored' = 'ignored';
+        if (similarity > 0.7) {
+          try {
+            const updateJobApply: UpdateJobApply = {
+              location: parsedData.location,
+              salary: parsedData.salary
+                ? Number.parseInt(parsedData.salary)
+                : undefined,
+              status: parsedData.status,
+              interviewDate:
+                parsedData.interviewDate &&
+                parsedData.interviewDate !== 'null' &&
+                parsedData.interviewDate.trim() !== ''
+                  ? new Date(parsedData.interviewDate)
+                  : null,
+              contractType: parsedData.contractType,
+            };
+
+            await this.jobApplyService.updateJobApplyByMail(
+              existingJob.id,
+              userId,
+              updateJobApply,
+            );
+            action = 'updated';
+            this.logger.log(
+              `Updated existing job ${existingJob.id}: ${existingJob.title} at ${existingJob.company}`,
+            );
+          } catch (error) {
+            this.logger.error(
+              `Failed to update job ${existingJob.id}: ${error.message}`,
+            );
+          }
+        }
+
+        similarJobs.push({
+          id: existingJob.id,
+          title: existingJob.title,
+          company: existingJob.company,
+          similarity,
+          action,
+        });
+      }
+    }
+
+    return {
+      foundSimilar: similarJobs.length > 0,
+      similarJobs: similarJobs.sort((a, b) => b.similarity - a.similarity),
+    };
+  }
+
+  private calculateJobSimilarity(
+    parsedData: ExtractedJobDataDto,
+    existingJob: ExistingJobComparisonDto,
+  ): number {
+    let score = 0;
+    let maxScore = 0;
+
+    // Comparaison entreprise (poids: 40%)
+    maxScore += 0.4;
+    if (parsedData.company && existingJob.company) {
+      const companySimilarity = this.stringSimilarity(
+        parsedData.company.toLowerCase(),
+        existingJob.company.toLowerCase(),
+      );
+      score += companySimilarity * 0.4;
+    }
+
+    // Comparaison titre (poids: 40%)
+    maxScore += 0.4;
+    if (parsedData.title && existingJob.title) {
+      const titleSimilarity = this.stringSimilarity(
+        parsedData.title.toLowerCase(),
+        existingJob.title.toLowerCase(),
+      );
+      score += titleSimilarity * 0.4;
+    }
+
+    // Comparaison localisation (poids: 10%)
+    maxScore += 0.1;
+    if (parsedData.location && existingJob.location) {
+      const locationSimilarity = this.stringSimilarity(
+        parsedData.location.toLowerCase(),
+        existingJob.location.toLowerCase(),
+      );
+      score += locationSimilarity * 0.1;
+    } else if (!parsedData.location && !existingJob.location) {
+      score += 0.1; // Bonus si les deux sont null
+    }
+
+    // Comparaison type contrat (poids: 10%)
+    maxScore += 0.1;
+    if (parsedData.contractType && existingJob.contractType) {
+      if (parsedData.contractType === existingJob.contractType) {
+        score += 0.1;
+      }
+    } else if (!parsedData.contractType && !existingJob.contractType) {
+      score += 0.1; // Bonus si les deux sont null
+    }
+
+    return maxScore > 0 ? score / maxScore : 0;
+  }
+
+  private stringSimilarity(str1: string, str2: string): number {
+    // Calcul simple de similarité basé sur Levenshtein distance
+    const longer = str1.length > str2.length ? str1 : str2;
+    const shorter = str1.length > str2.length ? str2 : str1;
+    if (longer.length === 0) return 1;
+    const editDistance = this.levenshteinDistance(longer, shorter);
+    return (longer.length - editDistance) / longer.length;
+  }
+
+  private levenshteinDistance(str1: string, str2: string): number {
+    const matrix = [];
+    for (let i = 0; i <= str2.length; i++) {
+      matrix[i] = [i];
+    }
+    for (let j = 0; j <= str1.length; j++) {
+      matrix[0][j] = j;
+    }
+    for (let i = 1; i <= str2.length; i++) {
+      for (let j = 1; j <= str1.length; j++) {
+        if (str2.charAt(i - 1) === str1.charAt(j - 1)) {
+          matrix[i][j] = matrix[i - 1][j - 1];
+        } else {
+          matrix[i][j] = Math.min(
+            matrix[i - 1][j - 1] + 1,
+            matrix[i][j - 1] + 1,
+            matrix[i - 1][j] + 1,
+          );
+        }
+      }
+    }
+    return matrix[str2.length][str1.length];
+  }
+
+  private addAnalysisToHistory(analysis: EmailAnalysisResult): void {
+    this.recentAnalyses.unshift(analysis);
+    if (this.recentAnalyses.length > this.MAX_RECENT_ANALYSES) {
+      this.recentAnalyses = this.recentAnalyses.slice(
+        0,
+        this.MAX_RECENT_ANALYSES,
+      );
+    }
+  }
+
+  // Méthodes pour le dashboard
+  getRecentAnalyses(limit: number = 10): EmailAnalysisResult[] {
+    return this.recentAnalyses.slice(0, limit);
+  }
+
+  getDashboardStats(): any {
+    const filterStats = this.preFilterService.getFilteringStats();
+    const currentMetrics = this.getPerformanceMetrics();
+    const totalCreated = this.recentAnalyses.filter(
+      (a) => a.jobApplyId && !a.existingJobsComparison?.foundSimilar,
+    ).length;
+    const totalUpdated = this.recentAnalyses.filter(
+      (a) => a.existingJobsComparison?.foundSimilar,
+    ).length;
+    return {
+      totalEmailsProcessed: filterStats.totalEmails,
+      emailsFilteredOut:
+        filterStats.totalEmails - filterStats.processedByClaude,
+      emailsProcessedByClaudeAI: filterStats.processedByClaude,
+      jobApplicationsCreated: totalCreated,
+      jobApplicationsUpdated: totalUpdated,
+      filteringEfficiency: filterStats.filteringEfficiency,
+      performanceMetrics: {
+        averageProcessingTime:
+          this.recentAnalyses.length > 0
+            ? this.recentAnalyses.reduce(
+                (sum, a) => sum + a.processingTime,
+                0,
+              ) / this.recentAnalyses.length
+            : 0,
+        claudeAICostSavings: filterStats.filteringEfficiency * 100,
+        errorRate: currentMetrics.errorRate,
+      },
+      recentAnalyses: this.getRecentAnalyses(20),
+    };
   }
 
   private getScaleRecommendations(userCount: number): any {

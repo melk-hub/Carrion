@@ -7,7 +7,7 @@ import googleOauthConfig from 'src/auth/config/google-oauth.config';
 import { PrismaModule } from 'src/prisma/prisma.module';
 import { UserModule } from 'src/user/user.module';
 import { MailFilterModule } from 'src/services/mailFilter/mailFilter.module';
-import { MailFilterService } from 'src/services/mailFilter/mailFilter.service';
+
 import { JwtModule } from '@nestjs/jwt';
 import jwtConfig from 'src/auth/config/jwt.config';
 
@@ -21,6 +21,6 @@ import jwtConfig from 'src/auth/config/jwt.config';
     JwtModule.registerAsync(jwtConfig.asProvider()),
   ],
   controllers: [GmailController],
-  providers: [GmailService, MailFilterService],
+  providers: [GmailService],
 })
 export class GmailModule {}

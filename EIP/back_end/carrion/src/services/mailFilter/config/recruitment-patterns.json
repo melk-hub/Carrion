@@ -1,0 +1,124 @@
+{
+  "recruitmentIndicators": {
+    "strong": {
+      "subjects": [
+        "candidature",
+        "application",
+        "entretien",
+        "interview",
+        "job offer",
+        "offre emploi",
+        "offer",
+        "recruitment",
+        "recrutement",
+        "invitation",
+        "selected",
+        "retenu",
+        "congratulations",
+        "felicitations"
+      ],
+      "senders": [
+        "rh@",
+        "hr@",
+        "recrutement@",
+        "recruitment@",
+        "talent@",
+        "careers@",
+        "carrieres@",
+        "jobs@"
+      ],
+      "domains": [
+        "linkedin.com",
+        "indeed.com",
+        "glassdoor.com",
+        "welcometothejungle.com",
+        "jobteaser.com",
+        "apec.fr",
+        "pole-emploi.fr",
+        "meteojob.com",
+        "hays.fr"
+      ]
+    },
+    "medium": {
+      "subjects": [
+        "opportunity",
+        "opportunite",
+        "position",
+        "poste",
+        "stage",
+        "internship",
+        "alternance",
+        "apprenticeship",
+        "mission",
+        "project",
+        "projet"
+      ],
+      "content": [
+        "nous recherchons",
+        "we are looking",
+        "hiring",
+        "embauche",
+        "nous embauchons",
+        "we are hiring",
+        "rejoindre",
+        "join",
+        "equipe",
+        "team",
+        "cv",
+        "resume",
+        "curriculum"
+      ]
+    }
+  },
+  "exclusionPatterns": {
+    "obvious": [
+      "newsletter",
+      "unsubscribe",
+      "desabonnement",
+      "expedie",
+      "shipped",
+      "delivered",
+      "livre",
+      "order",
+      "commande",
+      "facture",
+      "invoice",
+      "receipt",
+      "recu",
+      "paiement",
+      "payment",
+      "promotion",
+      "marketing",
+      "publicite",
+      "advertising",
+      "password",
+      "mot de passe",
+      "security",
+      "securite",
+      "verify",
+      "verifier",
+      "confirm",
+      "confirmer",
+      "activate",
+      "activer",
+      "special offer",
+      "offre speciale",
+      "discount",
+      "reduction",
+      "sale",
+      "soldes"
+    ]
+  },
+  "scoring": {
+    "strongSubject": 10,
+    "strongSender": 8,
+    "strongDomain": 6,
+    "mediumSubject": 4,
+    "mediumContent": 3,
+    "exclusionPenalty": -20
+  },
+  "thresholds": {
+    "processWithClaude": 5,
+    "certainRecruitment": 10
+  }
+} 
