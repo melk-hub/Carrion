@@ -8,6 +8,7 @@ export enum LogCategory {
   API = 'API',
   SECURITY = 'SECURITY',
   PERFORMANCE = 'PERFORMANCE',
+  CRON = 'CRON',
 }
 
 export interface LogContext {

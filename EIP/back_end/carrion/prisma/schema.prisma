@@ -57,6 +57,8 @@ model Token {
   providerId        String
   userEmail         String
   tokenTimeValidity DateTime
+  accessTokenValidity DateTime?
+  webhookExpiry     DateTime?
   externalId        String?
   createdAt         DateTime @default(now())
   userId            String   @db.Uuid

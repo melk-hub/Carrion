@@ -27,27 +27,22 @@ export class MicrosoftStrategy extends PassportStrategy(Strategy, 'microsoft') {
     accessToken: string,
     refreshToken: string,
     profile: Profile & { _json?: any; userPrincipalName?: string },
-    done: (err: any, user: any, info?: any) => void,
-  ) {
-    const rawEmail =
-      (profile.emails && profile.emails[0]?.value) ||
-      profile.userPrincipalName ||
-      profile._json?.mail;
-
+  ): Promise<any> {
     const providerId = profile.id;
 
+    const rawEmail = profile.userPrincipalName;
+
     if (!rawEmail || !providerId) {
-      return done(
-        new UnauthorizedException(
-          'Could not retrieve essential information from Microsoft profile.',
-        ),
-        false,
+      throw new UnauthorizedException(
+        'Could not retrieve essential information from Microsoft profile. The profile object is incomplete.',
       );
     }
 
-    const oauthEmail = rawEmail.toLowerCase();
+    const expiresInSeconds = 3600;
 
+    const oauthEmail = rawEmail.toLowerCase();
     const { displayName, name } = profile;
+
     let loggedInUserId: string | undefined = undefined;
     let isLinkFlow = false;
     const state = req.query.state;
@@ -73,24 +68,21 @@ export class MicrosoftStrategy extends PassportStrategy(Strategy, 'microsoft') {
       lastName: name?.familyName || '',
     };
 
-    try {
-      const user = await this.authService.validateOAuthUser(
-        'Microsoft_oauth2',
-        providerId,
-        oauthProfile,
-        loggedInUserId,
-      );
+    const user = await this.authService.validateOAuthUser(
+      'Microsoft_oauth2',
+      providerId,
+      oauthProfile,
+      loggedInUserId,
+    );
 
-      return done(null, {
-        ...user,
-        oauthEmail: oauthEmail,
-        accessToken,
-        refreshToken,
-        isLinkFlow,
-        providerId,
-      });
-    } catch (err) {
-      return done(err, false);
-    }
+    return {
+      ...user,
+      oauthEmail: oauthEmail,
+      accessToken,
+      refreshToken,
+      isLinkFlow,
+      providerId,
+      expires_in: expiresInSeconds,
+    };
   }
 }

@@ -29,34 +29,28 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
     accessToken: string,
     refreshToken: string,
     profile: Profile,
-    done: (err: any, user: any, info?: any) => void,
-  ) {
+  ): Promise<any> {
     if (!profile.emails || !profile.emails[0]?.value || !profile.id) {
-      return done(
-        new UnauthorizedException(
-          'Could not retrieve Google profile information.',
-        ),
-        false,
+      throw new UnauthorizedException(
+        'Could not retrieve Google profile information.',
       );
     }
 
     const { id: providerId, name, emails } = profile;
-
     const oauthEmail = emails[0].value.toLowerCase();
 
+    const state = req.query.state;
     let loggedInUserId: string | undefined = undefined;
     let isLinkFlow = false;
-    const state = req.query.state;
-
     if (state && typeof state === 'string') {
       try {
         const decodedState = this.jwtService.verify(state);
-        if (decodedState && decodedState.sub) {
+        if (decodedState?.sub) {
           loggedInUserId = decodedState.sub;
           isLinkFlow = true;
         }
       } catch (e) {
-        console.error('Error verifying state token:', e.message);
+        /* ignore */
       }
     }
 
@@ -69,24 +63,20 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
       lastName: name.familyName || '',
     };
 
-    try {
-      const user = await this.authService.validateOAuthUser(
-        'Google_oauth2',
-        providerId,
-        oauthProfile,
-        loggedInUserId,
-      );
+    const user = await this.authService.validateOAuthUser(
+      'Google_oauth2',
+      providerId,
+      oauthProfile,
+      loggedInUserId,
+    );
 
-      return done(null, {
-        ...user,
-        oauthEmail: oauthEmail,
-        accessToken,
-        refreshToken,
-        isLinkFlow,
-        providerId,
-      });
-    } catch (err) {
-      return done(err, false);
-    }
+    return {
+      ...user,
+      oauthEmail,
+      accessToken,
+      refreshToken,
+      isLinkFlow,
+      providerId,
+    };
   }
 }
