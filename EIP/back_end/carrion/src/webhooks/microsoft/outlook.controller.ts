@@ -22,7 +22,7 @@ import { Public } from 'src/auth/decorators/public.decorator';
 @Controller('webhook/outlook')
 export class OutlookController {
   private processedMessages = new Set<string>();
-  private readonly MESSAGE_CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+  private readonly MESSAGE_CACHE_TTL = 24 * 60 * 60 * 1000;
 
   constructor(
     private readonly outlookService: OutlookService,
@@ -30,12 +30,11 @@ export class OutlookController {
     private readonly mailFilterService: MailFilterService,
     private readonly userService: UserService,
   ) {
-    // Clean up processed messages cache every 10 minutes
     setInterval(
       () => {
         this.processedMessages.clear();
       },
-      10 * 60 * 1000,
+      6 * 60 * 60 * 1000,
     );
   }
 
@@ -296,6 +295,13 @@ export class OutlookController {
         return;
       }
 
+      if (await this.isUserSentEmail(emailMessage, user)) {
+        this.logger.log(
+          `Skipping Outlook email ${resourceData.id} - sent by user to themselves`,
+        );
+        return;
+      }
+
       // Log email processing start
       this.logger.logEmailProcessing(
         'Processing Outlook email',
@@ -322,6 +328,43 @@ export class OutlookController {
           requestContext,
         },
       );
+    }
+  }
+
+  private async isUserSentEmail(
+    emailMessage: OutlookMessage,
+    user: any,
+  ): Promise<boolean> {
+    try {
+      if (!user?.email) {
+        this.logger.warn(`User ${user?.id} has no email address`);
+        return false;
+      }
+
+      const userEmail = user.email.toLowerCase();
+      const fromEmail = emailMessage.from?.emailAddress?.address?.toLowerCase();
+
+      if (!fromEmail) {
+        return false;
+      }
+
+      const isSelfSent = fromEmail === userEmail;
+
+      if (isSelfSent) {
+        this.logger.log(
+          `Outlook email detected as self-sent: ${fromEmail} = ${userEmail}`,
+        );
+      }
+
+      return isSelfSent;
+    } catch (error) {
+      this.logger.error(
+        'Error checking if Outlook email is self-sent',
+        undefined,
+        LogCategory.WEBHOOK,
+        { error: error.message },
+      );
+      return false;
     }
   }
 }

@@ -8,12 +8,22 @@ import { AuthService } from 'src/auth/auth.service';
 @Injectable()
 export class GmailService {
   private logger = new Logger(GmailService.name);
+  private processedMessages = new Set<string>();
+  private readonly MESSAGE_CACHE_TTL = 24 * 60 * 60 * 1000; // 24 hours
 
   constructor(
     private readonly prisma: PrismaService,
     private readonly mailFilter: MailFilterService,
     private readonly authService: AuthService,
-  ) {}
+  ) {
+    setInterval(
+      () => {
+        this.processedMessages.clear();
+        this.logger.log('Cleared Gmail processed messages cache');
+      },
+      6 * 60 * 60 * 1000, // 6 hours
+    );
+  }
 
   async processHistoryUpdate(
     emailAddress: string,
@@ -169,6 +179,18 @@ export class GmailService {
   ): Promise<void> {
     this.logger.log(`Processing message ${messageId} for user ${userId}`);
 
+    // Check if this message was already processed
+    const cacheKey = `${userId}-${messageId}`;
+    if (this.processedMessages.has(cacheKey)) {
+      this.logger.log(
+        `Skipping already processed Gmail message: ${messageId} for user ${userId}`,
+      );
+      return;
+    }
+
+    // Mark as being processed to prevent race conditions
+    this.processedMessages.add(cacheKey);
+
     try {
       const messageRes = await gmail.users.messages.get({
         userId: 'me',
@@ -180,6 +202,13 @@ export class GmailService {
 
       const message = messageRes.data;
       const gmailMessage: GmailMessage = this.mapToGmailMessage(message);
+
+      if (await this.isUserSentEmail(gmailMessage, userId)) {
+        this.logger.log(
+          `Skipping email ${messageId} - sent by user to themselves`,
+        );
+        return;
+      }
 
       this.logger.log(`Mapped message ${messageId} to GmailMessage format`);
 
@@ -198,6 +227,58 @@ export class GmailService {
         error.stack,
       );
     }
+  }
+
+  private async isUserSentEmail(
+    gmailMessage: GmailMessage,
+    userId: string,
+  ): Promise<boolean> {
+    try {
+      // Get user's email address
+      const user = await this.prisma.user.findUnique({
+        where: { id: userId },
+        select: { email: true },
+      });
+
+      if (!user?.email) {
+        this.logger.warn(`User ${userId} not found or has no email`);
+        return false;
+      }
+
+      const userEmail = user.email.toLowerCase();
+
+      // Get sender from email headers
+      const fromHeader = gmailMessage.payload.headers.find(
+        (header) => header.name.toLowerCase() === 'from',
+      );
+
+      if (!fromHeader) {
+        return false;
+      }
+
+      const fromEmail = this.extractEmailFromHeader(fromHeader.value);
+
+      // Check if sender is the user themselves
+      const isSelfSent = fromEmail.toLowerCase() === userEmail;
+
+      if (isSelfSent) {
+        this.logger.log(
+          `Email detected as self-sent: ${fromEmail} = ${userEmail}`,
+        );
+      }
+
+      return isSelfSent;
+    } catch (error) {
+      this.logger.error(
+        `Error checking if email is self-sent: ${error.message}`,
+      );
+      return false;
+    }
+  }
+
+  private extractEmailFromHeader(headerValue: string): string {
+    const emailMatch = headerValue.match(/<([^>]+)>/);
+    return emailMatch ? emailMatch[1] : headerValue.trim();
   }
 
   mapToGmailMessage(sourceData: any): GmailMessage {
