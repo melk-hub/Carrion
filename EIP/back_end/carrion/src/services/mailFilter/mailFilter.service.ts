@@ -19,6 +19,7 @@ import {
   EmailAnalysisResult,
   ExistingJobComparisonDto,
 } from './dto/dashboard-response.dto';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 function extractJsonFromString(str: string): any | null {
   if (!str) {
@@ -70,9 +71,10 @@ export class MailFilterService {
   private readonly logger = new Logger(MailFilterService.name);
   private readonly claudeAI: Anthropic;
 
-  // Deduplication system
+  // Deduplication system with improved scalability
   private processedEmails = new Set<string>();
-  private readonly EMAIL_CACHE_TTL = 15 * 60 * 1000; // 15 minutes
+  private readonly EMAIL_CACHE_TTL = 24 * 60 * 60 * 1000; // 24 hours (prevent reprocessing same day)
+  private readonly MAX_CACHE_SIZE = 15000; // Limit cache size for memory control
 
   // Response caching system for claudeAI calls
   private responseCache = new Map<
@@ -80,6 +82,7 @@ export class MailFilterService {
     { response: ExtractedJobDataDto | null; timestamp: number }
   >();
   private readonly RESPONSE_CACHE_TTL = 60 * 60 * 1000; // 1 hour
+  private readonly MAX_RESPONSE_CACHE_SIZE = 1000; // Limit response cache size
 
   // Pre-filtering configuration
   private readonly JOB_KEYWORDS = [
@@ -186,20 +189,21 @@ export class MailFilterService {
     private readonly jobApplyService: JobApplyService,
     private readonly userService: UserService,
     private readonly preFilterService: EmailPreFilterService,
+    private readonly prisma: PrismaService,
   ) {
     this.claudeAI = new Anthropic({
       apiKey: process.env.ANTHROPIC_API_KEY,
     });
 
-    // Clean up processed emails cache every 20 minutes
+    // Clean up processed emails cache every 6 hours (instead of clearing completely)
     setInterval(
       () => {
-        this.processedEmails.clear();
+        this.performCacheCleanup(); // Use smart cleanup instead of clearing everything
         this.cleanupResponseCache();
-        this.logger.log('Cleared email deduplication cache');
+        this.logger.log('Performed smart email deduplication cache cleanup');
         this.logMetrics();
       },
-      20 * 60 * 1000,
+      6 * 60 * 60 * 1000, // 6 hours
     );
   }
 
@@ -308,15 +312,34 @@ export class MailFilterService {
     emailSender?: string,
     messageId?: string,
   ): string {
-    const content = `${userId}|${emailSubject || ''}|${emailSender || ''}|${messageId || Date.now()}|${emailText}`;
-    return createHash('sha256').update(content).digest('hex');
+    // Create stable hash based on message ID + user + subject (ignore content changes from Gmail formatting)
+    const stableContent = `${userId}|${emailSubject || ''}|${emailSender || ''}|${messageId || 'no-msg-id'}`;
+    const hash = createHash('sha256').update(stableContent).digest('hex');
+
+    // Add timestamp for TTL tracking
+    const timestampedHash = `${hash}:${Date.now()}`;
+    return timestampedHash;
   }
 
   /**
    * Check if email has already been processed recently
    */
   private isEmailAlreadyProcessed(emailHash: string): boolean {
-    return this.processedEmails.has(emailHash);
+    // Extract base hash without timestamp for checking
+    const baseHash = emailHash.split(':')[0];
+
+    // Check if any variant of this email was already processed
+    for (const processedHash of this.processedEmails) {
+      const processedBaseHash = processedHash.split(':')[0];
+      if (processedBaseHash === baseHash) {
+        this.logger.debug(
+          `Found duplicate email with base hash: ${baseHash.substring(0, 12)}...`,
+        );
+        return true;
+      }
+    }
+
+    return false;
   }
 
   /**
@@ -1101,7 +1124,7 @@ If validation fails → return null
   }
 
   /**
-   * Cleanup method to clear expired entries from cache and processed emails
+   * Enhanced cache cleanup with memory management
    */
   private performCacheCleanup(): void {
     const now = Date.now();
@@ -1118,6 +1141,25 @@ If validation fails → return null
       this.processedEmails.delete(email),
     );
 
+    // LRU cleanup if cache is too large
+    if (this.processedEmails.size > this.MAX_CACHE_SIZE) {
+      const sortedEmails = Array.from(this.processedEmails).sort((a, b) => {
+        const timestampA = parseInt(a.split(':')[1]);
+        const timestampB = parseInt(b.split(':')[1]);
+        return timestampA - timestampB; // Oldest first
+      });
+
+      const toRemove = sortedEmails.slice(
+        0,
+        this.processedEmails.size - this.MAX_CACHE_SIZE,
+      );
+      toRemove.forEach((email) => this.processedEmails.delete(email));
+
+      this.logger.warn(
+        `Cache size exceeded ${this.MAX_CACHE_SIZE}. Removed ${toRemove.length} oldest entries.`,
+      );
+    }
+
     // Clear expired cache entries
     const expiredCacheKeys = [];
     for (const [key, entry] of this.responseCache.entries()) {
@@ -1127,11 +1169,85 @@ If validation fails → return null
     }
     expiredCacheKeys.forEach((key) => this.responseCache.delete(key));
 
-    if (expiredProcessedEmails.length > 0 || expiredCacheKeys.length > 0) {
-      this.logger.log(
-        `Cache cleanup: Removed ${expiredProcessedEmails.length} processed emails and ${expiredCacheKeys.length} cached responses`,
+    // LRU cleanup for response cache
+    if (this.responseCache.size > this.MAX_RESPONSE_CACHE_SIZE) {
+      const sortedEntries = Array.from(this.responseCache.entries()).sort(
+        (a, b) => a[1].timestamp - b[1].timestamp,
       );
+      const toRemove = sortedEntries.slice(
+        0,
+        this.responseCache.size - this.MAX_RESPONSE_CACHE_SIZE,
+      );
+      toRemove.forEach(([key]) => this.responseCache.delete(key));
     }
+
+    const memoryUsage = this.estimateMemoryUsage();
+    this.logger.log(
+      `Cache cleanup: Removed ${expiredProcessedEmails.length} processed emails and ${expiredCacheKeys.length} cached responses. Memory: ${memoryUsage.totalMB}MB`,
+    );
+  }
+
+  /**
+   * Estimate current memory usage
+   */
+  private estimateMemoryUsage(): {
+    processedEmailsMB: number;
+    responseCacheMB: number;
+    totalMB: number;
+  } {
+    const processedEmailsSize =
+      Array.from(this.processedEmails).join('').length * 2; // UTF-16
+    const responseCacheSize =
+      JSON.stringify(Array.from(this.responseCache.values())).length * 2;
+
+    return {
+      processedEmailsMB: +(processedEmailsSize / 1024 / 1024).toFixed(2),
+      responseCacheMB: +(responseCacheSize / 1024 / 1024).toFixed(2),
+      totalMB: +(
+        (processedEmailsSize + responseCacheSize) /
+        1024 /
+        1024
+      ).toFixed(2),
+    };
+  }
+
+  /**
+   * Get cache statistics for monitoring
+   */
+  public getCacheStats(): any {
+    const memoryUsage = this.estimateMemoryUsage();
+
+    return {
+      processedEmails: {
+        count: this.processedEmails.size,
+        maxSize: this.MAX_CACHE_SIZE,
+        memoryMB: memoryUsage.processedEmailsMB,
+        ttlHours: this.EMAIL_CACHE_TTL / (60 * 60 * 1000),
+      },
+      responseCache: {
+        count: this.responseCache.size,
+        maxSize: this.MAX_RESPONSE_CACHE_SIZE,
+        memoryMB: memoryUsage.responseCacheMB,
+        ttlHours: this.RESPONSE_CACHE_TTL / (60 * 60 * 1000),
+      },
+      total: {
+        memoryMB: memoryUsage.totalMB,
+        recommendation: this.getCacheRecommendation(memoryUsage.totalMB),
+      },
+    };
+  }
+
+  /**
+   * Get cache optimization recommendations
+   */
+  private getCacheRecommendation(totalMemoryMB: number): string {
+    if (totalMemoryMB > 50) {
+      return 'HIGH MEMORY USAGE - Consider Redis or reducing TTL';
+    }
+    if (totalMemoryMB > 20) {
+      return 'MEDIUM MEMORY USAGE - Monitor and consider optimizations';
+    }
+    return 'OPTIMAL MEMORY USAGE - Current setup is efficient';
   }
 
   /**

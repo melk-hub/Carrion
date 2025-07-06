@@ -55,7 +55,8 @@
       "accepted": "Acceptées",
       "refused": "Refusées",
       "applications": "Candidatures",
-      "totalApplications": "Total candidatures"
+      "totalApplications": "Total candidatures",
+      "interview": "Entretien"
     },
     "empty": {
       "title": "Aucune donnée",

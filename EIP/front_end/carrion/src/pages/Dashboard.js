@@ -222,7 +222,7 @@ function Dashboard() {
             <p className="stat-value">{stats.refused}</p>
           </div>
           <div className="stat-card">
-            <h3 className="stat-title">{t('dashboard.stats.interview')}</h3>
+            <h3 className="stat-title">{t('shared.stats.interview')}</h3>
             <p className="stat-value">{stats.interview}</p>
           </div>
         </div>

@@ -72,10 +72,25 @@ export class GmailService {
 
       const messageIds = new Set<string>();
       for (const historyRecord of history.data.history) {
-        if (historyRecord.messages) {
-          for (const message of historyRecord.messages) {
-            messageIds.add(message.id);
+        // ONLY process newly added messages - ignore read/delete/label events
+        if (historyRecord.messagesAdded) {
+          for (const messageAdded of historyRecord.messagesAdded) {
+            if (messageAdded.message?.id) {
+              messageIds.add(messageAdded.message.id);
+              this.logger.debug(`New message added: ${messageAdded.message.id}`);
+            }
           }
+        }
+        
+        // Optional: Log other events but don't process them
+        if (historyRecord.messagesDeleted) {
+          this.logger.debug(`Messages deleted (ignored): ${historyRecord.messagesDeleted.length}`);
+        }
+        if (historyRecord.labelsAdded) {
+          this.logger.debug(`Labels added (ignored): ${historyRecord.labelsAdded.length}`);
+        }
+        if (historyRecord.labelsRemoved) {
+          this.logger.debug(`Labels removed (ignored): ${historyRecord.labelsRemoved.length}`);
         }
       }
 
