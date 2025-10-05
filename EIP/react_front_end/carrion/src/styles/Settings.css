@@ -1,0 +1,361 @@
+/* Votre CSS d'origine */
+.settings-container {
+  max-width: 900px;
+  margin: 40px auto;
+  padding: 20px 40px;
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.settings-header {
+  text-align: left;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #e2e8f0;
+  margin-bottom: 30px;
+}
+
+.settings-header h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1a202c;
+  margin: 0;
+}
+
+.settings-header p {
+  font-size: 1rem;
+  color: #718096;
+  margin-top: 8px;
+}
+
+.settings-content {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+.settings-section {
+  padding-bottom: 30px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.settings-section:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.section-header h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #2d3748;
+  margin: 0;
+}
+
+.section-header p {
+  font-size: 0.9rem;
+  color: #718096;
+  margin-top: 6px;
+}
+
+.goal-form {
+  margin-top: 24px;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 24px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group label {
+  font-weight: 500;
+  margin-bottom: 8px;
+  color: #4a5568;
+}
+
+.form-group input {
+  padding: 10px 12px;
+  border: 1px solid #cbd5e0;
+  border-radius: 6px;
+  font-size: 1rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: #4299e1;
+  box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.5);
+}
+
+.form-group small {
+  margin-top: 6px;
+  font-size: 0.8rem;
+  color: #718096;
+}
+
+.form-actions {
+  margin-top: 24px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 20px;
+  background-color: #4299e1;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.btn-primary:hover {
+  background-color: #3182ce;
+}
+
+.btn-primary:disabled {
+  background-color: #a0aec0;
+  cursor: not-allowed;
+}
+
+.btn-spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin-right: 8px;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.success-message {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 0.925rem;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+  animation: slideInUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.success-icon {
+  font-size: 1.4rem;
+  filter: grayscale(1);
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.feature-coming-soon {
+  margin-top: 24px;
+  padding: 20px;
+  background-color: #f7fafc;
+  border: 1px dashed #e2e8f0;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.feature-coming-soon p {
+  margin: 0;
+  color: #718096;
+  font-style: italic;
+}
+
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #e2e8f0;
+  border-top-color: #4299e1;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.loading-state p {
+  color: #64748b;
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+/* --- MODIFICATIONS ET AJOUTS CI-DESSOUS --- */
+
+/* Style pour le conteneur de la section "Compte" */
+.account-actions {
+  margin-top: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px; /* Espace entre les deux actions */
+}
+
+/* Style pour chaque ligne d'action (texte + bouton) */
+.action-item {
+  display: flex;
+  justify-content: space-between; /* Aligne le texte à gauche, le bouton à droite */
+  align-items: center;
+  flex-wrap: wrap; /* Permet le passage à la ligne sur mobile */
+  gap: 16px;
+}
+
+/* Style pour le texte à gauche */
+.action-item strong {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #1a202c;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.action-description {
+  font-size: 0.9rem;
+  color: #718096;
+  margin: 0;
+}
+
+/* Style du bouton secondaire (déconnexion) */
+.btn-secondary {
+  padding: 8px 16px;
+  font-weight: 600;
+  background-color: #fff;
+  color: #4a5568;
+  border: 1px solid #cbd5e0;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background-color: #f7fafc;
+  border-color: #a0aec0;
+}
+
+/* Style du bouton de danger (suppression) */
+.btn-danger {
+  padding: 8px 16px;
+  font-weight: 600;
+  background-color: #fff;
+  color: #c53030;
+  border: 1px solid #fbb6b6;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-danger:hover:not(:disabled) {
+  background-color: #fff5f5;
+  color: #9b2c2c;
+  border-color: #f56565;
+}
+
+/* État désactivé pour les boutons */
+.btn-secondary:disabled,
+.btn-danger:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ========== RESPONSIVE DESIGN ========== */
+@media (max-width: 1024px) {
+  /* Pas de changement spécifique nécessaire ici, flex-wrap s'en charge */
+}
+
+@media (max-width: 768px) {
+  .settings-container {
+    padding: 16px;
+  }
+
+  .settings-header {
+    padding: 24px 20px;
+    margin-bottom: 24px;
+  }
+
+  .settings-header h1 {
+    font-size: 1.875rem;
+  }
+
+  .settings-section {
+    padding: 20px 0;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .form-actions {
+    justify-content: stretch;
+  }
+
+  .btn-primary {
+    width: 100%;
+    padding: 16px 24px;
+  }
+
+  .section-header h2 {
+    font-size: 1.25rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .settings-container {
+    padding: 12px;
+  }
+
+  .settings-header {
+    padding: 20px 16px;
+  }
+
+  .settings-header h1 {
+    font-size: 1.625rem;
+  }
+
+  .settings-section {
+    padding: 16px 0;
+  }
+
+  .feature-coming-soon {
+    padding: 32px 20px;
+  }
+
+  .coming-soon-icon {
+    font-size: 3rem;
+  }
+
+  .form-group input {
+    padding: 12px 14px;
+  }
+}

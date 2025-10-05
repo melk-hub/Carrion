@@ -1,0 +1,31 @@
+:root {
+  --primary-color: #91d0f3;
+  --secondary-color: #ffffff;
+  --text-color: #333333;
+  --accent-color: #000000;
+  --shadow-color: rgba(0, 0, 0, 0.1);
+}
+
+@font-face {
+  font-family: 'TextPolice';
+  src: url('assets/fonts/Open_Sans/OpenSans-VariableFont_wdth\,wght.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'TitlePolice';
+  src: url('assets/fonts/Montserrat/Montserrat-VariableFont_wght.ttf') format('truetype');
+}
+
+body {
+  margin: auto;
+  font-family: 'TextPolice', sans-serif;
+  background-color: #FFF9F0;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'TitlePolice', Arial, sans-serif;
+}
+
+html {
+  overflow-y: scroll;
+}

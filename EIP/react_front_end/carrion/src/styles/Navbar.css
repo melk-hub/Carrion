@@ -1,0 +1,418 @@
+.sidebar {
+  position: fixed;
+  top: 70px;
+  left: 0;
+  width: 220px;
+  height: calc(100vh - 70px);
+  background-color: #132238;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
+  z-index: 1000;
+  transition: width 0.3s ease;
+}
+
+/* Courbe décorative */
+.sidebar::before {
+  content: '';
+  position: absolute;
+  top: -20px;
+  right: 0;
+  width: 20px;
+  height: 20px;
+  background: radial-gradient(circle at top right, transparent 0%, transparent 70%, #132238 70%, #132238 100%);
+  z-index: 1001;
+}
+
+/* Sidebar réduite */
+.sidebar.collapsed {
+  width: 60px;
+  padding: 1rem 0.5rem;
+}
+
+.sidebar.collapsed .logo-text {
+  display: none;
+}
+
+.sidebar.collapsed .menu-text {
+  display: none;
+}
+
+.sidebar.collapsed .navbar-menu li:not(.active):hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.sidebar.collapsed .navbar-menu li.active {
+  background-color: rgba(255, 255, 255, 0.15);
+}
+
+/* Logo img ajusté */
+.sidebar.collapsed .logo-img {
+  margin-right: 0;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.logo-img {
+  width: 40px;
+  height: 40px;
+  margin-right: 8px;
+}
+
+.logo-text {
+  font-size: 1.4rem;
+  font-weight: bold;
+  color: white;
+}
+
+.navbar-menu {
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.navbar-menu li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 12px;
+  font-size: 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.navbar-menu li:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.navbar-menu li.active {
+  font-weight: bold;
+  background-color: rgba(255, 255, 255, 0.15);
+}
+
+@media screen and (max-width: 768px) {
+  .sidebar {
+    width: 140px;
+  }
+
+  .sidebar .text {
+    display: none;
+  }
+
+  .navbar-menu li {
+    justify-content: center;
+  }
+
+  .logo-text {
+    display: none;
+  }
+
+  .logo-img {
+    margin-left: 30px;
+  }
+}
+
+.topbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 70px;
+  background-color: #132238;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  z-index: 1001;
+}
+
+.topbar-left,
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+/* Fixed button sizes */
+button {
+  min-width: fit-content;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top: 0px;
+}
+
+.toggle-button,
+.add-button,
+.primary-btn,
+.language-dropdown-button {
+  min-height: 40px;
+  padding: 8px 16px;
+  box-sizing: border-box;
+}
+
+/* Responsive button sizes */
+@media (max-width: 768px) {
+  .toggle-button,
+  .add-button,
+  .primary-btn {
+    min-height: 36px;
+    padding: 6px 12px;
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .toggle-button,
+  .add-button,
+  .primary-btn {
+    min-height: 32px;
+    padding: 4px 8px;
+    font-size: 12px;
+  }
+}
+
+.notifications {
+  font-size: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+/* Animation pour l'icône de notification quand il y a des notifications non lues */
+.navbar-menu li .notifications.has-unread {
+  animation: notification-pulse 2s infinite;
+}
+
+@keyframes notification-pulse {
+  0%, 100% {
+    transform: scale(1);
+    filter: brightness(1);
+  }
+  50% {
+    transform: scale(1.1);
+    filter: brightness(1.2);
+  }
+}
+
+/* Badge pour le compteur de notifications */
+.notification-badge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  color: white;
+  border-radius: 50%;
+  min-width: 18px;
+  height: 18px;
+  font-size: 10px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(239, 68, 68, 0.3);
+  animation: badge-bounce 1s ease-in-out;
+}
+
+@keyframes badge-bounce {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  60% {
+    transform: scale(1.2);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* S'assurer que les autres éléments ne sont pas affectés */
+.notification-item:not(.navbar-menu .notifications) {
+  animation: none !important;
+}
+
+.user-profile {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  color: white;
+  user-select: none;
+}
+
+.avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid #ffffff30;
+}
+
+.username {
+  font-weight: bold;
+  font-size: 18px;
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background-color: #1f2a44;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+  border-radius: 8px;
+  list-style: none;
+  margin: 8px 0 0 0;
+  padding: 8px 0;
+  min-width: 160px;
+  z-index: 1500;
+  color: white;
+  font-weight: bold;
+}
+
+.dropdown-menu li {
+  padding: 10px 20px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.dropdown-menu li:hover {
+  background-color: #324566;
+}
+
+.navbar-content {
+  margin-left: 220px;
+  margin-top: 70px;
+  transition: margin-left 0.3s ease;
+  padding: 25px;
+}
+
+.navbar-content.collapsed {
+  margin-left: 60px;
+}
+
+/* Motion toggle styles */
+.motion-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  margin: 1rem 0;
+}
+
+.sidebar .motion-toggle {
+  justify-content: center;
+  padding: 0 1rem;
+}
+
+.sidebar.collapsed .motion-toggle {
+  padding: 0 0.5rem;
+}
+
+.toggle-label {
+  color: white;
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.motion-toggle .reduceMotionToggle {
+  width: 3em;
+  color: #fbb75f;
+}
+
+/* Reduce motion class for global animation control */
+.reduce-motion * {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+}
+
+/* Responsive motion toggle */
+@media (max-width: 768px) {
+  .toggle-label {
+    font-size: 12px;
+  }
+  
+  .motion-toggle .reduceMotionToggle {
+    width: 2.5em;
+  }
+}
+
+.corner-bg {
+  position: fixed;
+  top: 70px;
+  left: 220px;
+  width: 40px;
+  height: 40px;
+  background-color: #132238;
+  z-index: 100;
+  transition: left 0.3s ease;
+}
+
+.sidebar.collapsed ~ .corner-bg {
+  left: 60px;
+}
+
+.corner-curve {
+  position: fixed;
+  top: 70px;
+  left: 220px;
+  width: 40px;
+  height: 40px;
+  border-top-left-radius: 40px;
+  background-color: rgb(255, 245, 232);
+  z-index: 100;
+  transition: left 0.3s ease;
+}
+
+.sidebar.collapsed ~ .corner-curve {
+  left: 60px;
+}
+
+.tooltip {
+  position: relative;
+  display: inline-block;
+}
+
+.tooltip .tooltip-text {
+  visibility: hidden;
+  width: max-content;
+  max-width: 200px;
+  background-color: #1f2a44;
+  text-align: center;
+  border-radius: 6px;
+  padding: 5px 10px;
+  font-size: 14px;
+  font-weight: 500;
+  position: absolute;
+  left: 40px;
+  top: 50%;
+  transform: translateY(-50%);
+  white-space: nowrap;
+  z-index: 2000;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.tooltip:hover .tooltip-text {
+  visibility: visible;
+  opacity: 1;
+}
