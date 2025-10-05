@@ -216,7 +216,7 @@ function LandingPageContent() {
             </div>
             <div className="tutorial-box hover-lift tutorial-slide-left">
               <div className="tutorial-image-container">
-                <Image src="/assets/optimize_landing.png" alt="Optimisation pour réussir la recherche" width={200} height={200} />
+                <Image src="/assets/optimize_landing.jpg" alt="Optimisation pour réussir la recherche" width={200} height={200} />
               </div>
               <div className="text-box">
                 <h3>{t("landing.howItWorks.optimize.title")}</h3>
