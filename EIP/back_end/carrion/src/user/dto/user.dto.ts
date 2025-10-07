@@ -6,7 +6,7 @@ import {
   Matches,
   MinLength,
 } from 'class-validator';
-import { passwordRegEX } from 'src/utils/constants';
+import { passwordRegEX } from '@/utils/constants';
 
 export class UserDto {
   @ApiProperty({

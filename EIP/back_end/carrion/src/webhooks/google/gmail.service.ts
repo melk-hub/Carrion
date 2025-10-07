@@ -1,9 +1,9 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { google } from 'googleapis';
-import { PrismaService } from 'src/prisma/prisma.service';
-import { MailFilterService } from 'src/services/mailFilter/mailFilter.service';
+import { PrismaService } from '@/prisma/prisma.service';
+import { MailFilterService } from '@/services/mailFilter/mailFilter.service';
 import { GmailMessage } from '../mail/gmail.types';
-import { AuthService } from 'src/auth/auth.service';
+import { AuthService } from '@/auth/auth.service';
 
 @Injectable()
 export class GmailService {

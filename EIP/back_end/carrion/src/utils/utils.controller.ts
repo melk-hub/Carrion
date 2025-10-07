@@ -7,7 +7,7 @@ import {
   Response,
   UseGuards,
 } from '@nestjs/common';
-import { JwtAuthGuard } from 'src/auth/guards/jwt/jwt-auth.guard';
+import { JwtAuthGuard } from '@/auth/guards/jwt/jwt-auth.guard';
 import { UtilsService } from './utils.service';
 
 interface countryBody {

@@ -1,3 +1,5 @@
+import { JobApply } from "./job-apply.interface";
+
 export interface UserProfile {
   id: string;
   username: string;
@@ -52,4 +54,9 @@ export interface User {
   totalApplications: number;
   rank: number;
   page?: number;
+}
+
+export interface UserProfileJobApply extends User {
+  jobApply: JobApply[];
+  userProfile: UserProfile;
 }

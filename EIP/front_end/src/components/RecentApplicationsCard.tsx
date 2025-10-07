@@ -1,13 +1,32 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useLanguage } from '../contexts/LanguageContext';
+"use client";
 
-const RecentApplicationsCard = ({ className = '' }) => {
+import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useLanguage } from "../contexts/LanguageContext";
+import Image from "next/image";
+
+interface Application {
+  id: string | number;
+  createdAt: string;
+  company: string;
+  contractType?: string;
+  title: string;
+  status?: string;
+  imageUrl?: string;
+}
+
+interface RecentApplicationsCardProps {
+  className?: string;
+}
+
+const RecentApplicationsCard = ({
+  className = "",
+}: RecentApplicationsCardProps) => {
   const { t } = useLanguage();
-  const navigate = useNavigate();
-  const [applications, setApplications] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const router = useRouter();
+  const [applications, setApplications] = useState<Application[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
   const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
   useEffect(() => {
@@ -15,9 +34,9 @@ const RecentApplicationsCard = ({ className = '' }) => {
       try {
         setLoading(true);
         setError(null);
-        
+
         const response = await fetch(`${API_URL}/job_applies/get_jobApply`, {
-          credentials: 'include',
+          credentials: "include",
         });
 
         if (!response.ok) {
@@ -25,25 +44,28 @@ const RecentApplicationsCard = ({ className = '' }) => {
         }
 
         const data = await response.json();
-        
+
         if (!Array.isArray(data)) {
-          console.error('❌ Data is not an array:', data);
+          console.error("❌ Data is not an array:", data);
           setApplications([]);
           return;
         }
 
         const sortedApplications = data
-          .filter(app => app && app.createdAt)
-          .sort((a, b) => {
-            const dateA = new Date(a.createdAt);
-            const dateB = new Date(b.createdAt);
-            return dateB - dateA;
-          })
+          .filter((app) => app && app.createdAt)
+          .sort(
+            (a, b) =>
+              new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+          )
           .slice(0, 3);
-        
+
         setApplications(sortedApplications);
-      } catch (error) {
-        setError(error.message);
+      } catch (error: unknown) {
+        if (error instanceof Error) {
+          setError(error.message);
+        } else {
+          setError("Unknown error");
+        }
         setApplications([]);
       } finally {
         setLoading(false);
@@ -53,66 +75,72 @@ const RecentApplicationsCard = ({ className = '' }) => {
     fetchRecentApplications();
   }, [API_URL]);
 
-  const formatTimeAgo = (dateString) => {
-    if (!dateString) return t('shared.time.unknown') || 'Date inconnue';
+  const formatTimeAgo = (dateString?: string): string => {
+    if (!dateString)
+      return (t("shared.time.unknown") as string) || "Date inconnue";
 
     const now = new Date();
     const applicationDate = new Date(dateString);
 
     if (isNaN(applicationDate.getTime())) {
-      return t('shared.time.unknown') || 'Date inconnue';
+      return (t("shared.time.unknown") as string) || "Date inconnue";
     }
 
-    const diffInMinutes = Math.floor((now - applicationDate) / (1000 * 60));
+    const diffInMinutes = Math.floor(
+      (now.getTime() - applicationDate.getTime()) / (1000 * 60)
+    );
 
     if (diffInMinutes < 1) {
-      return t('shared.time.now') || 'À l\'instant';
+      return (t("shared.time.now") as string) || "À l'instant";
     } else if (diffInMinutes < 60) {
-      return t('shared.time.minutes', { minutes: diffInMinutes }) || `Il y a ${diffInMinutes} min`;
+      return (
+        (t("shared.time.minutes", { minutes: diffInMinutes }) as string) ||
+        `Il y a ${diffInMinutes} min`
+      );
     } else if (diffInMinutes < 1440) {
       const hours = Math.floor(diffInMinutes / 60);
-      return t('shared.time.hoursAgo', { count: hours }) || `Il y a ${hours}h`;
+      return (
+        (t("shared.time.hoursAgo", { count: hours }) as string) ||
+        `Il y a ${hours}h`
+      );
     } else {
       const days = Math.floor(diffInMinutes / 1440);
-      return t('shared.time.daysAgo', { count: days }) || `Il y a ${days}j`;
+      return (
+        (t("shared.time.daysAgo", { count: days }) as string) ||
+        `Il y a ${days}j`
+      );
     }
   };
 
-  // Fonction pour obtenir le texte du statut traduit
-  const getStatusText = (status) => {
-    const statusKey = `shared.status.${status?.toLowerCase()}`;
-    const statusTexts = {
-      'pending': 'En attente',
-      'accepted': 'Acceptée',
-      'rejected': 'Refusée',
-      'interview': 'Entretien',
-      'archived': 'Archivée'
-    };
-    
-    return t(statusKey) || statusTexts[status?.toLowerCase()] || status || 'Inconnu';
+  const getStatusText = (status?: string): string => {
+    if (!status) return (t("shared.status.unknown") as string) || "Inconnu";
+    const statusKey = `shared.status.${status.toLowerCase()}`;
+    return (t(statusKey) as string) || status;
   };
 
-  // Fonction pour obtenir la première lettre de l'entreprise pour le placeholder
-  const getCompanyInitial = (company) => {
-    return company ? company.charAt(0).toUpperCase() : '?';
+  const getCompanyInitial = (company?: string): string => {
+    return company ? company.charAt(0).toUpperCase() : "?";
   };
 
   if (loading) {
     return (
       <div className={`card recent-applications ${className}`}>
         <div className="card-header">
-          <h3>{t("home.recentApplications") || "Dernières candidatures"}</h3>
+          <h3>
+            {(t("home.recentApplications") as string) ||
+              "Dernières candidatures"}
+          </h3>
           <button
             className="see-all-btn"
-            onClick={() => navigate("/dashboard")}
+            onClick={() => router.push("/dashboard")}
           >
-            {t("home.seeAll") || "Voir tout"}
+            {(t("home.seeAll") as string) || "Voir tout"}
           </button>
         </div>
         <div className="applications-list">
           <div className="application-item">
             <div className="application-info">
-              <h4>{t('shared.loading') || 'Chargement...'}</h4>
+              <h4>{(t("shared.loading") as string) || "Chargement..."}</h4>
             </div>
           </div>
         </div>
@@ -124,12 +152,15 @@ const RecentApplicationsCard = ({ className = '' }) => {
     return (
       <div className={`card recent-applications ${className}`}>
         <div className="card-header">
-          <h3>{t("home.recentApplications") || "Dernières candidatures"}</h3>
+          <h3>
+            {(t("home.recentApplications") as string) ||
+              "Dernières candidatures"}
+          </h3>
           <button
             className="see-all-btn"
-            onClick={() => navigate("/dashboard")}
+            onClick={() => router.push("/dashboard")}
           >
-            {t("home.seeAll") || "Voir tout"}
+            {(t("home.seeAll") as string) || "Voir tout"}
           </button>
         </div>
         <div className="applications-list">
@@ -148,19 +179,27 @@ const RecentApplicationsCard = ({ className = '' }) => {
     return (
       <div className={`card recent-applications ${className}`}>
         <div className="card-header">
-          <h3>{t("home.recentApplications") || "Dernières candidatures"}</h3>
+          <h3>
+            {(t("home.recentApplications") as string) ||
+              "Dernières candidatures"}
+          </h3>
           <button
             className="see-all-btn"
-            onClick={() => navigate("/dashboard")}
+            onClick={() => router.push("/dashboard")}
           >
-            {t("home.seeAll") || "Voir tout"}
+            {(t("home.seeAll") as string) || "Voir tout"}
           </button>
         </div>
         <div className="applications-list">
           <div className="application-item">
             <div className="application-info">
-              <h4>{t('home.noApplications') || 'Aucune candidature'}</h4>
-              <p>{t('home.noApplicationsMessage') || 'Vos candidatures apparaîtront ici'}</p>
+              <h4>
+                {(t("home.noApplications") as string) || "Aucune candidature"}
+              </h4>
+              <p>
+                {(t("home.noApplicationsMessage") as string) ||
+                  "Vos candidatures apparaîtront ici"}
+              </p>
             </div>
           </div>
         </div>
@@ -171,12 +210,14 @@ const RecentApplicationsCard = ({ className = '' }) => {
   return (
     <div className={`card recent-applications ${className}`}>
       <div className="card-header">
-        <h3>{t("home.recentApplications") || "Dernières candidatures"}</h3>
+        <h3>
+          {(t("home.recentApplications") as string) || "Dernières candidatures"}
+        </h3>
         <button
           className="see-all-btn"
-          onClick={() => navigate("/dashboard")}
+          onClick={() => router.push("/dashboard")}
         >
-          {t("home.seeAll") || "Voir tout"}
+          {(t("home.seeAll") as string) || "Voir tout"}
         </button>
       </div>
       <div className="applications-list">
@@ -184,29 +225,35 @@ const RecentApplicationsCard = ({ className = '' }) => {
           <div className="application-item" key={application.id}>
             <div className="company-logo">
               {application.imageUrl ? (
-                <img
+                <Image
                   src={application.imageUrl}
-                  alt={application.company}
-                  onError={(e) => {
-                    e.target.style.display = 'none';
-                    e.target.nextSibling.style.display = 'flex';
-                  }}
+                  alt={application.company || "Company logo"}
+                  width={40}
+                  height={40}
                 />
-              ) : null}
-              <div 
-                className="placeholder-logo" 
-                style={{ display: application.imageUrl ? 'none' : 'flex' }}
-              >
-                {getCompanyInitial(application.company)}
-              </div>
+              ) : (
+                <div className="placeholder-logo">
+                  {getCompanyInitial(application.company)}
+                </div>
+              )}
             </div>
             <div className="application-info">
-              <h4>{application.company || t('shared.unknown') || 'Entreprise inconnue'}</h4>
+              <h4>
+                {application.company ||
+                  (t("shared.unknown") as string) ||
+                  "Entreprise inconnue"}
+              </h4>
               <p>
                 {application.contractType && `${application.contractType} - `}
-                {application.title || t('shared.unknownPosition') || 'Poste non précisé'}
+                {application.title ||
+                  (t("shared.unknownPosition") as string) ||
+                  "Poste non précisé"}
               </p>
-              <span className={`status ${application.status?.toLowerCase() || 'pending'}`}>
+              <span
+                className={`status ${
+                  application.status?.toLowerCase() || "pending"
+                }`}
+              >
                 {getStatusText(application.status)}
               </span>
             </div>
@@ -220,4 +267,4 @@ const RecentApplicationsCard = ({ className = '' }) => {
   );
 };
 
-export default RecentApplicationsCard; 
+export default RecentApplicationsCard;

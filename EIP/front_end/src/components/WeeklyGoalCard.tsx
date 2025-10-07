@@ -1,82 +1,98 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { format, subDays, isThisWeek, endOfWeek } from 'date-fns';
-import apiService from '../services/api.js';
-import '../styles/WeeklyGoalCard.css';
-import { useLanguage } from '../contexts/LanguageContext';
+"use client";
 
-const WeeklyGoalCard = ({ showGoToStatsButton = false }) => {
+import React, { useState, useEffect, useMemo } from "react";
+import { useRouter } from "next/navigation";
+import { format, subDays, isThisWeek, endOfWeek } from "date-fns";
+import apiService from "../services/api";
+import { useLanguage } from "../contexts/LanguageContext";
+
+interface StatsData {
+  applicationsPerDay: Record<string, number>;
+}
+
+interface GoalSettings {
+  weeklyGoal: number;
+  monthlyGoal: number;
+}
+
+interface WeeklyGoalCardProps {
+  showGoToStatsButton?: boolean;
+}
+
+const WeeklyGoalCard = ({
+  showGoToStatsButton = false,
+}: WeeklyGoalCardProps) => {
   const { t } = useLanguage();
-  const navigate = useNavigate();
-  const [stats, setStats] = useState(null);
-  const [goalSettings, setGoalSettings] = useState({
+  const router = useRouter();
+  const [stats, setStats] = useState<StatsData | null>(null);
+  const [goalSettings, setGoalSettings] = useState<GoalSettings>({
     weeklyGoal: 5,
-    monthlyGoal: 20
+    monthlyGoal: 20,
   });
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetchStats();
-    fetchGoalSettings();
+    const token = localStorage.getItem("token");
+    if (!token) {
+      setError("Token d'authentification manquant.");
+      setLoading(false);
+      return;
+    }
+
+    fetchStats(token);
+    fetchGoalSettings(token);
   }, []);
 
-  const fetchStats = async () => {
+  const fetchStats = async (token: string) => {
     try {
       setLoading(true);
       setError(null);
-      const response = await apiService.get("/statistics", {
+      const data = await apiService.get<StatsData>("/statistics", {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
+          Authorization: `Bearer ${token}`,
         },
       });
-
-      if (!response.ok) {
-        throw new Error(`Erreur HTTP ${response.status}`);
-      }
-
-      const data = await response.json();
       setStats(data);
-    } catch (error) {
-      console.error("Erreur lors du chargement des statistiques :", error);
-      setError(error.message);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        console.error("Erreur lors du chargement des statistiques :", error);
+        setError(error.message || "Erreur inconnue");
+      }
     } finally {
       setLoading(false);
     }
   };
 
-  const fetchGoalSettings = async () => {
+  const fetchGoalSettings = async (token: string) => {
     try {
-      const response = await apiService.get("/settings/goal", {
+      const data = await apiService.get<GoalSettings>("/settings/goal", {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
+          Authorization: `Bearer ${token}`,
         },
       });
-      
-      if (response.ok) {
-        const data = await response.json();
-        setGoalSettings({
-          weeklyGoal: data.weeklyGoal || 5,
-          monthlyGoal: data.monthlyGoal || 20
-        });
-      }
+      setGoalSettings({
+        weeklyGoal: data.weeklyGoal || 5,
+        monthlyGoal: data.monthlyGoal || 20,
+      });
     } catch (error) {
-      console.error("Erreur lors du chargement des paramètres d'objectif :", error);
+      console.error(
+        "Erreur lors du chargement des paramètres d'objectif :",
+        error
+      );
     }
   };
 
-  // Mémoriser les données préparées pour éviter les recalculs constants
   const statsData = useMemo(() => {
     if (!stats || !stats.applicationsPerDay) return null;
 
     const now = new Date();
-    let days = [];
+    const days: { date: string; dateObj: Date; count: number }[] = [];
     const daysCount = 7;
 
-    // Générer les 7 derniers jours
     for (let i = daysCount - 1; i >= 0; i--) {
       const date = subDays(now, i);
-      const dateStr = format(date, 'yyyy-MM-dd');
+      const dateStr = format(date, "yyyy-MM-dd");
       days.push({
         date: dateStr,
         dateObj: date,
@@ -85,36 +101,44 @@ const WeeklyGoalCard = ({ showGoToStatsButton = false }) => {
     }
 
     const totals = {
-      thisWeek: days.filter(d => isThisWeek(d.dateObj, { weekStartsOn: 1 })).reduce((sum, d) => sum + d.count, 0),
+      thisWeek: days
+        .filter((d) => isThisWeek(d.dateObj, { weekStartsOn: 1 }))
+        .reduce((sum, d) => sum + d.count, 0),
     };
 
     return { days, totals };
   }, [stats]);
 
-  // Mémoriser le calcul des progrès pour éviter les recalculs constants
   const goalProgress = useMemo(() => {
-    if (!stats || !statsData) {
-      return { current: 0, target: 5, percentage: 0, timeLeft: '' };
+    if (!statsData) {
+      return {
+        current: 0,
+        target: goalSettings.weeklyGoal,
+        percentage: 0,
+        timeLeft: "",
+      };
     }
 
     const current = statsData.totals.thisWeek;
     const target = goalSettings.weeklyGoal;
-    
+
     const now = new Date();
     const endWeek = endOfWeek(now, { weekStartsOn: 1 });
-    const daysLeft = Math.ceil((endWeek - now) / (1000 * 60 * 60 * 24));
+    const daysLeft = Math.ceil(
+      (endWeek.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)
+    );
     const timeLeft = `${daysLeft} ${t("home.objectives.daysLeft")}`;
 
-    const percentage = Math.min((current / target) * 100, 100);
-    
+    const percentage = target > 0 ? Math.min((current / target) * 100, 100) : 0;
+
     return { current, target, percentage, timeLeft };
-  }, [stats, statsData, goalSettings.weeklyGoal]);
+  }, [statsData, goalSettings.weeklyGoal, t]);
 
   if (loading) {
     return (
       <div className="weekly-goal-card loading">
         <div className="loading-spinner"></div>
-        <p>{t("common.loading")}</p>
+        <p>{t("common.loading") as string}</p>
       </div>
     );
   }
@@ -123,27 +147,39 @@ const WeeklyGoalCard = ({ showGoToStatsButton = false }) => {
     return (
       <div className="weekly-goal-card">
         <div className="card-header">
-          <h3>{t("home.objectives.weekly")}</h3>
+          <h3>{t("home.objectives.weekly") as string}</h3>
         </div>
-        <div className="goal-progress-content" style={{ justifyContent: 'center' }}>
-          <p style={{ color: '#ef4444', textAlign: 'center', margin: '0 0 16px 0' }}>
-            {t("home.error")} {error}
-          </p>
-          <button 
-            onClick={() => {
-              fetchStats();
-              fetchGoalSettings();
-            }}
+        <div
+          className="goal-progress-content"
+          style={{ justifyContent: "center" }}
+        >
+          <p
             style={{
-              background: '#fbb75f',
-              color: 'white',
-              border: 'none',
-              padding: '8px 16px',
-              borderRadius: '6px',
-              cursor: 'pointer'
+              color: "#ef4444",
+              textAlign: "center",
+              margin: "0 0 16px 0",
             }}
           >
-            {t("common.retry")}
+            {t("home.error") as string}: {error}
+          </p>
+          <button
+            onClick={() => {
+              const token = localStorage.getItem("token");
+              if (token) {
+                fetchStats(token);
+                fetchGoalSettings(token);
+              }
+            }}
+            style={{
+              background: "#fbb75f",
+              color: "white",
+              border: "none",
+              padding: "8px 16px",
+              borderRadius: "6px",
+              cursor: "pointer",
+            }}
+          >
+            {t("common.retry") as string}
           </button>
         </div>
       </div>
@@ -153,18 +189,18 @@ const WeeklyGoalCard = ({ showGoToStatsButton = false }) => {
   return (
     <div className="weekly-goal-card">
       <div className="card-header">
-        <h3>{t("home.objectives.weekly")}</h3>
+        <h3>{t("home.objectives.weekly") as string}</h3>
         {showGoToStatsButton && (
-          <button 
+          <button
             className="see-all-btn"
-            onClick={() => navigate('/statistics')}
+            onClick={() => router.push("/statistics")}
             title="Voir toutes les statistiques"
           >
-            {t("home.seeAll") || "Voir tout"}
+            {(t("home.seeAll") as string) || "Voir tout"}
           </button>
         )}
       </div>
-      
+
       <div className="goal-progress-content">
         <div className="progress-circle-container">
           <svg className="progress-circle" viewBox="0 0 100 100">
@@ -184,7 +220,9 @@ const WeeklyGoalCard = ({ showGoToStatsButton = false }) => {
               strokeWidth="6"
               fill="transparent"
               strokeDasharray={`${2 * Math.PI * 42}`}
-              strokeDashoffset={`${2 * Math.PI * 42 * (1 - goalProgress.percentage / 100)}`}
+              strokeDashoffset={`${
+                2 * Math.PI * 42 * (1 - goalProgress.percentage / 100)
+              }`}
               strokeLinecap="round"
               className="progress-stroke"
             />
@@ -199,25 +237,33 @@ const WeeklyGoalCard = ({ showGoToStatsButton = false }) => {
             {goalProgress.current} / {goalProgress.target}
           </div>
           <div className="goal-subtitle">
-            {t("home.objectives.applications")}
+            {t("home.objectives.applications") as string}
           </div>
-          <div className="time-remaining">
-            {goalProgress.timeLeft}
-          </div>
+          <div className="time-remaining">{goalProgress.timeLeft}</div>
         </div>
 
         <div className="goal-stats-row">
           <div className="goal-stat-item">
             <span className="stat-number">{goalProgress.current}</span>
-            <span className="stat-label">{t("home.objectives.accomplished")}</span>
+            <span className="stat-label">
+              {t("home.objectives.accomplished") as string}
+            </span>
           </div>
           <div className="goal-stat-item">
-            <span className="stat-number">{Math.max(goalProgress.target - goalProgress.current, 0)}</span>
-            <span className="stat-label">{t("home.objectives.remaining")}</span>
+            <span className="stat-number">
+              {Math.max(goalProgress.target - goalProgress.current, 0)}
+            </span>
+            <span className="stat-label">
+              {t("home.objectives.remaining") as string}
+            </span>
           </div>
           <div className="goal-stat-item">
-            <span className="stat-number">{Math.round(goalProgress.percentage)}%</span>
-            <span className="stat-label">{t("home.objectives.progress")}</span>
+            <span className="stat-number">
+              {Math.round(goalProgress.percentage)}%
+            </span>
+            <span className="stat-label">
+              {t("home.objectives.progress") as string}
+            </span>
           </div>
         </div>
       </div>
@@ -225,6 +271,4 @@ const WeeklyGoalCard = ({ showGoToStatsButton = false }) => {
   );
 };
 
-export default WeeklyGoalCard; 
- 
- 
+export default WeeklyGoalCard;

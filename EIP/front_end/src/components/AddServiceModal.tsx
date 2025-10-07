@@ -1,24 +1,31 @@
 import React from "react";
 import { X } from "lucide-react";
 import { useLanguage } from "../contexts/LanguageContext";
-import googleLogo from "../assets/google-logo.png";
-import outlookLogo from "../assets/outlook-logo.svg";
+import Image from "next/image";
 
-const AddServiceModal = ({ isOpen, onClose, connectedServices }) => {
+const AddServiceModal = ({
+  isOpen,
+  onClose,
+  connectedServices,
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+  connectedServices: { name: string }[];
+}) => {
+  const { t } = useLanguage();
+  const API_URL = process.env.NEXT_PUBLIC_API_URL;
   if (!isOpen) return null;
 
-  const API_URL = process.env.NEXT_PUBLIC_API_URL;
-  const { t } = useLanguage();
-  const handleConnect = (serviceProvider) => {
+  const handleConnect = (serviceProvider: string) => {
     window.location.href = `${API_URL}/auth/${serviceProvider}/link`;
     onClose();
   };
 
   const isGoogleConnected = connectedServices.some(
-    (service) => service.name === "Google_oauth2"
+    (service: { name: string }) => service.name === "Google_oauth2"
   );
   const isMicrosoftConnected = connectedServices.some(
-    (service) => service.name === "Microsoft_oauth2"
+    (service: { name: string }) => service.name === "Microsoft_oauth2"
   );
 
   return (
@@ -42,10 +49,12 @@ const AddServiceModal = ({ isOpen, onClose, connectedServices }) => {
                 className="service-option"
                 onClick={() => handleConnect("google")}
               >
-                <img
-                  src={googleLogo}
+                <Image
+                  src="/assets/google-logo.png"
                   alt="Google"
                   className="service-option-icon"
+                  width={32}
+                  height={32}
                 />
                 <span>{t("profile.connectGmail")}</span>
               </button>
@@ -56,10 +65,12 @@ const AddServiceModal = ({ isOpen, onClose, connectedServices }) => {
                 className="service-option"
                 onClick={() => handleConnect("microsoft")}
               >
-                <img
-                  src={outlookLogo}
+                <Image
+                  src="/assets/outlook-logo.svg"
                   alt="Outlook"
                   className="service-option-icon"
+                  width={32}
+                  height={32}
                 />
                 <span>{t("profile.connectOutlook")}</span>
               </button>

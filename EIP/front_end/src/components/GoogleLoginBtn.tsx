@@ -1,5 +1,6 @@
 import React from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
+import Image from 'next/image';
 
 const GoogleLoginButton = () => {
     const GOOGLE_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
@@ -25,7 +26,7 @@ const GoogleLoginButton = () => {
 
     return (
         <button type="button" className="google-login-button" onClick={handleGoogleLogin} style={{marginTop: "0", marginLeft: "3.5em", height: "2.5em"}}>
-        <img src="/assets/google-logo.png" alt="Google Logo" />
+        <Image src="/assets/google-logo.png" alt="Google Logo" width={20} height={20} />
         {t("auth.loginWithGoogle")}
         </button>
     );

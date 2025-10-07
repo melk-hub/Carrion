@@ -1,11 +1,3 @@
-:root {
-  --primary-color: #91d0f3;
-  --secondary-color: #ffffff;
-  --text-color: #333333;
-  --accent-color: #000000;
-  --shadow-color: rgba(0, 0, 0, 0.1);
-}
-
 @font-face {
   font-family: 'TextPolice';
   src: url('assets/fonts/Open_Sans/OpenSans-VariableFont_wdth\,wght.ttf') format('truetype');

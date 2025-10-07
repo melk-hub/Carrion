@@ -4,7 +4,7 @@ import { Strategy } from 'passport-microsoft';
 import { AuthService } from '../auth.service';
 import { JwtService } from '@nestjs/jwt';
 import { Profile } from 'passport';
-import { CreateUserDto } from 'src/user/dto/create-user.dto';
+import { CreateUserDto } from '@/user/dto/create-user.dto';
 
 @Injectable()
 export class MicrosoftStrategy extends PassportStrategy(Strategy, 'microsoft') {

@@ -1,4 +1,4 @@
-import { ApplicationStatus } from 'src/jobApply/enum/application-status.enum';
+import { ApplicationStatus } from '@/jobApply/enum/application-status.enum';
 
 export class ExtractedJobDataDto {
   company: string;

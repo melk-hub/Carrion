@@ -1,17 +1,22 @@
-import React, { useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import "../styles/AuthModal.css";
+"use client";
 
-function ResetPasswordPage() {
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [message, setMessage] = useState("");
-  const [error, setError] = useState("");
-  const { token } = useParams();
-  const navigate = useNavigate();
+import React, { useState } from "react";
+import { useParams, useRouter } from "next/navigation";
+import "@/styles/AuthModal.css";
+
+export default function ResetPasswordPage() {
+  const [password, setPassword] = useState<string>("");
+  const [confirmPassword, setConfirmPassword] = useState<string>("");
+  const [message, setMessage] = useState<string>("");
+  const [error, setError] = useState<string>("");
+
+  const params = useParams();
+  const router = useRouter();
+  const token = params.token as string;
+
   const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (password.length < 8) {
       setError("Le mot de passe doit contenir au moins 8 caractères.");
@@ -36,7 +41,7 @@ function ResetPasswordPage() {
         setMessage(
           "Votre mot de passe a été réinitialisé avec succès ! Vous allez être redirigé vers la page d'accueil."
         );
-        setTimeout(() => navigate("/"), 3000);
+        setTimeout(() => router.push("/"), 3000);
       } else {
         setError(data.message || "Ce lien est invalide ou a expiré.");
       }
@@ -94,5 +99,3 @@ function ResetPasswordPage() {
     </div>
   );
 }
-
-export default ResetPasswordPage;

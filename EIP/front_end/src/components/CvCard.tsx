@@ -10,11 +10,23 @@ import {
 import "../styles/CvCard.css";
 import { useLanguage } from "../contexts/LanguageContext";
 
-function CvCard({ cvUrl, uploadingCv, onUpload, onDelete }) {
+function CvCard({
+  cvUrl,
+  uploadingCv,
+  onUpload,
+  onDelete,
+}: {
+  cvUrl: string;
+  uploadingCv: boolean;
+  onUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onDelete: () => void;
+}) {
   const fileInputRef = useRef(null);
   const { t } = useLanguage();
   const handleModifyClick = () => {
-    fileInputRef.current?.click();
+    if (fileInputRef.current) {
+      (fileInputRef.current as HTMLInputElement).click();
+    }
   };
 
   const handleViewClick = () => {

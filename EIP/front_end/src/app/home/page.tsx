@@ -1,7 +1,12 @@
 import { cookies } from "next/headers";
 import ApiService from "@/services/api";
-import HomeClient from "@/components/HomeClient";
-import { UserProfile, UserRankingInfo, UserStats } from "@/interface/user.interface";
+import {
+  UserProfile,
+  UserRankingInfo,
+  UserStats,
+} from "@/interface/user.interface";
+
+import HomeClient from "./HomeClient";
 
 interface Stats {
   totalApplications: number;
@@ -19,8 +24,8 @@ interface Notification {
 }
 
 async function getHomeData() {
-  const cookieStore = cookies();
-  const token = (await cookieStore).get("access_token");
+  const cookieStore = await cookies();
+  const token = cookieStore.get("access_token");
 
   if (!token) {
     return {
@@ -37,17 +42,29 @@ async function getHomeData() {
   try {
     const [profileCheckRes, statsRes, usersRes, profileRes, notificationsRes] =
       await Promise.all([
-        ApiService.get<boolean>("/utils/hasProfile", { headers }),
-        ApiService.get<Stats>("/statistics", { headers }),
-        ApiService.get<UserStats[]>("/user/all-users", { headers }),
-        ApiService.get<UserProfile>("/user/profile", { headers }),
-        ApiService.get<Notification[]>("/notification", { headers }),
+        ApiService.get<boolean>("/utils/hasProfile", {
+          headers,
+          cache: "no-store",
+        }),
+        ApiService.get<Stats>("/statistics", { headers, cache: "no-store" }),
+        ApiService.get<UserStats[]>("/user/all-users", {
+          headers,
+          cache: "no-store",
+        }),
+        ApiService.get<UserProfile>("/user/profile", {
+          headers,
+          cache: "no-store",
+        }),
+        ApiService.get<Notification[]>("/notification", {
+          headers,
+          cache: "no-store",
+        }),
       ]);
 
     let userRanking: UserRankingInfo | null = null;
     if (usersRes && Array.isArray(usersRes) && profileRes) {
       const sortedUsers = [...usersRes].sort(
-        (a, b) => b.totalApplications - a.totalApplications
+        (a, b) => (b.totalApplications || 0) - (a.totalApplications || 0)
       );
       const userIndex = sortedUsers.findIndex(
         (user) => user.id === profileRes.id
@@ -85,5 +102,6 @@ async function getHomeData() {
 
 export default async function HomePage() {
   const homeData = await getHomeData();
+
   return <HomeClient {...homeData} />;
 }

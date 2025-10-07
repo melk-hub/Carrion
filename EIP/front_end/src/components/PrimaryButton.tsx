@@ -16,15 +16,15 @@ const PrimaryButton = ({
   onClick,
   disabled = false,
   size = "medium",
-  style, // 2. Récupérer la prop
+  style,
 }: PrimaryButtonProps) => {
   return (
     <button
       type="button"
       onClick={onClick}
-      // className={`primary-button ${size}`}
+      className={`primary-button ${size}`}
       disabled={disabled}
-      // style={style}
+      style={style}
     >
       <b>{text}</b>
     </button>

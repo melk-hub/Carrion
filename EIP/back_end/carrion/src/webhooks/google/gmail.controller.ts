@@ -8,7 +8,7 @@ import {
 } from '@nestjs/common';
 import { GmailService } from './gmail.service';
 import { ApiOperation } from '@nestjs/swagger';
-import { Public } from 'src/auth/decorators/public.decorator';
+import { Public } from '@/auth/decorators/public.decorator';
 
 @Controller('webhook')
 export class GmailController {

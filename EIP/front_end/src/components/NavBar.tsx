@@ -68,8 +68,10 @@ function Navbar({
     const fetchProfilePicture = async () => {
       try {
         const res = await ApiService.get(`/s3/download?filename=profile`);
-        const { signedUrl } = await res.json();
-        if (signedUrl) setUploadedImage(signedUrl);
+        if (res instanceof Response) {
+          const { signedUrl } = await res.json();
+          if (signedUrl) setUploadedImage(signedUrl);
+        }
       } catch (error) {
         console.error("Failed to load profile picture", error);
       }

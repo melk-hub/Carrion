@@ -1,8 +1,3 @@
-/* Variables CSS pour la cohérence avec la landing page */
-:root {
-  --background-color: #fff9f0;
-}
-
 /* Application du même background que la landing page */
 body, 
 .dashboard-page,

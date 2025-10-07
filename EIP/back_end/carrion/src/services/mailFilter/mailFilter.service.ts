@@ -1,25 +1,25 @@
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
-import { CreateJobApplyDto } from 'src/jobApply/dto/jobApply.dto';
-import { JobApplyService } from 'src/jobApply/jobApply.service';
-import { ApplicationStatus } from 'src/jobApply/enum/application-status.enum';
+import { CreateJobApplyDto } from '@/jobApply/dto/jobApply.dto';
+import { JobApplyService } from '@/jobApply/jobApply.service';
+import { ApplicationStatus } from '@/jobApply/enum/application-status.enum';
 import { ExtractedJobDataDto } from './dto/extracted-job-data.dto';
 import { convert } from 'html-to-text';
 import {
   GmailMessage,
   GmailMessagePart,
   GmailHeader,
-} from 'src/webhooks/mail/gmail.types';
-import { UpdateJobApply } from 'src/jobApply/interface/jobApply.interface';
-import { OutlookMessage } from 'src/webhooks/mail/outlook.types';
+} from '@/webhooks/mail/gmail.types';
+import { UpdateJobApply } from '@/jobApply/interface/jobApply.interface';
+import { OutlookMessage } from '@/webhooks/mail/outlook.types';
 import { createHash } from 'crypto';
-import { UserService } from 'src/user/user.service';
+import { UserService } from '@/user/user.service';
 import Anthropic from '@anthropic-ai/sdk';
 import { EmailPreFilterService } from './prefilter.service';
 import {
   EmailAnalysisResult,
   ExistingJobComparisonDto,
 } from './dto/dashboard-response.dto';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from '@/prisma/prisma.service';
 
 function extractJsonFromString(str: string): any | null {
   if (!str) {
@@ -385,7 +385,7 @@ export class MailFilterService {
         wordwrap: false,
         selectors: [
           { selector: 'a', options: { ignoreHref: true } },
-          { selector: 'img', format: 'skip' },
+          { selector: 'Image', format: 'skip' },
         ],
       });
     } else if (part.mimeType.startsWith('multipart/') && part.parts) {
@@ -1084,7 +1084,7 @@ If validation fails → return null
         wordwrap: false,
         selectors: [
           { selector: 'a', options: { ignoreHref: true } },
-          { selector: 'img', format: 'skip' },
+          { selector: 'Image', format: 'skip' },
           { selector: 'script', format: 'skip' },
           { selector: 'style', format: 'skip' },
         ],

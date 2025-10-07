@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 import ApiService from "@/services/api";
-import SettingsClient from "@/components/SettingsClient";
+import SettingsClient from "@/app/settings/SettingsClient";
 import { GoalSettings } from "@/interface/misc.interface";
 
 async function getSettingsData() {

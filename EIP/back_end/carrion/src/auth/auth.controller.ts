@@ -19,7 +19,7 @@ import { LocalAuthGuard } from './guards/local/local-auth.guard';
 import { JwtAuthGuard } from './guards/jwt/jwt-auth.guard';
 import { Public } from './decorators/public.decorator';
 import { GoogleAuthGuard } from './guards/google/google-auth.guard';
-import { CreateUserDto } from 'src/user/dto/create-user.dto';
+import { CreateUserDto } from '@/user/dto/create-user.dto';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { MicrosoftAuthGuard } from './guards/microsoft/microsoft-auth.guard';
 import { JwtService } from '@nestjs/jwt';

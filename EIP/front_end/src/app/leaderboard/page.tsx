@@ -1,6 +1,6 @@
 import { cookies } from 'next/headers';
 import ApiService from '@/services/api';
-import LeaderboardClient from '@/components/LeaderboardClient';
+import LeaderboardClient from '@/app/leaderboard/LeaderboardClient';
 import { User, UserStats } from '@/interface/user.interface';
 
 interface UserProfile {

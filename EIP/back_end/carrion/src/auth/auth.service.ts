@@ -5,20 +5,20 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { UserService } from 'src/user/user.service';
+import { UserService } from '@/user/user.service';
 import refreshJwtConfig from './config/refresh-jwt.config';
 import { ConfigType } from '@nestjs/config';
 import * as argon2 from 'argon2';
-import { CreateUserDto } from 'src/user/dto/create-user.dto';
+import { CreateUserDto } from '@/user/dto/create-user.dto';
 import { Role } from './enums/role.enum';
 import * as bcrypt from 'bcrypt';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from '@/prisma/prisma.service';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
 import {
   CustomLoggingService,
   LogCategory,
-} from 'src/common/services/logging.service';
+} from '@/common/services/logging.service';
 import { User, Token } from '@prisma/client';
 import * as crypto from 'crypto';
 import * as SibApiV3Sdk from '@getbrevo/brevo';

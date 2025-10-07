@@ -1,15 +1,45 @@
-import React from 'react';
+"use client";
 
-function InputField({ label, required, ...props }) {
+import React, { JSX } from "react";
+
+interface BaseProps {
+  label: string;
+  id?: string;
+}
+
+type InputProps = BaseProps & {
+  as?: "input";
+} & React.InputHTMLAttributes<HTMLInputElement>;
+
+type TextareaProps = BaseProps & {
+  as: "textarea";
+} & React.TextareaHTMLAttributes<HTMLTextAreaElement>;
+
+type InputFieldProps = InputProps | TextareaProps;
+
+const InputField = (props: InputFieldProps) => {
+  const { label, id, name, required } = props;
+  const inputId = id || name;
+
+  let inputElement: JSX.Element;
+
+  if (props.as === "textarea") {
+    const { label, as, ...rest } = props;
+    inputElement = <textarea id={inputId} {...rest} />;
+  } else {
+    const { label, as, ...rest } = props;
+    inputElement = <input id={inputId} {...rest} />;
+  }
+
   return (
-    <div className="form-group">
-      <label htmlFor={props.id || props.name}>
+    <div className="input-field-group">
+      <label htmlFor={inputId}>
         {label}
-        {required && <span style={{ color: '#e53e3e' }}>*</span>}
+        {required && <span className="required-star">*</span>}
       </label>
-      <input id={props.id || props.name} required={required} {...props} />
+      {inputElement}
     </div>
   );
-}
+};
 
 export default InputField;

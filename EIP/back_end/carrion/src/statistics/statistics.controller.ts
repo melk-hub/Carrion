@@ -6,7 +6,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { StatisticsService } from './statistics.service';
-import { JwtAuthGuard } from 'src/auth/guards/jwt/jwt-auth.guard';
+import { JwtAuthGuard } from '@/auth/guards/jwt/jwt-auth.guard';
 
 @Controller('statistics')
 export class StatisticsController {

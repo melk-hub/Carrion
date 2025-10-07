@@ -1,6 +1,6 @@
 .carrion-loading {
   min-height: 100vh;
-  background-image: url("../assets/svg/background.svg");
+  background-image: url("/assets/svg/background.svg");
   background-color: #fff9f0;
   padding: 24px;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;

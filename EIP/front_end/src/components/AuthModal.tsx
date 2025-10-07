@@ -11,7 +11,15 @@ import { motion, AnimatePresence } from "framer-motion";
 import { FiEye, FiEyeOff, FiXCircle, FiCheckCircle } from "react-icons/fi";
 import { passwordRegEX, emailRegEX } from "../services/utils";
 
-export default function AuthModal({ isOpen, onClose, defaultTab = "login" }) {
+export default function AuthModal({
+  isOpen,
+  onClose,
+  defaultTab = "login",
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+  defaultTab?: "login" | "register";
+}) {
   const [activeTab, setActiveTab] = useState(defaultTab);
   const [direction, setDirection] = useState(1);
   const [credentials, setCredentials] = useState({
@@ -37,7 +45,7 @@ export default function AuthModal({ isOpen, onClose, defaultTab = "login" }) {
     special: false,
   });
 
-  const validatePassword = (password) => {
+  const validatePassword = (password: string) => {
     setPasswordCriteria({
       length: password.length >= 8,
       letter: /[A-Za-z]/.test(password),
@@ -46,7 +54,7 @@ export default function AuthModal({ isOpen, onClose, defaultTab = "login" }) {
     });
   };
 
-  const handleChange = (e) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
     const newValue = type === "checkbox" ? checked : value;
     setCredentials((prev) => ({ ...prev, [name]: newValue }));
@@ -79,7 +87,7 @@ export default function AuthModal({ isOpen, onClose, defaultTab = "login" }) {
 
   const togglePasswordVisibility = () => setShowPassword((prev) => !prev);
 
-  const handleTabChange = (tab) => {
+  const handleTabChange = (tab: "login" | "register") => {
     if (tab === activeTab) return;
     setDirection(tab === "login" ? -1 : 1);
     setActiveTab(tab);
@@ -90,12 +98,12 @@ export default function AuthModal({ isOpen, onClose, defaultTab = "login" }) {
   const handleClose = () => onClose();
 
   const variants = {
-    enter: (direction) => ({ x: direction * 100, opacity: 0 }),
+    enter: (direction: number) => ({ x: direction * 100, opacity: 0 }),
     center: { x: 0, opacity: 1 },
-    exit: (direction) => ({ x: direction * -100, opacity: 0 }),
+    exit: (direction: number) => ({ x: direction * -100, opacity: 0 }),
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setErrorMessage("");
     setSuccessMessage("");
@@ -123,21 +131,21 @@ export default function AuthModal({ isOpen, onClose, defaultTab = "login" }) {
         }
       } catch (err) {
         console.error(err);
-        setErrorMessage(t("auth.genericError"));
+        setErrorMessage(t("auth.genericError") as string);
       }
     }
 
     if (activeTab === "register") {
       if (!emailRegEX.test(credentials.email)) {
-        setErrorMessage(t("auth.invalidEmail"));
+        setErrorMessage(t("auth.invalidEmail") as string);
         return;
       }
       if (!passwordRegEX.test(credentials.password)) {
-        setErrorMessage(t("auth.passwordInvalid"));
+        setErrorMessage(t("auth.passwordInvalid") as string);
         return;
       }
       if (credentials.password !== credentials.confirmPassword) {
-        setErrorMessage(t("auth.passwordMismatch"));
+        setErrorMessage(t("auth.passwordMismatch") as string);
         return;
       }
       try {
@@ -161,11 +169,11 @@ export default function AuthModal({ isOpen, onClose, defaultTab = "login" }) {
         }
       } catch (err) {
         console.error(err);
-        setErrorMessage(t("auth.genericError"));
+        setErrorMessage(t("auth.genericError") as string);
       }
     }
 
-    if (activeTab === "forgotPassword") {
+    if ((activeTab as string) === "forgotPassword") {
       try {
         const response = await fetch(`${API_URL}/auth/forgot-password`, {
           method: "POST",
@@ -180,12 +188,18 @@ export default function AuthModal({ isOpen, onClose, defaultTab = "login" }) {
         }
       } catch (err) {
         console.error(err);
-        setErrorMessage(t("auth.genericError"));
+        setErrorMessage(t("auth.genericError") as string);
       }
     }
   };
 
-  const ValidationCriterion = ({ isValid, text }) => (
+  const ValidationCriterion = ({
+    isValid,
+    text,
+  }: {
+    isValid: boolean;
+    text: string;
+  }) => (
     <li className={`criterion ${isValid ? "valid" : "invalid"}`}>
       {isValid ? <FiCheckCircle /> : <FiXCircle />}
       <span>{text}</span>
@@ -193,7 +207,8 @@ export default function AuthModal({ isOpen, onClose, defaultTab = "login" }) {
   );
 
   const getModalTitle = () => {
-    if (activeTab === "forgotPassword") return t("auth.resetYourPassword");
+    if ((activeTab as string) === "forgotPassword")
+      return t("auth.resetYourPassword");
     if (activeTab === "login") return t("home.welcome");
     return t("auth.joinUs");
   };
@@ -207,7 +222,7 @@ export default function AuthModal({ isOpen, onClose, defaultTab = "login" }) {
 
         <h1>{getModalTitle()}</h1>
 
-        {activeTab !== "forgotPassword" && (
+        {(activeTab as string) !== "forgotPassword" && (
           <>
             <div className="tabs">
               <button
@@ -243,7 +258,7 @@ export default function AuthModal({ isOpen, onClose, defaultTab = "login" }) {
                 <input
                   type="text"
                   name="identifier"
-                  placeholder={t("auth.emailOrUsername")}
+                  placeholder={t("auth.emailOrUsername") as string}
                   value={credentials.identifier}
                   onChange={handleChange}
                   required
@@ -253,7 +268,7 @@ export default function AuthModal({ isOpen, onClose, defaultTab = "login" }) {
                   <input
                     type={showPassword ? "text" : "password"}
                     name="password"
-                    placeholder={t("auth.password")}
+                    placeholder={t("auth.password") as string}
                     value={credentials.password}
                     onChange={handleChange}
                     required
@@ -288,7 +303,7 @@ export default function AuthModal({ isOpen, onClose, defaultTab = "login" }) {
                     href="#"
                     onClick={(e) => {
                       e.preventDefault();
-                      handleTabChange("forgotPassword");
+                      handleTabChange("forgotPassword" as "login" | "register");
                     }}
                     className="forgot-password-link"
                   >
@@ -319,7 +334,7 @@ export default function AuthModal({ isOpen, onClose, defaultTab = "login" }) {
                     <input
                       type="email"
                       name="email"
-                      placeholder={t("auth.email")}
+                      placeholder={t("auth.email") as string}
                       value={credentials.email}
                       onChange={handleChange}
                       required
@@ -330,7 +345,7 @@ export default function AuthModal({ isOpen, onClose, defaultTab = "login" }) {
                     <input
                       type="text"
                       name="username"
-                      placeholder={t("auth.username")}
+                      placeholder={t("auth.username") as string}
                       value={credentials.username}
                       onChange={handleChange}
                       required
@@ -344,7 +359,7 @@ export default function AuthModal({ isOpen, onClose, defaultTab = "login" }) {
                       <input
                         type={showPassword ? "text" : "password"}
                         name="password"
-                        placeholder={t("auth.password")}
+                        placeholder={t("auth.password") as string}
                         value={credentials.password}
                         onChange={handleChange}
                         required
@@ -367,7 +382,7 @@ export default function AuthModal({ isOpen, onClose, defaultTab = "login" }) {
                       <input
                         type={showPassword ? "text" : "password"}
                         name="confirmPassword"
-                        placeholder={t("auth.confirmPassword")}
+                        placeholder={t("auth.confirmPassword") as string}
                         value={credentials.confirmPassword}
                         onChange={handleChange}
                         required
@@ -388,19 +403,19 @@ export default function AuthModal({ isOpen, onClose, defaultTab = "login" }) {
                 <ul className="password-criteria">
                   <ValidationCriterion
                     isValid={passwordCriteria.length}
-                    text={t("auth.criteria.length")}
+                    text={t("auth.criteria.length") as string}
                   />
                   <ValidationCriterion
                     isValid={passwordCriteria.letter}
-                    text={t("auth.criteria.letter")}
+                    text={t("auth.criteria.letter") as string}
                   />
                   <ValidationCriterion
                     isValid={passwordCriteria.number}
-                    text={t("auth.criteria.number")}
+                    text={t("auth.criteria.number") as string}
                   />
                   <ValidationCriterion
                     isValid={passwordCriteria.special}
-                    text={t("auth.criteria.special")}
+                    text={t("auth.criteria.special") as string}
                   />
                 </ul>
                 {errorMessage && (
@@ -413,7 +428,7 @@ export default function AuthModal({ isOpen, onClose, defaultTab = "login" }) {
             </motion.div>
           )}
 
-          {activeTab === "forgotPassword" && (
+          {(activeTab as string) === "forgotPassword" && (
             <motion.div
               key="forgotPassword"
               custom={direction}
@@ -431,7 +446,7 @@ export default function AuthModal({ isOpen, onClose, defaultTab = "login" }) {
                 <input
                   type="email"
                   name="email"
-                  placeholder={t("auth.email")}
+                  placeholder={t("auth.email") as string}
                   value={credentials.email}
                   onChange={handleChange}
                   required
@@ -463,7 +478,7 @@ export default function AuthModal({ isOpen, onClose, defaultTab = "login" }) {
           )}
         </AnimatePresence>
 
-        {activeTab !== "forgotPassword" && (
+        {(activeTab as string) !== "forgotPassword" && (
           <>
             <hr />
             <div className="social-buttons">

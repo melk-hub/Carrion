@@ -19,13 +19,13 @@ import { JwtAuthGuard } from './guards/jwt/jwt-auth.guard';
 import { RolesGuard } from './guards/roles/roles.guard';
 import googleOauthConfig from './config/google-oauth.config';
 import { GoogleStrategy } from './strategies/google.strategy';
-import { PrismaModule } from 'src/prisma/prisma.module';
+import { PrismaModule } from '@/prisma/prisma.module';
 import { MicrosoftStrategy } from './strategies/microsoft.strategy';
 import microsoftOauthConfig from './config/microsoft-oauth.config';
-import { UserModule } from 'src/user/user.module';
+import { UserModule } from '@/user/user.module';
 import { HttpModule } from '@nestjs/axios';
-import { UserProfileModule } from 'src/userProfile/user-profile.module';
-import { CustomLoggingService } from 'src/common/services/logging.service';
+import { UserProfileModule } from '@/userProfile/user-profile.module';
+import { CustomLoggingService } from '@/common/services/logging.service';
 import { GoogleRedirectMiddleware } from './middleware/google-redirect.middleware';
 
 @Global()

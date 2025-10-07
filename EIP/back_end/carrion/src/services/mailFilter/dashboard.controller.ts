@@ -6,7 +6,7 @@ import {
   DashboardStatsDto,
   EmailAnalysisResult,
 } from './dto/dashboard-response.dto';
-import { Public } from 'src/auth/decorators/public.decorator';
+import { Public } from '@/auth/decorators/public.decorator';
 
 @ApiTags('dashboard-mail')
 @Public()

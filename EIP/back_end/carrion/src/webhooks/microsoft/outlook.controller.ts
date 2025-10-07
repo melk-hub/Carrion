@@ -13,11 +13,11 @@ import { OutlookService } from './outlook.service';
 import {
   CustomLoggingService,
   LogCategory,
-} from 'src/common/services/logging.service';
-import { MailFilterService } from 'src/services/mailFilter/mailFilter.service';
-import { OutlookMessage } from 'src/webhooks/mail/outlook.types';
-import { UserService } from 'src/user/user.service';
-import { Public } from 'src/auth/decorators/public.decorator';
+} from '@/common/services/logging.service';
+import { MailFilterService } from '@/services/mailFilter/mailFilter.service';
+import { OutlookMessage } from '@/webhooks/mail/outlook.types';
+import { UserService } from '@/user/user.service';
+import { Public } from '@/auth/decorators/public.decorator';
 
 @Controller('webhook/outlook')
 export class OutlookController {

@@ -1,14 +1,14 @@
 import { Module, forwardRef } from '@nestjs/common';
 import { UserService } from './user.service';
 import { UserController } from './user.controller';
-import { PrismaModule } from 'src/prisma/prisma.module';
+import { PrismaModule } from '@/prisma/prisma.module';
 import { JwtModule, JwtService } from '@nestjs/jwt';
 import { ConfigModule } from '@nestjs/config';
-import { AuthModule } from 'src/auth/auth.module';
+import { AuthModule } from '@/auth/auth.module';
 import { HttpModule } from '@nestjs/axios';
-import { CustomLoggingService } from 'src/common/services/logging.service';
-import { AuthService } from 'src/auth/auth.service';
-import { S3Module } from 'src/aws/s3.module';
+import { CustomLoggingService } from '@/common/services/logging.service';
+import { AuthService } from '@/auth/auth.service';
+import { S3Module } from '@/aws/s3.module';
 
 @Module({
   imports: [

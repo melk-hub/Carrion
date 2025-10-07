@@ -21,6 +21,8 @@ const OutlookLoginButton = () => {
         src="/assets/outlook-logo.svg"
         alt="Outlook"
         style={{ zIndex: 1 }}
+        width={24}
+        height={24}
       />
       {t("auth.loginWithOutlook")}
     </button>

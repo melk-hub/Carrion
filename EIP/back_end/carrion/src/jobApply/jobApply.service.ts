@@ -3,14 +3,14 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from '@/prisma/prisma.service';
 import {
   CreateJobApplyDto,
   JobApplyDto,
   UpdateJobApplyDto,
 } from './dto/jobApply.dto';
 import { ApplicationStatus } from './enum/application-status.enum';
-import { NotificationService } from 'src/notification/notification.service';
+import { NotificationService } from '@/notification/notification.service';
 
 export interface JobApplyParams {
   title: string;

@@ -12,7 +12,7 @@ import {
   HttpCode,
   HttpStatus,
 } from '@nestjs/common';
-import { JwtAuthGuard } from 'src/auth/guards/jwt/jwt-auth.guard';
+import { JwtAuthGuard } from '@/auth/guards/jwt/jwt-auth.guard';
 import { UserProfileService } from './user-profile.service';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { UserProfileDto } from './dto/user-profile.dto';

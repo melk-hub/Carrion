@@ -1,6 +1,7 @@
 import React from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
 import '../styles/NotificationTimeline.css';
+import { Notification } from '@/interface/notification.interface';
 
 const NotificationTimeline = ({ 
   notifications = [], 
@@ -15,28 +16,30 @@ const NotificationTimeline = ({
     let filtered = notifications;
     
     if (showOnlyUnread) {
-      filtered = filtered.filter(notification => !notification.isRead);
+      filtered = filtered.filter((notification: Notification) => !notification.read);
     }
     
     // Trier par date (plus récent en premier)
-    filtered = filtered.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    filtered = filtered.sort((a: Notification, b: Notification) => 
+      new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    );
     
     // Limiter le nombre d'éléments
     return filtered.slice(0, maxItems);
   }, [notifications, showOnlyUnread, maxItems]);
 
   // Fonction pour formater le temps écoulé (identique à l'original)
-  const formatTimestamp = (created_at) => {
-    if (!created_at) return t('shared.time.unknown') || 'Il y a un moment';
+  const formatTimestamp = (createdAt: string) => {
+    if (!createdAt) return t('shared.time.unknown') || 'Il y a un moment';
 
     const now = new Date();
-    const notificationTime = new Date(created_at);
+    const notificationTime = new Date(createdAt);
 
     if (isNaN(notificationTime.getTime())) {
       return t('shared.time.unknown') || 'Il y a un moment';
     }
 
-    const diffInMinutes = Math.floor((now - notificationTime) / (1000 * 60));
+    const diffInMinutes = Math.floor((now.getTime() - notificationTime.getTime()) / (1000 * 60));
 
     if (diffInMinutes < 1) {
       return t('shared.time.now') || 'À l\'instant';
@@ -52,7 +55,7 @@ const NotificationTimeline = ({
   };
 
   // Fonction pour obtenir l'icône selon le type (identique à l'original)
-  const getNotificationIcon = (type) => {
+  const getNotificationIcon = (type: Notification['type']) => {
     switch (type) {
       case 'POSITIVE':
         return '✅';
@@ -66,7 +69,7 @@ const NotificationTimeline = ({
     }
   };
 
-  const getNotificationMessage = (notification) => {
+  const getNotificationMessage = (notification: Notification) => {
     const { variables } = notification;
     
     if (variables?.company && variables?.jobTitle) {
@@ -83,7 +86,7 @@ const NotificationTimeline = ({
   };
 
   // Fonction pour obtenir la classe CSS du type de notification
-  const getNotificationTypeClass = (type) => {
+  const getNotificationTypeClass = (type: Notification['type']) => {
     switch (type) {
       case 'POSITIVE':
         return 'positive';
@@ -118,7 +121,7 @@ const NotificationTimeline = ({
 
   return (
     <div className={`timeline ${className}`}>
-      {filteredNotifications.map((notification) => (
+      {filteredNotifications.map((notification: Notification) => (
         <div className="timeline-item" key={notification.id}>
           <div className={`timeline-dot ${getNotificationTypeClass(notification.type)}`}>
             {getNotificationIcon(notification.type)}

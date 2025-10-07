@@ -11,6 +11,7 @@ class ApiService {
   private isRefreshing: boolean = false;
   private refreshSubscribers: (() => void)[] = [];
   private _logoutCallback: () => void = () => {};
+  private readonly NEXT_PUBLIC_API_URL = process.env.NEXT_PUBLIC_API_URL || "localhost:8000";
 
   constructor() {
     this.handleTokenRefresh = this.handleTokenRefresh.bind(this);
@@ -76,7 +77,8 @@ class ApiService {
     url: string,
     options: ApiOptions = {}
   ): Promise<Response> {
-    const fullUrl = `${process.env.NEXT_PUBLIC_API_URL}${url}`;
+    const fullUrl = `${this.NEXT_PUBLIC_API_URL}${url}`;
+    console.log(fullUrl);
 
     const defaultOptions: ApiOptions = {
       credentials: "include",

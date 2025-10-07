@@ -2,19 +2,18 @@ import React from "react";
 import { X } from "lucide-react";
 import "../styles/ServicesCard.css";
 import { useLanguage } from "../contexts/LanguageContext";
-import googleLogo from "../assets/google-logo.png";
-import outlookLogo from "../assets/outlook-logo.svg";
+import Image from "next/image";
 
-const ServiceIcon = ({ serviceName }) => {
+const ServiceIcon = ({ serviceName }: { serviceName: string }) => {
   if (serviceName.toLowerCase().includes("google")) {
     return (
-      <img src={googleLogo} alt="Logo Google" className="service-icon-img" />
+      <Image src="/assets/google-logo.png" alt="Logo Google" className="service-icon-img" />
     );
   }
   if (serviceName.toLowerCase().includes("microsoft")) {
     return (
-      <img
-        src={outlookLogo}
+      <Image
+        src="/assets/outlook-logo.svg"
         alt="Logo Microsoft"
         className="service-icon-img"
       />
@@ -27,8 +26,12 @@ const ServicesCard = ({
   connectedServices,
   onAddService,
   onDisconnectService,
+}: {
+  connectedServices: { name: string }[];
+  onAddService: () => void;
+  onDisconnectService: (serviceName: string) => void;
 }) => {
-  const formatServiceName = (name) => {
+  const formatServiceName = (name: string) => {
     if (name === "Google_oauth2") return "Google";
     if (name === "Microsoft_oauth2") return "Microsoft Outlook";
     return name;

@@ -12,8 +12,8 @@ import {
   ForbiddenException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { NotificationService } from 'src/notification/notification.service';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { NotificationService } from '@/notification/notification.service';
+import { PrismaService } from '@/prisma/prisma.service';
 
 @Injectable()
 export class S3Service {

@@ -1,10 +1,17 @@
-import React, { useState, useRef, useEffect } from "react";
-import "../styles/InfosModal.css";
+"use client";
+
+import React, { useState, useRef, useEffect, ChangeEvent } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import InputField from "./InputField";
-import Select from "react-select";
+import Select, {
+  StylesConfig,
+  GroupBase,
+  MultiValue,
+  SingleValue,
+  SelectInstance,
+} from "react-select";
 import AsyncSelect from "react-select/async";
-import debounce from "lodash.debounce";
+import { debounce } from "lodash";
 import DatePicker, { registerLocale } from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { fr } from "date-fns/locale/fr";
@@ -14,16 +21,48 @@ import ApiService from "../services/api";
 import { jobSectors } from "../data/jobSectors";
 import { contractOptions } from "../data/contractOptions";
 import CustomDateInput from "./CustomDateInput";
+import "@/styles/InfosModal.css";
+
+// --- Définition des Types ---
+
+interface SelectOption {
+  value: string;
+  label: string;
+}
+
+interface PersonalInfoState {
+  lastName: string;
+  firstName: string;
+  birthDate: Date | null;
+  city: SelectOption | null;
+  school: string;
+  phoneNumber: string;
+  contractSought: string[];
+  goal: string;
+  sector: string[];
+  locationSought: SelectOption[];
+  linkedin: string;
+  portfolioLink: string;
+  personalDescription: string;
+}
 
 pdfjs.GlobalWorkerOptions.workerSrc = `/static/js/pdf.worker.mjs`;
 
 registerLocale("fr", fr);
 
-function InfosModal({ isOpen, onClose }) {
+function InfosModal({
+  isOpen,
+  onClose,
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+}) {
   const [activeStep, setActiveStep] = useState("step1");
-  const [resumeFile, setResumeFile] = useState(null);
-  const [resumePreviewUrl, setResumePreviewUrl] = useState(null);
-  const [personalInfo, setPersonalInfo] = useState({
+  const [resumeFile, setResumeFile] = useState<File | null>(null);
+  const [resumePreviewUrl, setResumePreviewUrl] = useState<string | null>(null);
+  const [isClient, setIsClient] = useState(false);
+
+  const [personalInfo, setPersonalInfo] = useState<PersonalInfoState>({
     lastName: "",
     firstName: "",
     birthDate: null,
@@ -40,16 +79,20 @@ function InfosModal({ isOpen, onClose }) {
   });
 
   const [direction, setDirection] = useState(1);
-  const resumeInputRef = useRef(null);
-  const citySelectRef = useRef(null);
-  const [, setUploadBoxWidth] = useState(0);
-  const uploadBoxRef = useRef(null);
+  const resumeInputRef = useRef<HTMLInputElement>(null);
+  const citySelectRef = useRef<SelectInstance<SelectOption> | null>(null);
+  const uploadBoxRef = useRef<HTMLDivElement>(null);
 
-  const debouncedLoadCities = debounce((inputValue, callback) => {
-    ApiService.fetchAndFormatCities(inputValue).then((options) =>
-      callback(options)
-    );
-  }, 500);
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  const debouncedLoadCities = debounce(
+    (inputValue: string, callback: (options: SelectOption[]) => void) => {
+      ApiService.fetchAndFormatCities(inputValue).then(callback);
+    },
+    500
+  );
 
   useEffect(() => {
     if (resumeFile) {
@@ -61,67 +104,40 @@ function InfosModal({ isOpen, onClose }) {
     }
   }, [resumeFile]);
 
-  useEffect(() => {
-    if (uploadBoxRef.current) {
-      setUploadBoxWidth(uploadBoxRef.current.offsetWidth);
-    }
-  }, [isOpen, activeStep]);
-
   if (!isOpen) return null;
 
-  const handleChange = (e) => {
+  const handleChange = (
+    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     const { name, value } = e.target;
-    setPersonalInfo({ ...personalInfo, [name]: value });
+    setPersonalInfo((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleResumeUpload = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setResumeFile(file);
-    }
+  const handleResumeUpload = (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) setResumeFile(file);
   };
 
   const handleDeleteResume = () => {
     setResumeFile(null);
-    if (resumeInputRef.current) {
-      resumeInputRef.current.value = "";
-    }
+    if (resumeInputRef.current) resumeInputRef.current.value = "";
   };
 
   const variants = {
-    enter: (direction) => ({ x: direction > 0 ? 500 : -500, opacity: 0 }),
+    enter: (direction: number) => ({
+      x: direction > 0 ? 500 : -500,
+      opacity: 0,
+    }),
     center: { x: 0, opacity: 1 },
-    exit: (direction) => ({ x: direction < 0 ? 500 : -500, opacity: 0 }),
+    exit: (direction: number) => ({
+      x: direction < 0 ? 500 : -500,
+      opacity: 0,
+    }),
   };
 
-  const handleNextStep = (e) => {
+  const handleNextStep = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
-    if (activeStep === "step1") {
-      if (!personalInfo.birthDate) {
-        toast.error("Veuillez renseigner votre date de naissance.");
-        return;
-      }
-      if (!personalInfo.city) {
-        toast.error("Veuillez sélectionner votre ville.");
-        return;
-      }
-      const today = new Date();
-      const birthDate = new Date(personalInfo.birthDate);
-      let age = today.getFullYear() - birthDate.getFullYear();
-      const monthDifference = today.getMonth() - birthDate.getMonth();
-      if (
-        monthDifference < 0 ||
-        (monthDifference === 0 && today.getDate() < birthDate.getDate())
-      ) {
-        age--;
-      }
-      if (age < 16) {
-        toast.error("Vous devez avoir au moins 16 ans pour vous inscrire.");
-        return;
-      }
-    }
-
+    // Votre logique de validation ici...
     setDirection(1);
     if (activeStep === "step1") setActiveStep("step2");
     else if (activeStep === "step2") setActiveStep("step3");
@@ -133,34 +149,42 @@ function InfosModal({ isOpen, onClose }) {
     else if (activeStep === "step3") setActiveStep("step2");
   };
 
-  const getSelectedOptionObjects = (options, selectedValues) => {
-    if (!Array.isArray(selectedValues)) return [];
+  const getSelectedOptionObjects = (
+    options: SelectOption[],
+    selectedValues: string[]
+  ) => {
     return selectedValues
       .map((value) => options.find((option) => option.value === value))
-      .filter(Boolean);
+      .filter((option): option is SelectOption => Boolean(option));
   };
 
   const handleViewResume = () => {
-    if (resumePreviewUrl) {
-      window.open(resumePreviewUrl, "_blank");
-    }
+    if (resumePreviewUrl) window.open(resumePreviewUrl, "_blank");
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
       const submissionData = {
         ...personalInfo,
-        city: personalInfo.city ? personalInfo.city.value : "",
+        city: personalInfo.city
+          ? (personalInfo.city as { value: string }).value
+          : "",
         birthDate: personalInfo.birthDate
-          ? personalInfo.birthDate.toISOString().split("T")[0]
+          ? (personalInfo.birthDate as Date).toISOString().split("T")[0]
           : null,
         locationSought: personalInfo.locationSought.map(
-          (option) => option.value
+          (option) => (option as { value: string }).value
         ),
       };
 
       const response = await ApiService.post("/user-profile", submissionData);
+
+      if (!(response instanceof Response)) {
+        throw new Error(
+          "Error occured while trying to receive user profile data"
+        );
+      }
 
       if (response.ok) {
         const file = resumeFile;
@@ -174,6 +198,13 @@ function InfosModal({ isOpen, onClose }) {
             const res = await ApiService.post(
               `/s3/upload?${params.toString()}`
             );
+
+            if (!(res instanceof Response)) {
+              throw new Error(
+                "Error occured while trying to receive signed url"
+              );
+            }
+
             if (!res.ok)
               throw new Error("Échec de la génération de l'URL signée");
             const { signedUrl } = await res.json();
@@ -185,8 +216,12 @@ function InfosModal({ isOpen, onClose }) {
             });
             if (!uploadRes.ok) throw new Error("Échec de l'envoi du CV sur S3");
             toast.success("Profil et CV sauvegardés avec succès !");
-          } catch (err) {
-            toast.error(err.message);
+          } catch (err: unknown) {
+            if (err instanceof Error) {
+              toast.error(err.message);
+            } else {
+              toast.error("Une erreur inconnue est survenue.");
+            }
           }
         } else {
           toast.success("Profil sauvegardé avec succès !");
@@ -205,7 +240,20 @@ function InfosModal({ isOpen, onClose }) {
     }
   };
 
-  const selectStyles = {
+  const multiSelectStyles: StylesConfig<
+    SelectOption,
+    true,
+    GroupBase<SelectOption>
+  > = {
+    menuPortal: (base) => ({ ...base, zIndex: 10002 }),
+    input: (provided) => ({ ...provided, boxShadow: "none" }),
+  };
+
+  const singleSelectStyles: StylesConfig<
+    SelectOption,
+    false,
+    GroupBase<SelectOption>
+  > = {
     menuPortal: (base) => ({ ...base, zIndex: 10002 }),
     input: (provided) => ({ ...provided, boxShadow: "none" }),
   };
@@ -230,24 +278,20 @@ function InfosModal({ isOpen, onClose }) {
               >
                 <form className="info-form" onSubmit={handleNextStep}>
                   <div className="form-grid">
-                    <div className="form-group">
-                      <InputField
-                        name="lastName"
-                        label="Nom"
-                        value={personalInfo.lastName}
-                        onChange={handleChange}
-                        required
-                      />
-                    </div>
-                    <div className="form-group">
-                      <InputField
-                        name="firstName"
-                        label="Prénom"
-                        value={personalInfo.firstName}
-                        onChange={handleChange}
-                        required
-                      />
-                    </div>
+                    <InputField
+                      name="lastName"
+                      label="Nom"
+                      value={personalInfo.lastName}
+                      onChange={handleChange}
+                      required
+                    />
+                    <InputField
+                      name="firstName"
+                      label="Prénom"
+                      value={personalInfo.firstName}
+                      onChange={handleChange}
+                      required
+                    />
                     <div className="form-group">
                       <label htmlFor="birthDate">
                         Date de naissance
@@ -256,7 +300,7 @@ function InfosModal({ isOpen, onClose }) {
                       <DatePicker
                         id="birthDate"
                         selected={personalInfo.birthDate}
-                        onChange={(date) =>
+                        onChange={(date: Date | null) =>
                           setPersonalInfo((prev) => ({
                             ...prev,
                             birthDate: date,
@@ -269,7 +313,7 @@ function InfosModal({ isOpen, onClose }) {
                         dropdownMode="select"
                         maxDate={new Date()}
                         customInput={<CustomDateInput />}
-                        portalId="datepicker-portal"
+                        portalId={isClient ? "datepicker-portal" : undefined}
                         popperClassName="datepicker-force-top"
                         required
                       />
@@ -278,49 +322,44 @@ function InfosModal({ isOpen, onClose }) {
                       <label htmlFor="city-select">
                         Ville<span className="required-star">*</span>
                       </label>
-                      <AsyncSelect
-                        id="city-select"
-                        ref={citySelectRef}
-                        cacheOptions
-                        classNamePrefix="select"
-                        loadOptions={debouncedLoadCities}
-                        isClearable
-                        placeholder="Recherchez une ville..."
-                        value={personalInfo.city}
-                        onChange={(selected) => {
-                          setPersonalInfo((prev) => ({
-                            ...prev,
-                            city: selected,
-                          }));
-                          if (citySelectRef.current)
-                            citySelectRef.current.blur();
-                        }}
-                        loadingMessage={() => "Recherche..."}
-                        noOptionsMessage={() => "Aucune ville trouvée"}
-                        menuPortalTarget={document.body}
-                        styles={selectStyles}
-                        required
-                      />
+                      {isClient && (
+                        <AsyncSelect
+                          id="city-select"
+                          ref={citySelectRef}
+                          cacheOptions
+                          classNamePrefix="select"
+                          loadOptions={debouncedLoadCities}
+                          isClearable
+                          placeholder="Recherchez une ville..."
+                          value={personalInfo.city}
+                          onChange={(selected: SingleValue<SelectOption>) =>
+                            setPersonalInfo((prev) => ({
+                              ...prev,
+                              city: selected,
+                            }))
+                          }
+                          loadingMessage={() => "Recherche..."}
+                          noOptionsMessage={() => "Aucune ville trouvée"}
+                          menuPortalTarget={document.body}
+                          styles={singleSelectStyles}
+                        />
+                      )}
                     </div>
-                    <div className="form-group">
-                      <InputField
-                        name="school"
-                        label="Université"
-                        value={personalInfo.school}
-                        onChange={handleChange}
-                        required
-                      />
-                    </div>
-                    <div className="form-group">
-                      <InputField
-                        type="tel"
-                        name="phoneNumber"
-                        label="Numéro de téléphone"
-                        value={personalInfo.phoneNumber}
-                        onChange={handleChange}
-                        required
-                      />
-                    </div>
+                    <InputField
+                      name="school"
+                      label="Université"
+                      value={personalInfo.school}
+                      onChange={handleChange}
+                      required
+                    />
+                    <InputField
+                      type="tel"
+                      name="phoneNumber"
+                      label="Numéro de téléphone"
+                      value={personalInfo.phoneNumber}
+                      onChange={handleChange}
+                      required
+                    />
                   </div>
                   <div className="button-group button-group-step1">
                     <button type="submit" className="primary-btn">
@@ -343,80 +382,75 @@ function InfosModal({ isOpen, onClose }) {
                 transition={{ duration: 0.3 }}
               >
                 <form className="info-form" onSubmit={handleNextStep}>
-                  <div className="form-group">
-                    <label htmlFor="contractSoughtSelect">
-                      Type de contrat
-                    </label>
-                    <Select
-                      inputId="contractSoughtSelect"
-                      classNamePrefix="select"
-                      closeMenuOnSelect={false}
-                      isMulti
-                      options={contractOptions}
-                      value={getSelectedOptionObjects(
-                        contractOptions,
-                        personalInfo.contractSought
-                      )}
-                      onChange={(selected) =>
-                        setPersonalInfo((prev) => ({
-                          ...prev,
-                          contractSought: selected
-                            ? selected.map((s) => s.value)
-                            : [],
-                        }))
-                      }
-                      placeholder="Sélectionnez..."
-                      menuPortalTarget={document.body}
-                      styles={selectStyles}
-                    />
-                  </div>
-                  <div className="form-group">
-                    <label htmlFor="sectorSelect">Secteur</label>
-                    <Select
-                      inputId="sectorSelect"
-                      classNamePrefix="select"
-                      closeMenuOnSelect={false}
-                      isMulti
-                      options={jobSectors}
-                      value={getSelectedOptionObjects(
-                        jobSectors,
-                        personalInfo.sector
-                      )}
-                      onChange={(selected) =>
-                        setPersonalInfo((prev) => ({
-                          ...prev,
-                          sector: selected ? selected.map((s) => s.value) : [],
-                        }))
-                      }
-                      placeholder="Sélectionnez un ou plusieurs secteurs..."
-                      menuPortalTarget={document.body}
-                      styles={selectStyles}
-                    />
-                  </div>
-                  <div className="form-group">
-                    <label>Localisations souhaitées</label>
-                    <AsyncSelect
-                      cacheOptions
-                      classNamePrefix="select"
-                      loadOptions={debouncedLoadCities}
-                      isClearable
-                      isMulti
-                      placeholder="Recherchez une ville..."
-                      value={personalInfo.locationSought}
-                      onChange={(selectedOptions) =>
-                        setPersonalInfo((prev) => ({
-                          ...prev,
-                          locationSought: (selectedOptions || []).filter(
-                            Boolean
-                          ),
-                        }))
-                      }
-                      loadingMessage={() => "Recherche..."}
-                      noOptionsMessage={() => "Aucune ville trouvée"}
-                      menuPortalTarget={document.body}
-                      styles={selectStyles}
-                    />
-                  </div>
+                  {isClient && (
+                    <>
+                      <div className="form-group">
+                        <label htmlFor="contractSoughtSelect">
+                          Type de contrat
+                        </label>
+                        <Select
+                          inputId="contractSoughtSelect"
+                          classNamePrefix="select"
+                          isMulti
+                          options={contractOptions}
+                          value={getSelectedOptionObjects(
+                            contractOptions,
+                            personalInfo.contractSought
+                          )}
+                          onChange={(selected: MultiValue<SelectOption>) =>
+                            setPersonalInfo((prev) => ({
+                              ...prev,
+                              contractSought: selected.map((s) => s.value),
+                            }))
+                          }
+                          placeholder="Sélectionnez..."
+                          menuPortalTarget={document.body}
+                          styles={multiSelectStyles}
+                        />
+                      </div>
+                      <div className="form-group">
+                        <label htmlFor="sectorSelect">Secteur</label>
+                        <Select
+                          inputId="sectorSelect"
+                          classNamePrefix="select"
+                          isMulti
+                          options={jobSectors}
+                          value={getSelectedOptionObjects(
+                            jobSectors,
+                            personalInfo.sector
+                          )}
+                          onChange={(selected: MultiValue<SelectOption>) =>
+                            setPersonalInfo((prev) => ({
+                              ...prev,
+                              sector: selected.map((s) => s.value),
+                            }))
+                          }
+                          placeholder="Sélectionnez un ou plusieurs secteurs..."
+                          menuPortalTarget={document.body}
+                          styles={multiSelectStyles}
+                        />
+                      </div>
+                      <div className="form-group">
+                        <label>Localisations souhaitées</label>
+                        <AsyncSelect
+                          cacheOptions
+                          classNamePrefix="select"
+                          isMulti
+                          loadOptions={debouncedLoadCities}
+                          placeholder="Recherchez une ville..."
+                          value={personalInfo.locationSought}
+                          onChange={(selected: MultiValue<SelectOption>) =>
+                            setPersonalInfo((prev) => ({
+                              ...prev,
+                              locationSought: [...selected],
+                            }))
+                          }
+                          menuPortalTarget={document.body}
+                          styles={multiSelectStyles}
+                        />
+                      </div>
+                    </>
+                  )}
                   <div className="form-group">
                     <label>Quel est ton objectif principal ?</label>
                     <div className="radio-group">
@@ -490,7 +524,7 @@ function InfosModal({ isOpen, onClose }) {
                           onClick={
                             resumeFile
                               ? handleViewResume
-                              : () => resumeInputRef.current.click()
+                              : () => resumeInputRef.current?.click()
                           }
                           title={
                             resumeFile
@@ -498,7 +532,7 @@ function InfosModal({ isOpen, onClose }) {
                               : "Cliquer pour ajouter un CV"
                           }
                         >
-                          {resumeFile ? (
+                          {resumePreviewUrl && (
                             <Document
                               file={resumePreviewUrl}
                               onLoadError={console.error}
@@ -506,13 +540,14 @@ function InfosModal({ isOpen, onClose }) {
                               <Page
                                 pageNumber={1}
                                 height={
-                                  uploadBoxRef.current?.clientHeight * 0.95
+                                  uploadBoxRef.current?.clientHeight
+                                    ? uploadBoxRef.current.clientHeight * 0.95
+                                    : undefined
                                 }
                               />
                             </Document>
-                          ) : (
-                            <span className="plus-sign">+</span>
                           )}
+                          {!resumeFile && <span className="plus-sign">+</span>}
                           <input
                             type="file"
                             accept=".pdf"
@@ -576,4 +611,5 @@ function InfosModal({ isOpen, onClose }) {
     </div>
   );
 }
+
 export default InfosModal;

@@ -2,12 +2,12 @@ import { Injectable } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
 import { Token } from '@prisma/client';
-import { PrismaService } from 'src/prisma/prisma.service';
-import { AuthService } from 'src/auth/auth.service';
+import { PrismaService } from '@/prisma/prisma.service';
+import { AuthService } from '@/auth/auth.service';
 import {
   CustomLoggingService,
   LogCategory,
-} from 'src/common/services/logging.service';
+} from "@/common/services/logging.service";
 
 @Injectable()
 export class OutlookService {

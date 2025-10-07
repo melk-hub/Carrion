@@ -1,43 +1,59 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import '../styles/Header.css';
-import logo from '../assets/carrion_logo.png';
-import axios from 'axios';
+  "use client";
 
-function Header({ setIsAuthenticated }) {
-  const navigate = useNavigate();
-  const API_URL = process.env.NEXT_PUBLIC_API_URL;
+  import React from "react";
+  import { useRouter } from "next/navigation";
+  import Image from "next/image";
+  import axios from "axios";
+  import logo from "@/assets/carrion_logo.png";
+  import "@/styles/Header.css";
 
-  const handleLogout = async () => {
-    try {
-      await axios.get(`${API_URL}/auth/logout`, { withCredentials: true });
-      setIsAuthenticated(false);
-      navigate('/')
-    } catch (error) {
-      console.error('Error while logging out', error);
-    }
-  };
+  interface HeaderProps {
+    setIsAuthenticated: (isAuthenticated: boolean) => void;
+  }
 
-  return (
-<header className="header">
-  <h1 onClick={() => navigate('/dashboard')} className="logo-button">
-    <img src={logo} alt="Carrion" />
-  </h1>
+  function Header({ setIsAuthenticated }: HeaderProps) {
+    const router = useRouter();
+    const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
-  {/* Conteneur pour centrer la navigation */}
-  <div className="navigation-container">
-    <div className="navigation-buttons">
-      <button onClick={() => navigate('/dashboard')} className='applications-button'>Candidatures</button>
-      {/* <button onClick={() => navigate('/archives')} className='archives-button'>Archives</button> */}
-      {/* <button onClick={() => navigate('/objectives')} className='objectives-button'>Objectifs</button> */}
-      {/* <button onClick={() => navigate('/parameters')} className='parameters-button'>Profil</button> */}
-    </div>
-  </div>
+    const handleLogout = async () => {
+      try {
+        await axios.get(`${API_URL}/auth/logout`, { withCredentials: true });
+        setIsAuthenticated(false);
+        router.push("/");
+      } catch (error) {
+        console.error("Error while logging out", error);
+      }
+    };
 
-  <button onClick={handleLogout} className="logout-button">Déconnexion</button>
-</header>
-  
-  );
-}
+    return (
+      <header className="header">
+        <div
+          onClick={() => router.push("/dashboard")}
+          className="logo-button"
+          style={{ cursor: "pointer" }}
+        >
+          <Image src={logo} alt="Carrion" width={100} height={100} priority />
+        </div>
 
-export default Header;
+        <div className="navigation-container">
+          <nav className="navigation-buttons">
+            <button
+              onClick={() => router.push("/dashboard")}
+              className="applications-button"
+            >
+              Candidatures
+            </button>
+            {/* <button onClick={() => router.push('/archives')} className='archives-button'>Archives</button> */}
+            {/* <button onClick={() => router.push('/objectives')} className='objectives-button'>Objectifs</button> */}
+            {/* <button onClick={() => router.push('/parameters')} className='parameters-button'>Profil</button> */}
+          </nav>
+        </div>
+
+        <button onClick={handleLogout} className="logout-button">
+          Déconnexion
+        </button>
+      </header>
+    );
+  }
+
+  export default Header;

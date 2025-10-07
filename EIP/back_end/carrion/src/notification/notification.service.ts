@@ -3,8 +3,8 @@ import {
   NotFoundException,
   ForbiddenException,
 } from '@nestjs/common';
-import { NotificationContent } from 'src/interface/notification.interface';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { NotificationContent } from '@/interface/notification.interface';
+import { PrismaService } from '@/prisma/prisma.service';
 
 @Injectable()
 export class NotificationService {

@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 import ApiService from "@/services/api";
-import ArchivesClient from "@/components/ArchivesClient";
+import ArchivesClient from "@/app/archives/ArchivesClient";
 import { Application } from "@/interface/application.interface";
 
 async function getArchivedApplications() {

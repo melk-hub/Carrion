@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 import ApiService from "@/services/api";
-import ProfileClient from "@/components/ProfileClient";
+import ProfileClient from "@/app/profile/ProfileClient";
 import { UserProfile, ConnectedService } from "@/interface/user.interface";
 
 async function getProfileData() {

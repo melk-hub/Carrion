@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 import ApiService from "@/services/api";
-import DashboardClient from "@/components/DashboardClient";
+import DashboardClient from "@/app/dashboard/DashboardClient";
 import { Application } from "@/interface/application.interface";
 
 async function getDashboardData() {
