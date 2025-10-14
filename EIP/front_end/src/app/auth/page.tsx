@@ -3,7 +3,7 @@
 import React, { useEffect, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useLanguage } from "../../contexts/LanguageContext";
-import Loading from "../../components/Loading";
+import Loading from "../../components/Loading/Loading";
 
 function AuthCallback() {
   const router = useRouter();
@@ -29,9 +29,9 @@ function AuthCallback() {
         }
 
         if (authSuccess === "success") {
-          setTimeout(() => {
-            router.replace("/home");
-          }, 1000);
+          // setTimeout(() => {
+            // router.replace("/home");
+          // }, 1000);
           setLoading(false);
           return;
         }
@@ -47,7 +47,7 @@ function AuthCallback() {
           sessionStorage.removeItem("microsoft_oauth_state");
         }
         if (code) {
-          router.replace("/home");
+          // router.replace("/home");
         } else {
           setError("No authorization code or success parameter received");
         }

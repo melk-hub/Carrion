@@ -1,0 +1,430 @@
+.modernApplicationCard {
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  border-radius: 1rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid #e2e8f0;
+  position: relative;
+  min-height: 420px;
+  max-height: 500px;
+  height: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.modernApplicationCard::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: linear-gradient(90deg, #3b82f6, #8b5cf6, #06b6d4);
+  transition: opacity 0.3s ease;
+  opacity: 0;
+}
+
+.modernApplicationCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 25px rgba(0, 0, 0, 0.1);
+}
+
+.modernApplicationCard:hover::before {
+  opacity: 1;
+}
+
+/* Status-specific border colors */
+.modernApplicationCard.status-accepted::before {
+  background: linear-gradient(90deg, #10b981, #34d399);
+}
+
+.modernApplicationCard.status-pending::before {
+  background: linear-gradient(90deg, #f59e0b, #fbbf24);
+}
+
+.modernApplicationCard.status-refused::before {
+  background: linear-gradient(90deg, #ef4444, #f87171);
+}
+
+.modernCardHeader {
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: linear-gradient(135deg, #fefefe 0%, #f8fafc 100%);
+  border-bottom: 1px solid #e2e8f0;
+  min-height: 120px;
+  flex-shrink: 0;
+}
+
+.companyLogoSection {
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: 0.75rem;
+  background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.modernCompanyLogo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 0.75rem;
+}
+
+.modernLogoPlaceholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #ddd6fe 0%, #c7d2fe 100%);
+  border-radius: 0.75rem;
+}
+
+.iconPlaceholder {
+  width: 1.5rem;
+  height: 1.5rem;
+  opacity: 0.6;
+  filter: grayscale(100%);
+  transition: all 0.3s ease;
+}
+
+.modernLogoPlaceholder:hover .iconPlaceholder {
+  opacity: 0.8;
+  filter: grayscale(0%);
+  transform: scale(1.1);
+}
+
+.companyInfoSection {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.modernCompanyName {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0;
+  line-height: 1.3;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  hyphens: auto;
+}
+
+.modernJobTitle {
+  font-size: 0.875rem;
+  color: #64748b;
+  margin: 0;
+  line-height: 1.4;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  hyphens: auto;
+}
+
+.contractTypeBadge {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.25rem 0.75rem;
+  background: linear-gradient(135deg, #ddd6fe 0%, #c7d2fe 100%);
+  color: #6366f1;
+  border-radius: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+  align-self: flex-start;
+}
+
+.modernStatusBadge {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 1rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+  flex-shrink: 0;
+  align-self: flex-start;
+}
+
+.statusIndicator {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.modernStatusBadge.status-accepted {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(52, 211, 153, 0.1) 100%);
+  color: #059669;
+  border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.modernStatusBadge.status-accepted .statusIndicator {
+  background: linear-gradient(135deg, #10b981, #34d399);
+}
+
+.modernStatusBadge.status-pending {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(251, 191, 36, 0.1) 100%);
+  color: #d97706;
+  border: 1px solid rgba(245, 158, 11, 0.2);
+}
+
+.modernStatusBadge.status-pending .statusIndicator {
+  background: linear-gradient(135deg, #f59e0b, #fbbf24);
+}
+
+.modernStatusBadge.status-refused {
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(248, 113, 113, 0.1) 100%);
+  color: #dc2626;
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.modernStatusBadge.status-refused .statusIndicator {
+  background: linear-gradient(135deg, #ef4444, #f87171);
+}
+
+.modernCardContent {
+  padding: 1.5rem;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.infoGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+  height: 100%;
+}
+
+.infoItem {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  border-radius: 0.75rem;
+  border: 1px solid #e2e8f0;
+  transition: background 0.2s ease;
+}
+
+.infoItem:hover {
+  background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+}
+
+.infoIconWrapper {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 0.5rem;
+  background: linear-gradient(135deg, #ddd6fe 0%, #c7d2fe 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.infoIcon {
+  width: 1rem;
+  height: 1rem;
+  opacity: 0.7;
+}
+
+.infoContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  min-width: 0;
+}
+
+.infoLabel {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+
+.infoValue {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #1e293b;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+.modernCardActions {
+  padding: 1.5rem;
+  padding-top: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  flex-shrink: 0;
+}
+
+.modernActionButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  border: none;
+  border-radius: 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.modernActionButton.primary {
+  background: linear-gradient(135deg, #204785 0%, #132238 100%);
+  color: white;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.modernActionButton.primary:hover {
+  background: linear-gradient(135deg, #204785 0%, #132238 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(59, 130, 246, 0.4);
+}
+
+.secondaryActions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.modernActionButton.secondary {
+  flex: 1;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  color: #475569;
+  border: 1px solid #e2e8f0;
+}
+
+.modernActionButton.secondary:hover {
+  background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+}
+
+.modernActionButton.danger {
+  flex: 1;
+  background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+  color: #dc2626;
+  border: 1px solid #fecaca;
+}
+
+.modernActionButton.danger:hover {
+  background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.2);
+}
+
+.buttonIconWrapper {
+  width: 1rem;
+  height: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.buttonIcon {
+  width: 100%;
+  height: 100%;
+}
+
+@media (min-width: 768px) {
+  .infoGrid {
+    grid-template-columns: 1fr 1fr;
+  }
+  
+  .secondaryActions {
+    flex-direction: row;
+  }
+}
+
+@media (max-width: 480px) {
+  .modernApplicationCard {
+    margin: 0.5rem;
+    min-height: 380px;
+  }
+  
+  .modernCardHeader {
+    padding: 1rem;
+    flex-wrap: wrap;
+    min-height: 100px;
+  }
+  
+  .companyLogoSection {
+    width: 3rem;
+    height: 3rem;
+  }
+  
+  .modernCardContent {
+    padding: 1rem;
+  }
+  
+  .modernCardActions {
+    padding: 1rem;
+    padding-top: 0;
+  }
+  
+  .modernCompanyName {
+    font-size: 1rem;
+  }
+  
+  .modernStatusBadge {
+    width: 100%;
+    justify-content: center;
+    margin-top: 0.5rem;
+  }
+}
+
+/* Keep old styles for backward compatibility */
+.applicationCard {
+  background-color: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+  transition: box-shadow 0.3s;
+  border-left: 4px solid transparent;
+}
+
+.applicationCard:hover {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.applicationCard.status-accepted {
+  border-left-color: #10b981;
+}
+
+.applicationCard.status-pending {
+  border-left-color: #f59e0b;
+}
+
+.applicationCard.status-refused {
+  border-left-color: #ef4444;
+}
+
+.cornerCurve {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 100px;
+  height: 100px;
+  background: radial-gradient(circle at top right, transparent 100%, transparent 100%, #fff 100%, #fff 100%);
+  z-index: 100;
+}

@@ -1,6 +1,8 @@
 "use client";
 
-import React, { JSX } from "react";
+import React from "react";
+
+import styles from "./InfosModal/InfosModal.module.css";
 
 interface BaseProps {
   label: string;
@@ -18,28 +20,22 @@ type TextareaProps = BaseProps & {
 type InputFieldProps = InputProps | TextareaProps;
 
 const InputField = (props: InputFieldProps) => {
-  const { label, id, name, required } = props;
-  const inputId = id || name;
+  const { label, id, required } = props;
 
-  let inputElement: JSX.Element;
+  const inputId = id || props.name;
 
   if (props.as === "textarea") {
     const { label, as, ...rest } = props;
-    inputElement = <textarea id={inputId} {...rest} />;
-  } else {
-    const { label, as, ...rest } = props;
-    inputElement = <input id={inputId} {...rest} />;
+    return (
+      <div className={styles.formGroup}>
+        <label htmlFor={inputId}>
+          {label}
+          {required && <span className={styles.requiredStar}>*</span>}
+        </label>
+        <textarea id={inputId} {...rest} />
+      </div>
+    );
   }
-
-  return (
-    <div className="input-field-group">
-      <label htmlFor={inputId}>
-        {label}
-        {required && <span className="required-star">*</span>}
-      </label>
-      {inputElement}
-    </div>
-  );
 };
 
 export default InputField;

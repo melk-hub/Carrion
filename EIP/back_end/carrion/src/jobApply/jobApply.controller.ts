@@ -33,7 +33,7 @@ import { JwtAuthGuard } from '../auth/guards/jwt/jwt-auth.guard';
 export class JobApplyController {
   constructor(private readonly jobApplyService: JobApplyService) {}
 
-  @Get('get_jobApply')
+  @Get('jobApply')
   @ApiOperation({ summary: 'Get jobApply information' })
   @ApiResponse({ status: 200, description: 'Get successfully get jobApply' })
   @ApiResponse({ status: 400, description: "Can't get jobApply error" })
@@ -44,7 +44,7 @@ export class JobApplyController {
     return this.jobApplyService.getAllJobApplies(userId);
   }
 
-  @Post('add_jobApply')
+  @Post('jobApply')
   @ApiOperation({ summary: 'Add new job application' })
   @ApiResponse({
     status: 200,

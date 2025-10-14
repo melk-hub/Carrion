@@ -1,5 +1,6 @@
 import React from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
+import styles from '../app/(dashboard)/home/Home.module.css';
 
 const DailyTipCard = ({ className = '' }) => {
   const { t } = useLanguage();
@@ -57,11 +58,11 @@ const DailyTipCard = ({ className = '' }) => {
   const currentTip = getDailyTip();
 
   return (
-    <div className={`card tips-card ${className}`}>
-      <div className="card-header">
+    <div className={`${styles.card} ${styles.tipsCard} ${className}`}>
+      <div className={styles.cardHeader}>
         <h3>💡 {t('dailyTip.title') || 'Conseil du jour'}</h3>
       </div>
-      <div className="tip-content">
+      <div className={styles.tipContent}>
         <p>
           {currentTip}
         </p>

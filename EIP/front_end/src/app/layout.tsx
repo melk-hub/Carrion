@@ -1,18 +1,14 @@
+// RootLayout.tsx - CORRIGÉ
 import type { Metadata } from "next";
-import { Geist } from "next/font/google";
+import { AuthProvider } from "@/contexts/AuthContext";
+import { LanguageProvider } from "@/contexts/LanguageContext";
+import { NotificationProvider } from "@/contexts/NotificationContext";
+
 import "./globals.css";
-
-import { Providers } from "@/components/Providers";
-import ClientLayout from "@/components/ClientLayout";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
 
 export const metadata: Metadata = {
   title: "Carrion",
-  description: "Optimisez votre recherche d'emploi avec Carrion.",
+  description: "Suivez vos candidatures.",
 };
 
 export default function RootLayout({
@@ -22,10 +18,12 @@ export default function RootLayout({
 }) {
   return (
     <html lang="fr">
-      <body className={geistSans.variable}>
-        <Providers>
-          <ClientLayout>{children}</ClientLayout>
-        </Providers>
+      <body>
+        <AuthProvider>
+          <LanguageProvider>
+            <NotificationProvider>{children}</NotificationProvider>
+          </LanguageProvider>
+        </AuthProvider>
       </body>
     </html>
   );

@@ -54,6 +54,8 @@
       "pending": "En attente",
       "accepted": "Acceptées",
       "refused": "Refusées",
+      "offers": "Offres",
+      "interviews": "Entretien",
       "applications": "Candidatures",
       "totalApplications": "Total candidatures"
     },

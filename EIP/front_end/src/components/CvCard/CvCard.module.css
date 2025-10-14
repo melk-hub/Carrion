@@ -1,0 +1,118 @@
+.cvCard h2 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-dark, #111827);
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border-color, #f3f4f6);
+}
+
+.cvUploadedState,
+.cvEmptyState,
+.cvLoadingState {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  align-items: center;
+  text-align: center;
+}
+
+.cvLoadingState p {
+  margin: 0;
+  font-weight: 500;
+  color: var(--text-medium, #6b7280);
+}
+
+.spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.cvEmptyState p {
+  color: var(--text-medium, #6b7280);
+  margin: 0.5rem 0;
+}
+
+.cvDisplay {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background-color: #f9fafb;
+  border: 1px solid var(--border-color, #e5e7eb);
+  border-radius: var(--border-radius-md, 8px);
+  padding: 0.75rem 1.25rem;
+  width: 100%;
+  box-sizing: border-box;
+  font-weight: 500;
+  color: var(--text-medium, #374151);
+}
+
+.cvIcon {
+  color: var(--text-medium, #6b7280);
+}
+
+.cvActions {
+  display: flex;
+  gap: 0.75rem;
+  width: 100%;
+}
+
+.cvBtn {
+  flex-grow: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.6rem 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  border-radius: var(--border-radius-md, 8px);
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.cvBtn:focus {
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.4);
+}
+
+.cvBtnPrimary {
+  background-color: var(--primary-action, #111827);
+  color: white;
+}
+
+.cvBtnPrimary:hover {
+  background-color: #374151;
+}
+
+.cvBtnSecondary {
+  background-color: white;
+  color: var(--text-dark, #374151);
+  border-color: #d1d5db;
+}
+
+.cvBtnSecondary:hover {
+  background-color: #f9fafb;
+}
+
+.cvBtnDanger {
+  background-color: #ef4444;
+  color: white;
+}
+
+.cvBtnDanger:hover {
+  background-color: #dc2626;
+}

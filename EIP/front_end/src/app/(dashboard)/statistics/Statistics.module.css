@@ -1,0 +1,1173 @@
+.carrionStatistics {
+  min-height: 100vh;
+  background-image: url("../../../../public/assets/svg/background.svg");
+  background-color: #fff9f0;
+  padding: 24px;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  color: #1f2937;
+    max-width: 1400px;
+  margin: 0 auto;
+}
+
+.carrionStatistics .statisticsLoading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  gap: 24px;
+}
+
+.carrionStatistics .statisticsLoading h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #132238;
+  margin: 0;
+}
+
+.carrionStatistics .loadingSpinner {
+  width: 48px;
+  height: 48px;
+  border: 4px solid #f3f4f6;
+  border-top: 4px solid #fbb75f;
+  border-radius: 50%;
+  animation: carrion-spin 1.2s linear infinite;
+}
+
+@keyframes carrion-spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.carrionStatistics .kpiGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 20px;
+  margin-bottom: 32px;
+}
+
+.carrionStatistics .kpiCard {
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 24px 20px;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  word-wrap: break-word;
+  word-break: break-word;
+}
+
+.carrionStatistics .kpiCard::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(#132238);
+  border-radius: 16px 16px 0 0;
+}
+
+.carrionStatistics .kpiValue {
+  font-size: 2.25rem;
+  font-weight: 800;
+  color: #132238;
+  margin-bottom: 8px;
+  line-height: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.carrionStatistics .kpiLabel {
+  font-size: 0.875rem;
+  color: #64748b;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  word-wrap: break-word;
+  word-break: break-word;
+  hyphens: auto;
+  line-height: 1.2;
+}
+
+.carrionStatistics .chartsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 24px;
+}
+
+.carrionStatistics .chartCard {
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  border: 1px solid #e2e8f0;
+  border-radius: 20px;
+  padding: 24px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+  min-height: 360px;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.carrionStatistics .chartCard::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(#132238);
+  border-radius: 20px 20px 0 0;
+}
+
+.carrionStatistics .chartHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 2px solid #f1f5f9;
+}
+
+.carrionStatistics .chartHeader h3 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #132238;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.carrionStatistics .chartContainer {
+  height: 280px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.carrionStatistics .timeRangeSelector,
+.carrionStatistics .goalTypeSelector {
+  display: flex;
+  gap: 4px;
+  background: #f8fafc;
+  padding: 4px;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+}
+
+.carrionStatistics .timeRangeSelector button,
+.carrionStatistics .goalTypeSelector button {
+  padding: 8px 16px;
+  border: none;
+  background: transparent;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.carrionStatistics .timeRangeSelector button.active,
+.carrionStatistics .goalTypeSelector button.active {
+  background: linear-gradient(135deg, #132238 0%, #1e3a5f 100%);
+  color: white;
+  box-shadow: 0 4px 8px rgba(19, 34, 56, 0.3);
+  font-weight: 600;
+}
+
+.carrionStatistics .emptyState {
+  text-align: center;
+  color: #64748b;
+  padding: 40px 20px;
+}
+
+.carrionStatistics .emptyState p {
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #374151;
+}
+
+.carrionStatistics .emptyState small {
+  font-size: 0.875rem;
+  color: #9ca3af;
+}
+
+.carrionStatistics .statusChartWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  min-height: 320px;
+  padding: 12px;
+}
+
+.carrionStatistics .doughnutContainer {
+  position: relative;
+  width: 160px;
+  height: 160px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 8px;
+}
+
+.carrionStatistics .chartCenterContent {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.carrionStatistics .centerTotal {
+  font-size: 2rem;
+  font-weight: 800;
+  color: #132238;
+  line-height: 1;
+  margin: 0;
+}
+
+.carrionStatistics .centerLabel {
+  font-size: 0.7rem;
+  color: #64748b;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin: 2px 0 0 0;
+}
+
+.carrionStatistics .statusLegendCarousel {
+  width: 100%;
+  max-width: 100%;
+  position: relative;
+  padding: 12px;
+  overflow: hidden;
+}
+
+/* Navigation buttons */
+.carrionStatistics .carouselNavBtn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 24px;
+  height: 24px;
+  border: none;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 50%;
+  color: #132238;
+  font-size: 12px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(19, 34, 56, 0.1);
+}
+
+.carrionStatistics .carouselNavBtn:hover {
+  background: #ffffff;
+  transform: translateY(-50%) scale(1.05);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  color: #fbb75f;
+}
+
+.carrionStatistics .carouselNavBtn:active {
+  transform: translateY(-50%) scale(0.95);
+}
+
+.carrionStatistics .carouselNavBtn.prev {
+  left: 4px;
+}
+
+.carrionStatistics .carouselNavBtn.next {
+  right: 4px;
+}
+
+/* Carousel container */
+.carrionStatistics .carouselContainer {
+  width: 100%;
+  max-width: 180px;
+  overflow: hidden;
+  border-radius: 6px;
+  margin: 0 auto;
+  position: relative;
+}
+
+.carrionStatistics .carouselTrack {
+  display: flex;
+  transition: transform 0.3s ease-in-out;
+  width: 100%;
+}
+
+.carrionStatistics .carouselPage {
+  min-width: 100%;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  padding: 6px;
+  flex-shrink: 0;
+}
+
+.carrionStatistics .carouselStatusCard {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 12px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.2s ease;
+  min-height: 80px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.carrionStatistics .carouselStatusCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.carrionStatistics .carouselStatusCard::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--status-color, #cbd5e1);
+  border-radius: 8px 8px 0 0;
+}
+
+.carrionStatistics .statusName {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #132238;
+  margin: 0;
+  line-height: 1.2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.carrionStatistics .statsRow {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+}
+
+.carrionStatistics .countBadge {
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  border: 1px solid #e2e8f0;
+  color: #374151;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 8px;
+  min-width: 28px;
+  text-align: center;
+}
+
+.carrionStatistics .percentageBadge {
+  color: #ffffff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 8px;
+  min-width: 36px;
+  text-align: center;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+}
+
+/* Carousel indicators */
+.carrionStatistics .carouselIndicators {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 16px;
+}
+
+.carrionStatistics .carouselDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #cbd5e1;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.carrionStatistics .carouselDot.active {
+  background: #132238;
+  transform: scale(1.25);
+}
+
+.carrionStatistics .carouselDot:hover {
+  background: #94a3b8;
+  transform: scale(1.1);
+}
+
+/* Auto-play button */
+.carrionStatistics .carouselAutoplay {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  padding: 4px 6px;
+  font-size: 0.7rem;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(4px);
+  z-index: 10;
+}
+
+.carrionStatistics .carouselAutoplay:hover {
+  background: rgba(255, 255, 255, 1);
+  color: #374151;
+}
+
+.carrionStatistics .carouselAutoplay.active {
+  background: rgba(19, 34, 56, 0.9);
+  color: white;
+  border-color: #132238;
+}
+
+.carrionStatistics .emptyState {
+  text-align: center;
+  color: #64748b;
+  padding: 48px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  min-height: 280px;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  border: 2px dashed #cbd5e1;
+  border-radius: 16px;
+  position: relative;
+  overflow: hidden;
+}
+
+.carrionStatistics .emptyState::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: repeating-linear-gradient(
+    45deg,
+    transparent,
+    transparent 10px,
+    rgba(203, 213, 225, 0.1) 10px,
+    rgba(203, 213, 225, 0.1) 20px
+  );
+  pointer-events: none;
+}
+
+.carrionStatistics .emptyStateIcon {
+  font-size: 4rem;
+  color: #cbd5e1;
+  margin-bottom: 8px;
+  filter: grayscale(1);
+  opacity: 0.7;
+}
+
+.carrionStatistics .emptyState p {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin: 0 0 8px 0;
+  color: #374151;
+  position: relative;
+  z-index: 1;
+}
+
+.carrionStatistics .emptyState small {
+  font-size: 0.925rem;
+  color: #64748b;
+  font-weight: 500;
+  line-height: 1.4;
+  position: relative;
+  z-index: 1;
+  max-width: 280px;
+}
+
+.carrionStatistics .statusChartNoData {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  padding: 40px 20px;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  border: 2px dashed #cbd5e1;
+  border-radius: 16px;
+  text-align: center;
+  min-height: 280px;
+}
+
+.carrionStatistics .statusChartNoData .noDataIcon {
+  width: 80px;
+  height: 80px;
+  background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  color: #64748b;
+  margin-bottom: 8px;
+}
+
+.carrionStatistics .statusChartNoData h3 {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #374151;
+  margin: 0 0 8px 0;
+}
+
+.carrionStatistics .statusChartNoData p {
+  font-size: 0.925rem;
+  color: #64748b;
+  margin: 0;
+  line-height: 1.5;
+  max-width: 300px;
+}
+
+.carrionStatistics .goalProgressCardImproved {
+  font-size: 1em;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  max-height: 100%;
+  overflow: hidden;
+  gap: 4px;
+  align-items: center;
+  text-align: center;
+  position: relative;
+}
+
+.carrionStatistics .progressCircleContainer {
+  flex-shrink: 0;
+  width: 100px;
+  /* height: 140px; */
+  position: relative;
+  margin: 0 auto;
+}
+
+.carrionStatistics .progressCircle {
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+
+.carrionStatistics .progressCircle circle {
+  transition: stroke-dashoffset 0.8s ease;
+}
+
+.carrionStatistics .progressPercentage {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-weight: 800;
+  color: #132238;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.carrionStatistics .goalMainInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: center;
+  text-align: center;
+  flex: 1;
+}
+
+.carrionStatistics .goalMainInfo .goalTitle {
+  font-weight: 800;
+  color: #132238;
+  line-height: 1.1;
+  margin: 0;
+  white-space: nowrap;
+}
+
+.carrionStatistics .goalMainInfo .goalSubtitle {
+  color: #64748b;
+  line-height: 1.3;
+  margin: 0;
+  font-weight: 500;
+  max-width: 280px;
+  word-wrap: break-word;
+}
+
+.carrionStatistics .goalMainInfo .timeRemaining {
+  color: #fbb75f;
+  font-weight: 600;
+  line-height: 1.2;
+  margin: 0;
+  padding: 4px 12px;
+  background: rgba(251, 183, 95, 0.1);
+  border-radius: 20px;
+  border: 1px solid rgba(251, 183, 95, 0.2);
+}
+
+.carrionStatistics .goalStatsRow {
+  display: flex;
+  justify-content: space-around;
+  gap: 12px;
+  width: 100%;
+  flex-shrink: 0;
+  margin-top: auto;
+  flex-wrap: wrap;
+}
+
+.carrionStatistics .goalStatItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  gap: 6px;
+  padding: 8px 60px;
+  min-width: 60px;
+  max-width: 80px;
+}
+
+.carrionStatistics .goalStatItem .sStNIber {
+  color: #132238;
+  line-height: 1;
+  margin: 0;
+  font-size: 1rem;
+}
+
+.carrionStatistics .goalStatItem .SatIbel {
+  color: #64748b;
+  line-height: 1.2;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin: 0;
+  font-size: 0.75rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Remove goal configuration button styles - moved to Settings page */
+.carrionStatistics .goalConfigSection,
+.carrionStatistics .goalConfigButton {
+  display: none;
+}
+
+/* Goal Type Selector */
+.carrionStatistics .goalTypeSelector {
+  display: flex;
+  gap: 4px;
+  background: #f8fafc;
+  border-radius: 6px;
+  padding: 2px;
+  flex-shrink: 0;
+}
+
+.carrionStatistics .goalTypeSelector button {
+  padding: 6px 12px;
+  border: none;
+  background: transparent;
+  color: #64748b;
+  font-weight: 500;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  flex: 1;
+  min-width: 0;
+}
+
+.carrionStatistics .goalTypeSelector button.active {
+  background: #132238;
+  color: white;
+  font-weight: 600;
+}
+
+.carrionStatistics .goalTypeSelector button:hover:not(.active) {
+  background: #e2e8f0;
+  color: #132238;
+}
+
+.carrionStatistics .performanceInsights,
+.carrionStatistics .weeklyComparison,
+.carrionStatistics .advancedStats {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  height: 100%;
+  justify-content: center;
+}
+
+.carrionStatistics .insightItem,
+.carrionStatistics .comparisonItem,
+.carrionStatistics .statRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  transition: all 0.2s ease;
+  overflow: hidden;
+  word-wrap: break-word;
+}
+
+.carrionStatistics .insightValue,
+.carrionStatistics .comparisonValue,
+.carrionStatistics .statValue {
+  font-size: 1rem;
+  font-weight: 800;
+  color: #132238;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+  flex-shrink: 0;
+}
+
+.carrionStatistics .insightLabel,
+.carrionStatistics .comparisonLabel,
+.carrionStatistics .statLabel {
+  font-size: 0.95rem;
+  color: #64748b;
+  font-weight: 600;
+  line-height: 1.3;
+  flex: 1;
+  min-width: 0;
+  margin-right: 12px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.carrionStatistics .comparisonBar {
+  height: 6px;
+  background: #e2e8f0;
+  border-radius: 3px;
+  overflow: hidden;
+  margin-top: 8px;
+}
+
+.carrionStatistics .comparisonFill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.carrionStatistics .comparisonFill.current {
+  background: linear-gradient(90deg, #132238, #fbb75f);
+}
+
+.carrionStatistics .comparisonFill.last {
+  background: linear-gradient(90deg, #94a3b8, #cbd5e1);
+}
+.carrionStatistics .modalOverlay,
+.carrionStatistics .modalContent,
+.carrionStatistics .modalHeader,
+.carrionStatistics .modalClose,
+.carrionStatistics .goalForm,
+.carrionStatistics .formGroup,
+.carrionStatistics .formActions,
+.carrionStatistics .btnSecondary,
+.carrionStatistics .btnPrimary {
+  display: none;
+}
+
+@media (max-width: 1024px) {
+  .carrionStatistics .chartsGrid {
+    grid-template-columns: 1fr;
+  }
+  
+  .carrionStatistics .statusChartWrapper {
+    flex-direction: column;
+    gap: 20px;
+    align-items: center;
+    padding: 16px;
+  }
+  
+  .carrionStatistics .doughnutContainer {
+    width: 160px;
+    height: 160px;
+  }
+  
+  .carrionStatistics .centerTotal {
+    font-size: 2.25rem;
+  }
+  
+  .carrionStatistics .statusLegend {
+    width: 100%;
+    max-height: none;
+    overflow-y: visible;
+  }
+  
+  .carrionStatistics .legendText {
+    font-size: 0.875rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .carrionStatistics {
+    padding: 16px;
+  }
+
+  .carrionStatistics .kpiGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+
+  .carrionStatistics .chartCard {
+    min-height: 320px;
+    padding: 20px;
+  }
+
+  .carrionStatistics .kpiCard {
+    padding: 20px 16px;
+  }
+
+  .carrionStatistics .kpiValue {
+    font-size: 1.875rem;
+  }
+
+  .carrionStatistics .kpiLabel {
+    font-size: 0.8rem;
+    line-height: 1.1;
+  }
+
+  .carrionStatistics .goalProgressCardImproved {
+    gap: 16px;
+    padding: 12px;
+  }
+  
+  .carrionStatistics .progressCircleContainer {
+    width: 100px;
+    height: 100px;
+  }
+  
+  .carrionStatistics .progressPercentage {
+    font-size: 20px;
+  }
+  
+  .carrionStatistics .goalTitle {
+    font-size: 20px;
+  }
+  
+  .carrionStatistics .goalSubtitle {
+    font-size: 14px;
+  }
+  
+  .carrionStatistics .timeRemaining {
+    font-size: 12px;
+  }
+  
+  .carrionStatistics .goalStatsRow {
+    gap: 16px;
+  }
+  
+  .carrionStatistics .goalStatItem .SatIbel {
+    font-size: 0.65rem;
+    letter-spacing: 0.2px;
+    line-height: 1.1;
+  }
+  
+  /* Status chart responsive */
+  .carrionStatistics .statusChartWrapper {
+    gap: 12px;
+    padding: 10px;
+    min-height: 280px;
+  }
+  
+  .carrionStatistics .doughnutContainer {
+    width: 140px;
+    height: 140px;
+  }
+  
+  .carrionStatistics .centerTotal {
+    font-size: 1.75rem;
+  }
+  
+  .carrionStatistics .statusLegendCarousel {
+    max-width: 100%;
+    padding: 12px;
+  }
+  
+  .carrionStatistics .carouselContainer {
+    margin: 0 32px; /* Reduced space for smaller nav buttons */
+  }
+  
+  .carrionStatistics .carouselPage {
+    grid-template-columns: repeat(2, 1fr); /* 2 columns on tablet */
+    gap: 8px;
+    padding: 6px;
+  }
+  
+  .carrionStatistics .carouselStatusCard {
+    padding: 10px;
+    min-height: 70px;
+  }
+  
+  .carrionStatistics .carouselStatusCardSingle {
+    padding: 16px;
+    min-height: 85px;
+    gap: 10px;
+  }
+  
+  .carrionStatistics .statusName {
+    font-size: 0.8rem;
+  }
+  
+  .carrionStatistics .countBadge,
+  .carrionStatistics .percentageBadge {
+    font-size: 0.7rem;
+    padding: 3px 8px;
+  }
+  
+  .carrionStatistics .carouselNavBtn {
+    width: 28px;
+    height: 28px;
+    font-size: 14px;
+  }
+  
+  .carrionStatistics .carouselNavBtn.prev {
+    left: 6px;
+  }
+  
+  .carrionStatistics .carouselNavBtn.next {
+    right: 6px;
+  }
+}
+
+@media (max-width: 480px) {
+  .carrionStatistics .kpiGrid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  
+  .carrionStatistics .timeRangeSelector,
+  .carrionStatistics .goalTypeSelector {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .carrionStatistics .chartHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 16px;
+  }
+  
+  .carrionStatistics .kpiLabel {
+    font-size: 0.8rem;
+  }
+  
+  .carrionStatistics .insightLabel,
+  .carrionStatistics .modalOverlay h3 {
+    font-size: 0.9rem;
+  }
+  
+  .carrionStatistics .legendText {
+    font-size: 0.75rem;
+  }
+  
+  .carrionStatistics .progressCircleContainer {
+    width: 120px;
+    height: 120px;
+  }
+  
+  .carrionStatistics .goalStatsRow {
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  
+  .carrionStatistics .goalStatItem .SatIbel {
+    font-size: 0.65rem;
+    letter-spacing: 0.2px;
+    line-height: 1.1;
+  }
+  
+  .carrionStatistics .statusChartWrapper {
+    grid-template-columns: 1fr;
+    gap: 16px;
+    text-align: center;
+  }
+  
+  .carrionStatistics .doughnutContainer {
+    width: 160px;
+    height: 160px;
+    margin: 0 auto;
+  }
+  
+  .carrionStatistics .centerTotal {
+    font-size: 2rem;
+  }
+  
+  .carrionStatistics .centerLabel {
+    font-size: 0.65rem;
+  }
+  
+  .carrionStatistics .statusLegendCarousel {
+    max-width: 100%;
+    padding: 10px;
+  }
+  
+  .carrionStatistics .carouselContainer {
+    margin: 0 28px; /* Smaller space for nav buttons on mobile */
+  }
+  
+  .carrionStatistics .carouselPage {
+    grid-template-columns: 1fr; /* Single column on mobile */
+    gap: 6px;
+    padding: 4px;
+  }
+  
+  .carrionStatistics .carouselStatusCard {
+    padding: 8px;
+    min-height: 60px;
+  }
+  
+  .carrionStatistics .carouselStatusCardSingle {
+    padding: 12px;
+    min-height: 70px;
+    gap: 8px;
+  }
+  
+  .carrionStatistics .statusName {
+    font-size: 0.75rem;
+  }
+  
+  .carrionStatistics .countBadge,
+  .carrionStatistics .percentageBadge {
+    font-size: 0.65rem;
+    padding: 2px 6px;
+  }
+  
+  .carrionStatistics .carouselNavBtn {
+    width: 24px;
+    height: 24px;
+    font-size: 12px;
+  }
+  
+  .carrionStatistics .carouselNavBtn.prev {
+    left: 4px;
+  }
+  
+  .carrionStatistics .carouselNavBtn.next {
+    right: 4px;
+  }
+  
+  .carrionStatistics .carouselIndicators {
+    margin-top: 8px;
+    gap: 4px;
+  }
+  
+  .carrionStatistics .carouselDot {
+    width: 6px;
+    height: 6px;
+  }
+  
+  .carrionStatistics .carouselAutoplay {
+    top: 4px;
+    right: 4px;
+    padding: 2px 4px;
+    font-size: 0.6rem;
+  }
+}
+  
+.goal-progress-center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  z-index: 10;
+}
+
+.goal-progress-center .goalPercentage {
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: #1f2937;
+  line-height: 1;
+  margin: 0;
+}
+
+.goal-progress-center .goalLabel {
+  font-size: 0.9rem;
+  color: #6b7280;
+  font-weight: 500;
+  margin: 0.25rem 0 0 0;
+  line-height: 1.2;
+}
+
+/* New single-card carousel styles */
+.carrionStatistics .carouselTrackSingle {
+  display: flex;
+  transition: transform 0.3s ease-in-out;
+  width: 100%;
+  cursor: grab;
+}
+
+.carrionStatistics .carouselTrackSingle:active {
+  cursor: grabbing;
+}
+
+.carrionStatistics .carouselStatusCardSingle {
+  min-width: 100%;
+  flex-shrink: 0;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 12px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.2s ease;
+  min-height: 60px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 6px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+  user-select: none;
+}
+
+.carrionStatistics .carouselStatusCardSingle:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.carrionStatistics .carouselStatusCardSingle::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--status-color, #cbd5e1);
+  border-radius: 8px 8px 0 0;
+}

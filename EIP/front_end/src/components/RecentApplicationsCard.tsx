@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useLanguage } from "../contexts/LanguageContext";
 import Image from "next/image";
+import styles from "../app/(dashboard)/home/Home.module.css";
 
 interface Application {
   id: string | number;
@@ -35,7 +36,7 @@ const RecentApplicationsCard = ({
         setLoading(true);
         setError(null);
 
-        const response = await fetch(`${API_URL}/job_applies/get_jobApply`, {
+        const response = await fetch(`${API_URL}/job_applies/jobApply`, {
           credentials: "include",
         });
 
@@ -124,22 +125,22 @@ const RecentApplicationsCard = ({
 
   if (loading) {
     return (
-      <div className={`card recent-applications ${className}`}>
-        <div className="card-header">
+      <div className={`${styles.card} ${styles.recentApplications} ${className}`}>
+        <div className={styles.cardHeader}>
           <h3>
             {(t("home.recentApplications") as string) ||
               "Dernières candidatures"}
           </h3>
           <button
-            className="see-all-btn"
+            className={styles.seeAllBtn}
             onClick={() => router.push("/dashboard")}
           >
             {(t("home.seeAll") as string) || "Voir tout"}
           </button>
         </div>
-        <div className="applications-list">
-          <div className="application-item">
-            <div className="application-info">
+        <div className={styles.applicationsList}>
+          <div className={styles.applicationItem}>
+            <div className={styles.applicationInfo}>
               <h4>{(t("shared.loading") as string) || "Chargement..."}</h4>
             </div>
           </div>
@@ -150,22 +151,22 @@ const RecentApplicationsCard = ({
 
   if (error) {
     return (
-      <div className={`card recent-applications ${className}`}>
-        <div className="card-header">
+      <div className={`${styles.card} ${styles.recentApplications} ${className}`}>
+        <div className={styles.cardHeader}>
           <h3>
             {(t("home.recentApplications") as string) ||
               "Dernières candidatures"}
           </h3>
           <button
-            className="see-all-btn"
+            className={styles.seeAllBtn}
             onClick={() => router.push("/dashboard")}
           >
             {(t("home.seeAll") as string) || "Voir tout"}
           </button>
         </div>
-        <div className="applications-list">
-          <div className="application-item">
-            <div className="application-info">
+        <div className={styles.applicationsList}>
+          <div className={styles.applicationItem}>
+            <div className={styles.applicationInfo}>
               <h4>Erreur: {error}</h4>
               <p>Impossible de charger les candidatures</p>
             </div>
@@ -177,22 +178,22 @@ const RecentApplicationsCard = ({
 
   if (applications.length === 0) {
     return (
-      <div className={`card recent-applications ${className}`}>
-        <div className="card-header">
+      <div className={`${styles.card} ${styles.recentApplications} ${className}`}>
+        <div className={styles.cardHeader}>
           <h3>
             {(t("home.recentApplications") as string) ||
               "Dernières candidatures"}
           </h3>
           <button
-            className="see-all-btn"
+            className={styles.seeAllBtn}
             onClick={() => router.push("/dashboard")}
           >
             {(t("home.seeAll") as string) || "Voir tout"}
           </button>
         </div>
-        <div className="applications-list">
-          <div className="application-item">
-            <div className="application-info">
+        <div className={styles.applicationsList}>
+          <div className={styles.applicationItem}>
+            <div className={styles.applicationInfo}>
               <h4>
                 {(t("home.noApplications") as string) || "Aucune candidature"}
               </h4>
@@ -208,22 +209,22 @@ const RecentApplicationsCard = ({
   }
 
   return (
-    <div className={`card recent-applications ${className}`}>
-      <div className="card-header">
+    <div className={`${styles.card} ${styles.recentApplications} ${className}`}>
+      <div className={styles.cardHeader}>
         <h3>
           {(t("home.recentApplications") as string) || "Dernières candidatures"}
         </h3>
         <button
-          className="see-all-btn"
+          className={styles.seeAllBtn}
           onClick={() => router.push("/dashboard")}
         >
           {(t("home.seeAll") as string) || "Voir tout"}
         </button>
       </div>
-      <div className="applications-list">
+      <div className={styles.applicationsList}>
         {applications.map((application) => (
-          <div className="application-item" key={application.id}>
-            <div className="company-logo">
+          <div className={styles.applicationItem} key={application.id}>
+            <div className={styles.companyLogo}>
               {application.imageUrl ? (
                 <Image
                   src={application.imageUrl}
@@ -232,12 +233,12 @@ const RecentApplicationsCard = ({
                   height={40}
                 />
               ) : (
-                <div className="placeholder-logo">
+                <div className={styles.placeholderLogo}>
                   {getCompanyInitial(application.company)}
                 </div>
               )}
             </div>
-            <div className="application-info">
+            <div className={styles.applicationInfo}>
               <h4>
                 {application.company ||
                   (t("shared.unknown") as string) ||
@@ -250,14 +251,14 @@ const RecentApplicationsCard = ({
                   "Poste non précisé"}
               </p>
               <span
-                className={`status ${
+                className={`${styles.status} ${
                   application.status?.toLowerCase() || "pending"
                 }`}
               >
                 {getStatusText(application.status)}
               </span>
             </div>
-            <div className="application-time">
+            <div className={styles.applicationTime}>
               <span>{formatTimeAgo(application.createdAt)}</span>
             </div>
           </div>

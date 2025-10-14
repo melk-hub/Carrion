@@ -1,0 +1,268 @@
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.authModal {
+  background: #fff;
+  border-radius: 24px;
+  padding: 3rem;
+  width: 700px;
+  max-width: 90%;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  position: relative;
+  overflow: hidden;
+}
+
+.closeButton {
+  position: absolute;
+  top: 12px;
+  right: 16px;
+  background: none;
+  border: none;
+  font-size: 28px;
+  cursor: pointer;
+  width: 40px;
+  height: 40px;
+}
+
+.authModal h1 {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.tabs {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+.tabs button {
+  background: none;
+  border: none;
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  transition: all 0.2s ease;
+}
+
+.tabs button.active {
+  border-color: #ff9800;
+  cursor: default;
+}
+
+.authModal form { 
+  display: flex;
+  flex-direction: column;
+}
+
+.authModal label {
+  margin-top: 25px;
+}
+
+.authModal input {
+  padding: 0.75rem 1rem;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  font-size: 1rem;
+  margin-top: 5px;
+}
+
+.authModal .primaryBtn {
+  background: #132238;
+  color: #fff;
+  padding: 0.75rem;
+  border: none;
+  border-radius: 12px;
+  font-size: 1rem;
+  cursor: pointer;
+  margin: 25px auto;
+  width: 50%;
+}
+
+.socialButtons {
+  display: flex;
+  flex-direction: row;
+  gap: 0.75rem;
+  margin-top: 2rem;
+}
+
+.socialButtons button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-size: 1rem;
+  border-radius: 10px;
+  cursor: pointer;
+  border: none;
+}
+
+.googleLoginButton {
+  border: 1px solid #d1d1d1;
+  color: var(--text-color);
+  margin-left: 0 !important;
+}
+
+.googleLoginButton:hover {
+  background-color: rgb(199, 199, 199);
+}
+
+.googleLoginButton img {
+  width: 20px;
+}
+
+.outlookLoginButton {
+  background-color: var(--outlook-button-color);
+  border: 1px solid #d1d1d1;
+  color: var(--text-light);
+  margin-left: 0 !important;
+}
+
+.outlookLoginButton:hover {
+  background-color: #0a6eba;
+}
+
+.rowInputs {
+  display: flex;
+  gap: 1rem;
+}
+
+.rowInputs div {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.socialButtons button,
+.socialButtons > * {
+  flex: 1;
+}
+
+.errorMessage {
+  color: red;
+  font-size: 0.9rem;
+  background: #ffebee;
+  border: 1px solid #ffcdd2;
+  border-radius: 8px;
+  padding: 12px;
+  margin: 15px 0;
+  text-align: center;
+}
+
+.passwordWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.passwordWrapper input {
+  width: 100%;
+  padding-right: 40px;
+  box-sizing: border-box;
+}
+
+.togglePassword {
+  position: absolute;
+  right: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  cursor: pointer;
+  color: #666;
+  margin-top: 1%;
+}
+
+.togglePassword:hover {
+  color: black;
+}
+
+.passwordCriteria {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px 16px;
+  list-style-type: none;
+  padding: 0;
+  margin: 15px 0;
+  font-size: 0.85rem;
+}
+
+.valid {
+  color: #4caf50;
+}
+
+.invalid {
+  color: #f44336;
+}
+
+.loginOptions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1rem;
+}
+
+.rememberMeWrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.rememberMeWrapper input[type="checkbox"] {
+  margin-top: 0;
+}
+
+.rememberMeWrapper label {
+  margin-top: 0;
+  cursor: pointer;
+}
+
+.forgotPasswordLink {
+  font-size: 0.9rem;
+  color: #132238;
+  text-decoration: none;
+}
+
+.forgotPasswordLink:hover {
+  text-decoration: underline;
+}
+
+.forgotPasswordInstructions {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  color: #666;
+  line-height: 1.5;
+}
+
+.backToLoginLink {
+  display: block;
+  text-align: center;
+  margin-top: 1rem;
+  color: #132238;
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+
+.backToLoginLink:hover {
+  text-decoration: underline;
+}
+
+.successMessage {
+  color: #155724;
+  background-color: #d4edda;
+  border: 1px solid #c3e6cb;
+  border-radius: 8px;
+  padding: 12px;
+  margin: 15px 0;
+  text-align: center;
+}

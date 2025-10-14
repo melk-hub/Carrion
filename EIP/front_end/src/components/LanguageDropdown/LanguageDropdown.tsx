@@ -1,0 +1,94 @@
+import React, { useState, useRef, useEffect } from "react";
+import { useLanguage } from "@/contexts/LanguageContext";
+import styles from "./LanguageDropdown.module.css";
+import Image from "next/image";
+
+const LanguageDropdown = ({ className = "", style = {} }) => {
+  const { currentLanguage, changeLanguage } = useLanguage();
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef(null);
+
+  const languages = [
+    { code: "fr", name: "Français", flag: "/assets/france.png" },
+    { code: "en", name: "English", flag: "/assets/united-kingdom.png" },
+  ];
+
+  const currentLang = languages.find((lang) => lang.code === currentLanguage);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !(dropdownRef.current as HTMLElement).contains(event.target as Node)
+      ) {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  const handleLanguageSelect = (langCode: string) => {
+    changeLanguage(langCode);
+    setIsOpen(false);
+  };
+
+  const toggleDropdown = () => {
+    setIsOpen((prev) => !prev);
+  };
+
+  return (
+    <div className={`${styles.languageDropdown} ${className}`} ref={dropdownRef}>
+      <button
+        className={styles.languageDropdownButton}
+        onClick={toggleDropdown}
+        aria-expanded={isOpen}
+        aria-haspopup="true"
+        style={style}
+      >
+        <Image
+          src={currentLang?.flag as string}
+          alt={currentLang?.name as string}
+          className={styles.flagIcon}
+          width={24}
+          height={24}
+        />
+        <span className={styles.languageName}>{currentLang?.name}</span>
+        <svg
+          className={`${styles.dropdownArrow} ${isOpen ? "open" : ""}`}
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+        >
+          <polyline points="6,9 12,15 18,9"></polyline>
+        </svg>
+      </button>
+
+      {isOpen && (
+        <div className={styles.languageDropdownMenu}>
+          {languages.map((language) => (
+            <button
+              key={language.code}
+              className={`${styles.languageOption} ${
+                currentLanguage === language.code ? "active" : ""
+              }`}
+              onClick={() => handleLanguageSelect(language.code)}
+            >
+              <img
+                src={language.flag}
+                alt={language.name}
+                className={styles.flagIcon}
+              />
+              <span className={styles.languageName}>{language.name}</span>
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default LanguageDropdown;

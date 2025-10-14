@@ -1,0 +1,353 @@
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10010;
+}
+
+.infosModal {
+  background: rgb(255, 255, 255);
+  padding: 2rem 3rem;
+  border-radius: 20px;
+  width: 90%;
+  max-width: 750px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+}
+
+.infosModal h1 {
+  text-align: center;
+  font-size: 1.75rem;
+  font-weight: 600;
+  color: #1a202c;
+  margin-bottom: 0.5rem;
+}
+
+.infosModal hr {
+  border: none;
+  border-top: 1px solid #e2e8f0;
+  width: 100%;
+  margin-bottom: 2rem;
+}
+
+.formContentWrapper {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+}
+
+.motionForm {
+  width: 100%;
+}
+
+.infosModal .infoForm {
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+}
+
+.infosModal .formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.infosModal .formGroup label {
+  font-weight: 500;
+  font-size: 0.9rem;
+  color: #4a5568;
+}
+
+.infosModal .formGroup input,
+.infosModal .date-picker-custom-input {
+  background-color: white;
+  border: 1px solid #cbd5e0;
+  border-radius: 8px;
+  padding: 0.65rem 1rem;
+  font-size: 1rem;
+  color: #2d3748;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  height: 48px;
+  width: 100%;
+  text-align: left;
+}
+
+.infosModal .formGroup input:focus,
+.infosModal .date-picker-custom-input:focus {
+  border-color: #4299e1;
+  box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.3);
+  outline: none;
+}
+
+.infosModal .select__control {
+  min-height: 48px !important;
+  height: 48px !important;
+  border-radius: 8px !important;
+  border: 1px solid #cbd5e0 !important;
+  box-shadow: none !important;
+  transition: border-color 0.2s, box-shadow 0.2s !important;
+}
+
+.infosModal .select__control--is-focused {
+  border-color: #4299e1 !important;
+  box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.3) !important;
+}
+
+.infosModal .select__value-container {
+  padding: 2px 0.85rem !important;
+}
+
+.infosModal .buttonGroup {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 1.5rem;
+  border-top: 1px solid #e2e8f0;
+  padding-top: 1.5rem;
+}
+
+.infosModal .primaryBtn,
+.infosModal .secondaryBtn {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+
+  margin: 0;
+  width: auto;
+  height: auto;
+}
+
+.infosModal .primaryBtn {
+  background-color: #1a202c;
+  color: white;
+}
+.infosModal .primaryBtn:hover {
+  background-color: #2d3748;
+}
+
+.infosModal .secondaryBtn {
+  background-color: #e2e8f0;
+  color: #4a5568;
+}
+.infosModal .secondaryBtn:hover {
+  background-color: #cbd5e0;
+}
+
+.infosModal .buttonGroupStep1 {
+  justify-content: center;
+}
+.infosModal .buttonGroupStep1 .primaryBtn {
+  width: 50%;
+}
+
+.select__input-container {
+  padding: 0 !important;
+  margin: 0 !important;
+}
+.select__single-value {
+  margin: 0 !important;
+}
+.select__placeholder {
+  color: #a0aec0;
+}
+.select__menu {
+  border-radius: 8px !important;
+  z-index: 10002 !important;
+}
+.select__multi-value {
+  background-color: #edf2f7;
+  border-radius: 4px;
+}
+.select__multi-value__label {
+  color: #2d3748;
+  font-size: 0.85rem;
+  padding: 3px 6px;
+}
+.select__multi-value__remove {
+  cursor: pointer;
+}
+.select__multi-value__remove:hover {
+  background-color: #e53e3e;
+  color: white;
+}
+.formGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem 1.5rem;
+}
+.radioGroup {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+.radioGroup label {
+  background-color: #f7fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.radioGroup label:has(input:checked) {
+  border-color: #2d3748;
+  background-color: #edf2f7;
+  box-shadow: 0 0 0 2px rgba(45, 55, 72, 0.2);
+}
+.radioGroup input[type="radio"] {
+  accent-color: #2d3748;
+  width: 1em;
+  height: 1em;
+}
+.step3-container {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  gap: 2.5rem;
+  align-items: flex-start;
+}
+.resumeUpload {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+.resumeUpload .formGroup {
+  width: 100%;
+  align-items: center;
+}
+.resumeUpload label {
+  text-align: center;
+}
+.uploadBox {
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  border: 2px dashed #cbd5e0;
+  border-radius: 12px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.uploadBox:hover {
+  border-color: #4299e1;
+  background-color: #f7fafc;
+}
+.uploadBox span {
+  font-size: 2rem;
+  color: #a0aec0;
+}
+.linksSection {
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+}
+.deleteBtn {
+  background: none;
+  border: none;
+  color: #e53e3e;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.react-datepicker-popper {
+  z-index: 10002 !important;
+}
+.react-datepicker {
+  font-family: inherit !important;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 12px !important;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1) !important;
+  padding: 0.5rem !important;
+}
+.react-datepicker__header {
+  background-color: white !important;
+  border-bottom: 1px solid #e2e8f0 !important;
+  padding-top: 1rem !important;
+}
+.react-datepicker__current-month,
+.react-datepicker-time__header,
+.react-datepicker-year-header {
+  color: #1a202c !important;
+  font-weight: 600 !important;
+  font-size: 1rem !important;
+}
+.react-datepicker__navigation-icon::before {
+  border-color: #4a5568 !important;
+}
+.react-datepicker__day-name,
+.react-datepicker__day,
+.react-datepicker__time-name {
+  color: #4a5568 !important;
+  width: 2rem !important;
+  line-height: 2rem !important;
+}
+.react-datepicker__day {
+  transition: all 0.2s ease-in-out;
+}
+.react-datepicker__day:hover {
+  background-color: #edf2f7 !important;
+  border-radius: 50% !important;
+}
+.react-datepicker__day--selected,
+.react-datepicker__day--in-selecting-range,
+.react-datepicker__day--in-range,
+.react-datepicker__day--keyboard-selected {
+  background-color: #1a202c !important;
+  color: white !important;
+  border-radius: 50% !important;
+}
+.react-datepicker__day--disabled {
+  color: #a0aec0 !important;
+}
+
+.uploadBox .file-name {
+  font-size: 0.8rem;
+  color: #2d3748;
+  padding: 0 10px;
+  text-align: center;
+  word-break: break-all;
+}
+
+.uploadBox .plusSign {
+  font-size: 2rem;
+  color: #a0aec0;
+}
+
+.requiredStar {
+  color: #e53e3e;
+  margin-left: 2px;
+}
+
+.uploadBox {
+  background-color: #f7fafc;
+  overflow: hidden;
+  padding: 5px;
+  box-sizing: border-box;
+}
+
+.uploadBox .react-pdf__Document {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  height: 100%;
+  width: 100%;
+}
+
+.uploadBox .react-pdf__Page__canvas {
+  margin: 0 auto;
+}

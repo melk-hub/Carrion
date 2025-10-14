@@ -1,0 +1,218 @@
+.appModalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(30, 41, 59, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  backdrop-filter: blur(4px);
+}
+
+.appModalContainer {
+  background-color: #ffffff;
+  border-radius: 1rem;
+  box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1),
+    0 8px 10px -6px rgb(0 0 0 / 0.1);
+  width: 90%;
+  max-width: 56rem;
+  animation: app-modal-appear 0.3s ease-out;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+@keyframes app-modal-appear {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.appModalHeader {
+  padding: 1.25rem 2rem;
+  border-bottom: 1px solid #e2e8f0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.appModalTitle {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin: 0;
+}
+
+.appModalCloseBtn {
+  background: none;
+  border: none;
+  color: #64748b;
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: 9999px;
+  transition: all 0.2s ease;
+  display: flex;
+}
+
+.appModalCloseBtn:hover {
+  background-color: #f1f5f9;
+  color: #1e293b;
+}
+
+.appModalContent {
+  padding: 2rem;
+  background-color: #f8fafc;
+  overflow-y: auto;
+}
+
+.appModalGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.5rem 2rem;
+}
+
+.appModalColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.appModalFormGroup {
+  display: flex;
+  flex-direction: column;
+}
+
+.appModalFormGroup label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #334155;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+}
+
+.appModalFormGroup .requiredField::after {
+  content: "*";
+  color: #ef4444;
+  margin-left: 0.25rem;
+}
+
+.appModalInput,
+.app-modal-select__control {
+  background-color: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 0.5rem;
+  padding: 0 0.875rem;
+  height: 44px;
+  font-size: 0.875rem;
+  color: #1e293b;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.appModalInput:focus,
+.app-modal-select__control--is-focused {
+  outline: none;
+  border-color: #3b82f6 !important;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2) !important;
+}
+
+.appModalInput::placeholder,
+.app-modal-select__placeholder {
+  color: #94a3b8;
+}
+
+.app-modal-select__control {
+  padding: 0 !important;
+  box-shadow: none !important;
+  cursor: pointer;
+}
+
+.app-modal-select__value-container {
+  padding: 0 0.875rem !important;
+}
+
+.app-modal-select__indicator-separator {
+  display: none;
+}
+
+.app-modal-select__menu {
+  z-index: 10001 !important;
+  border-radius: 0.5rem !important;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+}
+
+.appModalInput-with-suffix {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.appModalInputWithSuffix .appModalInput {
+  padding-right: 2.5rem;
+}
+
+.appModalInputSuffix {
+  position: absolute;
+  right: 0.875rem;
+  color: #64748b;
+  font-size: 0.875rem;
+  pointer-events: none;
+}
+
+.appModalFooter {
+  padding: 1.25rem 2rem;
+  border-top: 1px solid #e2e8f0;
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  background-color: #ffffff;
+  flex-shrink: 0;
+}
+
+.appModalButton {
+  padding: 0.625rem 1.25rem;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
+}
+
+.appModalButton.secondary {
+  background-color: #ffffff;
+  color: #334155;
+  border-color: #cbd5e1;
+}
+
+.appModalButton.secondary:hover:not(:disabled) {
+  background-color: #f8fafc;
+  border-color: #94a3b8;
+}
+
+.appModalButton.primary {
+  background-color: #475569;
+  color: white;
+}
+
+.appModalButton.primary:hover:not(:disabled) {
+  background-color: #334155;
+}
+
+.appModalButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+

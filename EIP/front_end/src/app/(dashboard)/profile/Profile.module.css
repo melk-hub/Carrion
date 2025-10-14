@@ -1,0 +1,267 @@
+.profilePage {
+  padding: 2rem;
+  max-width: 1600px;
+  margin: 0 auto;
+}
+
+.profileContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+}
+
+.profileLeftColumn,
+.profileRightColumn {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+}
+
+@media (min-width: 1024px) {
+  .profilePage {
+    padding: 2rem 4rem;
+  }
+  .profileContainer {
+    flex-direction: row;
+    align-items: flex-start;
+  }
+  .profileLeftColumn {
+    flex: 3;
+    order: 1;
+    min-width: 450px;
+  }
+  .profileRightColumn {
+    flex: 1;
+    order: 2;
+    position: sticky;
+    top: 2rem;
+    min-width: 300px;
+  }
+}
+
+.profileCard {
+  background-color: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 1rem;
+  padding: 2rem;
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+}
+
+.profileCard h2 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #111827;
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.profileInfoForm .formGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem 2rem;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+}
+
+.formGroup label {
+  margin-bottom: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #374151;
+}
+
+.formGroup input,
+.date-picker-custom-input,
+.select__control {
+  padding: 0.75rem 1rem;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 1rem;
+  width: 100%;
+  box-sizing: border-box;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  height: 48px !important;
+  background-color: white;
+}
+
+.formGroup input:focus,
+.date-picker-custom-input:focus,
+.select__control--is-focused {
+  border-color: #3b82f6 !important;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3) !important;
+  outline: none;
+}
+
+.select__control {
+  padding: 0 !important;
+  box-shadow: none !important;
+}
+
+.select__value-container {
+  padding: 2px 1rem !important;
+  height: 100%;
+}
+
+.select__input-container {
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+.select__placeholder,
+.select__single-value {
+  color: #a0aec0;
+  margin-left: 2px;
+}
+
+.select__indicator-separator {
+  display: none;
+}
+
+.formGroup.fullWidth {
+  grid-column: span 2;
+}
+
+.formActionsGlobal {
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+}
+
+.saveButton {
+  background-color: #111827;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 0.75rem 1.5rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.saveButton:hover {
+  background-color: #374151;
+}
+
+.profilePictureCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 2.5rem 2rem;
+}
+
+.imageWrapper {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  margin-bottom: 1rem;
+  cursor: pointer;
+}
+
+.profileImg {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 4px solid white;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.profileName {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0;
+  color: #111827;
+}
+
+.profileJob {
+  font-size: 0.9rem;
+  color: #6b7280;
+  margin: 0;
+}
+
+.date-picker-custom-input {
+  color: #2d3748;
+  text-align: left;
+  cursor: pointer;
+}
+
+.react-datepicker-popper {
+  z-index: 10002 !important;
+}
+
+.react-datepicker {
+  font-family: inherit !important;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 12px !important;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1) !important;
+  padding: 0.5rem !important;
+}
+
+.react-datepicker__header {
+  background-color: white !important;
+  border-bottom: 1px solid #e2e8f0 !important;
+  padding-top: 1rem !important;
+}
+
+.react-datepicker__current-month,
+.react-datepicker-time__header,
+.react-datepicker-year-header {
+  color: #1a202c !important;
+  font-weight: 600 !important;
+  font-size: 1rem !important;
+}
+
+.react-datepicker__navigation-icon::before {
+  border-color: #4a5568 !important;
+}
+
+.react-datepicker__day-name,
+.react-datepicker__day,
+.react-datepicker__time-name {
+  color: #4a5568 !important;
+  width: 2rem !important;
+  line-height: 2rem !important;
+}
+
+.react-datepicker__day {
+  transition: all 0.2s ease-in-out;
+}
+
+.react-datepicker__day:hover {
+  background-color: #edf2f7 !important;
+  border-radius: 50% !important;
+}
+
+.react-datepicker__day--selected,
+.react-datepicker__day--in-selecting-range,
+.react-datepicker__day--in-range,
+.react-datepicker__day--keyboard-selected {
+  background-color: #1a202c !important;
+  color: white !important;
+  border-radius: 50% !important;
+}
+
+.react-datepicker__day--disabled {
+  color: #a0aec0 !important;
+}
+
+.deleteButton {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  background: #ef4444;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  cursor: pointer;
+  font-weight: bold;
+}

@@ -6,6 +6,7 @@ import Select, { StylesConfig, GroupBase } from "react-select";
 import { SelectOption } from "@/interface/misc.interface";
 import { JobApply } from "@/interface/job-apply.interface";
 import { ApplicationStatus } from "@/enum/application-status.enum";
+import styles from "../components/AddApplicationModal/AddApplicationModal.module.css";
 
 interface EditApplicationModalProps {
   application: JobApply;
@@ -63,11 +64,11 @@ export default function EditApplicationModal({
   };
 
   return (
-    <div className="app-modal-overlay">
-      <div className="app-modal-container">
-        <div className="app-modal-header">
-          <h2 className="app-modal-title">{t("modal.edit.title") as string}</h2>
-          <button className="app-modal-close-btn" onClick={onClose}>
+    <div className={styles.appModalOverlay}>
+      <div className={styles.appModalContainer}>
+        <div className={styles.appModalHeader}>
+          <h2 className={styles.appModalTitle}>{t("modal.edit.title") as string}</h2>
+          <button className={styles.appModalCloseBtn} onClick={onClose}>
             <svg
               width="24"
               height="24"
@@ -82,18 +83,18 @@ export default function EditApplicationModal({
           </button>
         </div>
 
-        <div className="app-modal-content">
-          <div className="app-modal-grid">
+        <div className={styles.appModalContent}>
+          <div className={styles.appModalGrid}>
             {/* Colonne de Gauche */}
-            <div className="app-modal-column">
-              <div className="app-modal-form-group">
-                <label htmlFor="company" className="required-field">
+            <div className={styles.appModalColumn}>
+              <div className={styles.appModalFormGroup}>
+                <label htmlFor="company" className={styles.requiredField}>
                   {t("modal.add.company") as string}
                 </label>
                 <input
                   type="text"
                   id="company"
-                  className="app-modal-input"
+                  className={styles.appModalInput}
                   placeholder={t("modal.add.placeholders.company") as string}
                   value={application.company || ""}
                   onChange={(e) =>
@@ -102,14 +103,14 @@ export default function EditApplicationModal({
                   required
                 />
               </div>
-              <div className="app-modal-form-group">
-                <label htmlFor="title" className="required-field">
+              <div className={styles.appModalFormGroup}>
+                <label htmlFor="title" className={styles.requiredField}>
                   {t("modal.add.title_job") as string}
                 </label>
                 <input
                   type="text"
                   id="title"
-                  className="app-modal-input"
+                  className={styles.appModalInput}
                   placeholder={t("modal.add.placeholders.title") as string}
                   value={application.title || ""}
                   onChange={(e) =>
@@ -118,14 +119,14 @@ export default function EditApplicationModal({
                   required
                 />
               </div>
-              <div className="app-modal-form-group">
+              <div className={styles.appModalFormGroup}>
                 <label htmlFor="location">
                   {t("modal.add.location") as string}
                 </label>
                 <input
                   type="text"
                   id="location"
-                  className="app-modal-input"
+                  className={styles.appModalInput}
                   placeholder={t("modal.add.placeholders.location") as string}
                   value={application.location || ""}
                   onChange={(e) =>
@@ -136,14 +137,14 @@ export default function EditApplicationModal({
             </div>
 
             {/* Colonne de Droite */}
-            <div className="app-modal-column">
-              <div className="app-modal-form-group">
-                <label htmlFor="status" className="required-field">
+            <div className={styles.appModalColumn}>
+              <div className={styles.appModalFormGroup}>
+                <label htmlFor="status" className={styles.requiredField}>
                   {t("modal.add.status") as string}
                 </label>
                 <Select
                   inputId="status"
-                  classNamePrefix="app-modal-select"
+                  classNamePrefix={styles.appModalSelect}
                   options={statusOptions}
                   value={statusOptions.find(
                     (option) => option.value === application.status
@@ -161,13 +162,13 @@ export default function EditApplicationModal({
                 />
               </div>
 
-              <div className="app-modal-form-group">
+              <div className={styles.appModalFormGroup}>
                 <label htmlFor="contractType">
                   {t("modal.add.contract_type") as string}
                 </label>
                 <Select
                   inputId="contractType"
-                  classNamePrefix="app-modal-select"
+                  classNamePrefix={styles.appModalSelect}
                   options={contractTypeOptions}
                   value={contractTypeOptions.find(
                     (option) => option.value === application.contractType
@@ -186,15 +187,15 @@ export default function EditApplicationModal({
                 />
               </div>
 
-              <div className="app-modal-form-group">
+              <div className={styles.appModalFormGroup}>
                 <label htmlFor="salary">
                   {t("modal.add.salary") as string}
                 </label>
-                <div className="app-modal-input-with-suffix">
+                <div className={styles.appModalInputWithSuffix}>
                   <input
                     type="number"
                     id="salary"
-                    className="app-modal-input"
+                    className={styles.appModalInput}
                     placeholder={t("modal.add.placeholders.salary") as string}
                     value={application.salary || ""}
                     onChange={(e) =>
@@ -206,19 +207,19 @@ export default function EditApplicationModal({
                     min="0"
                     step="1000"
                   />
-                  <span className="app-modal-input-suffix">€</span>
+                  <span className={styles.appModalInputSuffix}>€</span>
                 </div>
               </div>
             </div>
           </div>
         </div>
 
-        <div className="app-modal-footer">
-          <button className="app-modal-button secondary" onClick={onClose}>
+        <div className={styles.appModalFooter}>
+          <button className={styles.appModalButton + " " + styles.secondary} onClick={onClose}>
             {t("common.cancel") as string}
           </button>
           <button
-            className="app-modal-button primary"
+            className={styles.appModalButton + " " + styles.primary}
             onClick={() => onUpdate(application)}
             disabled={
               !application.company || !application.title || !application.status

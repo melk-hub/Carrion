@@ -17,7 +17,7 @@ interface AuthContextType {
   loadingAuth: boolean;
   userProfile: UserProfile | null;
   setIsAuthenticated: (isAuthenticated: boolean) => void;
-  logOut: () => void;
+  logOut: (callApi?: boolean) => void;
   getUserDisplayName: () => string;
 }
 
@@ -40,18 +40,22 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [loadingAuth, setLoadingAuth] = useState<boolean>(true);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
 
-  const logOut = useCallback(async () => {
-    try {
-      await apiService.post("/auth/logout", {});
-    } catch (error) {
-      console.error(
-        "Logout request failed, clearing session locally anyway.",
-        error
-      );
-    } finally {
-      setIsAuthenticated(false);
-      setUserProfile(null);
+  const logOut = useCallback(async (callApi: boolean = true) => {
+    if (callApi) {
+      try {
+        await apiService.get("/auth/logout");
+      } catch (error) {
+        console.error(
+          "Logout request failed, clearing session locally anyway.",
+          error
+        );
+      }
     }
+
+    localStorage.removeItem("session_active");
+
+    setIsAuthenticated(false);
+    setUserProfile(null);
   }, []);
 
   useEffect(() => {
@@ -60,22 +64,34 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   useEffect(() => {
     const checkAuthStatus = async () => {
+      const sessionFlag = localStorage.getItem("session_active");
+
+      if (sessionFlag !== "true") {
+        setLoadingAuth(false);
+        setIsAuthenticated(false);
+        return;
+      }
+
       setLoadingAuth(true);
       try {
         const profileData = await apiService.get<UserProfile>("/user/profile");
-        setUserProfile(profileData);
-        setIsAuthenticated(true);
+
+        if (profileData) {
+          setUserProfile(profileData);
+          setIsAuthenticated(true);
+        } else {
+          setUserProfile(null);
+          setIsAuthenticated(false);
+        }
       } catch (error) {
-        console.error(
-          "Initial auth check failed, user is not authenticated:",
-          error
-        );
-        setIsAuthenticated(false);
+        console.error("A critical error occurred during auth check:", error);
         setUserProfile(null);
+        setIsAuthenticated(false);
       } finally {
         setLoadingAuth(false);
       }
     };
+
     checkAuthStatus();
   }, []);
 
@@ -95,14 +111,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       logOut,
       getUserDisplayName,
     }),
-    [
-      isAuthenticated,
-      loadingAuth,
-      userProfile,
-      setIsAuthenticated,
-      logOut,
-      getUserDisplayName,
-    ]
+    [isAuthenticated, loadingAuth, userProfile, logOut, getUserDisplayName]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
