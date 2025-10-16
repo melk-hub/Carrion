@@ -123,7 +123,6 @@ export default function AuthModal({
         });
 
         if (response.ok) {
-          localStorage.setItem("session_active", "true");
           setIsAuthenticated(true);
           onClose();
         } else {
@@ -163,7 +162,6 @@ export default function AuthModal({
           credentials: "include",
         });
         if (response.ok) {
-          localStorage.setItem("session_active", "true");
           setIsAuthenticated(true);
           onClose();
         } else {

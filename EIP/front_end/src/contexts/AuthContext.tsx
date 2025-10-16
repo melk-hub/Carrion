@@ -52,8 +52,6 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       }
     }
 
-    localStorage.removeItem("session_active");
-
     setIsAuthenticated(false);
     setUserProfile(null);
   }, []);
@@ -64,36 +62,20 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   useEffect(() => {
     const checkAuthStatus = async () => {
-      const sessionFlag = localStorage.getItem("session_active");
+      const profileData = await apiService.get<UserProfile>("/user/profile");
 
-      if (sessionFlag !== "true") {
-        setLoadingAuth(false);
-        setIsAuthenticated(false);
-        return;
-      }
-
-      setLoadingAuth(true);
-      try {
-        const profileData = await apiService.get<UserProfile>("/user/profile");
-
-        if (profileData) {
-          setUserProfile(profileData);
-          setIsAuthenticated(true);
-        } else {
-          setUserProfile(null);
-          setIsAuthenticated(false);
-        }
-      } catch (error) {
-        console.error("A critical error occurred during auth check:", error);
+      if (profileData) {
+        setUserProfile(profileData);
+        setIsAuthenticated(true);
+      } else {
         setUserProfile(null);
         setIsAuthenticated(false);
-      } finally {
-        setLoadingAuth(false);
       }
+      setLoadingAuth(false);
     };
 
     checkAuthStatus();
-  }, []);
+  }, [logOut]);
 
   const getUserDisplayName = useCallback((): string => {
     if (!userProfile) return "Carrion";
