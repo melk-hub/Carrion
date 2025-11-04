@@ -228,10 +228,10 @@ export default function ProfileClient({
   };
 
   const multiSelectStyles: StylesConfig<SelectOption, true> = {
-    menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+    menuPortal: (base) => ({ ...base, zIndex: 10011 }),
   };
   const singleSelectStyles: StylesConfig<SelectOption, false> = {
-    menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+    menuPortal: (base) => ({ ...base, zIndex: 10011 }),
   };
 
   const getSelectedObjects = (

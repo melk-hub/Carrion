@@ -28,8 +28,6 @@ export default function NotificationsClient() {
   >(new Set());
 
   useEffect(() => {
-    // Le contexte gère déjà l'appel initial, mais on peut le rappeler si nécessaire.
-    // Si le contexte ne le fait pas, cette ligne est correcte.
     fetchNotifications();
   }, [fetchNotifications]);
 
@@ -111,7 +109,6 @@ export default function NotificationsClient() {
           }) as string
         );
       }
-      // ... Ajoutez vos autres logiques de 'changes' ici
       return changes.length > 0
         ? `${baseMessage}\n${changes.join("\n")}`
         : baseMessage;

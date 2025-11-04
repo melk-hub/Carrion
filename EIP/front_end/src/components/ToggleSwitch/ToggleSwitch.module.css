@@ -1,143 +1,143 @@
 .reduceMotionToggle {
-    width: 4em;
-    height: auto;
-    color: #bbb;
+  width: 4em;
+  height: auto;
+  color: #bbb;
+}
+
+.stReduceMotionToggleBtn {
+  position: relative;
+  cursor: pointer;
+}
+
+.stReduceMotionToggleBtn .reduceMotionToggleInput {
+  opacity: 0;
+  width: inherit;
+  aspect-ratio: 1;
+}
+
+.stReduceMotionToggleBtn svg {
+  position: absolute;
+  left: 0;
+  width: inherit;
+  height: inherit;
+}
+.stReduceMotionToggleBtn svg .line {
+  transform: scaleX(0);
+}
+
+.stReduceMotionToggleBtn
+  .reduceMotionToggleInput:not(:checked)
+  + svg
+  .ballTrace {
+  animation: ballTrace_toggleMotionOff9371A 0.3s ease 0s 1 forwards,
+    ballTrace_toggleMotionOff9371B 0.1s steps(2, end)
+      calc(0.32s + var(--_appearOffset)) 1 forwards;
+}
+.stReduceMotionToggleBtn .reduceMotionToggleInput:not(:checked) + svg .ball {
+  animation: ball_toggleMotionOn9371A 0.3s ease 0s 1 forwards,
+    ball_toggleMotionOn9371B 0.4s cubic-bezier(0.165, 0.84, 0.45, 1.11) 0.3s 1
+      forwards;
+}
+
+.stReduceMotionToggleBtn .reduceMotionToggleInput:checked + svg circle {
+  animation: ball_toggleMotionOff9371 0.9s linear 0s 1 forwards;
+}
+
+.stReduceMotionToggleBtn .reduceMotionToggleInput:checked + svg .line {
+  animation: line_toggleMotionOff9371 0.32s cubic-bezier(0.075, 0.82, 0.165, 1)
+    0.47s 1 forwards;
+}
+
+@keyframes ball_toggleMotionOff9371 {
+  0% {
+    transform: translateX(0px);
   }
-  
-  .st-reduceMotionToggleBtn {
-    position: relative;
-    cursor: pointer;
+  6.66% {
+    transform: translateX(calc(var(--_toCenterXOffset) * 0.45));
   }
-  
-  .st-reduceMotionToggleBtn .reduceMotionToggleInput {
+  13.33% {
+    transform: translateX(calc(var(--_toCenterXOffset) * 0.77));
+  }
+  20% {
+    transform: translateX(calc(var(--_toCenterXOffset) * 0.9));
+  }
+  26.66% {
+    transform: translateX(calc(var(--_toCenterXOffset) * 0.94));
+  }
+  33.33% {
+    transform: translate(calc(var(--_toCenterXOffset) * 0.965 + 1px), 2px);
+  }
+  35% {
+    transform: translate(calc(var(--_toCenterXOffset) * 0.988), 1px);
+  }
+  37% {
+    transform: translate(calc(var(--_toCenterXOffset) * 0.991 + 1px), -1px);
+  }
+  39% {
+    transform: translate(calc(var(--_toCenterXOffset) * 0.995 - 1px), -2px);
+  }
+  41% {
+    transform: translate(calc(var(--_toCenterXOffset) * 0.999 + 1px), -1px);
+  }
+  43% {
+    transform: translate(calc(var(--_toCenterXOffset) * 0.75), 1px);
+  }
+  45% {
+    transform: translate(calc(var(--_toCenterXOffset) * 0.5), 0px);
+  }
+  100% {
+    transform: translate(calc(var(--_toCenterXOffset) * 0.5), 0px);
+  }
+}
+
+@keyframes line_toggleMotionOff9371 {
+  0% {
+    transform: scaleY(0);
+  }
+  100% {
+    transform: scaleY(1);
+  }
+}
+
+@keyframes ball_toggleMotionOn9371A {
+  0% {
+    transform: translate(calc(var(--_toCenterXOffset) * 0.5), 0px);
+  }
+  100% {
+    transform: translate(calc(var(--_toCenterXOffset) - 5.67px), 0px);
+  }
+}
+
+@keyframes ball_toggleMotionOn9371B {
+  0% {
+    transform: translate(calc(var(--_toCenterXOffset) - 5.67px), 0px);
+  }
+  100% {
+    transform: translate(0px, 0px);
+  }
+}
+
+@keyframes ballTrace_toggleMotionOff9371A {
+  0% {
+    opacity: 1;
+    transform: translate(calc(var(--_toCenterXOffset) * 0.5), 0px);
+  }
+  99.9% {
+    opacity: 1;
+    transform: translate(calc(var(--_toCenterXOffset) - 5.67px), 0px);
+  }
+  100% {
     opacity: 0;
-    width: inherit;
-    aspect-ratio: 1;
+    transform: translate(calc(var(--_toCenterXOffset) - 5.67px), 0px);
   }
-  
-  .st-reduceMotionToggleBtn svg {
-    position: absolute;
-    left: 0;
-    width: inherit;
-    height: inherit;
+}
+@keyframes ballTrace_toggleMotionOff9371B {
+  0% {
+    opacity: 0;
+    transform: translate(0px, 0px);
   }
-  .st-reduceMotionToggleBtn svg .line {
-    transform: scaleX(0);
+  100% {
+    opacity: 1;
+    transform: translate(0px, 0px);
   }
-  
-  .st-reduceMotionToggleBtn
-    .reduceMotionToggleInput:not(:checked)
-    + svg
-    .ballTrace {
-    animation: ballTrace_toggleMotionOff9371A 0.3s ease 0s 1 forwards,
-      ballTrace_toggleMotionOff9371B 0.1s steps(2, end)
-        calc(0.32s + var(--_appearOffset)) 1 forwards;
-  }
-  .st-reduceMotionToggleBtn .reduceMotionToggleInput:not(:checked) + svg .ball {
-    animation: ball_toggleMotionOn9371A 0.3s ease 0s 1 forwards,
-      ball_toggleMotionOn9371B 0.4s cubic-bezier(0.165, 0.84, 0.45, 1.11) 0.3s 1
-        forwards;
-  }
-  
-  .st-reduceMotionToggleBtn .reduceMotionToggleInput:checked + svg circle {
-    animation: ball_toggleMotionOff9371 0.9s linear 0s 1 forwards;
-  }
-  
-  .st-reduceMotionToggleBtn .reduceMotionToggleInput:checked + svg .line {
-    animation: line_toggleMotionOff9371 0.32s cubic-bezier(0.075, 0.82, 0.165, 1)
-      0.47s 1 forwards;
-  }
-  
-  @keyframes ball_toggleMotionOff9371 {
-    0% {
-      transform: translateX(0px);
-    }
-    6.66% {
-      transform: translateX(calc(var(--_toCenterXOffset) * 0.45));
-    }
-    13.33% {
-      transform: translateX(calc(var(--_toCenterXOffset) * 0.77));
-    }
-    20% {
-      transform: translateX(calc(var(--_toCenterXOffset) * 0.9));
-    }
-    26.66% {
-      transform: translateX(calc(var(--_toCenterXOffset) * 0.94));
-    }
-    33.33% {
-      transform: translate(calc(var(--_toCenterXOffset) * 0.965 + 1px), 2px);
-    }
-    35% {
-      transform: translate(calc(var(--_toCenterXOffset) * 0.988), 1px);
-    }
-    37% {
-      transform: translate(calc(var(--_toCenterXOffset) * 0.991 + 1px), -1px);
-    }
-    39% {
-      transform: translate(calc(var(--_toCenterXOffset) * 0.995 - 1px), -2px);
-    }
-    41% {
-      transform: translate(calc(var(--_toCenterXOffset) * 0.999 + 1px), -1px);
-    }
-    43% {
-      transform: translate(calc(var(--_toCenterXOffset) * 0.75), 1px);
-    }
-    45% {
-      transform: translate(calc(var(--_toCenterXOffset) * 0.5), 0px);
-    }
-    100% {
-      transform: translate(calc(var(--_toCenterXOffset) * 0.5), 0px);
-    }
-  }
-  
-  @keyframes line_toggleMotionOff9371 {
-    0% {
-      transform: scaleY(0);
-    }
-    100% {
-      transform: scaleY(1);
-    }
-  }
-  
-  @keyframes ball_toggleMotionOn9371A {
-    0% {
-      transform: translate(calc(var(--_toCenterXOffset) * 0.5), 0px);
-    }
-    100% {
-      transform: translate(calc(var(--_toCenterXOffset) - 5.67px), 0px);
-    }
-  }
-  
-  @keyframes ball_toggleMotionOn9371B {
-    0% {
-      transform: translate(calc(var(--_toCenterXOffset) - 5.67px), 0px);
-    }
-    100% {
-      transform: translate(0px, 0px);
-    }
-  }
-  
-  @keyframes ballTrace_toggleMotionOff9371A {
-    0% {
-      opacity: 1;
-      transform: translate(calc(var(--_toCenterXOffset) * 0.5), 0px);
-    }
-    99.9% {
-      opacity: 1;
-      transform: translate(calc(var(--_toCenterXOffset) - 5.67px), 0px);
-    }
-    100% {
-      opacity: 0;
-      transform: translate(calc(var(--_toCenterXOffset) - 5.67px), 0px);
-    }
-  }
-  @keyframes ballTrace_toggleMotionOff9371B {
-    0% {
-      opacity: 0;
-      transform: translate(0px, 0px);
-    }
-    100% {
-      opacity: 1;
-      transform: translate(0px, 0px);
-    }
-  }
+}

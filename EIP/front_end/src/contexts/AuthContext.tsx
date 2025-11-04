@@ -18,6 +18,7 @@ interface AuthContextType {
   userProfile: UserProfile | null;
   setIsAuthenticated: (isAuthenticated: boolean) => void;
   logOut: (callApi?: boolean) => void;
+  checkAuthStatus: () => Promise<void>;
   getUserDisplayName: () => string;
 }
 
@@ -37,9 +38,12 @@ interface AuthProviderProps {
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
-  const [loadingAuth, setLoadingAuth] = useState<boolean>(true);
+  const [loadingAuth, setLoadingAuth] = useState<boolean>(false);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
 
+  /**
+   * Logs the user out by calling the API and clearing the local state.
+   */
   const logOut = useCallback(async (callApi: boolean = true) => {
     if (callApi) {
       try {
@@ -54,14 +58,16 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
     setIsAuthenticated(false);
     setUserProfile(null);
+    setLoadingAuth(false);
   }, []);
 
-  useEffect(() => {
-    apiService.registerLogoutCallback(logOut);
-  }, [logOut]);
-
-  useEffect(() => {
-    const checkAuthStatus = async () => {
+  /**
+   * Checks the user's authentication status by fetching their profile.
+   * This function will be called by protected layouts.
+   */
+  const checkAuthStatus = useCallback(async () => {
+    setLoadingAuth(true);
+    try {
       const profileData = await apiService.get<UserProfile>("/user/profile");
 
       if (profileData) {
@@ -71,12 +77,21 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         setUserProfile(null);
         setIsAuthenticated(false);
       }
+    } catch (error) {
+      setUserProfile(null);
+      setIsAuthenticated(false);
+    } finally {
       setLoadingAuth(false);
-    };
+    }
+  }, []);
 
-    checkAuthStatus();
+  useEffect(() => {
+    apiService.registerLogoutCallback(logOut);
   }, [logOut]);
 
+  /**
+   * Returns a display-friendly user name or a default value.
+   */
   const getUserDisplayName = useCallback((): string => {
     if (!userProfile) return "Carrion";
     const { firstName, lastName } = userProfile;
@@ -91,9 +106,17 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       userProfile,
       setIsAuthenticated,
       logOut,
+      checkAuthStatus,
       getUserDisplayName,
     }),
-    [isAuthenticated, loadingAuth, userProfile, logOut, getUserDisplayName]
+    [
+      isAuthenticated,
+      loadingAuth,
+      userProfile,
+      logOut,
+      checkAuthStatus,
+      getUserDisplayName,
+    ]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

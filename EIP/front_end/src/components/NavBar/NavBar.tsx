@@ -68,7 +68,7 @@ export default function Navbar({ children }: { children: React.ReactNode }) {
   ];
 
   return (
-    <div className={styles.dashboardContainer}>
+    <div className={`${styles.dashboardContainer} ${sidebarCollapsed ? styles.collapsed : ""}`}>
       <header className={styles.topbar}>
         <div className={styles.topbarLeft}>
           <div className={styles.logo}>

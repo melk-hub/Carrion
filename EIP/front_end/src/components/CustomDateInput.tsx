@@ -1,5 +1,6 @@
 import React from "react";
 import { forwardRef } from "react";
+import styles from "../app/(dashboard)/profile/Profile.module.css";
 
 const CustomDateInput = forwardRef(
   (
@@ -8,11 +9,11 @@ const CustomDateInput = forwardRef(
   ) => (
     <button
       type="button"
-      className="date-picker-custom-input"
+      className={styles.datePickerCustomInput}
       onClick={onClick}
       ref={ref}
     >
-      {value || "jj/mm/aaaa"}
+      {value || "dd/mm/yyyy"}
     </button>
   )
 );

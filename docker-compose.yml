@@ -9,7 +9,7 @@ services:
       POSTGRES_USER: carrion
       POSTGRES_PASSWORD: carrion
     volumes:
-      - pg_data:/var/lib/postgresql/data
+      - pg_data:/var/lib/postgresql
     ports:
       - "5432:5432"
     healthcheck:
@@ -48,8 +48,8 @@ services:
     ports:
       - "8080:8080"
     networks:
-      - back-tier
-      - api-tier
+      back-tier:
+      api-tier:
     volumes:
       - common:/apk
       - ./EIP/back_end/carrion:/app
@@ -67,12 +67,20 @@ services:
   client_web:
     build:
       context: ./EIP/front_end
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.dev
     ports:
-      - 8081:3000
-    networks:
-      - api-tier
+      - "8081:3000"
     restart: unless-stopped
+    networks:
+      api-tier:
+    volumes:
+      - ./EIP/front_end:/app
+      - /app/node_modules
+      - /app/.next
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+      - NEXT_PUBLIC_API_URL=http://localhost:8080
+      - INTERNAL_API_URL=http://server:8080
 
 networks:
   back-tier:

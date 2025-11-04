@@ -24,18 +24,26 @@ const InputField = (props: InputFieldProps) => {
 
   const inputId = id || props.name;
 
-  if (props.as === "textarea") {
-    const { label, as, ...rest } = props;
-    return (
-      <div className={styles.formGroup}>
-        <label htmlFor={inputId}>
-          {label}
-          {required && <span className={styles.requiredStar}>*</span>}
-        </label>
-        <textarea id={inputId} {...rest} />
-      </div>
-    );
-  }
+  const { as, ...rest } = props;
+  return (
+    <div className={styles.formGroup}>
+      <label htmlFor={inputId}>
+        {label}
+        {required && <span className={styles.requiredStar}>*</span>}
+      </label>
+      {as === "textarea" ? (
+        <textarea
+          id={inputId}
+          {...(rest as React.TextareaHTMLAttributes<HTMLTextAreaElement>)}
+        />
+      ) : (
+        <input
+          id={inputId}
+          {...(rest as React.InputHTMLAttributes<HTMLInputElement>)}
+        />
+      )}
+    </div>
+  );
 };
 
 export default InputField;

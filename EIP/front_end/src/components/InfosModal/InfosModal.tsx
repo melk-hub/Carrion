@@ -245,7 +245,6 @@ function InfosModal({
     true,
     GroupBase<SelectOption>
   > = {
-    menuPortal: (base) => ({ ...base, zIndex: 10002 }),
     input: (provided) => ({ ...provided, boxShadow: "none" }),
   };
 
@@ -254,7 +253,6 @@ function InfosModal({
     false,
     GroupBase<SelectOption>
   > = {
-    menuPortal: (base) => ({ ...base, zIndex: 10002 }),
     input: (provided) => ({ ...provided, boxShadow: "none" }),
   };
 
@@ -291,6 +289,7 @@ function InfosModal({
                       value={personalInfo.firstName}
                       onChange={handleChange}
                       required
+                      as="input"
                     />
                     <div className={styles.formGroup}>
                       <label htmlFor="birthDate">
@@ -313,8 +312,11 @@ function InfosModal({
                         dropdownMode="select"
                         maxDate={new Date()}
                         customInput={<CustomDateInput />}
-                        portalId={isClient ? "datepicker-portal" : undefined}
+                        portalId="datepicker-portal"
                         popperClassName="datepicker-force-top"
+                        popperProps={{
+                          strategy: "fixed",
+                        }}
                         required
                       />
                     </div>

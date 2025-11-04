@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import styles from "./AuthModal.module.css";
@@ -35,7 +34,6 @@ export default function AuthModal({
   });
   const { setIsAuthenticated } = useAuth();
   const { t } = useLanguage();
-  const router = useRouter();
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const API_URL = process.env.NEXT_PUBLIC_API_URL;

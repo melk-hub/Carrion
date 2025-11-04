@@ -1,6 +1,7 @@
 interface ApiOptions extends RequestInit {
   isRetry?: boolean;
 }
+
 interface CityOption {
   label: string;
   value: string;
@@ -10,13 +11,25 @@ class ApiService {
   private isRefreshing: boolean = false;
   private refreshSubscribers: (() => Promise<void>)[] = [];
   private _logoutCallback: (callApi?: boolean) => void = () => {};
-  private readonly NEXT_PUBLIC_API_URL =
-    process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
 
   constructor() {}
 
   public registerLogoutCallback(callback: (callApi?: boolean) => void) {
     this._logoutCallback = callback;
+  }
+
+  /**
+   * Détermine dynamiquement l'URL de base de l'API.
+   * Utilise l'URL interne pour le rendu côté serveur (SSR) dans Docker.
+   * Utilise l'URL publique pour les appels côté client (navigateur).
+   */
+  private getBaseUrl(): string {
+    // Si 'window' est undefined, nous sommes côté serveur (SSR/SSG).
+    if (typeof window === "undefined") {
+      return process.env.INTERNAL_API_URL || "http://server:8080";
+    }
+    // Sinon, nous sommes côté client (dans le navigateur).
+    return process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
   }
 
   private handleLocalLogout() {
@@ -38,8 +51,9 @@ class ApiService {
     this.isRefreshing = true;
 
     try {
+      // Utilise la méthode dynamique pour obtenir la bonne URL de base
       const refreshResponse = await fetch(
-        `${this.NEXT_PUBLIC_API_URL}/auth/refresh`,
+        `${this.getBaseUrl()}/auth/refresh`,
         { method: "POST", credentials: "include" }
       );
 
@@ -65,7 +79,8 @@ class ApiService {
     url: string,
     options: ApiOptions = {}
   ): Promise<Response> {
-    const fullUrl = `${this.NEXT_PUBLIC_API_URL}${url}`;
+    // Utilise la méthode dynamique pour obtenir la bonne URL de base
+    const fullUrl = `${this.getBaseUrl()}${url}`;
     const defaultOptions: ApiOptions = {
       credentials: "include",
       headers: { "Content-Type": "application/json", ...options.headers },

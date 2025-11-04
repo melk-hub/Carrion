@@ -1,4 +1,3 @@
-// RootLayout.tsx - CORRIGÉ
 import type { Metadata } from "next";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { LanguageProvider } from "@/contexts/LanguageContext";
@@ -24,6 +23,7 @@ export default function RootLayout({
             <NotificationProvider>{children}</NotificationProvider>
           </LanguageProvider>
         </AuthProvider>
+        <div id="datepicker-portal"></div>
       </body>
     </html>
   );

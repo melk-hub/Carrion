@@ -60,7 +60,7 @@ export default function EditApplicationModal({
     false,
     GroupBase<SelectOption>
   > = {
-    menuPortal: (base) => ({ ...base, zIndex: 10001 }),
+    menuPortal: (base) => ({ ...base, zIndex: 10011 }),
   };
 
   return (

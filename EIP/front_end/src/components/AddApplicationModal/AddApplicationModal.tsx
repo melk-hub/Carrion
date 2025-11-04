@@ -73,7 +73,7 @@ export default function AddApplicationModal({
   };
 
   const selectStyles: StylesConfig<SelectOption, false> = {
-    menuPortal: (base) => ({ ...base, zIndex: 10001 }),
+    menuPortal: (base) => ({ ...base, zIndex: 10011 }),
   };
 
   return (

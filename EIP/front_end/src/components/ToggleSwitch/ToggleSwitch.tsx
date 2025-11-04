@@ -15,11 +15,11 @@ const ToggleSwitch = ({ isChecked, setIsChecked }: ToggleSwitchProps) => {
 
   return (
     <label
-      className="reduceMotionToggle st-reduceMotionToggleBtn"
+      className={styles.reduceMotionToggle + " "  + styles.stReduceMotionToggleBtn}
       htmlFor="reduceMotionToggle"
     >
       <input
-        className="reduceMotionToggleInput"
+        className={styles.reduceMotionToggleInput}
         id="reduceMotionToggle"
         type="checkbox"
         checked={isChecked}
@@ -42,7 +42,7 @@ const ToggleSwitch = ({ isChecked, setIsChecked }: ToggleSwitchProps) => {
             width="4.1"
             y="-5"
             x="9.807"
-            className="line"
+            className={styles.line}
           ></rect>
         </mask>
         <rect
@@ -51,7 +51,7 @@ const ToggleSwitch = ({ isChecked, setIsChecked }: ToggleSwitchProps) => {
           width="1.3"
           y="-3.3"
           x="11.3"
-          className="line"
+          className={styles.line}
         ></rect>
         <g mask="url(#lineMask)">
           <circle
@@ -66,7 +66,7 @@ const ToggleSwitch = ({ isChecked, setIsChecked }: ToggleSwitchProps) => {
             r="2.95"
             cy="9"
             cx="3.24"
-            className="ballTrace"
+            className={styles.ballTrace}
           ></circle>
           <circle
             style={
@@ -80,7 +80,7 @@ const ToggleSwitch = ({ isChecked, setIsChecked }: ToggleSwitchProps) => {
             r="2.9"
             cy="9"
             cx="6"
-            className="ballTrace"
+            className={styles.ballTrace}
           ></circle>
           <circle
             style={
@@ -94,7 +94,7 @@ const ToggleSwitch = ({ isChecked, setIsChecked }: ToggleSwitchProps) => {
             r="2.8"
             cy="9"
             cx="9"
-            className="ballTrace"
+            className={styles.ballTrace}
           ></circle>
           <circle
             style={
@@ -108,14 +108,14 @@ const ToggleSwitch = ({ isChecked, setIsChecked }: ToggleSwitchProps) => {
             r="2.75"
             cy="9"
             cx="11.75"
-            className="ballTrace"
+            className={styles.ballTrace}
           ></circle>
           <circle
             style={{ "--_toCenterXOffset": "-5.7px" } as React.CSSProperties}
             r="3"
             cy="9"
             cx="14.7"
-            className="ball"
+            className={styles.ball}
           ></circle>
         </g>
       </svg>
