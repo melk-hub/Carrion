@@ -312,6 +312,10 @@
   color: #a0aec0 !important;
 }
 
+.datepickerForceTop {
+  z-index: 10012 !important;
+}
+
 .uploadBox .file-name {
   font-size: 0.8rem;
   color: #2d3748;

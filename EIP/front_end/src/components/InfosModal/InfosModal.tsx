@@ -16,7 +16,6 @@ import DatePicker, { registerLocale } from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { fr } from "date-fns/locale/fr";
 import toast from "react-hot-toast";
-import { Document, Page, pdfjs } from "react-pdf";
 import ApiService from "@/services/api";
 import { jobSectors } from "@/data/jobSectors";
 import { contractOptions } from "@/data/contractOptions";
@@ -45,8 +44,6 @@ interface PersonalInfoState {
   portfolioLink: string;
   personalDescription: string;
 }
-
-pdfjs.GlobalWorkerOptions.workerSrc = `/static/js/pdf.worker.mjs`;
 
 registerLocale("fr", fr);
 
@@ -313,7 +310,7 @@ function InfosModal({
                         maxDate={new Date()}
                         customInput={<CustomDateInput />}
                         portalId="datepicker-portal"
-                        popperClassName="datepicker-force-top"
+                        popperClassName={styles.datepickerForceTop}
                         popperProps={{
                           strategy: "fixed",
                         }}
@@ -537,19 +534,11 @@ function InfosModal({
                           }
                         >
                           {resumePreviewUrl && (
-                            <Document
-                              file={resumePreviewUrl}
-                              onLoadError={console.error}
-                            >
-                              <Page
-                                pageNumber={1}
-                                height={
-                                  uploadBoxRef.current?.clientHeight
-                                    ? uploadBoxRef.current.clientHeight * 0.95
-                                    : undefined
-                                }
-                              />
-                            </Document>
+                            <iframe
+                              src={resumePreviewUrl}
+                              style={{ width: "100%", height: "100%", border: "none" }}
+                              title="Aperçu du CV"
+                            />
                           )}
                           {!resumeFile && (
                             <span className={styles.plusSign}>+</span>

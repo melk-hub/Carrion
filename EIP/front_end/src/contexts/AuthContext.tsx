@@ -41,9 +41,6 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [loadingAuth, setLoadingAuth] = useState<boolean>(false);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
 
-  /**
-   * Logs the user out by calling the API and clearing the local state.
-   */
   const logOut = useCallback(async (callApi: boolean = true) => {
     if (callApi) {
       try {
@@ -61,10 +58,6 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     setLoadingAuth(false);
   }, []);
 
-  /**
-   * Checks the user's authentication status by fetching their profile.
-   * This function will be called by protected layouts.
-   */
   const checkAuthStatus = useCallback(async () => {
     setLoadingAuth(true);
     try {
@@ -89,9 +82,6 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     apiService.registerLogoutCallback(logOut);
   }, [logOut]);
 
-  /**
-   * Returns a display-friendly user name or a default value.
-   */
   const getUserDisplayName = useCallback((): string => {
     if (!userProfile) return "Carrion";
     const { firstName, lastName } = userProfile;

@@ -18,17 +18,10 @@ class ApiService {
     this._logoutCallback = callback;
   }
 
-  /**
-   * Détermine dynamiquement l'URL de base de l'API.
-   * Utilise l'URL interne pour le rendu côté serveur (SSR) dans Docker.
-   * Utilise l'URL publique pour les appels côté client (navigateur).
-   */
   private getBaseUrl(): string {
-    // Si 'window' est undefined, nous sommes côté serveur (SSR/SSG).
     if (typeof window === "undefined") {
       return process.env.INTERNAL_API_URL || "http://server:8080";
     }
-    // Sinon, nous sommes côté client (dans le navigateur).
     return process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
   }
 
@@ -51,7 +44,6 @@ class ApiService {
     this.isRefreshing = true;
 
     try {
-      // Utilise la méthode dynamique pour obtenir la bonne URL de base
       const refreshResponse = await fetch(
         `${this.getBaseUrl()}/auth/refresh`,
         { method: "POST", credentials: "include" }
@@ -79,7 +71,6 @@ class ApiService {
     url: string,
     options: ApiOptions = {}
   ): Promise<Response> {
-    // Utilise la méthode dynamique pour obtenir la bonne URL de base
     const fullUrl = `${this.getBaseUrl()}${url}`;
     const defaultOptions: ApiOptions = {
       credentials: "include",
