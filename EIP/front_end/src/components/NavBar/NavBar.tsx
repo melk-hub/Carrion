@@ -96,10 +96,10 @@ export default function Navbar({ children }: { children: React.ReactNode }) {
             />
             {isDropdownOpen && (
               <ul className={styles.dropdownMenu}>
-                <li onClick={() => router.push("/profile")}>
+                <li onClick={() => {router.push("/profile"); setIsDropdownOpen(false);}}>
                   {t("navbar.profile")}
                 </li>
-                <li onClick={() => router.push("/settings")}>
+                <li onClick={() => {router.push("/settings"); setIsDropdownOpen(false);}}>
                   {t("navbar.settings")}
                 </li>
                 <li onClick={handleLogout} style={{ color: "#ef4444" }}>
