@@ -64,7 +64,7 @@ function CvCard({
               type="button"
               onClick={handleViewClick}
               disabled={!cvUrl}
-              className={styles.cvBtnPrimary}
+              className={styles.cvBtn + " " + styles.cvBtnPrimary}
             >
               <Eye size={16} />
               <span>{t("profile.visualize")}</span>
@@ -72,7 +72,7 @@ function CvCard({
             <button
               type="button"
               onClick={handleModifyClick}
-              className={styles.cvBtnSecondary}
+              className={styles.cvBtn + " " + styles.cvBtnSecondary}
             >
               <UploadCloud size={16} />
               <span>{t("profile.modify")}</span>
@@ -80,7 +80,7 @@ function CvCard({
             <button
               type="button"
               onClick={onDelete}
-              className={styles.cvBtnDanger + " " + styles.cvBtnPrimary}
+              className={styles.cvBtn + " " + styles.cvBtnDanger + " " + styles.cvBtnPrimary}
             >
               <Trash2 size={16} />
               <span>{t("profile.delete")}</span>

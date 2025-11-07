@@ -226,7 +226,7 @@
   color: var(--error-color);
 }
 
-@media (max-width: 992px) {
+@media (max-width: 1120px) {
   .welcomeSection {
     flex-direction: column;
     text-align: center;

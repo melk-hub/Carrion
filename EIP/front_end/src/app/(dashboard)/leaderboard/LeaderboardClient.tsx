@@ -2,10 +2,11 @@
 
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
-import axios from "axios";
 import { useLanguage } from "@/contexts/LanguageContext";
 import Loading from "@/components/Loading/Loading";
 import styles from "./Leaderboard.module.css";
+import ApiService from "@/services/api";
+import { UserProfile } from "@/interface/user.interface";
 
 // --- Type Definitions ---
 interface User {
@@ -46,7 +47,6 @@ export default function RankingClient({
   const [totalPages, setTotalPages] = useState<number>(1);
   const { t } = useLanguage();
   const usersPerPage = 10;
-  const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
   const processAndSetUsers = (usersData: User[], page: number) => {
     const total = Math.ceil(usersData.length / usersPerPage) || 1;
@@ -66,16 +66,15 @@ export default function RankingClient({
     try {
       setLoading(true);
       setError(null);
-      const response = await axios.get(`${API_URL}/user/all-users-ranking`, {
-        withCredentials: true,
-      });
-      const currentUserResponse = await axios.get(`${API_URL}/user/profile`, {
-        withCredentials: true,
-      });
-      if (!response.data || !Array.isArray(response.data))
+      const response: User[] | null = await ApiService.get('/user/all-users-ranking');
+      const currentUserResponse: UserProfile | null = await ApiService.get('/user/profile');
+
+      if (!currentUserResponse) throw new Error(t("ranking.errors.fetchError") as string);
+
+      if (!response || !Array.isArray(response))
         throw new Error(t("ranking.warnings.noUserDataReceived") as string);
 
-      const sortedUsers = [...response.data].sort(
+      const sortedUsers = [...response].sort(
         (a, b) => b.totalApplications - a.totalApplications
       );
       const usersWithRank = sortedUsers.map((user, index) => ({
@@ -84,9 +83,8 @@ export default function RankingClient({
       }));
       setTopThreeUsers(usersWithRank.slice(0, 3));
 
-      const currentUserData = currentUserResponse.data;
       const currentUserWithRank = usersWithRank.find(
-        (user) => user.id === currentUserData.id
+        (user) => user.id === currentUserResponse.id
       );
       if (currentUserWithRank) {
         setCurrentUser({

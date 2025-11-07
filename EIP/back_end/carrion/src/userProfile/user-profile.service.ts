@@ -22,6 +22,7 @@ export class UserProfileService {
     userProfileInfo: UserProfileDto,
   ): Promise<string> {
     try {
+      let returnMessage = "";
       const profileData = {
         ...userProfileInfo,
         birthDate: userProfileInfo.birthDate
@@ -38,18 +39,19 @@ export class UserProfileService {
           where: { userId },
           data: { ...profileData },
         });
-        return 'User profile updated';
+        Logger.log("Updated")
+        returnMessage = 'User profile updated';
       } else {
         await this.prisma.userProfile.create({
           data: { ...profileData, userId },
         });
-        await this.prisma.user.update({
+        returnMessage = 'User profile created';
+      }
+      await this.prisma.user.update({
           where: { id: userId },
           data: { hasProfile: true },
-        });
-
-        return 'User profile created';
-      }
+      });
+      return returnMessage;
     } catch (error) {
       Logger.error(
         `Error during profile creation/update for user ${userId}: ${error.message}`,

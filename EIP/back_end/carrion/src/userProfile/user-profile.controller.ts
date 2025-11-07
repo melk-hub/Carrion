@@ -11,6 +11,7 @@ import {
   Param,
   HttpCode,
   HttpStatus,
+  Res,
 } from '@nestjs/common';
 import { JwtAuthGuard } from '@/auth/guards/jwt/jwt-auth.guard';
 import { UserProfileService } from './user-profile.service';
@@ -43,6 +44,7 @@ export class UserProfileController {
   }
 
   @ApiOperation({ summary: 'Create or update the user profile' })
+  @HttpCode(HttpStatus.CREATED)
   @ApiResponse({
     status: 201,
     description: 'User profile created or updated successfully.',

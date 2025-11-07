@@ -177,13 +177,7 @@ function InfosModal({
 
       const response = await ApiService.post("/user-profile", submissionData);
 
-      if (!(response instanceof Response)) {
-        throw new Error(
-          "Error occured while trying to receive user profile data"
-        );
-      }
-
-      if (response.ok) {
+      if (response) {
         const file = resumeFile;
         if (file) {
           try {
@@ -225,11 +219,9 @@ function InfosModal({
         }
         onClose();
       } else {
-        const errorData = await response.json();
         toast.error(
-          `Erreur de sauvegarde: ${errorData.message || "Erreur inconnue"}`
+          `Erreur de sauvegarde: lors de la création du profil`
         );
-        console.error("Erreur de sauvegarde du profil:", errorData.message);
       }
     } catch (error) {
       toast.error("Une erreur est survenue lors de la soumission.");
