@@ -10,23 +10,26 @@ datasource db {
 }
 
 model User {
-  id                 String             @id @default(uuid()) @db.Uuid
-  username           String             @unique
-  email              String             @unique
-  password           String
-  passwordResetToken String?            @unique
-  passwordResetExpires DateTime?
-  hasProfile         Boolean            @default(false)
-  createdAt          DateTime           @default(now())
-  role               Role               @default(VISITOR)
-  jobApplies         jobApply[]         @relation("UserJobApplies")
-  archivedJobApplies ArchivedJobApply[] @relation("UserArchivedJobApplies")
-  userProfile        UserProfile?       @relation("UserProfile")
-  Settings           Settings?          @relation("UserSettings")
-  hashedRefreshToken String?            @unique
-  tokens             Token[]            @relation("UserTokens")
-  userAchievements   UserAchievement[]  @relation("UserAchievements")
-  notifications      Notification[]     @relation("UserNotifications")
+  id                      String                   @id @default(uuid()) @db.Uuid
+  username                String                   @unique
+  email                   String                   @unique
+  password                String
+  passwordResetToken      String?                  @unique
+  passwordResetExpires    DateTime?
+  hasProfile              Boolean                  @default(false)
+  createdAt               DateTime                 @default(now())
+  role                    Role                     @default(VISITOR)
+  jobApplies              jobApply[]               @relation("UserJobApplies")
+  archivedJobApplies      ArchivedJobApply[]       @relation("UserArchivedJobApplies")
+  userProfile             UserProfile?             @relation("UserProfile")
+  Settings                Settings?                @relation("UserSettings")
+  hashedRefreshToken      String?                  @unique
+  tokens                  Token[]                  @relation("UserTokens")
+  userAchievements        UserAchievement[]        @relation("UserAchievements")
+  notifications           Notification[]           @relation("UserNotifications")
+  userOrganization        OrganizationMember[]     @relation("UserOrganization")
+  organizationOwner       Organization?            @relation("OrganizationOwner")
+  organizationInvitations OrganizationInvitation[]
 }
 
 model UserProfile {
@@ -50,34 +53,34 @@ model UserProfile {
 }
 
 model Token {
-  id                String   @id @default(uuid()) @db.Uuid
-  name              String
-  accessToken       String
-  refreshToken      String
-  providerId        String
-  userEmail         String
-  tokenTimeValidity DateTime
+  id                  String    @id @default(uuid()) @db.Uuid
+  name                String
+  accessToken         String
+  refreshToken        String
+  providerId          String
+  userEmail           String
+  tokenTimeValidity   DateTime
   accessTokenValidity DateTime?
-  webhookExpiry     DateTime?
-  externalId        String?
-  createdAt         DateTime @default(now())
-  userId            String   @db.Uuid
-  user              User     @relation("UserTokens", fields: [userId], references: [id], onDelete: Cascade)
+  webhookExpiry       DateTime?
+  externalId          String?
+  createdAt           DateTime  @default(now())
+  userId              String    @db.Uuid
+  user                User      @relation("UserTokens", fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([name, providerId])
 }
 
 model Notification {
-  id            String     @id @default(uuid()) @db.Uuid
-  userId        String     @db.Uuid
-  type          NotificationType
-  titleKey      String?
-  messageKey    String?
-  variables     Json?
-  language      String?    @default("fr")
-  createdAt     DateTime   @default(now())
-  read          Boolean    @default(false)
-  user          User       @relation("UserNotifications", fields: [userId], references: [id], onDelete: Cascade)
+  id         String           @id @default(uuid()) @db.Uuid
+  userId     String           @db.Uuid
+  type       NotificationType
+  titleKey   String?
+  messageKey String?
+  variables  Json?
+  language   String?          @default("fr")
+  createdAt  DateTime         @default(now())
+  read       Boolean          @default(false)
+  user       User             @relation("UserNotifications", fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model jobApply {
@@ -148,6 +151,41 @@ model UserAchievement {
   @@unique([userId, achievementId])
 }
 
+model Organization {
+  id                      String                   @id @default(uuid()) @db.Uuid
+  name                    String                   @unique
+  ownerUserId             String                   @unique @db.Uuid
+  user                    User                     @relation("OrganizationOwner", fields: [ownerUserId], references: [id])
+  organizationMember      OrganizationMember[]     @relation("OrganizationManyToMany")
+  organizationInvitations OrganizationInvitation[]
+}
+
+model OrganizationMember {
+  id             String           @id @default(uuid()) @db.Uuid
+  userId         String           @db.Uuid
+  organizationId String           @db.Uuid
+  userRole       OrganizationRole
+  user           User             @relation("UserOrganization", fields: [userId], references: [id])
+  organization   Organization     @relation("OrganizationManyToMany", fields: [organizationId], references: [id])
+
+  @@unique([userId, organizationId])
+}
+
+model OrganizationInvitation {
+  id             String           @id @default(uuid()) @db.Uuid
+  email          String
+  role           OrganizationRole @default(STUDENT)
+  token          String           @unique
+  expiresAt      DateTime
+  organizationId String           @db.Uuid
+  organization   Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  inviterUserId  String           @db.Uuid
+  inviter        User             @relation(fields: [inviterUserId], references: [id])
+  createdAt      DateTime         @default(now())
+
+  @@unique([organizationId, email])
+}
+
 enum Status {
   APPLIED
   PENDING
@@ -194,4 +232,10 @@ enum NotificationType {
   WARNING
   INFO
   DEFAULT
+}
+
+enum OrganizationRole {
+  OWNER
+  TEACHER
+  STUDENT
 }
