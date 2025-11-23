@@ -255,7 +255,6 @@ export default function DashboardClient({
             Contrôles de filtrage, tri et affichage
           </h2>
           <div className={styles.filterContainer}>
-            {/* MODIFICATION : Remplacer l'ancien bloc par cette boucle dynamique */}
             {Object.keys(statusMap).map((statusKey) => (
               <label key={statusKey} className={styles.filterCheckbox}>
                 <input

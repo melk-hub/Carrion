@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useMemo } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import Image from "next/image";
@@ -14,7 +14,10 @@ import styles from "./NavBar.module.css";
 
 export default function Navbar({ children }: { children: React.ReactNode }) {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const { setIsAuthenticated } = useAuth();
+
+  // On récupère isMember depuis le contexte global
+  const { setIsAuthenticated, isMember } = useAuth();
+
   const router = useRouter();
   const pathname = usePathname();
   const { t } = useLanguage();
@@ -24,6 +27,7 @@ export default function Navbar({ children }: { children: React.ReactNode }) {
   const dropdownRef = useRef<HTMLDivElement>(null);
   const [avatarUrl, setAvatarUrl] = useState("/assets/avatar.png");
 
+  // Fermeture du dropdown au clic extérieur
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (
@@ -47,25 +51,42 @@ export default function Navbar({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const navLinks = [
-    { href: "/home", labelKey: "home", icon: "/assets/home-button.png" },
-    {
-      href: "/dashboard",
-      labelKey: "applications",
-      icon: "/assets/candidate-profile.png",
-    },
-    { href: "/archives", labelKey: "archives", icon: "/assets/archives.png" },
-    {
-      href: "/statistics",
-      labelKey: "statistics",
-      icon: "/assets/pie-chart.png",
-    },
-    {
-      href: "/leaderboard",
-      labelKey: "ranking",
-      icon: "/assets/podium.png",
-    },
-  ];
+  // Configuration des liens de navigation avec useMemo
+  // La liste se met à jour automatiquement si isMember change
+  const navLinks = useMemo(() => {
+    const links = [
+      { href: "/home", labelKey: "home", icon: "/assets/home-button.png" },
+      {
+        href: "/dashboard",
+        labelKey: "applications",
+        icon: "/assets/candidate-profile.png",
+      },
+      { href: "/archives", labelKey: "archives", icon: "/assets/archives.png" },
+      {
+        href: "/statistics",
+        labelKey: "statistics",
+        icon: "/assets/pie-chart.png",
+      },
+      {
+        href: "/leaderboard",
+        labelKey: "ranking",
+        icon: "/assets/podium.png",
+      },
+    ];
+
+    // Si l'utilisateur est membre d'une organisation, on ajoute le lien
+    if (isMember) {
+      links.push({
+        href: "/organization",
+        labelKey: "organization",
+        // Assure-toi d'avoir une icône nommée organization.png dans tes assets
+        // ou remplace par une autre icône existante pour tester
+        icon: "/assets/organization.png",
+      });
+    }
+
+    return links;
+  }, [isMember]);
 
   return (
     <div className={`${styles.dashboardContainer} ${sidebarCollapsed ? styles.collapsed : ""}`}>
@@ -110,6 +131,7 @@ export default function Navbar({ children }: { children: React.ReactNode }) {
           </div>
         </div>
       </header>
+
       <aside
         className={`${styles.sidebar} ${
           sidebarCollapsed ? styles.collapsed : ""
@@ -179,6 +201,7 @@ export default function Navbar({ children }: { children: React.ReactNode }) {
           />
         </div>
       </aside>
+
       <main
         className={`${styles.content} ${
           sidebarCollapsed ? styles.collapsed : ""

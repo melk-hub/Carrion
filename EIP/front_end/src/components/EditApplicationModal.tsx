@@ -85,7 +85,6 @@ export default function EditApplicationModal({
 
         <div className={styles.appModalContent}>
           <div className={styles.appModalGrid}>
-            {/* Colonne de Gauche */}
             <div className={styles.appModalColumn}>
               <div className={styles.appModalFormGroup}>
                 <label htmlFor="company" className={styles.requiredField}>
@@ -135,8 +134,6 @@ export default function EditApplicationModal({
                 />
               </div>
             </div>
-
-            {/* Colonne de Droite */}
             <div className={styles.appModalColumn}>
               <div className={styles.appModalFormGroup}>
                 <label htmlFor="status" className={styles.requiredField}>

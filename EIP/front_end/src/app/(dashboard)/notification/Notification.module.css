@@ -24,7 +24,8 @@
   background-image: url("../../../../public/assets/svg/background.svg");
   background-color: #fff9f0;
   padding: 24px;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
   color: #1f2937;
 }
 
@@ -84,8 +85,13 @@
 }
 
 @keyframes pulse-badge {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.05); }
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
 }
 
 .headerActions {
@@ -112,13 +118,18 @@
 }
 
 .actionButton:before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
   transition: left 0.5s;
 }
 
@@ -135,12 +146,10 @@
 }
 
 .actionButton.refresh {
-  background: linear-gradient(135deg, #FBB75F 0%, #ffae45 100%);
+  background: linear-gradient(135deg, #fbb75f 0%, #ffae45 100%);
   color: black;
   box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
 }
-
-/* .actionButton.refresh:hover:disabled */
 
 .actionButton:disabled {
   opacity: 0.6;
@@ -185,13 +194,18 @@
 }
 
 .filterButton:before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(19, 34, 56, 0.1), transparent);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(19, 34, 56, 0.1),
+    transparent
+  );
   transition: left 0.4s;
 }
 
@@ -243,7 +257,6 @@
   cursor: pointer;
 }
 
-/* Hover seulement pour les notifications non lues */
 .notificationItem.unread:hover {
   transform: translateY(-2px);
   box-shadow: 0 8px 25px rgba(251, 183, 95, 0.15);
@@ -251,7 +264,6 @@
   cursor: pointer;
 }
 
-/* Pas d'effet hover pour les notifications lues */
 .notificationItem:not(.unread) {
   cursor: default;
 }
@@ -302,20 +314,22 @@
 }
 
 @keyframes pulse-glow {
-  0%, 100% { 
+  0%,
+  100% {
     box-shadow: 0 0 0 0 rgba(251, 191, 36, 0.3);
   }
-  50% { 
+  50% {
     box-shadow: 0 0 0 8px rgba(251, 191, 36, 0);
   }
 }
 
 @keyframes pulse-dot {
-  0%, 100% { 
+  0%,
+  100% {
     transform: scale(1);
     opacity: 1;
   }
-  50% { 
+  50% {
     transform: scale(1.3);
     opacity: 0.7;
   }
@@ -466,7 +480,7 @@
 }
 
 .emptyState::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: 0;
@@ -531,8 +545,12 @@
 }
 
 @keyframes carrion-spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 .loadingState p {
@@ -633,7 +651,7 @@
 }
 
 .notificationCheckbox input[type="checkbox"]:checked::after {
-  content: '✓';
+  content: "✓";
   position: absolute;
   top: 50%;
   left: 50%;
@@ -655,12 +673,12 @@
   .notificationsContainer {
     max-width: 900px;
   }
-  
+
   .notificationsHeader {
     flex-direction: column;
     align-items: stretch;
   }
-  
+
   .headerActions {
     justify-content: center;
   }
@@ -677,7 +695,7 @@
     align-items: stretch;
     gap: 16px;
   }
-  
+
   .headerTitle {
     justify-content: center;
     text-align: center;
@@ -786,4 +804,4 @@
     width: 14px;
     height: 14px;
   }
-} 
+}

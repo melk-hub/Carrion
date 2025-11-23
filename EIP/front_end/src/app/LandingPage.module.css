@@ -262,7 +262,6 @@
   text-align: center;
 }
 
-/* SECTION COMMENT ÇA MARCHE */
 .tutorialSections {
   padding: 60px 20px;
 }
@@ -336,7 +335,6 @@
   flex-direction: row-reverse;
 }
 
-/* SECTION STATISTIQUES */
 .statsSection {
   padding: 80px 20px;
   background-color: var(--primary-color);
@@ -375,7 +373,6 @@
   letter-spacing: 1px;
 }
 
-/* SECTION TÉMOIGNAGES */
 .testimonialsSection {
   padding: 80px 20px;
   background-color: #f8f9fa;
@@ -434,7 +431,6 @@
   font-size: 14px;
 }
 
-/* SECTION CALL TO ACTION */
 .ctaSection {
   padding: 100px 20px;
   background-color: var(--primary-color);
