@@ -5,12 +5,17 @@ import {
   UseGuards,
   Request,
   Body,
+  Query,
+  Put,
+  Delete,
 } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/guards/jwt/jwt-auth.guard';
 import { OrganizationService } from './organization.service';
 import {
+  ChangeMemberRoleDTO,
   CreateOrganizationInvitationDTO,
-  JoinOrganizationDTO,
+  GetInformationOrganizationDTO,
+  KickMemberFromOrganizationDTO,
 } from './dto/organization.dto';
 
 @Controller('organization')
@@ -24,7 +29,10 @@ export class OrganizationController {
   }
 
   @Post('join')
-  async joinOrganization(@Request() req, @Body() body: JoinOrganizationDTO) {
+  async joinOrganization(
+    @Request() req,
+    @Body() body: GetInformationOrganizationDTO,
+  ) {
     return this.organizationService.joinOrganization(req.user.id, body);
   }
 
@@ -35,5 +43,32 @@ export class OrganizationController {
   ) {
     const userId: string = req.user.id;
     return this.organizationService.sendInvitationToOrganization(userId, body);
+  }
+
+  @Get('get-info')
+  async getOrganizationInformation(
+    @Request() req,
+    @Query() query: GetInformationOrganizationDTO,
+  ) {
+    return this.organizationService.getOrganizationInformation(
+      req.user.id,
+      query,
+    );
+  }
+
+  @Put('edit-role')
+  async editMemberRole(@Request() req, @Body() body: ChangeMemberRoleDTO) {
+    return this.organizationService.editMemberRole(req.user.id, body);
+  }
+
+  @Delete('kick-member')
+  async kickMember(
+    @Request() req,
+    @Body() body: KickMemberFromOrganizationDTO,
+  ) {
+    return this.organizationService.kickMemberFromOrganization(
+      req.user.id,
+      body,
+    );
   }
 }

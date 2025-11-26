@@ -95,7 +95,8 @@
     "notification": "Notifications",
     "ranking": "Classement",
     "logout": "Déconnexion",
-    "seeAll": "Voir toutes les notifications"
+    "seeAll": "Voir toutes les notifications",
+    "organization": "Organisation"
   },
   "landing": {
     "title": "La plateforme idéale pour gérer ses candidatures",
@@ -128,7 +129,7 @@
         ]
       },
       "reminders": {
-        "title": "Rappels et notifications personnalisés", 
+        "title": "Rappels et notifications personnalisés",
         "points": [
           "Recevez des rappels automatiques (suivis, entretiens...).",
           "Soyez alerté(e) des prochaines étapes importantes.",
@@ -258,7 +259,7 @@
     "ranking": {
       "ordinals": {
         "1": "1er",
-        "2": "2ème", 
+        "2": "2ème",
         "3": "3ème",
         "4": "4ème",
         "5": "5ème",
@@ -330,7 +331,7 @@
     "statuses": {
       "PENDING": "En attente de réponse",
       "APPLIED": "Postulée",
-      "ACCEPTED": "Acceptée", 
+      "ACCEPTED": "Acceptée",
       "REJECTED": "Refusée",
       "INTERVIEW": "Entretien",
       "REJECTED_BY_COMPANY": "Refusée",
@@ -421,7 +422,7 @@
   "modal": {
     "add": {
       "title": "Ajouter une candidature",
-      "company": "Entreprise", 
+      "company": "Entreprise",
       "title_job": "Poste",
       "status": "Statut",
       "contract_type": "Type de contrat",

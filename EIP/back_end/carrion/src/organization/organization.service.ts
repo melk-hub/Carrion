@@ -3,12 +3,16 @@ import {
   ForbiddenException,
   Injectable,
   InternalServerErrorException,
+  NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { OrganizationRole } from '@prisma/client';
 import {
+  ChangeMemberRoleDTO,
   CreateOrganizationInvitationDTO,
-  JoinOrganizationDTO,
+  GetInformationOrganizationDTO,
+  KickMemberFromOrganizationDTO,
 } from './dto/organization.dto';
 import { randomBytes } from 'crypto';
 
@@ -19,18 +23,20 @@ export class OrganizationService {
   constructor(private prisma: PrismaService) {}
 
   async getUserOrganization(userId: string) {
-    return await this.prisma.organizationMember.findMany({
+    const data = await this.prisma.organizationMember.findFirst({
       where: { userId },
     });
+    return data;
   }
 
-  async joinOrganization(userId: string, body: JoinOrganizationDTO) {
+  async joinOrganization(userId: string, body: GetInformationOrganizationDTO) {
     try {
+      console.log(userId, body);
       await this.prisma.organizationMember.create({
         data: {
           userId,
           organizationId: body.organizationId,
-          userRole: body.userRole as unknown as OrganizationRole, // TODO Potentiellement a fix c'est l'erreur de mon IDE qui me demande de faire ça :/
+          userRole: body.role as unknown as OrganizationRole, // TODO Potentiellement a fix c'est l'erreur de mon IDE qui me demande de faire ça :/
         },
       });
 
@@ -113,6 +119,215 @@ export class OrganizationService {
       throw new InternalServerErrorException(
         'Unknown error unable to process with the invitation of this user',
       );
+    }
+  }
+
+  async getOrganizationInformation(
+    userId: string,
+    body: GetInformationOrganizationDTO,
+  ) {
+    const organizationInfo = await this.prisma.organization.findUnique({
+      where: { id: body.organizationId },
+      select: {
+        id: true,
+        name: true,
+        user: {
+          select: {
+            id: true,
+            email: true,
+            userProfile: { select: { firstName: true, lastName: true } },
+          },
+        },
+        organizationInvitations: {
+          select: {
+            id: true,
+            email: true,
+            role: true,
+            expiresAt: true,
+            inviter: {
+              select: {
+                email: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    const membersList = await this.prisma.organizationMember.findMany({
+      where: { organizationId: body.organizationId },
+      select: {
+        id: true,
+        userRole: true,
+        user: {
+          select: {
+            id: true,
+            email: true,
+            userProfile: { select: { firstName: true, lastName: true } },
+            _count: {
+              select: { jobApplies: true, archivedJobApplies: true },
+            },
+          },
+        },
+      },
+    });
+
+    const orgTotalJobApply = membersList.reduce(
+      (acc, cur) =>
+        (acc +=
+          cur.user._count.archivedJobApplies + cur.user._count.jobApplies),
+      0,
+    );
+
+    return {
+      organization: organizationInfo,
+      members: membersList,
+      totalJobApply: orgTotalJobApply,
+    };
+  }
+
+  async editMemberRole(userId: string, body: ChangeMemberRoleDTO) {
+    try {
+      const currentUser = await this.prisma.organizationMember.findUnique({
+        where: {
+          userId_organizationId: {
+            userId: userId,
+            organizationId: body.organizationId,
+          },
+        },
+        select: {
+          userRole: true,
+        },
+      });
+
+      if (!currentUser.userRole) {
+        throw new NotFoundException(
+          "The user that requested the role edit doesn't exist in this organization",
+        );
+      }
+
+      if (currentUser.userRole !== OrganizationRole.OWNER) {
+        throw new ForbiddenException(
+          "Not enough permission to change this user's role",
+        );
+      }
+
+      if (
+        (body.role as unknown as string) !== OrganizationRole.STUDENT &&
+        (body.role as unknown as string) !== OrganizationRole.TEACHER
+      ) {
+        throw new ForbiddenException(
+          'You can only choose between STUDENT and TEACHER',
+        );
+      }
+
+      await this.prisma.organizationMember.update({
+        where: {
+          userId_organizationId: {
+            userId: body.memberId,
+            organizationId: body.organizationId,
+          },
+        },
+        data: { userRole: body.role as unknown },
+      });
+
+      return {
+        statusCode: 200,
+        message: 'User role edited successfully',
+      };
+    } catch (error) {
+      if (error.code) {
+        throw new InternalServerErrorException(
+          "An error occurred while trying to edit this user's role",
+        );
+      }
+      if (error.response.statusCode === 403) {
+        throw new ForbiddenException(error.response.message);
+      }
+      if (error.response.statusCode === 404) {
+        throw new NotFoundException(error.response.message);
+      }
+    }
+  }
+
+  async kickMemberFromOrganization(
+    userId: string,
+    body: KickMemberFromOrganizationDTO,
+  ) {
+    try {
+      const currentUser = await this.prisma.organizationMember.findUnique({
+        where: {
+          userId_organizationId: {
+            userId: userId,
+            organizationId: body.organizationId,
+          },
+        },
+        select: {
+          userRole: true,
+        },
+      });
+
+      if (!currentUser || !currentUser.userRole) {
+        throw new NotFoundException(
+          "The user that requested the kick doesn't exist in this organization",
+        );
+      }
+
+      if (currentUser.userRole !== OrganizationRole.OWNER) {
+        throw new ForbiddenException(
+          "Not enough permission to change this user's role",
+        );
+      }
+
+      const kickedUser = await this.prisma.organizationMember.findUnique({
+        where: {
+          userId_organizationId: {
+            userId: body.memberId,
+            organizationId: body.organizationId,
+          },
+        },
+        select: {
+          userRole: true,
+        },
+      });
+
+      if (!kickedUser || !kickedUser.userRole) {
+        throw new NotFoundException(
+          "The user being kicked doesn't exist in this organization",
+        );
+      }
+
+      if (kickedUser.userRole === OrganizationRole.OWNER) {
+        throw new ForbiddenException(
+          "You can't kick another OWNER from the organization, please contact Carrion for more information.",
+        );
+      }
+
+      await this.prisma.organizationMember.delete({
+        where: {
+          userId_organizationId: {
+            userId: body.memberId,
+            organizationId: body.organizationId,
+          },
+        },
+      });
+
+      return {
+        statusCode: 200,
+        message: 'Member kicked successfully',
+      };
+    } catch (error) {
+      if (error.code) {
+        throw new InternalServerErrorException(
+          'An error occurred while trying to kick this member',
+        );
+      }
+      if (error.response.statusCode === 403) {
+        throw new ForbiddenException(error.response.message);
+      }
+      if (error.response.statusCode === 404) {
+        throw new NotFoundException(error.response.message);
+      }
     }
   }
 }

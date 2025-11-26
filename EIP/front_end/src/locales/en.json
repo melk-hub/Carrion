@@ -93,7 +93,8 @@
     "notification": "Notifications",
     "ranking": "Ranking",
     "logout": "Logout",
-    "seeAll": "View all notifications"
+    "seeAll": "View all notifications",
+    "organization": "Organization"
   },
   "landing": {
     "title": "The ideal platform to manage your applications",

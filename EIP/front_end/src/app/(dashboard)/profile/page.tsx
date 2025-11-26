@@ -8,7 +8,6 @@ async function getProfileData() {
   const token = cookieStore.get("access_token");
 
   if (!token) {
-    // Rediriger ou retourner une erreur si non authentifié est aussi une option
     return {
       initialProfile: null,
       initialServices: [],
@@ -21,7 +20,6 @@ async function getProfileData() {
   const headers = { Cookie: `${token.name}=${token.value}` };
 
   try {
-    // On lance tous les appels API en parallèle
     const [profileRes, servicesRes, cvUrlRes, profilePicRes] =
       await Promise.all([
         ApiService.get<UserProfile>("/user-profile", { headers }),

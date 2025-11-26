@@ -45,12 +45,23 @@ export class AuthController {
     const cookieMaxAge = rememberMe
       ? 1000 * 60 * 60 * 24 * 15
       : 1000 * 60 * 60 * 24;
+
     res.cookie('access_token', tokens.accessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'Strict',
       maxAge: cookieMaxAge,
     });
+
+    if (tokens.refreshToken) {
+      res.cookie('refresh_token', tokens.refreshToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'Strict',
+        maxAge: 1000 * 60 * 60 * 24 * 7,
+      });
+    }
+
     return res
       .status(HttpStatus.OK)
       .send({ message: 'User logged in successfully' });
@@ -67,6 +78,16 @@ export class AuthController {
       sameSite: 'Strict',
       maxAge: 1000 * 60 * 60 * 24,
     });
+
+    if (tokens.refreshToken) {
+      res.cookie('refresh_token', tokens.refreshToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'Strict',
+        maxAge: 1000 * 60 * 60 * 24 * 7,
+      });
+    }
+
     return res
       .status(HttpStatus.OK)
       .send({ message: 'User created successfully' });

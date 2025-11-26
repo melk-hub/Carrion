@@ -17,7 +17,7 @@ interface AuthContextType {
   isAuthenticated: boolean;
   loadingAuth: boolean;
   userProfile: UserProfile | null;
-  isMember: boolean;
+  organizationMemberInfo: OrganizationMemberInfo | null;
   setIsAuthenticated: (isAuthenticated: boolean) => void;
   logOut: (callApi?: boolean) => void;
   checkAuthStatus: () => Promise<void>;
@@ -42,7 +42,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [loadingAuth, setLoadingAuth] = useState<boolean>(true);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
-  const [isMember, setIsMember] = useState<boolean>(false);
+  const [organizationMemberInfo, setOrganizationMemberInfo] = useState<OrganizationMemberInfo | null>(null);
 
   const logOut = useCallback(async (callApi: boolean = true) => {
     if (callApi) {
@@ -54,48 +54,43 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     }
     setIsAuthenticated(false);
     setUserProfile(null);
-    setIsMember(false);
+    setOrganizationMemberInfo(null);
     setLoadingAuth(false);
   }, []);
 
   const checkAuthStatus = useCallback(async () => {
     setLoadingAuth(true);
     try {
-
       const profileData = await apiService.get<UserProfile>("/user/profile");
-
       if (profileData) {
         setUserProfile(profileData);
         setIsAuthenticated(true);
-
-
         try {
-          const orgData = await apiService.get<OrganizationMemberInfo[]>('/organization');
-          if (orgData === null) { setIsMember(false);
-          } else {
-            setIsMember(orgData && orgData.length > 0);
-          }
+          const orgData = await apiService.get<OrganizationMemberInfo>('/organization');
+          setOrganizationMemberInfo(orgData || null);
         } catch (e) {
-          setIsMember(false);
+          setOrganizationMemberInfo(null);
         }
-
       } else {
         setUserProfile(null);
         setIsAuthenticated(false);
-        setIsMember(false);
+        setOrganizationMemberInfo(null);
       }
     } catch (error) {
       setUserProfile(null);
       setIsAuthenticated(false);
-      setIsMember(false);
+      setOrganizationMemberInfo(null);
     } finally {
+
       setLoadingAuth(false);
     }
   }, []);
 
+
   useEffect(() => {
     apiService.registerLogoutCallback(logOut);
-  }, [logOut]);
+    checkAuthStatus();
+  }, [logOut, checkAuthStatus]);
 
   const getUserDisplayName = useCallback((): string => {
     if (!userProfile) return "Carrion";
@@ -108,7 +103,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       isAuthenticated,
       loadingAuth,
       userProfile,
-      isMember,
+      organizationMemberInfo,
       setIsAuthenticated,
       logOut,
       checkAuthStatus,
@@ -118,7 +113,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       isAuthenticated,
       loadingAuth,
       userProfile,
-      isMember,
+      organizationMemberInfo,
       logOut,
       checkAuthStatus,
       getUserDisplayName,

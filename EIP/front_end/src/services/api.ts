@@ -44,10 +44,10 @@ class ApiService {
     this.isRefreshing = true;
 
     try {
-      const refreshResponse = await fetch(
-        `${this.getBaseUrl()}/auth/refresh`,
-        { method: "POST", credentials: "include" }
-      );
+      const refreshResponse = await fetch(`${this.getBaseUrl()}/auth/refresh`, {
+        method: "POST",
+        credentials: "include",
+      });
 
       if (refreshResponse.ok) {
         await Promise.all(
@@ -90,9 +90,12 @@ class ApiService {
 
   private async processResponse<T>(response: Response): Promise<T | null> {
     if (!response.ok) {
-      const errorData = await response
+      const errorData = (await response
         .json()
-        .catch(() => ({ message: response.statusText }));
+        .catch(() => ({ message: response.statusText }))) as {
+        message?: string;
+      };
+
       throw new Error(errorData.message || `API Error: ${response.status}`);
     }
     if (response.status === 204) {
@@ -109,6 +112,9 @@ class ApiService {
       const response = await this.request(url, { method: "GET", ...options });
       return await this.processResponse<T>(response);
     } catch (error) {
+      if (error instanceof Error && error.message === "Token refresh failed") {
+        return null;
+      }
       console.error(`GET ${url} failed:`, error);
       return null;
     }
@@ -127,6 +133,9 @@ class ApiService {
       });
       return await this.processResponse<T>(response);
     } catch (error) {
+      if (error instanceof Error && error.message === "Token refresh failed") {
+        return null;
+      }
       console.error(`POST ${url} failed:`, error);
       return null;
     }
@@ -145,6 +154,9 @@ class ApiService {
       });
       return await this.processResponse<T>(response);
     } catch (error) {
+      if (error instanceof Error && error.message === "Token refresh failed") {
+        return null;
+      }
       console.error(`PUT ${url} failed:`, error);
       return null;
     }
@@ -163,6 +175,9 @@ class ApiService {
       });
       return await this.processResponse<T>(response);
     } catch (error) {
+      if (error instanceof Error && error.message === "Token refresh failed") {
+        return null;
+      }
       console.error(`PATCH ${url} failed:`, error);
       return null;
     }
@@ -170,15 +185,20 @@ class ApiService {
 
   public async delete<T>(
     url: string,
+    data: unknown,
     options: ApiOptions = {}
   ): Promise<T | null> {
     try {
       const response = await this.request(url, {
         method: "DELETE",
+        body: JSON.stringify(data),
         ...options,
       });
       return await this.processResponse<T>(response);
     } catch (error) {
+      if (error instanceof Error && error.message === "Token refresh failed") {
+        return null;
+      }
       console.error(`DELETE ${url} failed:`, error);
       return null;
     }

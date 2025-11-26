@@ -134,7 +134,6 @@ function InfosModal({
 
   const handleNextStep = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // Votre logique de validation ici...
     setDirection(1);
     if (activeStep === "step1") setActiveStep("step2");
     else if (activeStep === "step2") setActiveStep("step3");

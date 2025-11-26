@@ -15,8 +15,7 @@ import styles from "./NavBar.module.css";
 export default function Navbar({ children }: { children: React.ReactNode }) {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
-  // On récupère isMember depuis le contexte global
-  const { setIsAuthenticated, isMember } = useAuth();
+  const { setIsAuthenticated, organizationMemberInfo } = useAuth();
 
   const router = useRouter();
   const pathname = usePathname();
@@ -27,7 +26,6 @@ export default function Navbar({ children }: { children: React.ReactNode }) {
   const dropdownRef = useRef<HTMLDivElement>(null);
   const [avatarUrl, setAvatarUrl] = useState("/assets/avatar.png");
 
-  // Fermeture du dropdown au clic extérieur
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (
@@ -51,8 +49,6 @@ export default function Navbar({ children }: { children: React.ReactNode }) {
     }
   };
 
-  // Configuration des liens de navigation avec useMemo
-  // La liste se met à jour automatiquement si isMember change
   const navLinks = useMemo(() => {
     const links = [
       { href: "/home", labelKey: "home", icon: "/assets/home-button.png" },
@@ -74,19 +70,16 @@ export default function Navbar({ children }: { children: React.ReactNode }) {
       },
     ];
 
-    // Si l'utilisateur est membre d'une organisation, on ajoute le lien
-    if (isMember) {
+    if (organizationMemberInfo) {
       links.push({
         href: "/organization",
         labelKey: "organization",
-        // Assure-toi d'avoir une icône nommée organization.png dans tes assets
-        // ou remplace par une autre icône existante pour tester
         icon: "/assets/organization.png",
       });
     }
 
     return links;
-  }, [isMember]);
+  }, [organizationMemberInfo]);
 
   return (
     <div className={`${styles.dashboardContainer} ${sidebarCollapsed ? styles.collapsed : ""}`}>
