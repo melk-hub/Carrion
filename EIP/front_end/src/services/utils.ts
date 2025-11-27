@@ -3,3 +3,5 @@ export const passwordRegEX =
 
 export const emailRegEX =
   /^((?!\.)[\w\-_.]*[^.])(@\w+)(\.\w+(\.\w+)?[^.\W])$/im;
+
+export const orgRolesWithRights = ['OWNER', 'TEACHER'];

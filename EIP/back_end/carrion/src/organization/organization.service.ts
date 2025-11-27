@@ -31,12 +31,11 @@ export class OrganizationService {
 
   async joinOrganization(userId: string, body: GetInformationOrganizationDTO) {
     try {
-      console.log(userId, body);
       await this.prisma.organizationMember.create({
         data: {
           userId,
           organizationId: body.organizationId,
-          userRole: body.role as unknown as OrganizationRole, // TODO Potentiellement a fix c'est l'erreur de mon IDE qui me demande de faire ça :/
+          userRole: body.role as unknown as OrganizationRole, // Potentiellement a fix c'est l'erreur de mon IDE qui me demande de faire ça :/
         },
       });
 
@@ -61,34 +60,6 @@ export class OrganizationService {
     body: CreateOrganizationInvitationDTO,
   ) {
     try {
-      const requesterInfo = await this.prisma.organizationMember.findUnique({
-        where: {
-          userId_organizationId: {
-            userId,
-            organizationId: body.organizationId,
-          },
-        },
-      });
-
-      if (!requesterInfo) {
-        throw new ForbiddenException("You aren't part of this organization");
-      }
-
-      if (!roleWithRights.includes(requesterInfo.userRole)) {
-        throw new ForbiddenException(
-          "You don't have the rights to invite someone",
-        );
-      }
-
-      if (
-        requesterInfo.userRole === 'TEACHER' &&
-        (body.role as unknown as string) !== 'STUDENT'
-      ) {
-        throw new ForbiddenException(
-          "Your role doesn't have enough rights to do that.",
-        );
-      }
-
       const token = randomBytes(32).toString('hex');
 
       await this.prisma.organizationInvitation.create({
@@ -138,19 +109,6 @@ export class OrganizationService {
             userProfile: { select: { firstName: true, lastName: true } },
           },
         },
-        organizationInvitations: {
-          select: {
-            id: true,
-            email: true,
-            role: true,
-            expiresAt: true,
-            inviter: {
-              select: {
-                email: true,
-              },
-            },
-          },
-        },
       },
     });
 
@@ -186,32 +144,8 @@ export class OrganizationService {
     };
   }
 
-  async editMemberRole(userId: string, body: ChangeMemberRoleDTO) {
+  async editMemberRole(body: ChangeMemberRoleDTO) {
     try {
-      const currentUser = await this.prisma.organizationMember.findUnique({
-        where: {
-          userId_organizationId: {
-            userId: userId,
-            organizationId: body.organizationId,
-          },
-        },
-        select: {
-          userRole: true,
-        },
-      });
-
-      if (!currentUser.userRole) {
-        throw new NotFoundException(
-          "The user that requested the role edit doesn't exist in this organization",
-        );
-      }
-
-      if (currentUser.userRole !== OrganizationRole.OWNER) {
-        throw new ForbiddenException(
-          "Not enough permission to change this user's role",
-        );
-      }
-
       if (
         (body.role as unknown as string) !== OrganizationRole.STUDENT &&
         (body.role as unknown as string) !== OrganizationRole.TEACHER
@@ -255,30 +189,6 @@ export class OrganizationService {
     body: KickMemberFromOrganizationDTO,
   ) {
     try {
-      const currentUser = await this.prisma.organizationMember.findUnique({
-        where: {
-          userId_organizationId: {
-            userId: userId,
-            organizationId: body.organizationId,
-          },
-        },
-        select: {
-          userRole: true,
-        },
-      });
-
-      if (!currentUser || !currentUser.userRole) {
-        throw new NotFoundException(
-          "The user that requested the kick doesn't exist in this organization",
-        );
-      }
-
-      if (currentUser.userRole !== OrganizationRole.OWNER) {
-        throw new ForbiddenException(
-          "Not enough permission to change this user's role",
-        );
-      }
-
       const kickedUser = await this.prisma.organizationMember.findUnique({
         where: {
           userId_organizationId: {
@@ -329,5 +239,17 @@ export class OrganizationService {
         throw new NotFoundException(error.response.message);
       }
     }
+  }
+
+  async getOrganizationSettingsData(userId: string, body: any) {
+
+  }
+
+  async changeOrganizationOwner(userId: string, body: any) {
+
+  }
+
+  async revokeOrganizationInvitation(userId: string, body: any) {
+
   }
 }

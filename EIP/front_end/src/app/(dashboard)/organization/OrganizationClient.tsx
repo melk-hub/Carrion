@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import ApiService from "@/services/api";
 import styles from "./Organization.module.css";
 import Loading from "@/components/Loading/Loading";
@@ -58,6 +59,8 @@ const getRoleBadgeClass = (role: string) => {
   }
 };
 
+const roleWithRights = ['OWNER', 'TEACHER'];
+
 const getDisplayName = (user: User) => {
   if (user.userProfile && user.userProfile.firstName) {
     return `${user.userProfile.firstName} ${user.userProfile.lastName || ""}`;
@@ -66,11 +69,13 @@ const getDisplayName = (user: User) => {
 };
 
 export default function OrganizationClient() {
+  const router = useRouter();
   const [data, setData] = useState<OrganizationData | null>(null);
   const [loading, setLoading] = useState(true);
   const { organizationMemberInfo } = useAuth();
 
   const [editingMember, setEditingMember] = useState<OrganizationMember | null>(null);
+  const [kickingMember, setKickingMember] = useState<OrganizationMember | null>(null);
   const [selectedRole, setSelectedRole] = useState<string>("STUDENT");
   const [isSaving, setIsSaving] = useState(false);
   const [viewingMember, setViewingMember] = useState<OrganizationMember | null>(null);
@@ -94,15 +99,19 @@ export default function OrganizationClient() {
     fetchOrganizationData();
   }, [organizationMemberInfo]);
 
-  const canManage = (organizationMemberInfo?.userRole as unknown as string) === "OWNER";
+  const canManage = roleWithRights.includes(organizationMemberInfo?.userRole as unknown as string);
 
   const canEditMember = (targetMember: OrganizationMember) => {
     if (!canManage) return false;
-    if ((targetMember.userRole as unknown as string) === "OWNER") return false;
+    if (roleWithRights.includes((targetMember.userRole as unknown as string))) return false;
     return true;
   };
 
-  const handleEditClick = async (member: OrganizationMember) => {
+  const handleManageClick = () => {
+    router.push("/organization/settings");
+  };
+
+  const handleEditClick = (member: OrganizationMember) => {
     setEditingMember(member);
     const currentRole = ["TEACHER", "STUDENT"].includes(member.userRole as unknown as string)
       ? member.userRole
@@ -112,6 +121,7 @@ export default function OrganizationClient() {
 
   const handleCloseModal = () => {
     setEditingMember(null);
+    setKickingMember(null);
   };
 
   const handleSaveRole = async () => {
@@ -119,13 +129,11 @@ export default function OrganizationClient() {
     setIsSaving(true);
 
     try {
-      const response = await ApiService.put('/organization/edit-role', {
+      await ApiService.put('/organization/edit-role', {
         organizationId: organizationMemberInfo?.organizationId,
         role: selectedRole,
         memberId: editingMember.user.id,
-      })
-
-      console.log(response);
+      });
 
       if (data) {
         const updatedMembers = data.members.map(m =>
@@ -144,13 +152,33 @@ export default function OrganizationClient() {
     }
   };
 
-  const handleKickMember = async (member: OrganizationMember) => {
-     if(confirm(`Êtes-vous sûr de vouloir retirer ${getDisplayName(member.user)} de l'organisation ?`)) {
-        const response = await ApiService.delete('/organization/kick-member', {
-          memberId: member.user.id,
-          organizationId: organizationMemberInfo?.organizationId
-        })
-     }
+  const handleKickClick = (member: OrganizationMember) => {
+    setKickingMember(member);
+  };
+
+  const handleConfirmKick = async () => {
+    if (!kickingMember) return;
+    setIsSaving(true);
+
+    try {
+      await ApiService.delete('/organization/kick-member', {
+        memberId: kickingMember.user.id,
+        organizationId: organizationMemberInfo?.organizationId
+      });
+
+      if (data) {
+        const filteredMembers = data.members.filter(m => m.id !== kickingMember.id);
+        setData({ ...data, members: filteredMembers });
+      }
+
+      toast.success(`${getDisplayName(kickingMember.user)} a été retiré.`);
+      handleCloseModal();
+    } catch (error) {
+      console.error(error);
+      toast.error("Erreur lors de l'exclusion.");
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handleViewMember = (member: OrganizationMember) => {
@@ -210,7 +238,7 @@ export default function OrganizationClient() {
           {canManage && (
             <button
               className={styles.actionButton}
-              onClick={() => alert("Paramètres globaux")}
+              onClick={handleManageClick}
               title="Gérer les paramètres de l'organisation"
             >
               <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.1a2 2 0 0 1-1-1.74v-.47a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path><circle cx="12" cy="12" r="3"></circle></svg>
@@ -313,7 +341,7 @@ export default function OrganizationClient() {
                               <button
                                 className={`${styles.iconButton} ${styles.deleteBtn}`}
                                 title="Exclure de l'organisation"
-                                onClick={() => handleKickMember(member)}
+                                onClick={() => handleKickClick(member)}
                                 aria-label={`Exclure ${getDisplayName(member.user)}`}
                               >
                                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
@@ -331,6 +359,8 @@ export default function OrganizationClient() {
         </div>
       </section>
 
+      {/* MODALES */}
+
       {editingMember && (
         <div className={styles.modalOverlay} onClick={handleCloseModal}>
           <div
@@ -338,9 +368,9 @@ export default function OrganizationClient() {
             onClick={(e) => e.stopPropagation()}
             role="dialog"
             aria-modal="true"
-            aria-labelledby="modal-title"
+            aria-labelledby="edit-modal-title"
           >
-            <h3 id="modal-title" className={styles.modalTitle}>Modifier le rôle</h3>
+            <h3 id="edit-modal-title" className={styles.modalTitle}>Modifier le rôle</h3>
             <p className={styles.modalDescription}>
               Changer le niveau d'accès pour <strong>{getDisplayName(editingMember.user)}</strong>.
             </p>
@@ -378,6 +408,40 @@ export default function OrganizationClient() {
         </div>
       )}
 
+      {kickingMember && (
+        <div className={styles.modalOverlay} onClick={handleCloseModal}>
+          <div
+            className={styles.modalContent}
+            onClick={(e) => e.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="delete-modal-title"
+          >
+            <h3 id="delete-modal-title" className={styles.modalTitle} style={{color: '#dc2626'}}>Exclure un membre</h3>
+            <p className={styles.modalDescription}>
+              Êtes-vous sûr de vouloir retirer <strong>{getDisplayName(kickingMember.user)}</strong> de l'organisation ?
+              <br/>Cette action est irréversible.
+            </p>
+
+            <div className={styles.modalActions}>
+              <button
+                className={styles.cancelButton}
+                onClick={handleCloseModal}
+                disabled={isSaving}
+              >
+                Annuler
+              </button>
+              <button
+                className={styles.dangerButton}
+                onClick={handleConfirmKick}
+                disabled={isSaving}
+              >
+                {isSaving ? "Exclusion..." : "Exclure le membre"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </main>
   );
 }

@@ -17,6 +17,7 @@ import {
   GetInformationOrganizationDTO,
   KickMemberFromOrganizationDTO,
 } from './dto/organization.dto';
+import { OrgRoles } from '@/auth/decorators/organizationRoles.decorator';
 
 @Controller('organization')
 @UseGuards(JwtAuthGuard)
@@ -36,7 +37,8 @@ export class OrganizationController {
     return this.organizationService.joinOrganization(req.user.id, body);
   }
 
-  @Post('send')
+  @OrgRoles('OWNER', 'TEACHER')
+  @Post('invite')
   async sendInvitationToOrganization(
     @Request() req,
     @Body() body: CreateOrganizationInvitationDTO,
@@ -56,11 +58,13 @@ export class OrganizationController {
     );
   }
 
+  @OrgRoles('OWNER')
   @Put('edit-role')
   async editMemberRole(@Request() req, @Body() body: ChangeMemberRoleDTO) {
     return this.organizationService.editMemberRole(req.user.id, body);
   }
 
+  @OrgRoles('OWNER')
   @Delete('kick-member')
   async kickMember(
     @Request() req,
