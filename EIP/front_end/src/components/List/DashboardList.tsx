@@ -213,7 +213,7 @@ function ApplicationList({
               (location.pathname.includes("dashboard")
                 ? t("common.archive")
                 : location.pathname.includes("archive")
-                ? t("common.dearchive")
+                ? t("common.unarchive")
                 : t("common.archive")) as string
             }
           >

@@ -4,38 +4,43 @@ import {
   Injectable,
   InternalServerErrorException,
   NotFoundException,
-  UnauthorizedException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { OrganizationRole } from '@prisma/client';
 import {
   ChangeMemberRoleDTO,
+  ChangeOrganizationOwnerDTO,
   CreateOrganizationInvitationDTO,
+  EditInvitationRoleDTO,
   GetInformationOrganizationDTO,
+  JoinOrganizationDTO,
   KickMemberFromOrganizationDTO,
+  RevokeOrganizationInvitationDTO,
 } from './dto/organization.dto';
 import { randomBytes } from 'crypto';
-
-const roleWithRights = ['OWNER', 'TEACHER'];
 
 @Injectable()
 export class OrganizationService {
   constructor(private prisma: PrismaService) {}
 
   async getUserOrganization(userId: string) {
-    const data = await this.prisma.organizationMember.findFirst({
-      where: { userId },
-    });
-    return data;
+    try {
+      const data = await this.prisma.organizationMember.findFirst({
+        where: { userId },
+      });
+      return data;
+    } catch {
+      return null;
+    }
   }
 
-  async joinOrganization(userId: string, body: GetInformationOrganizationDTO) {
+  async joinOrganization(userId: string, body: JoinOrganizationDTO) {
     try {
       await this.prisma.organizationMember.create({
         data: {
           userId,
           organizationId: body.organizationId,
-          userRole: body.role as unknown as OrganizationRole, // Potentiellement a fix c'est l'erreur de mon IDE qui me demande de faire ça :/
+          userRole: body.role as unknown as OrganizationRole,
         },
       });
 
@@ -60,6 +65,25 @@ export class OrganizationService {
     body: CreateOrganizationInvitationDTO,
   ) {
     try {
+      const requester = await this.prisma.organizationMember.findUnique({
+        where: {
+          userId_organizationId: {
+            userId,
+            organizationId: body.organizationId,
+          },
+        },
+        select: { userRole: true },
+      });
+
+      if (!requester) throw new ForbiddenException('Member not found');
+
+      if (
+        requester.userRole === OrganizationRole.TEACHER &&
+        (body.role as unknown as string) !== OrganizationRole.STUDENT
+      ) {
+        throw new ForbiddenException('Teachers can only invite Students.');
+      }
+
       const token = randomBytes(32).toString('hex');
 
       await this.prisma.organizationInvitation.create({
@@ -69,34 +93,20 @@ export class OrganizationService {
           organizationId: body.organizationId,
           inviterUserId: userId,
           expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7),
-          role:
-            (body.role as unknown as OrganizationRole) ||
-            OrganizationRole.STUDENT,
+          role: body.role as unknown as OrganizationRole,
         },
       });
 
-      // TODO Envoyer un mail du coup avec un lien
-      return {
-        status: 201,
-        message: 'Invitation sent successfully.',
-      };
+      return { status: 201, message: 'Invitation sent successfully.' };
     } catch (error) {
-      if (error.code == 'P2002') {
+      if (error.code == 'P2002')
         throw new ConflictException('This user already received an invitation');
-      }
-      if (error.response.statusCode == 403) {
-        throw new ForbiddenException(error.response.message);
-      }
-      throw new InternalServerErrorException(
-        'Unknown error unable to process with the invitation of this user',
-      );
+      if (error instanceof ForbiddenException) throw error;
+      throw new InternalServerErrorException('Error sending invitation');
     }
   }
 
-  async getOrganizationInformation(
-    userId: string,
-    body: GetInformationOrganizationDTO,
-  ) {
+  async getOrganizationInformation(body: GetInformationOrganizationDTO) {
     const organizationInfo = await this.prisma.organization.findUnique({
       where: { id: body.organizationId },
       select: {
@@ -112,6 +122,9 @@ export class OrganizationService {
       },
     });
 
+    const oneWeekAgo = new Date();
+    oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+
     const membersList = await this.prisma.organizationMember.findMany({
       where: { organizationId: body.organizationId },
       select: {
@@ -124,6 +137,14 @@ export class OrganizationService {
             userProfile: { select: { firstName: true, lastName: true } },
             _count: {
               select: { jobApplies: true, archivedJobApplies: true },
+            },
+            jobApplies: {
+              where: { createdAt: { gte: oneWeekAgo } },
+              select: { id: true },
+            },
+            archivedJobApplies: {
+              where: { archivedAt: { gte: oneWeekAgo } },
+              select: { id: true },
             },
           },
         },
@@ -184,10 +205,7 @@ export class OrganizationService {
     }
   }
 
-  async kickMemberFromOrganization(
-    userId: string,
-    body: KickMemberFromOrganizationDTO,
-  ) {
+  async kickMemberFromOrganization(body: KickMemberFromOrganizationDTO) {
     try {
       const kickedUser = await this.prisma.organizationMember.findUnique({
         where: {
@@ -241,15 +259,174 @@ export class OrganizationService {
     }
   }
 
-  async getOrganizationSettingsData(userId: string, body: any) {
+  async getOrganizationSettingsData(organizationId: string) {
+    try {
+      const invitationList = await this.prisma.organizationInvitation.findMany({
+        where: { organizationId },
+        select: {
+          id: true,
+          email: true,
+          role: true,
+          expiresAt: true,
+          inviter: {
+            select: {
+              id: true,
+              email: true,
+            },
+          },
+        },
+      });
 
+      const memberList = await this.prisma.organizationMember.findMany({
+        where: { organizationId },
+        select: {
+          user: {
+            select: {
+              id: true,
+              email: true,
+            },
+          },
+        },
+      });
+
+      return {
+        invitationList: invitationList,
+        memberList: memberList,
+      };
+    } catch (error) {
+      throw new InternalServerErrorException(
+        "Error occurred while trying to get data from organization's settings",
+      );
+    }
   }
 
-  async changeOrganizationOwner(userId: string, body: any) {
+  async changeOrganizationOwner(
+    userId: string,
+    body: ChangeOrganizationOwnerDTO,
+  ) {
+    try {
+      const updateUser1 = this.prisma.organizationMember.update({
+        where: {
+          userId_organizationId: {
+            userId,
+            organizationId: body.organizationId,
+          },
+        },
+        data: { userRole: 'TEACHER' },
+      });
 
+      const updateUser2 = this.prisma.organizationMember.update({
+        where: {
+          userId_organizationId: {
+            userId: body.newOwnerId,
+            organizationId: body.organizationId,
+          },
+        },
+        data: { userRole: 'OWNER' },
+      });
+
+      const updateOrg = this.prisma.organization.update({
+        where: {
+          id: body.organizationId,
+        },
+        data: {
+          ownerUserId: body.newOwnerId,
+        },
+      });
+
+      await this.prisma.$transaction([updateUser1, updateUser2, updateOrg]);
+      return {
+        statusCode: 200,
+        message: "The organization's owner has been changed successfully",
+      };
+    } catch (error) {
+      throw new InternalServerErrorException(
+        'Error occurred while trying to change the organization owner',
+      );
+    }
   }
 
-  async revokeOrganizationInvitation(userId: string, body: any) {
+  async editInvitationRole(userId: string, body: EditInvitationRoleDTO) {
+    try {
+      const requester = await this.prisma.organizationMember.findUnique({
+        where: {
+          userId_organizationId: {
+            userId,
+            organizationId: body.organizationId,
+          },
+        },
+        select: { userRole: true },
+      });
 
+      if (requester?.userRole !== OrganizationRole.OWNER) {
+        throw new ForbiddenException('Only Owners can edit invitation roles.');
+      }
+
+      await this.prisma.organizationInvitation.update({
+        where: { id: body.invitationId, organizationId: body.organizationId },
+        data: { role: body.role as unknown as OrganizationRole },
+      });
+
+      return {
+        statusCode: 200,
+        message: 'Invitation role updated successfully',
+      };
+    } catch (error) {
+      if (error instanceof ForbiddenException) throw error;
+      throw new InternalServerErrorException('Error editing invitation role');
+    }
+  }
+
+  async revokeOrganizationInvitation(
+    userId: string,
+    body: RevokeOrganizationInvitationDTO,
+  ) {
+    try {
+      const invitation = await this.prisma.organizationInvitation.findUnique({
+        where: { id: body.invitationId, organizationId: body.organizationId },
+        select: { role: true },
+      });
+
+      if (!invitation) throw new NotFoundException('Invitation not found');
+
+      const requester = await this.prisma.organizationMember.findUnique({
+        where: {
+          userId_organizationId: {
+            userId,
+            organizationId: body.organizationId,
+          },
+        },
+        select: { userRole: true },
+      });
+
+      if (!requester) throw new ForbiddenException('Requester not found');
+
+      if (
+        requester.userRole === OrganizationRole.TEACHER &&
+        invitation.role !== OrganizationRole.STUDENT
+      ) {
+        throw new ForbiddenException(
+          'Teachers can only revoke Student invitations.',
+        );
+      }
+
+      await this.prisma.organizationInvitation.delete({
+        where: { id: body.invitationId },
+      });
+
+      return {
+        statusCode: 200,
+        message: 'The invitation has been deleted successfully',
+      };
+    } catch (error) {
+      if (
+        error instanceof ForbiddenException ||
+        error instanceof NotFoundException
+      )
+        throw error;
+      throw new InternalServerErrorException(
+        `Error occurred while trying to delete invitation: ${body.organizationId}`,
+      );
+    }
   }
 }

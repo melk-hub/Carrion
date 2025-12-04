@@ -67,7 +67,10 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         setIsAuthenticated(true);
         try {
           const orgData = await apiService.get<OrganizationMemberInfo>('/organization');
-          setOrganizationMemberInfo(orgData || null);
+
+          if (orgData) {
+            setOrganizationMemberInfo(orgData);
+          }
         } catch (e) {
           setOrganizationMemberInfo(null);
         }

@@ -78,12 +78,23 @@
   flex-direction: column;
   justify-content: center;
   min-height: 140px;
+  position: relative;
+}
+
+.statHeader {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 0.5rem;
 }
 
 .statLabel {
   font-size: 0.875rem;
   color: #6c757d;
-  margin-bottom: 0.5rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  margin: 0;
 }
 
 .statValue {
@@ -96,6 +107,65 @@
   font-size: 0.875rem;
   color: #6c757d;
   margin-top: 0.5rem;
+}
+
+.infoIcon {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  background-color: #e2e8f0;
+  color: #64748b;
+  border-radius: 50%;
+  font-size: 11px;
+  font-weight: bold;
+  cursor: help;
+  flex-shrink: 0;
+}
+
+.infoIcon:hover {
+  background-color: #cbd5e1;
+}
+
+.tooltipText {
+  visibility: hidden;
+  opacity: 0;
+  position: absolute;
+  bottom: 140%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 220px;
+  background-color: #1f2937;
+  color: #fff;
+  text-align: center;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-transform: none;
+  line-height: 1.4;
+  z-index: 50;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  transition: opacity 0.2s ease-in-out;
+  pointer-events: none;
+}
+
+.tooltipText::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -6px;
+  border-width: 6px;
+  border-style: solid;
+  border-color: #1f2937 transparent transparent transparent;
+}
+
+.infoIcon:hover .tooltipText {
+  visibility: visible;
+  opacity: 1;
 }
 
 .membersContainer {
@@ -178,26 +248,11 @@
   text-transform: uppercase;
 }
 
-.roleOwner {
-  background-color: #dbeafe;
-  color: #1e40af;
-}
-.roleAdmin {
-  background-color: #fce7f3;
-  color: #9d174d;
-}
-.roleTeacher {
-  background-color: #e0e7ff;
-  color: #4338ca;
-}
-.roleMember {
-  background-color: #f3f4f6;
-  color: #374151;
-}
-.roleStudent {
-  background-color: #fef3c7;
-  color: #92400e;
-}
+.roleOwner { background-color: #dbeafe; color: #1e40af; }
+.roleAdmin { background-color: #fce7f3; color: #9d174d; }
+.roleTeacher { background-color: #e0e7ff; color: #4338ca; }
+.roleMember { background-color: #f3f4f6; color: #374151; }
+.roleStudent { background-color: #fef3c7; color: #92400e; }
 
 .statsCell {
   display: flex;

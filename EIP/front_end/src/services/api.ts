@@ -112,6 +112,9 @@ class ApiService {
       const response = await this.request(url, { method: "GET", ...options });
       return await this.processResponse<T>(response);
     } catch (error) {
+      if (error instanceof Error && error.message === "") {
+
+      }
       if (error instanceof Error && error.message === "Token refresh failed") {
         return null;
       }

@@ -5,3 +5,25 @@ export interface OrganizationMemberInfo {
   organizationId: string;
   userId: string;
 }
+
+export interface InvitationListInterface {
+  id: string;
+  email: string;
+  expiresAt: string;
+  role: OrganizationRole;
+  inviter: {
+    email: string;
+  }
+}
+
+export interface MemberListInterface {
+  user: {
+    id: string;
+    email: string
+  }
+}
+
+export interface SettingsDataInterface {
+  invitationList: InvitationListInterface[]
+  memberList: MemberListInterface[]
+}

@@ -68,7 +68,7 @@ export default function ArchivesClient({
     }
   };
 
-  const handleDeArchiveApplication = async (id: string) => {
+  const handleUnarchiveApplication = async (id: string) => {
     try {
       await apiService.post(`/job_applies/${id}/unarchive`, {});
       setApplications((prev) => prev.filter((app) => app.id !== id));
@@ -79,7 +79,7 @@ export default function ArchivesClient({
 
   const handleDeleteApplication = async (id: string) => {
     try {
-      await apiService.delete(`/job_applies/${id}/archived`);
+      await apiService.delete(`/job_applies/${id}/archived`, {});
       setApplications((prev) => prev.filter((app) => app.id !== id));
     } catch (err: unknown) {
       console.error(t("dashboard.errors.deleteError"), err);
@@ -270,7 +270,7 @@ export default function ArchivesClient({
                     application={app as JobApply}
                     statusMap={statusMap as Record<ApplicationStatus, string>}
                     onEdit={openEditPopup as (application: JobApply) => void}
-                    onArchive={handleDeArchiveApplication}
+                    onArchive={handleUnarchiveApplication}
                     onDelete={handleDeleteApplication}
                     onDetails={
                       openDetailsPopup as (application: JobApply) => void
@@ -298,7 +298,7 @@ export default function ArchivesClient({
                     application={app as JobApply}
                     statusMap={statusMap as Record<ApplicationStatus, string>}
                     onEdit={openEditPopup as (application: JobApply) => void}
-                    onArchive={handleDeArchiveApplication}
+                    onArchive={handleUnarchiveApplication}
                     onDelete={handleDeleteApplication}
                     onDetails={openDetailsPopup as (application: JobApply) => void}
                   />

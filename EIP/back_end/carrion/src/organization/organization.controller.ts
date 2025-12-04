@@ -8,19 +8,26 @@ import {
   Query,
   Put,
   Delete,
+  UsePipes,
+  ValidationPipe,
 } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/guards/jwt/jwt-auth.guard';
 import { OrganizationService } from './organization.service';
 import {
   ChangeMemberRoleDTO,
+  ChangeOrganizationOwnerDTO,
   CreateOrganizationInvitationDTO,
+  EditInvitationRoleDTO,
   GetInformationOrganizationDTO,
+  JoinOrganizationDTO,
   KickMemberFromOrganizationDTO,
+  RevokeOrganizationInvitationDTO,
 } from './dto/organization.dto';
-import { OrgRoles } from '@/auth/decorators/organizationRoles.decorator';
+import { OrgRoles } from '@/auth/decorators/organizationsRoles.decorator';
 
 @Controller('organization')
 @UseGuards(JwtAuthGuard)
+@UsePipes(new ValidationPipe({ transform: true }))
 export class OrganizationController {
   constructor(private readonly organizationService: OrganizationService) {}
 
@@ -30,10 +37,7 @@ export class OrganizationController {
   }
 
   @Post('join')
-  async joinOrganization(
-    @Request() req,
-    @Body() body: GetInformationOrganizationDTO,
-  ) {
+  async joinOrganization(@Request() req, @Body() body: JoinOrganizationDTO) {
     return this.organizationService.joinOrganization(req.user.id, body);
   }
 
@@ -49,28 +53,45 @@ export class OrganizationController {
 
   @Get('get-info')
   async getOrganizationInformation(
-    @Request() req,
     @Query() query: GetInformationOrganizationDTO,
   ) {
-    return this.organizationService.getOrganizationInformation(
-      req.user.id,
-      query,
-    );
+    return this.organizationService.getOrganizationInformation(query);
   }
 
   @OrgRoles('OWNER')
   @Put('edit-role')
-  async editMemberRole(@Request() req, @Body() body: ChangeMemberRoleDTO) {
-    return this.organizationService.editMemberRole(req.user.id, body);
+  async editMemberRole(@Body() body: ChangeMemberRoleDTO) {
+    return this.organizationService.editMemberRole(body);
   }
 
   @OrgRoles('OWNER')
   @Delete('kick-member')
-  async kickMember(
+  async kickMember(@Body() body: KickMemberFromOrganizationDTO) {
+    return this.organizationService.kickMemberFromOrganization(body);
+  }
+
+  @OrgRoles('OWNER', 'TEACHER')
+  @Get('settings-data')
+  async getInvitationList(@Query('organizationId') organizationId: string) {
+    return this.organizationService.getOrganizationSettingsData(organizationId);
+  }
+
+  @OrgRoles('OWNER')
+  @Put('edit-invitation-role')
+  async editInvitationRole(
     @Request() req,
-    @Body() body: KickMemberFromOrganizationDTO,
+    @Body() body: EditInvitationRoleDTO,
   ) {
-    return this.organizationService.kickMemberFromOrganization(
+    return this.organizationService.editInvitationRole(req.user.id, body);
+  }
+
+  @OrgRoles('OWNER', 'TEACHER')
+  @Delete('revoke-invitation')
+  async revokeOrganizationInvitation(
+    @Request() req,
+    @Body() body: RevokeOrganizationInvitationDTO,
+  ) {
+    return this.organizationService.revokeOrganizationInvitation(
       req.user.id,
       body,
     );

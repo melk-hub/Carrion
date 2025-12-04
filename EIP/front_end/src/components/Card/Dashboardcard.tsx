@@ -218,10 +218,10 @@ function ApplicationCard({
           >
             <span>
               {location.pathname.includes("dashboard")
-                ? t("common.dearchive")
+                ? t("common.unarchive")
                 : location.pathname.includes("archives")
                 ? t("common.archive")
-                : t("common.dearchive")}
+                : t("common.unarchive")}
             </span>
           </button>
 

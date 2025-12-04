@@ -9,7 +9,7 @@
     "delete": "Supprimer",
     "edit": "Modifier",
     "archive": "Archiver",
-    "dearchive": "Désarchiver",
+    "unarchive": "Désarchiver",
     "add": "Ajouter",
     "update": "Modifier",
     "close": "Fermer",
@@ -28,7 +28,14 @@
     "refresh": "Actualiser",
     "retry": "Réessayer",
     "previous": "Précédent",
-    "next": "Suivant"
+    "next": "Suivant",
+    "unauthorized": "Accès refusé",
+    "view": "Voir",
+    "manage": "Gérer",
+    "send": "Envoyer",
+    "sending": "Envoi...",
+    "saving": "Enregistrement...",
+    "email": "Adresse Email"
   },
   "shared": {
     "time": {
@@ -723,7 +730,7 @@
     "tip11": "Renseignez-vous sur le nom de votre interlocuteur avant l'entretien. Personnaliser vos échanges crée une meilleure connexion.",
     "tip12": "Tenez un tableau de bord de vos candidatures pour éviter les doublons et assurer un suivi efficace.",
     "tip13": "Mettez en avant vos soft skills avec des exemples précis. Les compétences humaines sont de plus en plus recherchées.",
-    "tip14": "Préparez des versions courtes et longues de votre CV selon le type de candidature (spontanée ou en réponse à une offre).",
+    "tip14": "Préparez des versions courtes et longues de votre CV selon le type de candidature (spontaneous ou en réponse à une offre).",
     "tip15": "Utilisez Google Alertes pour être informé des nouvelles offres dans votre domaine et des actualités de vos entreprises cibles.",
     "tip16": "Soignez votre e-réputation en vérifiant ce qui apparaît quand on tape votre nom sur Google. Supprimez le contenu non professionnel.",
     "tip17": "Participez à des événements de networking dans votre secteur. Les recommandations internes augmentent vos chances d'être embauché.",
@@ -738,5 +745,108 @@
     "tip26": "Analysez les offres d'emploi pour identifier les compétences les plus recherchées dans votre secteur et les développer.",
     "tip27": "Créez un réseau de contacts diversifié : anciens collègues, professeurs, professionnels de votre secteur.",
     "tip28": "Restez authentique lors des entretiens. Les recruteurs savent détecter les candidats qui jouent un rôle plutôt que d'être eux-mêmes."
+  },
+
+  "organization": {
+    "header": {
+      "title": "Organisation : {{name}}",
+      "manage": "Gérer"
+    },
+    "empty": {
+      "title": "Aucune organisation trouvée."
+    },
+    "stats": {
+      "label": "Statistiques de l'organisation",
+      "members": {
+        "label": "Membres",
+        "trend": "Personnes actives"
+      },
+      "applications": {
+        "label": "Candidatures",
+        "trend": "Cumul de l'équipe",
+        "tooltip": "Nombre total de candidatures envoyées par tous les membres depuis la création de l'organisation."
+      },
+      "activity": {
+        "label": "Activité",
+        "tooltip": "Calculé sur les membres ayant créé ou archivé une candidature ces 7 derniers jours.",
+        "trend": "{{count}} élèves actifs"
+      }
+    },
+    "table": {
+      "title": "Liste des membres",
+      "user": "Utilisateur",
+      "email": "Email",
+      "role": "Rôle",
+      "performance": "Performance",
+      "actions": "Actions",
+      "invitedBy": "Invité par",
+      "expires": "Expire le",
+      "stats": {
+        "active": "{{count}} en cours",
+        "total": "{{count}} au total"
+      }
+    },
+    "viewAs": {
+      "title": "Aperçu : {{name}}",
+      "placeholder": "Ici s'afficheront les candidatures de {{name}}"
+    },
+    "settings": {
+      "title": "Paramètres"
+    },
+    "invitations": {
+      "title": "Invitations en attente",
+      "add": "+ Inviter un membre",
+      "empty": "Aucune invitation en cours."
+    },
+    "dangerZone": {
+      "title": "Zone Dangereuse",
+      "transferTitle": "Transférer la propriété de l'organisation",
+      "transferWarning": "Attention : En transférant la propriété, vous deviendrez automatiquement un membre TEACHER et perdrez vos droits d'administration complète.",
+      "selectPlaceholder": "Choisir le nouveau directeur...",
+      "transferButton": "Transférer les droits"
+    },
+    "modals": {
+      "invite": {
+        "title": "Inviter un nouveau membre",
+        "description": "Envoyez un email d'invitation pour rejoindre l'organisation."
+      },
+      "revoke": {
+        "title": "Révoquer l'invitation",
+        "confirm": "Voulez-vous annuler l'invitation envoyée à {{email}} ? Le lien deviendra invalide."
+      },
+      "editRole": {
+        "title": "Modifier le rôle",
+        "newRole": "Nouveau rôle",
+        "description": "Changer le niveau d'accès pour {{name}}."
+      },
+      "kick": {
+        "title": "Exclure un membre",
+        "description": "Êtes-vous sûr de vouloir retirer {{name}} de l'organisation ? Cette action est irréversible.",
+        "confirmButton": "Exclure le membre"
+      }
+    },
+    "actions": {
+      "viewUser": "Voir les candidatures de {{name}}",
+      "editRole": "Modifier le rôle de {{name}}",
+      "kickUser": "Exclure {{name}}",
+      "revoke": "Révoquer"
+    },
+    "success": {
+      "roleUpdated": "Rôle mis à jour avec succès !",
+      "memberKicked": "{{name}} a été retiré.",
+      "owner": "Directeur changé avec succès !",
+      "invitationRevoked": "Invitation annulée.",
+      "invitationSent": "Invitation envoyée !"
+    },
+    "error": {
+      "update": "Impossible de mettre à jour le rôle.",
+      "delete": "Erreur lors de l'exclusion.",
+      "owner": {
+        "select": "Veuillez sélectionner un nouveau directeur",
+        "change": "Erreur lors du changement de propriétaire"
+      },
+      "emailRequired": "L'email est obligatoire",
+      "invite": "Erreur lors de l'envoi de l'invitation."
+    }
   }
 }

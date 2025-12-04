@@ -108,7 +108,7 @@ ul li {
 }
 
 .select__menu-portal {
-  z-index: 10012 !important; 
+  z-index: 10012 !important;
 }
 
 .select__control {
@@ -134,7 +134,9 @@ ul li {
   margin: 0 !important;
 }
 .select__single-value {
+  color: #2d3748 !important;
   margin: 0 !important;
+  font-weight: 400;
 }
 .select__placeholder {
   color: #a0aec0;
@@ -224,4 +226,20 @@ ul li {
 
 .react-datepicker__day--disabled {
   color: #a0aec0 !important;
+}
+
+.select__option {
+  background-color: #ffffff !important;
+  color: #2d3748 !important;
+  cursor: pointer;
+}
+
+.select__option--is-focused {
+  background-color: #edf2f7 !important;
+  color: #1a202c !important;
+}
+
+.select__option--is-selected {
+  background-color: #132238 !important;
+  color: #ffffff !important;
 }
