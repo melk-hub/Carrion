@@ -40,7 +40,8 @@
       "hours": "{{hours}}h",
       "days": "{{days}}d",
       "hoursAgo": "{{count}}h ago",
-      "daysAgo": "{{count}}d ago"
+      "daysAgo": "{{count}}d ago",
+      "back": "Back"
     },
     "status": {
       "read": "Read",
@@ -793,7 +794,10 @@
       "transferTitle": "Transfer organization ownership",
       "transferWarning": "Warning: By transferring ownership, you will automatically become a TEACHER member and lose your full administration rights.",
       "selectPlaceholder": "Select new director...",
-      "transferButton": "Transfer ownership"
+      "transferButton": "Transfer ownership",
+      "leaveTitle": "Leave organization",
+      "leaveWarning": "You will lose access to this workspace. You will need a new invitation to return.",
+      "leaveButton": "Leave organization"
     },
     "modals": {
       "invite": {
@@ -813,6 +817,10 @@
         "title": "Remove member",
         "description": "Are you sure you want to remove {{name}} from the organization? This action is irreversible.",
         "confirmButton": "Remove member"
+      },
+      "leave": {
+        "title": "Leave organization",
+        "confirm": "Are you sure you want to leave this organization? This action is immediate."
       }
     },
     "actions": {
@@ -826,7 +834,8 @@
       "memberKicked": "{{name}} has been removed.",
       "owner": "Director changed successfully!",
       "invitationRevoked": "Invitation revoked.",
-      "invitationSent": "Invitation sent!"
+      "invitationSent": "Invitation sent!",
+      "leave": "You have left the organization."
     },
     "error": {
       "update": "Unable to update role.",
@@ -836,7 +845,8 @@
         "change": "Error changing ownership"
       },
       "emailRequired": "Email is required",
-      "invite": "Error sending invitation."
+      "invite": "Error sending invitation.",
+      "leave": "Error while trying to leave the organization."
     }
   }
 }

@@ -15,10 +15,14 @@ export default function AuthModal({
   isOpen,
   onClose,
   defaultTab = "login",
+  invitedEmail = null,
+  onSuccess
 }: {
   isOpen: boolean;
   onClose: () => void;
   defaultTab?: "login" | "register";
+  invitedEmail?: string | null;
+  onSuccess?: () => void;
 }) {
   const [activeTab, setActiveTab] = useState<
     "login" | "register" | "forgotPassword"
@@ -69,6 +73,13 @@ export default function AuthModal({
   useEffect(() => {
     if (isOpen) {
       setActiveTab(defaultTab || "login");
+      if (invitedEmail) {
+        setCredentials((prev) => ({
+          ...prev,
+          email: invitedEmail,
+          identifier: invitedEmail
+        }));
+      }
     } else {
       setCredentials({
         identifier: "",
@@ -82,7 +93,7 @@ export default function AuthModal({
       setErrorMessage("");
       setSuccessMessage("");
     }
-  }, [isOpen, defaultTab]);
+  }, [isOpen, defaultTab, invitedEmail]);
 
   const togglePasswordVisibility = () => setShowPassword((prev) => !prev);
 
@@ -122,7 +133,8 @@ export default function AuthModal({
 
         if (response.ok) {
           setIsAuthenticated(true);
-          onClose();
+          if (onSuccess) onSuccess();
+          else onClose();
         } else {
           const errorData = await response.json();
           setErrorMessage(
@@ -161,7 +173,8 @@ export default function AuthModal({
         });
         if (response.ok) {
           setIsAuthenticated(true);
-          onClose();
+          if (onSuccess) onSuccess();
+          else onClose();
         } else {
           const errorData = await response.json();
           setErrorMessage(
@@ -215,6 +228,13 @@ export default function AuthModal({
     return t("auth.joinUs");
   };
 
+  const disabledStyle = {
+    backgroundColor: "#f3f4f6",
+    color: "#6b7280",
+    cursor: "not-allowed",
+    opacity: 0.8
+  };
+
   if (!isOpen) return null;
 
   return (
@@ -266,6 +286,8 @@ export default function AuthModal({
                   value={credentials.identifier}
                   onChange={handleChange}
                   required
+                  disabled={!!invitedEmail}
+                  style={invitedEmail ? disabledStyle : {}}
                 />
                 <label>{t("auth.password")}</label>
                 <div className={styles.passwordWrapper}>
@@ -345,6 +367,8 @@ export default function AuthModal({
                       onChange={handleChange}
                       placeholder={t("auth.email") as string}
                       required
+                      disabled={!!invitedEmail}
+                      style={invitedEmail ? disabledStyle : {}}
                     />
                   </div>
                   <div>
@@ -460,6 +484,8 @@ export default function AuthModal({
                   value={credentials.email}
                   onChange={handleChange}
                   required
+                  disabled={!!invitedEmail}
+                  style={invitedEmail ? disabledStyle : {}}
                 />
                 {errorMessage && (
                   <p className={styles.errorMessage}>{errorMessage}</p>
@@ -489,7 +515,7 @@ export default function AuthModal({
           )}
         </AnimatePresence>
 
-        {activeTab !== "forgotPassword" && (
+        {activeTab !== "forgotPassword" && !invitedEmail && (
           <>
             <div className={styles.socialButtons}>
               <GoogleLoginButton />

@@ -141,7 +141,7 @@ export default function OrganizationClient() {
 
       if (data) {
         const updatedMembers = data.members.map(m =>
-            m.id === editingMember.id ? { ...m, userRole: selectedRole as OrganizationRole } : m
+          m.id === editingMember.id ? { ...m, userRole: selectedRole as OrganizationRole } : m
         );
         setData({ ...data, members: updatedMembers });
       }
@@ -197,7 +197,7 @@ export default function OrganizationClient() {
   if (!data) return (
     <main className={styles.container}>
       <div className={styles.organizationHeader}>
-        <h1 style={{margin: 0, fontSize: '1.5rem', color:"white"}}>{t("organization.empty.title")}</h1>
+        <h1 style={{ margin: 0, fontSize: '1.5rem', color: "white" }}>{t("organization.empty.title")}</h1>
       </div>
     </main>
   );
@@ -218,7 +218,7 @@ export default function OrganizationClient() {
           </button>
         </header>
         <section className={styles.viewAsContainer}>
-          <div style={{color: '#64748b', textAlign: 'center', padding: '2rem'}}>
+          <div style={{ color: '#64748b', textAlign: 'center', padding: '2rem' }}>
             {t("organization.viewAs.placeholder", { name: getDisplayName(viewingMember.user) })}
           </div>
         </section>
@@ -244,16 +244,16 @@ export default function OrganizationClient() {
           <h1>{t("organization.header.title", { name: organization.name })}</h1>
         </div>
         <div className={styles.headerActions}>
-          {canManage && (
-            <button
-              className={styles.actionButton}
-              onClick={handleManageClick}
-              title={t("organization.header.manage") as string}
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.1a2 2 0 0 1-1-1.74v-.47a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path><circle cx="12" cy="12" r="3"></circle></svg>
-              {t("common.manage")}
-            </button>
-          )}
+          {/* MODIFICATION ICI : Le bouton est maintenant visible pour TOUT LE MONDE */}
+          <button
+            className={styles.actionButton}
+            onClick={handleManageClick}
+            title={t("organization.settings.title") as string}
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.1a2 2 0 0 1-1-1.74v-.47a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+            {/* Texte dynamique : "Gérer" pour admin, "Paramètres" pour les autres */}
+            {canManage ? t("organization.header.manage") : t("organization.settings.title")}
+          </button>
         </div>
       </header>
 
@@ -384,20 +384,14 @@ export default function OrganizationClient() {
         </div>
       </section>
 
+      {/* MODALES D'ÉDITION ET D'EXCLUSION (restent inchangées) */}
       {editingMember && (
         <div className={styles.modalOverlay} onClick={handleCloseModal}>
-          <div
-            className={styles.modalContent}
-            onClick={(e) => e.stopPropagation()}
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="edit-modal-title"
-          >
+          <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
             <h3 id="edit-modal-title" className={styles.modalTitle}>{t("organization.modals.editRole.title")}</h3>
             <p className={styles.modalDescription}>
               {t("organization.modals.editRole.description", { name: getDisplayName(editingMember.user) })}
             </p>
-
             <div className={styles.formGroup}>
               <label htmlFor="role-select" className={styles.label}>{t("organization.modals.editRole.newRole")}</label>
               <select
@@ -410,20 +404,11 @@ export default function OrganizationClient() {
                 <option value="TEACHER">TEACHER</option>
               </select>
             </div>
-
             <div className={styles.modalActions}>
-              <button
-                className={styles.cancelButton}
-                onClick={handleCloseModal}
-                disabled={isSaving}
-              >
+              <button className={styles.cancelButton} onClick={handleCloseModal} disabled={isSaving}>
                 {t("common.cancel")}
               </button>
-              <button
-                className={styles.saveButton}
-                onClick={handleSaveRole}
-                disabled={isSaving}
-              >
+              <button className={styles.saveButton} onClick={handleSaveRole} disabled={isSaving}>
                 {isSaving ? t("common.saving") : t("common.save")}
               </button>
             </div>
@@ -433,31 +418,16 @@ export default function OrganizationClient() {
 
       {kickingMember && (
         <div className={styles.modalOverlay} onClick={handleCloseModal}>
-          <div
-            className={styles.modalContent}
-            onClick={(e) => e.stopPropagation()}
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="delete-modal-title"
-          >
-            <h3 id="delete-modal-title" className={styles.modalTitle} style={{color: '#dc2626'}}>{t("organization.modals.kick.title")}</h3>
+          <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+            <h3 id="delete-modal-title" className={styles.modalTitle} style={{ color: '#dc2626' }}>{t("organization.modals.kick.title")}</h3>
             <p className={styles.modalDescription}>
               {t("organization.modals.kick.description", { name: getDisplayName(kickingMember.user) })}
             </p>
-
             <div className={styles.modalActions}>
-              <button
-                className={styles.cancelButton}
-                onClick={handleCloseModal}
-                disabled={isSaving}
-              >
+              <button className={styles.cancelButton} onClick={handleCloseModal} disabled={isSaving}>
                 {t("common.cancel")}
               </button>
-              <button
-                className={styles.dangerButton}
-                onClick={handleConfirmKick}
-                disabled={isSaving}
-              >
+              <button className={styles.dangerButton} onClick={handleConfirmKick} disabled={isSaving}>
                 {isSaving ? t("common.processing") : t("organization.modals.kick.confirmButton")}
               </button>
             </div>

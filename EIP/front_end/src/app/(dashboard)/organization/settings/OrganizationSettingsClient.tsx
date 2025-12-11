@@ -31,7 +31,7 @@ const getRoleBadgeClass = (role: string) => {
 export default function OrganizationSettingsClient() {
   const router = useRouter();
   const { t } = useLanguage();
-  const { organizationMemberInfo } = useAuth();
+  const { organizationMemberInfo, checkAuthStatus } = useAuth();
   const [loading, setLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [memberOptions, setMemberOptions] = useState<SelectOption[]>([]);
@@ -41,30 +41,29 @@ export default function OrganizationSettingsClient() {
   const [editingInvite, setEditingInvite] = useState<InvitationListInterface | null>(null);
   const [selectedInviteRole, setSelectedInviteRole] = useState<string>("STUDENT");
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
+  const [isLeaveModalOpen, setIsLeaveModalOpen] = useState(false);
   const [newInviteEmail, setNewInviteEmail] = useState("");
   const [newInviteRole, setNewInviteRole] = useState<string>("STUDENT");
+  const userRole = organizationMemberInfo?.userRole as unknown as string;
+  const isOwner = userRole === 'OWNER';
+  const canManageInvites = orgRolesWithRights.includes(userRole);
 
   useEffect(() => {
     const init = async () => {
-      if (!orgRolesWithRights.includes(organizationMemberInfo?.userRole as unknown as string)) {
-        toast.error(t("common.unauthorized") as string);
-        router.push("/organization");
-        return;
-      }
       try {
-        const response = await ApiService.get<SettingsDataInterface>(
-          `/organization/settings-data?organizationId=${organizationMemberInfo?.organizationId}`
-        );
-
-        if (!response) return;
-
-        const formattedOptions = response.memberList.map((member) => ({
-          label: member.user.email,
-          value: member.user.id,
-        }));
-        setMemberOptions(formattedOptions);
-        setInvitations(response.invitationList);
-
+        if (canManageInvites) {
+          const response = await ApiService.get<SettingsDataInterface>(
+            `/organization/settings-data?organizationId=${organizationMemberInfo?.organizationId}`
+          );
+          if (response) {
+            const formattedOptions = response.memberList.map((member) => ({
+              label: member.user.email,
+              value: member.user.id,
+            }));
+            setMemberOptions(formattedOptions);
+            setInvitations(response.invitationList);
+          }
+        }
       } catch (error) {
         console.error(error);
       } finally {
@@ -75,7 +74,7 @@ export default function OrganizationSettingsClient() {
     if (organizationMemberInfo) {
       init();
     }
-  }, [organizationMemberInfo, router, t]);
+  }, [organizationMemberInfo, canManageInvites]);
 
   const handleSaveOwner = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -96,6 +95,25 @@ export default function OrganizationSettingsClient() {
       toast.error(t("organization.error.owner.change") as string);
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  const handleLeaveOrganization = async () => {
+    setIsSaving(true);
+    try {
+      await ApiService.delete("/organization/leave", {
+        organizationId: organizationMemberInfo?.organizationId
+      });
+      toast.success(t("organization.success.leave") as string);
+      await checkAuthStatus();
+      router.refresh();
+      router.push('/dashboard');
+    } catch (error) {
+      console.error(error);
+      toast.error(t("organization.error.leave") as string);
+    } finally {
+      setIsSaving(false);
+      setIsLeaveModalOpen(false);
     }
   };
 
@@ -122,7 +140,7 @@ export default function OrganizationSettingsClient() {
 
   const handleEditInviteClick = (invite: InvitationListInterface) => {
     setEditingInvite(invite);
-    const currentRole = ["TEACHER", "STUDENT"].includes(invite.role as unknown as string)
+    const currentRole = ["TEACHER", "STUDENT"].includes(invite.role as string)
       ? invite.role
       : "STUDENT";
     setSelectedInviteRole(currentRole as string);
@@ -138,7 +156,7 @@ export default function OrganizationSettingsClient() {
         role: selectedInviteRole
       });
       setInvitations(prev => prev.map(i =>
-        i.id === editingInvite.id ? { ...i, role: selectedInviteRole as unknown as OrganizationRole } : i
+        i.id === editingInvite.id ? { ...i, role: selectedInviteRole as OrganizationRole } : i
       ));
       toast.success(t("organization.success.roleUpdated") as string);
       setEditingInvite(null);
@@ -164,11 +182,7 @@ export default function OrganizationSettingsClient() {
       });
 
       toast.success(t("organization.success.invitationSent") as string);
-
       window.location.reload();
-
-      setIsInviteModalOpen(false);
-      setNewInviteEmail("");
     } catch (error) {
       console.error(error);
       toast.error(t("organization.error.invite") as string);
@@ -179,15 +193,13 @@ export default function OrganizationSettingsClient() {
 
   if (loading) return <Loading />;
 
-  const isOwner = (organizationMemberInfo?.userRole as unknown as string) === 'OWNER';
-
   return (
     <div className={styles.container}>
       <Toaster position="top-right" />
 
       <header className={styles.settingsHeader}>
         <div className={styles.headerTitle}>
-           <h1 style={{color:'white', margin:0, fontSize:'1.5rem'}}>{t("organization.settings.title")}</h1>
+          <h1 style={{ color: 'white', margin: 0, fontSize: '1.5rem' }}>{t("organization.settings.title")}</h1>
         </div>
         <button
           className={styles.backButton}
@@ -199,95 +211,97 @@ export default function OrganizationSettingsClient() {
 
       <div className={styles.contentGrid}>
 
-        <section className={styles.card}>
-          <div style={{display:'flex', justifyContent:'space-between', alignItems:'center', borderBottom:'1px solid #e2e8f0', paddingBottom:'1rem', marginBottom:'1.5rem'}}>
-            <h2 style={{margin:0, fontSize:'1.25rem', fontWeight:600, color:'#1f2937'}}>{t("organization.invitations.title")}</h2>
-            <button
-                className={styles.saveButton}
-                style={{fontSize:'0.85rem', padding:'0.5rem 1rem'}}
-                onClick={() => setIsInviteModalOpen(true)}
-            >
-                {t("organization.invitations.add")}
-            </button>
-          </div>
-
-          {invitations.length > 0 ? (
-            <div className={styles.tableWrapper}>
-              <table className={styles.table}>
-                <thead>
-                  <tr>
-                    <th>{t("organization.table.email")}</th>
-                    <th>{t("organization.table.role")}</th>
-                    <th>{t("organization.table.invitedBy")}</th>
-                    <th>{t("organization.table.expires")}</th>
-                    <th style={{textAlign: 'right'}}>{t("organization.table.actions")}</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {invitations.map((invite) => (
-                    <tr key={invite.id}>
-                      <td style={{fontWeight: 600}}>{invite.email}</td>
-                      <td>
-                        <span className={`${styles.roleBadge} ${getRoleBadgeClass(invite.role as unknown as string)}`}>
-                          {invite.role}
-                        </span>
-                      </td>
-                      <td style={{color: '#6b7280', fontSize: '0.85rem'}}>{invite.inviter.email}</td>
-                      <td style={{color: '#6b7280', fontSize: '0.85rem'}}>
-                        {new Date(invite.expiresAt).toLocaleDateString()}
-                      </td>
-                      <td style={{textAlign: 'right'}}>
-                        <div className={styles.actionsCell}>
-                          <button
-                            className={styles.editButton}
-                            onClick={() => handleEditInviteClick(invite)}
-                            title={t("common.edit") as string}
-                          >
-                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
-                            {t("common.edit")}
-                          </button>
-                          <button
-                            className={styles.revokeButton}
-                            onClick={() => handleRevokeClick(invite)}
-                            title={t("organization.actions.revoke") as string}
-                          >
-                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-                            {t("organization.actions.revoke")}
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          ) : (
-            <p style={{color: '#6b7280', marginTop: '1rem'}}>{t("organization.invitations.empty")}</p>
-          )}
-        </section>
-
-        {isOwner && (
+        {canManageInvites && (
           <section className={styles.card}>
-            <h2 className={styles.cardTitle}>{t("organization.dangerZone.title")}</h2>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #e2e8f0', paddingBottom: '1rem', marginBottom: '1.5rem' }}>
+              <h2 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 600, color: '#1f2937' }}>{t("organization.invitations.title")}</h2>
+              <button
+                className={styles.saveButton}
+                style={{ fontSize: '0.85rem', padding: '0.5rem 1rem' }}
+                onClick={() => setIsInviteModalOpen(true)}
+              >
+                {t("organization.invitations.add")}
+              </button>
+            </div>
+
+            {invitations.length > 0 ? (
+              <div className={styles.tableWrapper}>
+                <table className={styles.table}>
+                  <thead>
+                    <tr>
+                      <th>{t("organization.table.email")}</th>
+                      <th>{t("organization.table.role")}</th>
+                      <th>{t("organization.table.invitedBy")}</th>
+                      <th>{t("organization.table.expires")}</th>
+                      <th style={{ textAlign: 'right' }}>{t("organization.table.actions")}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {invitations.map((invite) => (
+                      <tr key={invite.id}>
+                        <td style={{ fontWeight: 600 }}>{invite.email}</td>
+                        <td>
+                          <span className={`${styles.roleBadge} ${getRoleBadgeClass(invite.role)}`}>
+                            {invite.role}
+                          </span>
+                        </td>
+                        <td style={{ color: '#6b7280', fontSize: '0.85rem' }}>{invite.inviter.email}</td>
+                        <td style={{ color: '#6b7280', fontSize: '0.85rem' }}>
+                          {new Date(invite.expiresAt).toLocaleDateString()}
+                        </td>
+                        <td style={{ textAlign: 'right' }}>
+                          <div className={styles.actionsCell}>
+                            <button
+                              className={styles.editButton}
+                              onClick={() => handleEditInviteClick(invite)}
+                              title={t("common.edit") as string}
+                            >
+                              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                              {t("common.edit")}
+                            </button>
+                            <button
+                              className={styles.revokeButton}
+                              onClick={() => handleRevokeClick(invite)}
+                              title={t("organization.actions.revoke") as string}
+                            >
+                              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                              {t("organization.actions.revoke")}
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <p style={{ color: '#6b7280', marginTop: '1rem' }}>{t("organization.invitations.empty")}</p>
+            )}
+          </section>
+        )}
+
+        <section className={styles.card}>
+          <h2 className={styles.cardTitle}>{t("organization.dangerZone.title")}</h2>
+          {isOwner ? (
             <form onSubmit={handleSaveOwner} className={styles.form}>
               <div className={styles.formGroup}>
                 <label className={styles.label}>{t("organization.dangerZone.transferTitle")}</label>
-                <p style={{fontSize: '0.85rem', color: '#ef4444', marginBottom: '1rem'}}>
+                <p style={{ fontSize: '0.85rem', color: '#ef4444', marginBottom: '1rem' }}>
                   {t("organization.dangerZone.transferWarning")}
                 </p>
                 <Select
-                    inputId="newOwner"
-                    classNamePrefix="select"
-                    placeholder={t("organization.dangerZone.selectPlaceholder") as string}
-                    menuPortalTarget={typeof document !== "undefined" ? document.body : null}
-                    menuPosition="fixed"
-                    options={memberOptions}
-                    value={selectedNewOwner}
-                    onChange={(selected) => setSelectedNewOwner(selected as SelectOption)}
-                    styles={{
-                      control: (base) => ({...base, borderColor: '#d1d5db', borderRadius: '8px', padding: '2px'}),
-                    }}
-                  />
+                  inputId="newOwner"
+                  classNamePrefix="select"
+                  placeholder={t("organization.dangerZone.selectPlaceholder") as string}
+                  menuPortalTarget={typeof document !== "undefined" ? document.body : null}
+                  menuPosition="fixed"
+                  options={memberOptions}
+                  value={selectedNewOwner}
+                  onChange={(selected) => setSelectedNewOwner(selected as SelectOption)}
+                  styles={{
+                    control: (base) => ({ ...base, borderColor: '#d1d5db', borderRadius: '8px', padding: '2px' }),
+                  }}
+                />
               </div>
               <div className={styles.formActions}>
                 <PrimaryButton
@@ -297,8 +311,26 @@ export default function OrganizationSettingsClient() {
                 />
               </div>
             </form>
-          </section>
-        )}
+          ) : (
+            <div className={styles.form}>
+              <div className={styles.formGroup}>
+                <label className={styles.label}>{t("organization.dangerZone.leaveTitle")}</label>
+                <p style={{ fontSize: '0.85rem', color: '#6b7280', marginBottom: '1rem' }}>
+                  {t("organization.dangerZone.leaveWarning")}
+                </p>
+              </div>
+              <div className={styles.formActions}>
+                <button
+                  className={styles.dangerButton}
+                  onClick={() => setIsLeaveModalOpen(true)}
+                  disabled={isSaving}
+                >
+                  {t("organization.dangerZone.leaveButton")}
+                </button>
+              </div>
+            </div>
+          )}
+        </section>
       </div>
 
       {isInviteModalOpen && (
@@ -338,8 +370,8 @@ export default function OrganizationSettingsClient() {
       {revokingInvite && (
         <div className={styles.modalOverlay} onClick={() => setRevokingInvite(null)}>
           <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
-            <h3 className={styles.modalTitle} style={{color: '#dc2626'}}>{t("organization.modals.revoke.title")}</h3>
-            <p style={{marginBottom: '1.5rem', color: '#4b5563'}}>
+            <h3 className={styles.modalTitle} style={{ color: '#dc2626' }}>{t("organization.modals.revoke.title")}</h3>
+            <p style={{ marginBottom: '1.5rem', color: '#4b5563' }}>
               {t("organization.modals.revoke.confirm", { email: revokingInvite.email })}
             </p>
             <div className={styles.modalActions}>
@@ -353,6 +385,26 @@ export default function OrganizationSettingsClient() {
           </div>
         </div>
       )}
+
+      {isLeaveModalOpen && (
+        <div className={styles.modalOverlay} onClick={() => setIsLeaveModalOpen(false)}>
+          <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+            <h3 className={styles.modalTitle} style={{ color: '#dc2626' }}>{t("organization.modals.leave.title")}</h3>
+            <p style={{ marginBottom: '1.5rem', color: '#4b5563' }}>
+              {t("organization.modals.leave.confirm")}
+            </p>
+            <div className={styles.modalActions}>
+              <button className={styles.cancelButton} onClick={() => setIsLeaveModalOpen(false)} disabled={isSaving}>
+                {t("common.cancel")}
+              </button>
+              <button className={styles.dangerButton} onClick={handleLeaveOrganization} disabled={isSaving}>
+                {isSaving ? t("common.processing") : t("organization.dangerZone.leaveButton")}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
 
       {editingInvite && (
         <div className={styles.modalOverlay} onClick={() => setEditingInvite(null)}>

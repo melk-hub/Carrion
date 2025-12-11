@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ConflictException,
   ForbiddenException,
   Injectable,
@@ -15,13 +16,14 @@ import {
   GetInformationOrganizationDTO,
   JoinOrganizationDTO,
   KickMemberFromOrganizationDTO,
+  LeaveOrganizationDTO,
   RevokeOrganizationInvitationDTO,
 } from './dto/organization.dto';
 import { randomBytes } from 'crypto';
 
 @Injectable()
 export class OrganizationService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) { }
 
   async getUserOrganization(userId: string) {
     try {
@@ -153,8 +155,8 @@ export class OrganizationService {
 
     const orgTotalJobApply = membersList.reduce(
       (acc, cur) =>
-        (acc +=
-          cur.user._count.archivedJobApplies + cur.user._count.jobApplies),
+      (acc +=
+        cur.user._count.archivedJobApplies + cur.user._count.jobApplies),
       0,
     );
 
@@ -427,6 +429,107 @@ export class OrganizationService {
       throw new InternalServerErrorException(
         `Error occurred while trying to delete invitation: ${body.organizationId}`,
       );
+    }
+  }
+
+  async getInvitationByToken(token: string) {
+    const invitation = await this.prisma.organizationInvitation.findUnique({
+      where: { token },
+      include: {
+        organization: { select: { name: true } },
+        inviter: {
+          select: {
+            email: true,
+            userProfile: { select: { firstName: true, lastName: true } }
+          }
+        }
+      }
+    });
+
+    if (!invitation) throw new NotFoundException("Invitation introuvable ou invalide.");
+    if (new Date() > invitation.expiresAt) throw new BadRequestException("Cette invitation a expiré.");
+
+    console.log("invitation trouvée");
+    return invitation;
+  }
+
+  async acceptInvitation(userId: string, token: string) {
+    return await this.prisma.$transaction(async (tx) => {
+      const invitation = await tx.organizationInvitation.findUnique({
+        where: { token },
+      });
+
+      if (!invitation) throw new NotFoundException("Invitation invalide.");
+      if (new Date() > invitation.expiresAt) throw new BadRequestException("Invitation expirée.");
+
+      const user = await tx.user.findUnique({ where: { id: userId } });
+
+      if (!user || user.email.toLowerCase() !== invitation.email.toLowerCase()) {
+        throw new ForbiddenException(
+          `Cette invitation est réservée à l'adresse ${invitation.email}. Vous êtes connecté avec ${user?.email}.`
+        );
+      }
+
+      const existingMember = await tx.organizationMember.findUnique({
+        where: { userId_organizationId: { userId, organizationId: invitation.organizationId } }
+      });
+
+      if (existingMember) {
+        await tx.organizationInvitation.delete({ where: { id: invitation.id } });
+        return { status: 200, message: "Vous êtes déjà membre de cette organisation." };
+      }
+
+      await tx.organizationMember.create({
+        data: {
+          userId,
+          organizationId: invitation.organizationId,
+          userRole: invitation.role,
+        },
+      });
+
+      await tx.organizationInvitation.delete({
+        where: { id: invitation.id },
+      });
+
+      return { status: 201, message: "Invitation acceptée avec succès !" };
+    });
+  }
+
+  async leaveOrganization(userId: string, body: LeaveOrganizationDTO) {
+    try {
+      const member = await this.prisma.organizationMember.findUnique({
+        where: {
+          userId_organizationId: {
+            userId,
+            organizationId: body.organizationId,
+          },
+        },
+      });
+
+      if (!member) {
+        throw new NotFoundException("Vous ne faites pas partie de cette organisation.");
+      }
+
+      // Règle cruciale : Un OWNER ne peut pas quitter sans transférer
+      if (member.userRole === OrganizationRole.OWNER) {
+        throw new ForbiddenException(
+          "Le propriétaire ne peut pas quitter l'organisation. Vous devez transférer la propriété ou supprimer l'organisation."
+        );
+      }
+
+      await this.prisma.organizationMember.delete({
+        where: { id: member.id },
+      });
+
+      return {
+        statusCode: 200,
+        message: "Vous avez quitté l'organisation avec succès.",
+      };
+    } catch (error) {
+      if (error instanceof ForbiddenException || error instanceof NotFoundException) {
+        throw error;
+      }
+      throw new InternalServerErrorException("Erreur lors de la tentative de quitter l'organisation.");
     }
   }
 }

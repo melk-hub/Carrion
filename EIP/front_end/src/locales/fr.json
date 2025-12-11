@@ -35,7 +35,8 @@
     "send": "Envoyer",
     "sending": "Envoi...",
     "saving": "Enregistrement...",
-    "email": "Adresse Email"
+    "email": "Adresse Email",
+    "back": "Retour"
   },
   "shared": {
     "time": {
@@ -803,7 +804,10 @@
       "transferTitle": "Transférer la propriété de l'organisation",
       "transferWarning": "Attention : En transférant la propriété, vous deviendrez automatiquement un membre TEACHER et perdrez vos droits d'administration complète.",
       "selectPlaceholder": "Choisir le nouveau directeur...",
-      "transferButton": "Transférer les droits"
+      "transferButton": "Transférer les droits",
+      "leaveTitle": "Quitter l'organisation",
+      "leaveWarning": "Vous perdrez l'accès à cet espace de travail. Vous devrez être invité à nouveau pour revenir.",
+      "leaveButton": "Quitter l'organisation"
     },
     "modals": {
       "invite": {
@@ -823,6 +827,10 @@
         "title": "Exclure un membre",
         "description": "Êtes-vous sûr de vouloir retirer {{name}} de l'organisation ? Cette action est irréversible.",
         "confirmButton": "Exclure le membre"
+      },
+      "leave": {
+        "title": "Quitter l'organisation",
+        "confirm": "Êtes-vous sûr de vouloir quitter cette organisation ? Cette action est immédiate."
       }
     },
     "actions": {
@@ -836,7 +844,8 @@
       "memberKicked": "{{name}} a été retiré.",
       "owner": "Directeur changé avec succès !",
       "invitationRevoked": "Invitation annulée.",
-      "invitationSent": "Invitation envoyée !"
+      "invitationSent": "Invitation envoyée !",
+      "leave": "Vous avez quitté l'organisation."
     },
     "error": {
       "update": "Impossible de mettre à jour le rôle.",
@@ -846,7 +855,8 @@
         "change": "Erreur lors du changement de propriétaire"
       },
       "emailRequired": "L'email est obligatoire",
-      "invite": "Erreur lors de l'envoi de l'invitation."
+      "invite": "Erreur lors de l'envoi de l'invitation.",
+      "leave": "Erreur lors de la tentative de quitter l'organisation."
     }
   }
 }

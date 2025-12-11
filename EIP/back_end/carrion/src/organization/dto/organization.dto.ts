@@ -1,4 +1,4 @@
-import { IsEmail, IsEnum, IsString, IsUUID } from 'class-validator';
+import { IsEmail, IsEnum, IsNotEmpty, IsString, IsUUID } from 'class-validator';
 import { OrganizationRole } from '../utils/organization.enum';
 import { ApiProperty } from '@nestjs/swagger';
 
@@ -140,4 +140,24 @@ export class EditInvitationRoleDTO extends RevokeOrganizationInvitationDTO {
   })
   @IsEnum(OrganizationRole)
   role: OrganizationRole;
+}
+
+export class AcceptInvitationDTO {
+  @ApiProperty({
+    description: "Le token d'invitation reçu par email",
+    example: "a4f8e9d2..."
+  })
+  @IsString()
+  @IsNotEmpty()
+  token: string;
+}
+
+export class LeaveOrganizationDTO {
+  @ApiProperty({
+    description: "L'ID de l'organisation que l'utilisateur souhaite quitter",
+    example: "c56a4180-65aa-42ec-a945-5fd21dec0538"
+  })
+  @IsString()
+  @IsNotEmpty()
+  organizationId: string;
 }
