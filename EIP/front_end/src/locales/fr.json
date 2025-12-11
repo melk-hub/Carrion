@@ -858,5 +858,34 @@
       "invite": "Erreur lors de l'envoi de l'invitation.",
       "leave": "Erreur lors de la tentative de quitter l'organisation."
     }
+  },
+
+  "invitation": {
+    "errors": {
+      "missingToken": "Lien d'invitation manquant.",
+      "invalid": "Cette invitation n'existe pas ou a expiré.",
+      "emailMismatch": "Connexion refusée : Le compte {{currentEmail}} ne correspond pas à l'invitation pour {{targetEmail}}.",
+      "acceptFailed": "Erreur lors de l'acceptation."
+    },
+    "success": {
+      "connected": "Connexion réussie !",
+      "joined": "Bienvenue dans l'équipe !"
+    },
+    "ui": {
+      "invalidTitle": "Lien invalide",
+      "redirecting": "Redirection vers l'accueil...",
+      "title": "Invitation reçue",
+      "invitedBy": "vous invite à rejoindre l'organisation :",
+      "role": "Rôle :",
+      "reservedFor": "Cette invitation est réservée à l'adresse :"
+    },
+    "buttons": {
+      "validating": "Validation...",
+      "accept": "Accepter et Rejoindre",
+      "ignore": "Ignorer et aller au dashboard",
+      "createAccount": "Créer un compte",
+      "login": "J'ai déjà un compte"
+    }
   }
+
 }

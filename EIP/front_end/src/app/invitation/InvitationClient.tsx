@@ -8,6 +8,7 @@ import styles from "./Invitation.module.css";
 import Loading from "@/components/Loading/Loading";
 import toast, { Toaster } from "react-hot-toast";
 import AuthModal from "@/components/AuthModal/AuthModal";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface InvitationDetails {
 	email: string;
@@ -20,6 +21,7 @@ export default function InvitationClient() {
 	const router = useRouter();
 	const searchParams = useSearchParams();
 	const token = searchParams.get("token");
+	const { t } = useLanguage();
 
 	const { userProfile, loadingAuth, checkAuthStatus } = useAuth();
 
@@ -31,12 +33,16 @@ export default function InvitationClient() {
 	const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 	const [authTab, setAuthTab] = useState<'login' | 'register'>('login');
 
-	const processingMismatch = useRef(false);
+	const errorToastShown = useRef(false);
+	const mismatchToastShown = useRef(false);
 
 	useEffect(() => {
 		if (!token) {
-			toast.error("Lien d'invitation manquant.");
-			router.push('/home');
+			if (!errorToastShown.current) {
+				errorToastShown.current = true;
+				toast.error(t("invitation.errors.missingToken") as string);
+				router.push('/home');
+			}
 			return;
 		}
 
@@ -44,38 +50,37 @@ export default function InvitationClient() {
 			try {
 				const response = await ApiService.get<InvitationDetails>(`/organization/invitation-details?token=${token}`);
 				if (!response) {
-					setError("Invitation invalide");
-					toast.error("Cette invitation n'existe pas ou a expiré.");
-					setTimeout(() => {
-						router.push('/home');
-					}, 2000);
+					throw new Error("No response");
 				}
 				setDetails(response);
 			} catch (err) {
 				console.error(err);
-				setError("Invitation invalide");
-				toast.error("Cette invitation n'existe pas ou a expiré.");
-				setTimeout(() => {
-					router.push('/home');
-				}, 2000);
-
+				if (!errorToastShown.current) {
+					errorToastShown.current = true;
+					setError("Invitation invalide");
+					toast.error(t("invitation.errors.invalid") as string);
+					setTimeout(() => {
+						router.push('/home');
+					}, 2000);
+				}
 			} finally {
 				setLoadingDetails(false);
 			}
 		};
-
 		fetchDetails();
-	}, [token, router]);
+	}, [token, router, t]);
 
 
 	useEffect(() => {
-
 		if (!loadingAuth && userProfile && details) {
 			if (userProfile.email.toLowerCase() !== details.email.toLowerCase()) {
-				if (!processingMismatch.current) {
-					processingMismatch.current = true;
+				if (!mismatchToastShown.current) {
+					mismatchToastShown.current = true;
 					toast.error(
-						`Connexion refusée : Le compte ${userProfile.email} ne correspond pas à l'invitation pour ${details.email}.`,
+						t("invitation.errors.emailMismatch", {
+							currentEmail: userProfile.email,
+							targetEmail: details.email
+						}) as string,
 						{ duration: 4000 }
 					);
 					setTimeout(() => {
@@ -84,7 +89,7 @@ export default function InvitationClient() {
 				}
 			}
 		}
-	}, [userProfile, details, loadingAuth, router]);
+	}, [userProfile, details, loadingAuth, router, t]);
 
 	const handleOpenAuth = (tab: 'login' | 'register') => {
 		setAuthTab(tab);
@@ -94,7 +99,7 @@ export default function InvitationClient() {
 	const handleAuthSuccess = async () => {
 		setIsAuthModalOpen(false);
 		await checkAuthStatus();
-		toast.success("Connexion réussie !");
+		toast.success(t("invitation.success.connected") as string);
 	};
 
 	const handleAccept = async () => {
@@ -103,11 +108,11 @@ export default function InvitationClient() {
 		setIsAccepting(true);
 		try {
 			await ApiService.post("/organization/accept-invite", { token });
-			toast.success("Bienvenue dans l'équipe !");
+			toast.success(t("invitation.success.joined") as string);
 			router.push("/organization");
 		} catch (err: any) {
 			console.error(err);
-			toast.error(err?.response?.data?.message || "Erreur lors de l'acceptation.");
+			toast.error(err?.response?.data?.message || t("invitation.errors.acceptFailed") as string);
 		} finally {
 			setIsAccepting(false);
 		}
@@ -115,20 +120,18 @@ export default function InvitationClient() {
 
 	if (loadingAuth || loadingDetails) return <Loading />;
 
-
 	if (error) {
 		return (
 			<div className={styles.container}>
 				<Toaster position="top-center" />
 				<div className={styles.card}>
 					<div className={`${styles.icon} ${styles.iconError}`}>⚠️</div>
-					<h1 className={styles.title}>Lien invalide</h1>
-					<p className={styles.description}>Redirection vers l'accueil...</p>
+					<h1 className={styles.title}>{t("invitation.ui.invalidTitle")}</h1>
+					<p className={styles.description}>{t("invitation.ui.redirecting")}</p>
 				</div>
 			</div>
 		);
 	}
-
 
 	if (userProfile && details && userProfile.email.toLowerCase() !== details.email.toLowerCase()) {
 		return (
@@ -139,21 +142,20 @@ export default function InvitationClient() {
 		);
 	}
 
-
 	return (
 		<div className={styles.container}>
 			<Toaster position="top-center" />
 
 			<div className={styles.card}>
 				<div className={styles.icon}>📬</div>
-				<h1 className={styles.title}>Invitation reçue</h1>
+				<h1 className={styles.title}>{t("invitation.ui.title")}</h1>
 
 				<div className={styles.content}>
-					<p><strong>{details?.inviter?.email}</strong> vous invite à rejoindre l'organisation :</p>
+					<p><strong>{details?.inviter?.email}</strong> {t("invitation.ui.invitedBy")}</p>
 					<div className={styles.orgName}>{details?.organization?.name}</div>
-					<div className={styles.roleTag}>Rôle : {details?.role}</div>
+					<div className={styles.roleTag}>{t("invitation.ui.role")} {details?.role}</div>
 					<p className={styles.instruction}>
-						Cette invitation est réservée à l'adresse :<br />
+						{t("invitation.ui.reservedFor")}<br />
 						<strong>{details?.email}</strong>
 					</p>
 				</div>
@@ -162,19 +164,19 @@ export default function InvitationClient() {
 					{userProfile ? (
 						<>
 							<button className={styles.primaryButton} onClick={handleAccept} disabled={isAccepting}>
-								{isAccepting ? "Validation..." : "Accepter et Rejoindre"}
+								{isAccepting ? t("invitation.buttons.validating") : t("invitation.buttons.accept")}
 							</button>
 							<button className={styles.secondaryButton} onClick={() => router.push("/dashboard")}>
-								Ignorer et aller au dashboard
+								{t("invitation.buttons.ignore")}
 							</button>
 						</>
 					) : (
 						<>
 							<button className={styles.primaryButton} onClick={() => handleOpenAuth('register')}>
-								Créer un compte
+								{t("invitation.buttons.createAccount")}
 							</button>
 							<button className={styles.outlineButton} onClick={() => handleOpenAuth('login')}>
-								J'ai déjà un compte
+								{t("invitation.buttons.login")}
 							</button>
 						</>
 					)}

@@ -27,12 +27,9 @@ async function getRankingData() {
       ApiService.get<UserStats[]>('/user/all-users-ranking', { headers }),
       ApiService.get<UserProfile>('/user/profile', { headers })
     ]);
-
     const allUsers = usersResponse || [];
     const currentUserProfile = profileResponse;
-
     const sortedUsers = [...allUsers].sort((a, b) => b.totalApplications - a.totalApplications);
-
     const usersWithRank: User[] = sortedUsers.map((user, index) => ({
       ...user,
       rank: index + 1,

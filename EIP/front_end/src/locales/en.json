@@ -848,5 +848,33 @@
       "invite": "Error sending invitation.",
       "leave": "Error while trying to leave the organization."
     }
+  },
+
+  "invitation": {
+    "errors": {
+      "missingToken": "Missing invitation link.",
+      "invalid": "This invitation does not exist or has expired.",
+      "emailMismatch": "Connection refused: The account {{currentEmail}} does not match the invitation for {{targetEmail}}.",
+      "acceptFailed": "Error accepting invitation."
+    },
+    "success": {
+      "connected": "Login successful!",
+      "joined": "Welcome to the team!"
+    },
+    "ui": {
+      "invalidTitle": "Invalid Link",
+      "redirecting": "Redirecting to home...",
+      "title": "Invitation Received",
+      "invitedBy": "invites you to join the organization:",
+      "role": "Role:",
+      "reservedFor": "This invitation is reserved for the address:"
+    },
+    "buttons": {
+      "validating": "Validating...",
+      "accept": "Accept and Join",
+      "ignore": "Ignore and go to dashboard",
+      "createAccount": "Create an account",
+      "login": "I already have an account"
+    }
   }
 }
