@@ -10,9 +10,9 @@ interface CityOption {
 class ApiService {
   private isRefreshing: boolean = false;
   private refreshSubscribers: (() => Promise<void>)[] = [];
-  private _logoutCallback: (callApi?: boolean) => void = () => {};
+  private _logoutCallback: (callApi?: boolean) => void = () => { };
 
-  constructor() {}
+  constructor() { }
 
   public registerLogoutCallback(callback: (callApi?: boolean) => void) {
     this._logoutCallback = callback;
@@ -81,6 +81,12 @@ class ApiService {
     const response = await fetch(fullUrl, defaultOptions);
 
     if (response.status === 401 && !options.isRetry) {
+      const isAuthRoute = url.includes("/auth/login") || url.includes("/auth/refresh");
+
+      if (isAuthRoute) {
+        return response;
+      }
+
       return this.handleTokenRefresh(() =>
         this.request(url, { ...options, isRetry: true })
       );
@@ -90,18 +96,33 @@ class ApiService {
 
   private async processResponse<T>(response: Response): Promise<T | null> {
     if (!response.ok) {
-      const errorData = (await response
-        .json()
-        .catch(() => ({ message: response.statusText }))) as {
-        message?: string;
-      };
+      const textBody = await response.text().catch(() => "");
+      let errorMessage = response.statusText;
 
-      throw new Error(errorData.message || `API Error: ${response.status}`);
+      try {
+        if (textBody) {
+          const jsonBody = JSON.parse(textBody);
+          errorMessage = jsonBody.message || errorMessage;
+        }
+      } catch {
+      }
+
+      throw new Error(errorMessage || `API Error: ${response.status}`);
     }
+
     if (response.status === 204) {
       return null;
     }
-    return response.json() as Promise<T>;
+
+    const text = await response.text();
+    if (!text) return null;
+
+    try {
+      return JSON.parse(text);
+    } catch (e) {
+      console.warn(`[API] Warning: Failed to parse JSON from ${response.url}`, e);
+      return null;
+    }
   }
 
   public async get<T>(
@@ -112,10 +133,15 @@ class ApiService {
       const response = await this.request(url, { method: "GET", ...options });
       return await this.processResponse<T>(response);
     } catch (error) {
-      if (error instanceof Error && error.message === "") {
+      const quietRoutes = [
+        "/user/profile",
+        "/organization",
+        "/auth/refresh"
+      ];
 
-      }
-      if (error instanceof Error && error.message === "Token refresh failed") {
+      const isQuietRoute = quietRoutes.some(route => url.includes(route));
+
+      if (isQuietRoute || (error instanceof Error && error.message === "Token refresh failed")) {
         return null;
       }
       console.error(`GET ${url} failed:`, error);

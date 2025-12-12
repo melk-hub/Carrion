@@ -114,7 +114,7 @@ export class OrganizationService {
       select: {
         id: true,
         name: true,
-        user: {
+        owner: {
           select: {
             id: true,
             email: true,

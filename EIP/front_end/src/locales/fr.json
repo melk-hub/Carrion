@@ -36,7 +36,7 @@
     "sending": "Envoi...",
     "saving": "Enregistrement...",
     "email": "Adresse Email",
-    "back": "Retour"
+    "or": "ou"
   },
   "shared": {
     "time": {
@@ -886,6 +886,17 @@
       "createAccount": "Créer un compte",
       "login": "J'ai déjà un compte"
     }
-  }
+  },
 
+  "setup": {
+    "choice": {
+      "title": "Comment souhaitez-vous gérer vos candidatures ?",
+      "description": "Carrion vous offre deux modes de fonctionnement. Vous pouvez utiliser les deux simultanément.",
+      "autoTitle": "Mode Automatique",
+      "autoDesc": "Liez votre boîte mail. Nous détectons et ajoutons vos candidatures automatiquement.",
+      "goToProfileBtn": "Configurer dans mon Profil",
+      "manualBtn": "Je préfère saisir manuellement",
+      "profileNote": "Info : Vous pourrez changer d'avis à tout moment."
+    }
+  }
 }

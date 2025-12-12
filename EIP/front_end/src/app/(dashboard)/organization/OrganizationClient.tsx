@@ -141,7 +141,7 @@ export default function OrganizationClient() {
 
       if (data) {
         const updatedMembers = data.members.map(m =>
-          m.id === editingMember.id ? { ...m, userRole: selectedRole as OrganizationRole } : m
+          m.id === editingMember.id ? { ...m, userRole: selectedRole as unknown as OrganizationRole } : m
         );
         setData({ ...data, members: updatedMembers });
       }

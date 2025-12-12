@@ -30,7 +30,8 @@
     "previous": "Previous",
     "next": "Next",
     "unauthorized": "Access denied",
-    "email": "Email Address"
+    "email": "Email Address",
+    "or": "or"
   },
   "shared": {
     "time": {
@@ -875,6 +876,18 @@
       "ignore": "Ignore and go to dashboard",
       "createAccount": "Create an account",
       "login": "I already have an account"
+    }
+  },
+
+  "setup": {
+    "choice": {
+      "title": "How do you want to manage your applications?",
+      "description": "Carrion offers two modes of operation. You can use both simultaneously.",
+      "autoTitle": "Automatic Mode",
+      "autoDesc": "Link your mailbox. We automatically detect and add your applications.",
+      "goToProfileBtn": "Configure in my Profile",
+      "manualBtn": "I prefer manual entry",
+      "profileNote": "Info: You can change your mind at any time."
     }
   }
 }
