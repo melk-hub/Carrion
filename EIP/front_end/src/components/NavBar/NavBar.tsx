@@ -27,6 +27,25 @@ export default function Navbar({ children }: { children: React.ReactNode }) {
   const [avatarUrl, setAvatarUrl] = useState("/assets/avatar.png");
 
   useEffect(() => {
+    const fetchAvatar = async () => {
+      try {
+        const res = await ApiService.get<{ signedUrl: string | null }>(
+          "/s3/download?filename=profile"
+        );
+
+        if (res?.signedUrl) {
+          setAvatarUrl(res.signedUrl);
+        } else {
+          setAvatarUrl("/assets/avatar.png");
+        }
+      } catch (error) {
+        console.error("Failed to load avatar", error);
+        setAvatarUrl("/assets/avatar.png");
+      }
+    };
+
+    fetchAvatar();
+
     function handleClickOutside(event: MouseEvent) {
       if (
         dropdownRef.current &&
