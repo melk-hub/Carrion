@@ -1,0 +1,84 @@
+############################
+# Dependencies
+############################
+node_modules/
+.pnp/
+.pnp.js
+
+############################
+# Build outputs
+############################
+# NestJS
+dist/
+build/
+
+# Next.js
+.next/
+out/
+
+############################
+# Environment variables
+############################
+.env
+.env.*
+!.env.example
+
+############################
+# Logs
+############################
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+############################
+# Runtime data
+############################
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+############################
+# Coverage
+############################
+coverage/
+.nyc_output/
+
+############################
+# Cache
+############################
+.cache/
+.eslintcache
+.swc/
+
+############################
+# IDE / Editor
+############################
+.vscode/
+!.vscode/extensions.json
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+############################
+# OS files
+############################
+.DS_Store
+Thumbs.db
+
+############################
+# Testing
+############################
+jest.config.ts.bak
+test-results/
+
+############################
+# Misc
+############################
+*.tgz
+*.bak
