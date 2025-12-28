@@ -119,7 +119,7 @@ export default function ProfileClient({
     setUploadedImage(tempUrl);
     setUploading(true);
     try {
-      const response = await apiService.post<{ signedUrl: string } | null>(
+      const response = await apiService.post<{ signedUrl: string }>(
         `/s3/upload?filename=profile&contentType=${file.type}`,
         {}
       );
@@ -135,6 +135,15 @@ export default function ProfileClient({
         headers: { "Content-Type": file.type },
         body: file,
       });
+
+      const downloadResponse = await apiService.get<{ signedUrl: string }>(
+        `/s3/download?filename=profile`
+      );
+
+      if (downloadResponse?.signedUrl) {
+        setUploadedImage(downloadResponse.signedUrl);
+      }
+
       toast.success("Image de profil mise à jour !");
     } catch (error: unknown) {
       toast.error(
