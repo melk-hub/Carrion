@@ -64,7 +64,6 @@ function ApplicationCard({
         application.status
       )}`}
     >
-      {/* Header avec logo et infos principales */}
       <div className={styles.modernCardHeader}>
         <div className={styles.companyLogoSection}>
           {application.imageUrl ? (
@@ -77,7 +76,6 @@ function ApplicationCard({
             />
           ) : (
             <div className={styles.modernLogoPlaceholder}>
-              {/* Emplacement pour icône entreprise */}
               <Image
                 src="/assets/avatar.png"
                 alt="Company"
@@ -135,7 +133,6 @@ function ApplicationCard({
           {application.location && (
             <div className={styles.infoItem}>
               <div className={styles.infoIconWrapper}>
-                {/* Emplacement pour icône localisation */}
                 <Image
                   src="/assets/map.png"
                   alt="Location"
@@ -156,7 +153,6 @@ function ApplicationCard({
           {application.salary && (
             <div className={styles.infoItem}>
               <div className={styles.infoIconWrapper}>
-                {/* Emplacement pour icône salaire */}
                 <Image
                   src="/assets/money.png"
                   alt="Salary"
@@ -179,7 +175,6 @@ function ApplicationCard({
           {application.interviewDate && (
             <div className={styles.infoItem}>
               <div className={styles.infoIconWrapper}>
-                {/* Emplacement pour icône entretien */}
                 <Image
                   src="/assets/interview.png"
                   alt="Interview"
@@ -201,7 +196,6 @@ function ApplicationCard({
         </div>
       </div>
 
-      {/* Actions */}
       <div className={styles.modernCardActions}>
         <button
           className={styles.modernActionButton + " " + styles.primary}
@@ -224,10 +218,10 @@ function ApplicationCard({
           >
             <span>
               {location.pathname.includes("dashboard")
-                ? t("common.dearchive")
+                ? t("common.unarchive")
                 : location.pathname.includes("archives")
                 ? t("common.archive")
-                : t("common.dearchive")}
+                : t("common.unarchive")}
             </span>
           </button>
 

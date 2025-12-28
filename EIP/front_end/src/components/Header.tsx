@@ -43,9 +43,6 @@ function Header({ setIsAuthenticated }: HeaderProps) {
           >
             Candidatures
           </button>
-          {/* <button onClick={() => router.push('/archives')} className='archives-button'>Archives</button> */}
-          {/* <button onClick={() => router.push('/objectives')} className='objectives-button'>Objectifs</button> */}
-          {/* <button onClick={() => router.push('/parameters')} className='parameters-button'>Profil</button> */}
         </nav>
       </div>
 

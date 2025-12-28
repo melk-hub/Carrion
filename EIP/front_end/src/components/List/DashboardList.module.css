@@ -10,7 +10,7 @@
 }
 
 .modernApplicationListItem::before {
-  content: '';
+  content: "";
   position: absolute;
   left: 0;
   top: 0;
@@ -30,7 +30,6 @@
   opacity: 1;
 }
 
-/* Status-specific border colors */
 .modernApplicationListItem.status-accepted::before {
   background: linear-gradient(180deg, #10b981, #34d399);
 }
@@ -181,7 +180,11 @@
 }
 
 .modernStatusBadgeList.status-accepted {
-  background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(52, 211, 153, 0.1) 100%);
+  background: linear-gradient(
+    135deg,
+    rgba(16, 185, 129, 0.1) 0%,
+    rgba(52, 211, 153, 0.1) 100%
+  );
   color: #059669;
   border: 1px solid rgba(16, 185, 129, 0.2);
 }
@@ -191,7 +194,11 @@
 }
 
 .modernStatusBadgeList.status-pending {
-  background: linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(251, 191, 36, 0.1) 100%);
+  background: linear-gradient(
+    135deg,
+    rgba(245, 158, 11, 0.1) 0%,
+    rgba(251, 191, 36, 0.1) 100%
+  );
   color: #d97706;
   border: 1px solid rgba(245, 158, 11, 0.2);
 }
@@ -201,7 +208,11 @@
 }
 
 .modernStatusBadgeList.status-refused {
-  background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(248, 113, 113, 0.1) 100%);
+  background: linear-gradient(
+    135deg,
+    rgba(239, 68, 68, 0.1) 0%,
+    rgba(248, 113, 113, 0.1) 100%
+  );
   color: #dc2626;
   border: 1px solid rgba(239, 68, 68, 0.2);
 }
@@ -321,13 +332,18 @@
 }
 
 .modernListButton::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.3),
+    transparent
+  );
   transition: left 0.4s;
 }
 
@@ -387,11 +403,13 @@
 }
 
 .modernListButton.secondary .listButtonIcon {
-  filter: brightness(0) saturate(100%) invert(27%) sepia(7%) saturate(1481%) hue-rotate(202deg) brightness(95%) contrast(86%);
+  filter: brightness(0) saturate(100%) invert(27%) sepia(7%) saturate(1481%)
+    hue-rotate(202deg) brightness(95%) contrast(86%);
 }
 
 .modernListButton.danger .listButtonIcon {
-  filter: brightness(0) saturate(100%) invert(22%) sepia(98%) saturate(2969%) hue-rotate(346deg) brightness(97%) contrast(94%);
+  filter: brightness(0) saturate(100%) invert(22%) sepia(98%) saturate(2969%)
+    hue-rotate(346deg) brightness(97%) contrast(94%);
 }
 
 .modernListButton:hover .listButtonIcon {
@@ -399,10 +417,15 @@
 }
 
 @keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
 }
-/* Keep old styles for backward compatibility */
+
 .applicationListItem {
   background-color: white;
   border-radius: 0.5rem;

@@ -1,11 +1,8 @@
-// Fichier: components/Button/PrimaryButton.tsx - CORRIGÉ
-
 import React from "react";
 import styles from "./Button.module.css";
 
 interface PrimaryButtonProps {
   text: string;
-  // Un onClick est une fonction simple, ou reçoit un événement de souris
   onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void;
   disabled?: boolean;
   size?: "small" | "medium" | "large";

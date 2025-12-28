@@ -8,7 +8,7 @@ import { PrismaService } from '@/prisma/prisma.service';
 
 @Injectable()
 export class NotificationService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) { }
 
   async getUserNotifications(userId: string) {
     const notifications = await this.prisma.notification.findMany({

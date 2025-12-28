@@ -61,7 +61,6 @@ function ApplicationList({
       )}`}
     >
       <div className={styles.modernListContent}>
-        {/* Logo section */}
         <div className={styles.modernListLogo}>
           {application.imageUrl ? (
             <Image
@@ -73,7 +72,6 @@ function ApplicationList({
             />
           ) : (
             <div className={styles.modernLogoPlaceholderList}>
-              {/* Emplacement pour icône entreprise */}
               <Image
                 src="/icons/company-placeholder.svg"
                 alt="Company"
@@ -85,7 +83,6 @@ function ApplicationList({
           )}
         </div>
 
-        {/* Company info */}
         <div className={styles.modernListInfo}>
           <h3 className={styles.modernCompanyNameList}>
             {application.company || t("dashboard.unknownCompany")}
@@ -101,7 +98,6 @@ function ApplicationList({
           </div>
         </div>
 
-        {/* Status */}
         <div
           className={styles.modernStatusBadgeList + ` ${getStatusClass(
             application.status
@@ -113,11 +109,9 @@ function ApplicationList({
           </span>
         </div>
 
-        {/* Details list */}
         <div className={styles.modernListDetails}>
           <div className={styles.detailItemModern}>
             <div className={styles.detailIconWrapper}>
-              {/* Emplacement pour icône calendrier */}
               <Image
                 src="/icons/calendar.svg"
                 alt="Date"
@@ -139,7 +133,6 @@ function ApplicationList({
           {application.location && (
             <div className={styles.detailItemModern}>
               <div className={styles.detailIconWrapper}>
-                {/* Emplacement pour icône localisation */}
                 <Image
                   src="/icons/location.svg"
                   alt="Location"
@@ -160,7 +153,6 @@ function ApplicationList({
           {application.salary && (
             <div className={styles.detailItemModern}>
               <div className={styles.detailIconWrapper}>
-                {/* Emplacement pour icône salaire */}
                 <Image
                   src="/icons/salary.svg"
                   alt="Salary"
@@ -181,7 +173,6 @@ function ApplicationList({
           )}
         </div>
 
-        {/* Actions */}
         <div className={styles.modernListActions}>
           <button
             className={styles.modernListButton + " " + styles.primary}
@@ -189,7 +180,6 @@ function ApplicationList({
             title={t("common.details") as string}
           >
             <div className={styles.listButtonIconWrapper}>
-              {/* Emplacement pour icône détails */}
               <Image
                 src="/icons/eye.svg"
                 alt="Details"
@@ -206,7 +196,6 @@ function ApplicationList({
             title={t("common.edit") as string}
           >
             <div className={styles.listButtonIconWrapper}>
-              {/* Emplacement pour icône éditer */}
               <Image
                 src="/icons/edit.svg"
                 alt="Edit"
@@ -224,12 +213,11 @@ function ApplicationList({
               (location.pathname.includes("dashboard")
                 ? t("common.archive")
                 : location.pathname.includes("archive")
-                ? t("common.dearchive")
+                ? t("common.unarchive")
                 : t("common.archive")) as string
             }
           >
             <div className={styles.listButtonIconWrapper}>
-              {/* Emplacement pour icône éditer */}
               <Image
                 src="/icons/edit.svg"
                 alt="Edit"
@@ -246,7 +234,6 @@ function ApplicationList({
             title={t("common.delete") as string}
           >
             <div className={styles.listButtonIconWrapper}>
-              {/* Emplacement pour icône supprimer */}
               <Image
                 src="/icons/trash.svg"
                 alt="Delete"

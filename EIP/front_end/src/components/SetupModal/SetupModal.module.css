@@ -1,0 +1,170 @@
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  animation: fadeIn 0.3s ease-out;
+}
+.modal {
+  background: white;
+  width: 90%;
+  max-width: 500px;
+  padding: 40px;
+  border-radius: 24px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  text-align: center;
+  position: relative;
+  max-height: 90vh;
+  overflow-y: auto;
+  animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.illustration {
+  font-size: 3rem;
+  margin-bottom: 20px;
+  background: #f3f4f6;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 4px solid #fff;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+.description {
+  color: #6b7280;
+  font-size: 1rem;
+  line-height: 1.5;
+  margin: 0 0 25px 0;
+}
+.optionsContainer {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+}
+.optionCard {
+  background: #f9fafb;
+  border: 2px solid #e5e7eb;
+  border-radius: 16px;
+  padding: 24px;
+  width: 100%;
+  position: relative;
+  text-align: center;
+  transition: border-color 0.2s;
+}
+.optionCard:hover {
+  border-color: #d1d5db;
+}
+.badge {
+  position: absolute;
+  top: -12px;
+  right: 20px;
+  background: #10b981;
+  color: white;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 4px 12px;
+  border-radius: 20px;
+  box-shadow: 0 2px 4px rgba(16, 185, 129, 0.2);
+}
+.optionCard h3 {
+  margin: 5px 0 8px 0;
+  font-size: 1.1rem;
+  color: #1f2937;
+  font-weight: 600;
+}
+.optionCard p {
+  font-size: 0.9rem;
+  color: #6b7280;
+  margin-bottom: 20px;
+  line-height: 1.4;
+}
+.divider {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  margin: 10px 0;
+  color: #9ca3af;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+.divider::before,
+.divider::after {
+  content: "";
+  flex: 1;
+  border-bottom: 1px solid #e5e7eb;
+}
+.divider span {
+  margin: 0 12px;
+}
+.textButton {
+  background: none;
+  border: none;
+  color: #6b7280;
+  font-weight: 500;
+  font-size: 0.95rem;
+  cursor: pointer;
+  padding: 10px 20px;
+  border-radius: 8px;
+  transition: color 0.2s, background 0.2s;
+}
+.textButton:hover {
+  color: #1f2937;
+  background: #f3f4f6;
+}
+.footerNote {
+  font-size: 0.8rem;
+  color: #9ca3af;
+  margin-top: 15px;
+  font-style: italic;
+}
+.primaryButton {
+  background-color: #0c1f3d;
+  color: white;
+  border: none;
+  padding: 14px 24px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  border-radius: 10px;
+  cursor: pointer;
+  width: 100%;
+  transition: background-color 0.2s, transform 0.1s;
+  box-shadow: 0 4px 6px rgba(12, 31, 61, 0.15);
+}
+.primaryButton:hover {
+  background-color: #1a3a6c;
+  transform: translateY(-1px);
+}
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}

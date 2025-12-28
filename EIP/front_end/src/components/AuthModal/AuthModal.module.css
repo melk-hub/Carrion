@@ -60,7 +60,7 @@
   cursor: default;
 }
 
-.authModal form { 
+.authModal form {
   display: flex;
   flex-direction: column;
 }

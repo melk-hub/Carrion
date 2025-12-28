@@ -14,7 +14,7 @@
 }
 
 .modernApplicationCard::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: 0;
@@ -34,7 +34,6 @@
   opacity: 1;
 }
 
-/* Status-specific border colors */
 .modernApplicationCard.status-accepted::before {
   background: linear-gradient(90deg, #10b981, #34d399);
 }
@@ -166,12 +165,21 @@
 }
 
 @keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
 }
 
 .modernStatusBadge.status-accepted {
-  background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(52, 211, 153, 0.1) 100%);
+  background: linear-gradient(
+    135deg,
+    rgba(16, 185, 129, 0.1) 0%,
+    rgba(52, 211, 153, 0.1) 100%
+  );
   color: #059669;
   border: 1px solid rgba(16, 185, 129, 0.2);
 }
@@ -181,7 +189,11 @@
 }
 
 .modernStatusBadge.status-pending {
-  background: linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(251, 191, 36, 0.1) 100%);
+  background: linear-gradient(
+    135deg,
+    rgba(245, 158, 11, 0.1) 0%,
+    rgba(251, 191, 36, 0.1) 100%
+  );
   color: #d97706;
   border: 1px solid rgba(245, 158, 11, 0.2);
 }
@@ -191,7 +203,11 @@
 }
 
 .modernStatusBadge.status-refused {
-  background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(248, 113, 113, 0.1) 100%);
+  background: linear-gradient(
+    135deg,
+    rgba(239, 68, 68, 0.1) 0%,
+    rgba(248, 113, 113, 0.1) 100%
+  );
   color: #dc2626;
   border: 1px solid rgba(239, 68, 68, 0.2);
 }
@@ -350,7 +366,7 @@
   .infoGrid {
     grid-template-columns: 1fr 1fr;
   }
-  
+
   .secondaryActions {
     flex-direction: row;
   }
@@ -361,31 +377,31 @@
     margin: 0.5rem;
     min-height: 380px;
   }
-  
+
   .modernCardHeader {
     padding: 1rem;
     flex-wrap: wrap;
     min-height: 100px;
   }
-  
+
   .companyLogoSection {
     width: 3rem;
     height: 3rem;
   }
-  
+
   .modernCardContent {
     padding: 1rem;
   }
-  
+
   .modernCardActions {
     padding: 1rem;
     padding-top: 0;
   }
-  
+
   .modernCompanyName {
     font-size: 1rem;
   }
-  
+
   .modernStatusBadge {
     width: 100%;
     justify-content: center;
@@ -393,7 +409,6 @@
   }
 }
 
-/* Keep old styles for backward compatibility */
 .applicationCard {
   background-color: white;
   border-radius: 0.5rem;
@@ -425,6 +440,12 @@
   right: 0;
   width: 100px;
   height: 100px;
-  background: radial-gradient(circle at top right, transparent 100%, transparent 100%, #fff 100%, #fff 100%);
+  background: radial-gradient(
+    circle at top right,
+    transparent 100%,
+    transparent 100%,
+    #fff 100%,
+    #fff 100%
+  );
   z-index: 100;
 }

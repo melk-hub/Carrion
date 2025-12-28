@@ -50,6 +50,7 @@ services:
     networks:
       back-tier:
       api-tier:
+    command: npm run start:dev
     volumes:
       - common:/apk
       - ./EIP/back_end/carrion:/app

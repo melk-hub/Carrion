@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useMemo } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import Image from "next/image";
@@ -14,7 +14,9 @@ import styles from "./NavBar.module.css";
 
 export default function Navbar({ children }: { children: React.ReactNode }) {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const { setIsAuthenticated } = useAuth();
+
+  const { setIsAuthenticated, organizationMemberInfo } = useAuth();
+
   const router = useRouter();
   const pathname = usePathname();
   const { t } = useLanguage();
@@ -47,25 +49,37 @@ export default function Navbar({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const navLinks = [
-    { href: "/home", labelKey: "home", icon: "/assets/home-button.png" },
-    {
-      href: "/dashboard",
-      labelKey: "applications",
-      icon: "/assets/candidate-profile.png",
-    },
-    { href: "/archives", labelKey: "archives", icon: "/assets/archives.png" },
-    {
-      href: "/statistics",
-      labelKey: "statistics",
-      icon: "/assets/pie-chart.png",
-    },
-    {
-      href: "/leaderboard",
-      labelKey: "ranking",
-      icon: "/assets/podium.png",
-    },
-  ];
+  const navLinks = useMemo(() => {
+    const links = [
+      { href: "/home", labelKey: "home", icon: "/assets/home-button.png" },
+      {
+        href: "/dashboard",
+        labelKey: "applications",
+        icon: "/assets/candidate-profile.png",
+      },
+      { href: "/archives", labelKey: "archives", icon: "/assets/archives.png" },
+      {
+        href: "/statistics",
+        labelKey: "statistics",
+        icon: "/assets/pie-chart.png",
+      },
+      {
+        href: "/leaderboard",
+        labelKey: "ranking",
+        icon: "/assets/podium.png",
+      },
+    ];
+
+    if (organizationMemberInfo) {
+      links.push({
+        href: "/organization",
+        labelKey: "organization",
+        icon: "/assets/organization.png",
+      });
+    }
+
+    return links;
+  }, [organizationMemberInfo]);
 
   return (
     <div className={`${styles.dashboardContainer} ${sidebarCollapsed ? styles.collapsed : ""}`}>
@@ -110,6 +124,7 @@ export default function Navbar({ children }: { children: React.ReactNode }) {
           </div>
         </div>
       </header>
+
       <aside
         className={`${styles.sidebar} ${
           sidebarCollapsed ? styles.collapsed : ""
@@ -179,6 +194,7 @@ export default function Navbar({ children }: { children: React.ReactNode }) {
           />
         </div>
       </aside>
+
       <main
         className={`${styles.content} ${
           sidebarCollapsed ? styles.collapsed : ""

@@ -26,32 +26,25 @@ function extractJsonFromString(str: string): any | null {
     return null;
   }
 
-  // Étape 1 : Essayer d'extraire le JSON d'un bloc markdown. C'est la méthode la plus fiable.
-  // La regex est améliorée pour accepter ` ``` ` ou ` ```json `
   const match = str.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
 
   if (match && match[1]) {
     try {
-      // On a trouvé un bloc, on essaie de parser son contenu.
       return JSON.parse(match[1]);
     } catch (e) {
       Logger.error(
         `A JSON markdown block was found, but its content is invalid: ${e.message}`,
         'MailFilterService-JSONUtil',
       );
-      // Si le bloc trouvé est invalide, il est inutile de continuer.
       return null;
     }
   }
 
-  // Étape 2 : Si aucun bloc markdown n'a été trouvé, essayer de parser la chaîne entière.
-  // Utile si Claude retourne UNIQUEMENT l'objet JSON, sans le markdown.
   try {
     const parsed = JSON.parse(str);
     if (typeof parsed === 'object' && parsed !== null) {
       return parsed;
     }
-    // Le JSON est valide mais ce n'est pas un objet (ex: juste une chaîne "ok")
     Logger.warn(
       `The string was parsed as valid JSON, but it is not an object.`,
       'MailFilterService-JSONUtil',
@@ -71,22 +64,18 @@ export class MailFilterService {
   private readonly logger = new Logger(MailFilterService.name);
   private readonly claudeAI: Anthropic;
 
-  // Deduplication system with improved scalability
   private processedEmails = new Set<string>();
-  private readonly EMAIL_CACHE_TTL = 24 * 60 * 60 * 1000; // 24 hours (prevent reprocessing same day)
-  private readonly MAX_CACHE_SIZE = 15000; // Limit cache size for memory control
+  private readonly EMAIL_CACHE_TTL = 24 * 60 * 60 * 1000;
+  private readonly MAX_CACHE_SIZE = 15000;
 
-  // Response caching system for claudeAI calls
   private responseCache = new Map<
     string,
     { response: ExtractedJobDataDto | null; timestamp: number }
   >();
-  private readonly RESPONSE_CACHE_TTL = 60 * 60 * 1000; // 1 hour
-  private readonly MAX_RESPONSE_CACHE_SIZE = 1000; // Limit response cache size
+  private readonly RESPONSE_CACHE_TTL = 60 * 60 * 1000;
+  private readonly MAX_RESPONSE_CACHE_SIZE = 1000;
 
-  // Pre-filtering configuration
   private readonly JOB_KEYWORDS = [
-    // French keywords
     'recrutement',
     'candidature',
     'poste',
@@ -106,7 +95,7 @@ export class MailFilterService {
     'carrière',
     'postulation',
     'embauche',
-    // English keywords
+
     'recruitment',
     'application',
     'position',
@@ -163,7 +152,6 @@ export class MailFilterService {
     'sécurité',
   ];
 
-  // Performance metrics
   private metrics = {
     startTime: Date.now(),
     processedEmails: 0,
@@ -174,14 +162,11 @@ export class MailFilterService {
     totalProcessingTime: 0,
   };
 
-  // Concurrent processing configuration
-  private readonly CONCURRENT_EMAIL_LIMIT = 5; // Shared limit for Gmail and Outlook
+  private readonly CONCURRENT_EMAIL_LIMIT = 5;
 
-  // User count cache to avoid frequent DB calls
   private userCountCache: { count: number; timestamp: number } | null = null;
-  private readonly USER_COUNT_CACHE_TTL = 10 * 60 * 1000; // 10 minutes
+  private readonly USER_COUNT_CACHE_TTL = 10 * 60 * 1000;
 
-  // Stockage analyses pour dashboard
   private recentAnalyses: EmailAnalysisResult[] = [];
   private readonly MAX_RECENT_ANALYSES = 100;
 
@@ -195,15 +180,14 @@ export class MailFilterService {
       apiKey: process.env.ANTHROPIC_API_KEY,
     });
 
-    // Clean up processed emails cache every 6 hours (instead of clearing completely)
     setInterval(
       () => {
-        this.performCacheCleanup(); // Use smart cleanup instead of clearing everything
+        this.performCacheCleanup();
         this.cleanupResponseCache();
         this.logger.log('Performed smart email deduplication cache cleanup');
         this.logMetrics();
       },
-      6 * 60 * 60 * 1000, // 6 hours
+      6 * 60 * 60 * 1000,
     );
   }
 
@@ -230,12 +214,11 @@ export class MailFilterService {
    * Generate cache key for similar emails
    */
   private generateCacheKey(emailText: string, emailSubject?: string): string {
-    // Normalize text for better cache hits
     const normalizedText = emailText
       .toLowerCase()
       .replace(/\s+/g, ' ')
       .replace(/[^\w\s]/g, '')
-      .substring(0, 500); // Use first 500 chars for similarity
+      .substring(0, 500);
 
     const normalizedSubject = (emailSubject || '')
       .toLowerCase()
@@ -312,11 +295,9 @@ export class MailFilterService {
     emailSender?: string,
     messageId?: string,
   ): string {
-    // Create stable hash based on message ID + user + subject (ignore content changes from Gmail formatting)
     const stableContent = `${userId}|${emailSubject || ''}|${emailSender || ''}|${messageId || 'no-msg-id'}`;
     const hash = createHash('sha256').update(stableContent).digest('hex');
 
-    // Add timestamp for TTL tracking
     const timestampedHash = `${hash}:${Date.now()}`;
     return timestampedHash;
   }
@@ -325,10 +306,8 @@ export class MailFilterService {
    * Check if email has already been processed recently
    */
   private isEmailAlreadyProcessed(emailHash: string): boolean {
-    // Extract base hash without timestamp for checking
     const baseHash = emailHash.split(':')[0];
 
-    // Check if any variant of this email was already processed
     for (const processedHash of this.processedEmails) {
       const processedBaseHash = processedHash.split(':')[0];
       if (processedBaseHash === baseHash) {
@@ -426,7 +405,7 @@ export class MailFilterService {
     emailSubject?: string,
     emailSender?: string,
   ): { isJobRelated: boolean; confidence: number; reason: string } {
-    // Pre-filtering logic removed - all emails will be processed
+
     return {
       isJobRelated: true,
       confidence: 100,
@@ -639,7 +618,6 @@ If validation fails → return null
       `Processing Gmail email. Subject: "${subject}", Sender: "${sender}"`,
     );
 
-    // Generate hash for deduplication (including Gmail message ID for uniqueness)
     const emailHash = this.generateEmailHash(
       bodyText,
       userId,
@@ -648,7 +626,6 @@ If validation fails → return null
       gmailMessage.id,
     );
 
-    // Check if email was already processed
     if (this.isEmailAlreadyProcessed(emailHash)) {
       this.metrics.duplicatesSkipped++;
       this.logger.warn(
@@ -657,7 +634,6 @@ If validation fails → return null
       return 'Email already processed - skipped';
     }
 
-    // Mark as being processed
     this.markEmailAsProcessed(emailHash);
 
     try {
@@ -699,7 +675,6 @@ If validation fails → return null
       `Processing email for user ${userId}. Subject: "${emailSubject}", Sender: "${emailSender}"`,
     );
 
-    // Smart pre-filtering before Claude AI
     const preFilterResult =
       await this.preFilterService.shouldProcessWithClaudeAI(
         emailText,
@@ -707,7 +682,6 @@ If validation fails → return null
         emailSender || '',
       );
 
-    // Créer analyse pour dashboard
     const analysis: EmailAnalysisResult = {
       emailId,
       timestamp: new Date(),
@@ -761,7 +735,6 @@ If validation fails → return null
         existingJobs,
       );
 
-      // Check cache first
       const cacheKey = this.generateCacheKey(emailText, emailSubject);
       const cachedResponse = this.getCachedResponse(cacheKey);
 
@@ -773,7 +746,6 @@ If validation fails → return null
         analysis.systemReflection.claudeAIReasoning =
           'Réponse trouvée en cache';
       } else {
-        // Make claudeAI call with fallback mechanism
         analysis.claudeAIUsed = true;
         parsedData = await this.callclaudeAIWithFallback(
           optimizedPrompt,
@@ -784,7 +756,6 @@ If validation fails → return null
         analysis.systemReflection.claudeAIReasoning =
           this.generateClaudeAIReasoning(parsedData, isComplex, existingJobs);
 
-        // Cache the response
         if (parsedData) {
           this.setCachedResponse(cacheKey, parsedData);
         }
@@ -827,7 +798,6 @@ If validation fails → return null
         parsedData.status = ApplicationStatus.PENDING;
       }
 
-      // Comparaison avec jobs existants
       const jobComparison = await this.compareWithExistingJobs(
         parsedData,
         userId,
@@ -849,7 +819,7 @@ If validation fails → return null
         const newJobResult = await this.createJobApply(parsedData, userId);
         analysis.systemReflection.finalDecision = `New job created: ${parsedData.title} at ${parsedData.company}`;
         analysis.finalResult = newJobResult;
-        // Extract ID from result
+
         const idMatch = newJobResult.match(/ID: ([^)]+)/);
         if (idMatch) {
           analysis.jobApplyId = idMatch[1];
@@ -926,7 +896,6 @@ If validation fails → return null
       );
 
       if (retryCount < maxRetries) {
-        // Exponential backoff
         const delay = Math.pow(2, retryCount) * 1000;
         await new Promise((resolve) => setTimeout(resolve, delay));
         return this.callclaudeAIWithFallback(
@@ -937,7 +906,6 @@ If validation fails → return null
         );
       }
 
-      // If all retries failed, try with simpler prompt
       if (isComplex && retryCount >= maxRetries) {
         this.logger.log('Retrying with simplified prompt for complex email');
         const simplifiedPrompt = this.generateOptimizedPrompt(
@@ -1005,7 +973,6 @@ If validation fails → return null
     const subject = outlookMessage.subject || '';
     const sender = `${outlookMessage.from?.emailAddress?.name || ''} <${outlookMessage.from?.emailAddress?.address || ''}>`;
 
-    // Extract text content from Outlook message body
     let bodyText = this.extractTextFromOutlookMessage(outlookMessage);
 
     if (!bodyText && outlookMessage.bodyPreview) {
@@ -1029,10 +996,8 @@ If validation fails → return null
       `Processing Outlook email without pre-filtering. Subject: "${subject}", Sender: "${sender}"`,
     );
 
-    // Generate hash for deduplication
     const emailHash = this.generateEmailHash(bodyText, userId, subject, sender);
 
-    // Check if email was already processed
     if (this.isEmailAlreadyProcessed(emailHash)) {
       this.metrics.duplicatesSkipped++;
       this.logger.warn(
@@ -1041,7 +1006,6 @@ If validation fails → return null
       return 'Email already processed - skipped';
     }
 
-    // Mark as being processed
     this.markEmailAsProcessed(emailHash);
 
     try {
@@ -1078,7 +1042,6 @@ If validation fails → return null
 
     let content = outlookMessage.body.content;
 
-    // If HTML content, convert to plain text
     if (outlookMessage.body.contentType === 'html') {
       content = convert(content, {
         wordwrap: false,
@@ -1098,7 +1061,6 @@ If validation fails → return null
    * Initialize monitoring system
    */
   onModuleInit() {
-    // Start cache cleanup every 20 minutes
     setInterval(
       () => {
         this.performCacheCleanup();
@@ -1106,7 +1068,6 @@ If validation fails → return null
       20 * 60 * 1000,
     );
 
-    // Log performance metrics every 30 minutes
     setInterval(
       () => {
         this.logPerformanceMetrics();
@@ -1128,7 +1089,6 @@ If validation fails → return null
   private performCacheCleanup(): void {
     const now = Date.now();
 
-    // Clear expired processed emails
     const expiredProcessedEmails = [];
     for (const email of this.processedEmails) {
       const [, timestamp] = email.split(':');
@@ -1140,12 +1100,11 @@ If validation fails → return null
       this.processedEmails.delete(email),
     );
 
-    // LRU cleanup if cache is too large
     if (this.processedEmails.size > this.MAX_CACHE_SIZE) {
       const sortedEmails = Array.from(this.processedEmails).sort((a, b) => {
         const timestampA = parseInt(a.split(':')[1]);
         const timestampB = parseInt(b.split(':')[1]);
-        return timestampA - timestampB; // Oldest first
+        return timestampA - timestampB;
       });
 
       const toRemove = sortedEmails.slice(
@@ -1159,7 +1118,6 @@ If validation fails → return null
       );
     }
 
-    // Clear expired cache entries
     const expiredCacheKeys = [];
     for (const [key, entry] of this.responseCache.entries()) {
       if (now - entry.timestamp > this.RESPONSE_CACHE_TTL) {
@@ -1168,7 +1126,6 @@ If validation fails → return null
     }
     expiredCacheKeys.forEach((key) => this.responseCache.delete(key));
 
-    // LRU cleanup for response cache
     if (this.responseCache.size > this.MAX_RESPONSE_CACHE_SIZE) {
       const sortedEntries = Array.from(this.responseCache.entries()).sort(
         (a, b) => a[1].timestamp - b[1].timestamp,
@@ -1195,7 +1152,7 @@ If validation fails → return null
     totalMB: number;
   } {
     const processedEmailsSize =
-      Array.from(this.processedEmails).join('').length * 2; // UTF-16
+      Array.from(this.processedEmails).join('').length * 2;
     const responseCacheSize =
       JSON.stringify(Array.from(this.responseCache.values())).length * 2;
 
@@ -1296,7 +1253,6 @@ If validation fails → return null
   private async getUserCount(): Promise<number> {
     const now = Date.now();
 
-    // Check if we have a valid cached count
     if (
       this.userCountCache &&
       now - this.userCountCache.timestamp < this.USER_COUNT_CACHE_TTL
@@ -1305,11 +1261,9 @@ If validation fails → return null
     }
 
     try {
-      // Fetch all users from database
       const users = await this.userService.findAll();
       const userCount = users.length;
 
-      // Cache the result
       this.userCountCache = {
         count: userCount,
         timestamp: now,
@@ -1321,7 +1275,7 @@ If validation fails → return null
       this.logger.error(
         `Failed to get user count: ${error.message}. Using fallback of 100.`,
       );
-      // Fallback to a conservative estimate
+
       return 100;
     }
   }
@@ -1330,15 +1284,13 @@ If validation fails → return null
    * Get the concurrent email processing limit (dynamically calculated from real user count)
    */
   public async getConcurrentEmailLimit(): Promise<number> {
-    // Get actual user count from database
     const userCount = await this.getUserCount();
 
-    // Calculate optimal limit based on actual user scale
-    if (userCount <= 100) return 5; // Small scale: 5 concurrent
-    if (userCount <= 500) return 10; // Medium scale: 10 concurrent
-    if (userCount <= 1000) return 15; // Large scale: 15 concurrent (RECOMMANDÉ pour 1000 users)
-    if (userCount <= 5000) return 25; // Enterprise: 25 concurrent
-    return 35; // Massive scale: 35 concurrent
+    if (userCount <= 100) return 5;
+    if (userCount <= 500) return 10;
+    if (userCount <= 1000) return 15;
+    if (userCount <= 5000) return 25;
+    return 35;
   }
 
   /**
@@ -1355,10 +1307,10 @@ If validation fails → return null
 
     return {
       currentConfig: {
-        userCount: userCount, // Real user count from DB
+        userCount: userCount,
         concurrencyLimit: currentLimit,
-        estimatedDailyEmails: userCount * 50, // estimation moyenne
-        estimatedJobEmails: Math.floor(userCount * 50 * 0.2), // 20% job-related
+        estimatedDailyEmails: userCount * 50,
+        estimatedJobEmails: Math.floor(userCount * 50 * 0.2),
       },
       currentPerformance: {
         errorRate: (errorRate * 100).toFixed(2) + '%',
@@ -1386,7 +1338,6 @@ If validation fails → return null
     return 'GOOD - Current settings optimal';
   }
 
-  // Methods for analysis and dashboard
   private generatePreFilterDecision(preFilterResult: any): string {
     if (!preFilterResult.shouldProcess) {
       return `FILTERED: ${preFilterResult.reason} (Confidence: ${Math.round(preFilterResult.confidence * 100)}%)`;
@@ -1401,7 +1352,6 @@ If validation fails → return null
   ): string {
     const analysis = [];
 
-    // Length analysis
     if (emailText.length < 100) {
       analysis.push('Very short email');
     } else if (emailText.length > 2000) {
@@ -1410,7 +1360,6 @@ If validation fails → return null
       analysis.push('Normal length');
     }
 
-    // Keywords analysis (both French and English)
     const jobKeywords = [
       'candidature',
       'entretien',
@@ -1433,7 +1382,6 @@ If validation fails → return null
       analysis.push('No job keywords detected');
     }
 
-    // Sender analysis
     if (sender?.includes('linkedin.com') || sender?.includes('indeed.com')) {
       analysis.push('Sender: Job platform');
     } else if (sender?.includes('no-reply') || sender?.includes('noreply')) {
@@ -1479,10 +1427,8 @@ If validation fails → return null
     userId: string,
   ): Promise<ExistingJobComparisonDto[]> {
     try {
-      // Récupérer les jobs existants de l'utilisateur
       const existingJobs = await this.jobApplyService.getAllJobApplies(userId);
 
-      // Convertir au format ExistingJobComparisonDto (limiter à 50 récents pour performance)
       const jobsForComparison: ExistingJobComparisonDto[] = existingJobs
         .sort(
           (a, b) =>
@@ -1497,8 +1443,8 @@ If validation fails → return null
           status: job.status,
           contractType: job.contractType || null,
           createdAt: job.createdAt,
-          similarity: 0, // Valeur par défaut, sera calculée lors de la comparaison
-          matchReason: '', // Valeur par défaut, sera définie lors de la comparaison
+          similarity: 0,
+          matchReason: '',
         }));
 
       this.logger.log(
@@ -1550,7 +1496,7 @@ If validation fails → return null
           this.logger.log(
             `Rejecting match due to different companies: "${parsedData.company}" vs "${existingJob.company}" (${(companySimilarity * 100).toFixed(1)}% similar)`,
           );
-          continue; // Skip this job if companies are too different
+          continue;
         }
 
         let action: 'updated' | 'created' | 'ignored' = 'ignored';
@@ -1634,7 +1580,6 @@ If validation fails → return null
       score += titleSimilarity * 0.3;
     }
 
-    // Comparaison localisation (poids: 10%)
     maxScore += 0.1;
     if (parsedData.location && existingJob.location) {
       const locationSimilarity = this.stringSimilarity(
@@ -1643,17 +1588,16 @@ If validation fails → return null
       );
       score += locationSimilarity * 0.1;
     } else if (!parsedData.location && !existingJob.location) {
-      score += 0.1; // Bonus si les deux sont null
+      score += 0.1;
     }
 
-    // Comparaison type contrat (poids: 10%)
     maxScore += 0.1;
     if (parsedData.contractType && existingJob.contractType) {
       if (parsedData.contractType === existingJob.contractType) {
         score += 0.1;
       }
     } else if (!parsedData.contractType && !existingJob.contractType) {
-      score += 0.1; // Bonus si les deux sont null
+      score += 0.1;
     }
 
     const finalScore = maxScore > 0 ? score / maxScore : 0;
@@ -1666,7 +1610,6 @@ If validation fails → return null
   }
 
   private stringSimilarity(str1: string, str2: string): number {
-    // Calcul simple de similarité basé sur Levenshtein distance
     const longer = str1.length > str2.length ? str1 : str2;
     const shorter = str1.length > str2.length ? str2 : str1;
     if (longer.length === 0) return 1;
@@ -1708,7 +1651,6 @@ If validation fails → return null
     }
   }
 
-  // Méthodes pour le dashboard
   getRecentAnalyses(limit: number = 10): EmailAnalysisResult[] {
     return this.recentAnalyses.slice(0, limit);
   }

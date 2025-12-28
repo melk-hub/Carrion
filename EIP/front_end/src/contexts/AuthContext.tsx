@@ -11,11 +11,13 @@ import React, {
 } from "react";
 import apiService from "@/services/api";
 import { UserProfile } from "@/interface/user.interface";
+import { OrganizationMemberInfo } from "@/interface/organization.interface";
 
 interface AuthContextType {
   isAuthenticated: boolean;
   loadingAuth: boolean;
   userProfile: UserProfile | null;
+  organizationMemberInfo: OrganizationMemberInfo | null;
   setIsAuthenticated: (isAuthenticated: boolean) => void;
   logOut: (callApi?: boolean) => void;
   checkAuthStatus: () => Promise<void>;
@@ -38,23 +40,21 @@ interface AuthProviderProps {
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
-  const [loadingAuth, setLoadingAuth] = useState<boolean>(false);
+  const [loadingAuth, setLoadingAuth] = useState<boolean>(true);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+  const [organizationMemberInfo, setOrganizationMemberInfo] = useState<OrganizationMemberInfo | null>(null);
 
   const logOut = useCallback(async (callApi: boolean = true) => {
     if (callApi) {
       try {
         await apiService.get("/auth/logout");
       } catch (error) {
-        console.error(
-          "Logout request failed, clearing session locally anyway.",
-          error
-        );
+        console.error("Logout error", error);
       }
     }
-
     setIsAuthenticated(false);
     setUserProfile(null);
+    setOrganizationMemberInfo(null);
     setLoadingAuth(false);
   }, []);
 
@@ -62,31 +62,43 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     setLoadingAuth(true);
     try {
       const profileData = await apiService.get<UserProfile>("/user/profile");
-
       if (profileData) {
         setUserProfile(profileData);
         setIsAuthenticated(true);
+        try {
+          const orgData = await apiService.get<OrganizationMemberInfo>('/organization');
+
+          if (orgData) {
+            setOrganizationMemberInfo(orgData);
+          }
+        } catch (e) {
+          setOrganizationMemberInfo(null);
+        }
       } else {
         setUserProfile(null);
         setIsAuthenticated(false);
+        setOrganizationMemberInfo(null);
       }
     } catch (error) {
       setUserProfile(null);
       setIsAuthenticated(false);
+      setOrganizationMemberInfo(null);
     } finally {
+
       setLoadingAuth(false);
     }
   }, []);
 
+
   useEffect(() => {
     apiService.registerLogoutCallback(logOut);
-  }, [logOut]);
+    checkAuthStatus();
+  }, [logOut, checkAuthStatus]);
 
   const getUserDisplayName = useCallback((): string => {
     if (!userProfile) return "Carrion";
     const { firstName, lastName } = userProfile;
-    const displayName = `${firstName || ""} ${lastName || ""}`.trim();
-    return displayName || "Carrion";
+    return `${firstName || ""} ${lastName || ""}`.trim() || "Carrion";
   }, [userProfile]);
 
   const value = useMemo(
@@ -94,6 +106,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       isAuthenticated,
       loadingAuth,
       userProfile,
+      organizationMemberInfo,
       setIsAuthenticated,
       logOut,
       checkAuthStatus,
@@ -103,6 +116,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       isAuthenticated,
       loadingAuth,
       userProfile,
+      organizationMemberInfo,
       logOut,
       checkAuthStatus,
       getUserDisplayName,

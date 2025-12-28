@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { useLanguage } from "@/contexts/LanguageContext";
 import apiService from "@/services/api";
+import { useAuth } from "@/contexts/AuthContext";
 
 import WeeklyGoalCard from "@/components/WeeklyGoalCard/WeeklyGoalCard";
 import DailyTipCard from "@/components/DailyTipCard";
@@ -13,6 +14,7 @@ import AddApplicationModal, {
   ApplicationFormData,
 } from "@/components/AddApplicationModal/AddApplicationModal";
 import Loading from "@/components/Loading/Loading";
+import SetupModal from "@/components/SetupModal/SetupModal";
 
 import candidature from "../../../../public/assets/candidate-profile.png";
 import newApplicationIcon from "../../../../public/assets/plus.png";
@@ -60,22 +62,52 @@ export default function HomeClient({
 }: HomeClientProps) {
   const { t } = useLanguage();
   const router = useRouter();
+  const { userProfile, loadingAuth } = useAuth();
   const [showAddModal, setShowAddModal] = useState(false);
   const [isInfosModalOpen, setIsInfosModalOpen] = useState(false);
+  const [isSetupModalOpen, setIsSetupModalOpen] = useState(false);
+  const [hasSeenSetup, setHasSeenSetup] = useState(false);
 
   useEffect(() => {
+    const seen = sessionStorage.getItem('hasSeenSetupModal');
+    if (seen) setHasSeenSetup(true);
+  }, []);
+
+  useEffect(() => {
+    if (loadingAuth) return;
     if (!hasProfile) {
       const timer = setTimeout(() => {
         setIsInfosModalOpen(true);
       }, 500);
       return () => clearTimeout(timer);
     }
-  }, [hasProfile]);
+    if (hasProfile && userProfile && !hasSeenSetup) {
+      const isLinked = (userProfile as any).googleId || (userProfile as any).outlookId;
+      if (!isLinked) {
+        const timer = setTimeout(() => {
+          setIsSetupModalOpen(true);
+        }, 500);
+        return () => clearTimeout(timer);
+      }
+    }
+  }, [hasProfile, userProfile, loadingAuth, hasSeenSetup]);
+
+  const handleCloseInfosModal = () => {
+    setIsInfosModalOpen(false);
+    router.refresh();
+  };
+
+  const handleCloseSetupModal = () => {
+    setIsSetupModalOpen(false);
+
+    sessionStorage.setItem('hasSeenSetupModal', 'true');
+    setHasSeenSetup(true);
+    router.refresh();
+  };
 
   const formatRanking = (ranking: UserRankingInfo | null): string => {
     if (!ranking) return t("home.ranking.noRank") as string;
     const { rank } = ranking;
-
     const ordinalKey = `home.ranking.ordinals.${rank}`;
     const ordinalTranslation = t(ordinalKey) as string;
     return ordinalTranslation !== ordinalKey
@@ -87,18 +119,10 @@ export default function HomeClient({
     if (!createdAt) return t("notifications.time.unknown") as string;
     const now = new Date();
     const notificationTime = new Date(createdAt);
-    if (isNaN(notificationTime.getTime()))
-      return t("notifications.time.unknown") as string;
-
-    const diffInMinutes = Math.floor(
-      (now.getTime() - notificationTime.getTime()) / (1000 * 60)
-    );
-
+    if (isNaN(notificationTime.getTime())) return t("notifications.time.unknown") as string;
+    const diffInMinutes = Math.floor((now.getTime() - notificationTime.getTime()) / (1000 * 60));
     if (diffInMinutes < 1) return t("notifications.time.now") as string;
-    if (diffInMinutes < 60)
-      return t("notifications.time.minutes", {
-        minutes: diffInMinutes,
-      }) as string;
+    if (diffInMinutes < 60) return t("notifications.time.minutes", { minutes: diffInMinutes }) as string;
     if (diffInMinutes < 1440) {
       const hours = Math.floor(diffInMinutes / 60);
       return t("notifications.time.hours", { hours }) as string;
@@ -109,41 +133,28 @@ export default function HomeClient({
 
   const getNotificationIcon = (type: Notification["type"]): string => {
     switch (type) {
-      case "POSITIVE":
-        return "✅";
-      case "WARNING":
-        return "⚠️";
-      case "NEGATIVE":
-        return "❌";
-      case "INFO":
-      default:
-        return "📋";
+      case "POSITIVE": return "✅";
+      case "WARNING": return "⚠️";
+      case "NEGATIVE": return "❌";
+      case "INFO": default: return "📋";
     }
   };
 
   const getSimplifiedTitle = (notification: Notification): string => {
-    if (notification.titleKey?.includes("application.updated"))
-      return t("notifications.titles.application.updated") as string;
-    if (notification.titleKey?.includes("application.created"))
-      return t("notifications.titles.application.created") as string;
-    if (notification.titleKey?.includes("interview"))
-      return t("notifications.titles.interview") as string;
+    if (notification.titleKey?.includes("application.updated")) return t("notifications.titles.application.updated") as string;
+    if (notification.titleKey?.includes("application.created")) return t("notifications.titles.application.created") as string;
+    if (notification.titleKey?.includes("interview")) return t("notifications.titles.interview") as string;
     return notification.title || (t("notifications.titles.default") as string);
   };
 
   const getRecentNotifications = () => {
     return [...notifications]
-      .sort(
-        (a, b) =>
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-      )
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
       .slice(0, 3);
   };
   const recentNotifications = getRecentNotifications();
 
-  const handleSaveNewApplication = async (
-    applicationData: ApplicationFormData
-  ) => {
+  const handleSaveNewApplication = async (applicationData: ApplicationFormData) => {
     try {
       await apiService.post("/job_applies", applicationData);
       closeAddModal();
@@ -178,7 +189,14 @@ export default function HomeClient({
       {isInfosModalOpen && (
         <InfosModal
           isOpen={isInfosModalOpen}
-          onClose={() => setIsInfosModalOpen(false)}
+          onClose={handleCloseInfosModal}
+        />
+      )}
+
+      {isSetupModalOpen && (
+        <SetupModal
+          isOpen={isSetupModalOpen}
+          onClose={handleCloseSetupModal}
         />
       )}
 
@@ -227,36 +245,21 @@ export default function HomeClient({
               className={`${styles.actionBtn} ${styles.primary}`}
               onClick={() => navigate("/dashboard")}
             >
-              <Image
-                src={candidature}
-                alt="Candidature"
-                width={30}
-                height={30}
-              />
+              <Image src={candidature} alt="Candidature" width={30} height={30} />
               <span>{t("home.myApplications") as string}</span>
             </button>
             <button
               className={`${styles.actionBtn} ${styles.primary}`}
               onClick={openAddModal}
             >
-              <Image
-                src={newApplicationIcon}
-                alt="Nouvelle Candidature"
-                width={30}
-                height={30}
-              />
+              <Image src={newApplicationIcon} alt="Nouvelle Candidature" width={30} height={30} />
               <span>{t("home.newApplications") as string}</span>
             </button>
             <button
               className={`${styles.actionBtn} ${styles.primary}`}
               onClick={() => navigate("/statistics")}
             >
-              <Image
-                src={statistics}
-                alt="Statistiques"
-                width={30}
-                height={30}
-              />
+              <Image src={statistics} alt="Statistiques" width={30} height={30} />
               <span>{t("home.statistics") as string}</span>
             </button>
             <button
@@ -283,11 +286,7 @@ export default function HomeClient({
             {recentNotifications.length > 0 ? (
               recentNotifications.map((notification) => (
                 <div className={styles.timelineItem} key={notification.id}>
-                  <div
-                    className={`${styles.timelineDot} ${
-                      styles[notification.type.toLowerCase()]
-                    }`}
-                  >
+                  <div className={`${styles.timelineDot} ${styles[notification.type.toLowerCase()]}`}>
                     {getNotificationIcon(notification.type)}
                   </div>
                   <div className={styles.timelineContent}>

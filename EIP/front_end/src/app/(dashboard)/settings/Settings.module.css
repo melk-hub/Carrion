@@ -211,26 +211,21 @@
   margin: 0;
 }
 
-/* --- MODIFICATIONS ET AJOUTS CI-DESSOUS --- */
-
-/* Style pour le conteneur de la section "Compte" */
 .accountActions {
   margin-top: 24px;
   display: flex;
   flex-direction: column;
-  gap: 24px; /* Espace entre les deux actions */
+  gap: 24px;
 }
 
-/* Style pour chaque ligne d'action (texte + bouton) */
 .actionItem {
   display: flex;
-  justify-content: space-between; /* Aligne le texte à gauche, le bouton à droite */
+  justify-content: space-between;
   align-items: center;
-  flex-wrap: wrap; /* Permet le passage à la ligne sur mobile */
+  flex-wrap: wrap;
   gap: 16px;
 }
 
-/* Style pour le texte à gauche */
 .actionItem strong {
   font-size: 1.1rem;
   font-weight: 600;
@@ -278,7 +273,6 @@
   border-color: #f56565;
 }
 
-/* État désactivé pour les boutons */
 .btnSecondary:disabled,
 .btnDanger:disabled {
   opacity: 0.6;
@@ -286,7 +280,6 @@
 }
 
 @media (max-width: 1024px) {
-  /* TODO Si il y a du responsive a faire */
 }
 
 @media (max-width: 768px) {

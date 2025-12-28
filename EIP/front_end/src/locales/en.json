@@ -9,7 +9,7 @@
     "delete": "Delete",
     "edit": "Edit",
     "archive": "Archive",
-    "dearchive": "Unarchive",
+    "unarchive": "Unarchive",
     "add": "Add",
     "update": "Edit",
     "close": "Close",
@@ -28,7 +28,10 @@
     "refresh": "Refresh",
     "retry": "Retry",
     "previous": "Previous",
-    "next": "Next"
+    "next": "Next",
+    "unauthorized": "Access denied",
+    "email": "Email Address",
+    "or": "or"
   },
   "shared": {
     "time": {
@@ -38,7 +41,8 @@
       "hours": "{{hours}}h",
       "days": "{{days}}d",
       "hoursAgo": "{{count}}h ago",
-      "daysAgo": "{{count}}d ago"
+      "daysAgo": "{{count}}d ago",
+      "back": "Back"
     },
     "status": {
       "read": "Read",
@@ -93,7 +97,8 @@
     "notification": "Notifications",
     "ranking": "Ranking",
     "logout": "Logout",
-    "seeAll": "View all notifications"
+    "seeAll": "View all notifications",
+    "organization": "Organization"
   },
   "landing": {
     "title": "The ideal platform to manage your applications",
@@ -732,5 +737,157 @@
     "tip26": "Analyze job offers to identify the most sought-after skills in your sector and develop them.",
     "tip27": "Create a diverse contact network: former colleagues, professors, professionals in your sector.",
     "tip28": "Stay authentic during interviews. Recruiters can spot candidates who play a role rather than being themselves."
+  },
+
+  "organization": {
+    "header": {
+      "title": "Organization: {{name}}",
+      "manage": "Manage"
+    },
+    "empty": {
+      "title": "No organization found."
+    },
+    "stats": {
+      "label": "Organization Statistics",
+      "members": {
+        "label": "Members",
+        "trend": "Active members"
+      },
+      "applications": {
+        "label": "Applications",
+        "trend": "Team total",
+        "tooltip": "Total number of applications sent by all members since organization creation."
+      },
+      "activity": {
+        "label": "Activity",
+        "tooltip": "Calculated based on members who created or archived an application in the last 7 days.",
+        "trend": "{{count}} active members"
+      }
+    },
+    "table": {
+      "title": "Member List",
+      "user": "User",
+      "email": "Email",
+      "role": "Role",
+      "performance": "Performance",
+      "actions": "Actions",
+      "invitedBy": "Invited by",
+      "expires": "Expires on",
+      "stats": {
+        "active": "{{count}} active",
+        "total": "{{count}} total"
+      }
+    },
+    "viewAs": {
+      "title": "Preview: {{name}}",
+      "placeholder": "Here will be displayed applications for {{name}}"
+    },
+    "settings": {
+      "title": "Settings"
+    },
+    "invitations": {
+      "title": "Pending invitations",
+      "add": "+ Invite member",
+      "empty": "No pending invitations."
+    },
+    "dangerZone": {
+      "title": "Danger Zone",
+      "transferTitle": "Transfer organization ownership",
+      "transferWarning": "Warning: By transferring ownership, you will automatically become a TEACHER member and lose your full administration rights.",
+      "selectPlaceholder": "Select new director...",
+      "transferButton": "Transfer ownership",
+      "leaveTitle": "Leave organization",
+      "leaveWarning": "You will lose access to this workspace. You will need a new invitation to return.",
+      "leaveButton": "Leave organization"
+    },
+    "modals": {
+      "invite": {
+        "title": "Invite a new member",
+        "description": "Send an invitation email to join the organization."
+      },
+      "revoke": {
+        "title": "Revoke invitation",
+        "confirm": "Do you want to cancel the invitation sent to {{email}}? The link will become invalid."
+      },
+      "editRole": {
+        "title": "Edit Role",
+        "newRole": "New Role",
+        "description": "Change access level for {{name}}."
+      },
+      "kick": {
+        "title": "Remove member",
+        "description": "Are you sure you want to remove {{name}} from the organization? This action is irreversible.",
+        "confirmButton": "Remove member"
+      },
+      "leave": {
+        "title": "Leave organization",
+        "confirm": "Are you sure you want to leave this organization? This action is immediate."
+      }
+    },
+    "actions": {
+      "viewUser": "View applications for {{name}}",
+      "editRole": "Edit role for {{name}}",
+      "kickUser": "Remove {{name}}",
+      "revoke": "Revoke"
+    },
+    "success": {
+      "roleUpdated": "Role updated successfully!",
+      "memberKicked": "{{name}} has been removed.",
+      "owner": "Director changed successfully!",
+      "invitationRevoked": "Invitation revoked.",
+      "invitationSent": "Invitation sent!",
+      "leave": "You have left the organization."
+    },
+    "error": {
+      "update": "Unable to update role.",
+      "delete": "Error removing member.",
+      "owner": {
+        "select": "Please select a new director",
+        "change": "Error changing ownership"
+      },
+      "emailRequired": "Email is required",
+      "invite": "Error sending invitation.",
+      "leave": "Error while trying to leave the organization."
+    }
+  },
+
+  "invitation": {
+    "errors": {
+      "missingToken": "Missing invitation link.",
+      "invalid": "This invitation does not exist or has expired.",
+      "emailMismatch": "Connection refused: The account {{currentEmail}} does not match the invitation for {{targetEmail}}.",
+      "acceptFailed": "Error accepting invitation."
+    },
+    "success": {
+      "connected": "Login successful!",
+      "joined": "Welcome to the team!"
+    },
+    "ui": {
+      "invalidTitle": "Invalid Link",
+      "redirecting": "Redirecting to home...",
+      "title": "Invitation Received",
+      "invitedBy": "invites you to join the organization:",
+      "role": "Role:",
+      "reservedFor": "This invitation is reserved for the address:"
+    },
+    "buttons": {
+      "validating": "Validating...",
+      "accept": "Accept and Join",
+      "ignore": "Ignore and go to dashboard",
+      "createAccount": "Create an account",
+      "login": "I already have an account"
+    }
+  },
+
+  "setup": {
+    "choice": {
+      "title": "How do you want to manage your applications?",
+      "description": "Carrion offers two modes of operation. You can use both simultaneously.",
+      "autoTitle": "Automatic Mode",
+      "autoDesc": "Link your mailbox. We automatically detect and add your applications.",
+      "goToProfileBtn": "Configure in my Profile",
+      "manualBtn": "I prefer manual entry",
+      "profileNote": "Info: You can change your mind at any time."
+    }
   }
 }
