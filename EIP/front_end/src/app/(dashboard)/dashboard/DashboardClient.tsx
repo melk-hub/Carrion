@@ -75,9 +75,11 @@ export default function DashboardClient({
   const handleUpdateApplication = async () => {
     if (!selectedApplication) return;
     try {
+      // Ne pas envoyer id et createdAt car ils ne sont pas acceptés par le DTO
+      const { id, createdAt, ...updateData } = selectedApplication;
       const updatedApp = await apiService.put<Application>(
-        `/job_applies/${selectedApplication.id}`,
-        selectedApplication
+        `/job_applies/${selectedApplication.id}/status`,
+        updateData
       );
       if (updatedApp) {
         setApplications((prev) =>
@@ -101,7 +103,7 @@ export default function DashboardClient({
 
   const handleDeleteApplication = async (id: string) => {
     try {
-      await apiService.delete(`/job_applies/${id}`);
+      await apiService.delete(`/job_applies/${id}`, {});
       setApplications((prev) => prev.filter((app) => app.id !== id));
     } catch (err: unknown) {
       console.error(t("dashboard.errors.deleteError"), err);

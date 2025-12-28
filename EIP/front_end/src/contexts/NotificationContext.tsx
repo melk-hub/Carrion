@@ -57,6 +57,7 @@ export const NotificationProvider = ({
       setNotifications([]);
       setUnreadCount(0);
       setLoading(false);
+      setError(null);
       return;
     }
 
@@ -77,9 +78,20 @@ export const NotificationProvider = ({
         setUnreadCount(0);
       }
     } catch (err: unknown) {
+      // Le service API gère déjà les erreurs réseau silencieusement
+      // Cette catch ne devrait normalement pas être atteint pour les erreurs réseau
+      // mais on le garde pour les autres types d'erreurs
       const errorMessage =
         err instanceof Error ? err.message : "Failed to fetch notifications";
-      setError(errorMessage);
+      // Ne définir l'erreur que si ce n'est pas une erreur réseau
+      if (!errorMessage.includes("Network error")) {
+        setError(errorMessage);
+      } else {
+        // Pour les erreurs réseau, juste logger et ne pas afficher d'erreur à l'utilisateur
+        console.warn("Network error fetching notifications (backend may be down)");
+        setNotifications([]);
+        setUnreadCount(0);
+      }
     } finally {
       setLoading(false);
     }
@@ -111,7 +123,7 @@ export const NotificationProvider = ({
 
   const deleteNotification = useCallback(async (notificationId: string) => {
     try {
-      await apiService.delete(`/notifications/${notificationId}`);
+      await apiService.delete(`/notifications/${notificationId}`, {});
       setNotifications((prev) => prev.filter((n) => n.id !== notificationId));
     } catch (error) {
       console.error("Failed to delete notification", error);

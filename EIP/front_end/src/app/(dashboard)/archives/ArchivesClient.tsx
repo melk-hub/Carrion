@@ -52,16 +52,18 @@ export default function ArchivesClient({
 
   const handleUpdateApplication = async () => {
     if (!selectedApplication) return;
-    console.log(selectedApplication);
     try {
+      // Ne pas envoyer id et createdAt car ils ne sont pas acceptés par le DTO
+      const { id, createdAt, ...updateData } = selectedApplication;
       const updatedApp = await apiService.put<Application>(
         `/job_applies/${selectedApplication.id}/archived-status`,
-        selectedApplication
+        updateData
       );
-      console.log(updatedApp);
-      setApplications((prev) =>
-        prev.map((app) => (app.id === updatedApp!.id ? updatedApp! : app))
-      );
+      if (updatedApp) {
+        setApplications((prev) =>
+          prev.map((app) => (app.id === updatedApp.id ? updatedApp : app))
+        );
+      }
       closePopup();
     } catch (err: unknown) {
       console.error(t("dashboard.errors.updateError"), err);

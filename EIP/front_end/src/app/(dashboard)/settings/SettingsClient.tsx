@@ -59,7 +59,7 @@ export default function SettingsClient({
   const handleDisconnectAllServices = async () => {
     if (!window.confirm(t("settings.confirmDisconnect") as string)) return;
     setIsDisconnecting(true);
-    const disconnectPromise = apiService.delete("/user-profile/services/all");
+    const disconnectPromise = apiService.delete("/user-profile/services/all", {});
     toast.promise(disconnectPromise, {
       loading: t("settings.pendingDisconnect") as string,
       success: () => {
@@ -79,7 +79,7 @@ export default function SettingsClient({
     if (window.confirm(t("settings.confirmDeleteAccount") as string)) {
       setIsDeleting(true);
       try {
-        await apiService.delete("/user/me");
+        await apiService.delete("/user/me", {});
         toast.success(t("settings.sucessDeleteAccount") as string);
         logOut();
       } catch (err: unknown) {

@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useAuth } from "../../contexts/AuthContext";
 import { useLanguage } from "../../contexts/LanguageContext";
 import Loading from "../../components/Loading/Loading";
 
@@ -9,6 +10,7 @@ function AuthCallback() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { t } = useLanguage();
+  const { checkAuthStatus } = useAuth();
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
@@ -29,9 +31,11 @@ function AuthCallback() {
         }
 
         if (authSuccess === "success") {
-          // setTimeout(() => {
-            // router.replace("/home");
-          // }, 1000);
+          checkAuthStatus().then(() => {
+            setTimeout(() => {
+              router.replace("/home");
+            }, 1000);
+          });
           setLoading(false);
           return;
         }
@@ -47,7 +51,13 @@ function AuthCallback() {
           sessionStorage.removeItem("microsoft_oauth_state");
         }
         if (code) {
-          // router.replace("/home");
+          // Le backend gère l'échange du code OAuth et redirige vers /auth?auth=success
+          // Ici on attend juste que le backend traite le code
+          checkAuthStatus().then(() => {
+            setTimeout(() => {
+              router.replace("/home");
+            }, 1500);
+          });
         } else {
           setError("No authorization code or success parameter received");
         }

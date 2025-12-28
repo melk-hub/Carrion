@@ -14,7 +14,7 @@ import styles from "./LandingPage.module.css";
 import Loading from "@/components/Loading/Loading";
 
 function LandingPageContent() {
-  const { isAuthenticated, setIsAuthenticated, loadingAuth } = useAuth();
+  const { isAuthenticated, setIsAuthenticated, loadingAuth, checkAuthStatus } = useAuth();
   const { t } = useLanguage();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -38,8 +38,10 @@ function LandingPageContent() {
     if (successType === "success") {
       paramsHandled.current = true;
       toast.success(t("auth.loginSuccessRedirect") as string);
-      setIsAuthenticated(true);
-      router.replace("/", { scroll: false });
+      checkAuthStatus().then(() => {
+        setIsAuthenticated(true);
+        router.push("/home");
+      });
     }
   }, [
     isAuthenticated,
@@ -152,8 +154,8 @@ function LandingPageContent() {
                   className={`${styles.mainHeroImage} ${styles.imageZoomIn}`}
                   style={{ objectFit: "cover" }}
                   priority
-                  height={400}
-                  width={400}
+                  height={800}
+                  width={1200}
                 />
                 <div className={styles.imageGlow}></div>
               </div>

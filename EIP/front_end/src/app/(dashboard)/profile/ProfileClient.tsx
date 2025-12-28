@@ -154,7 +154,7 @@ export default function ProfileClient({
     if (!window.confirm(t("profile.removePictureConfirmation") as string))
       return;
     try {
-      await apiService.delete(`/s3/delete?filename=profile`);
+      await apiService.delete(`/s3/delete?filename=profile`, {});
       setUploadedImage(null);
       toast.success(t("profile.removePictureSuccess") as string);
     } catch (error: unknown) {
@@ -202,7 +202,7 @@ export default function ProfileClient({
     if (!window.confirm("Êtes-vous sûr de vouloir supprimer votre CV ?"))
       return;
     try {
-      await apiService.delete(`/s3/delete?filename=cv`);
+      await apiService.delete(`/s3/delete?filename=cv`, {});
       setCvUrl(null);
       toast.success("CV supprimé avec succès !");
     } catch (error: unknown) {

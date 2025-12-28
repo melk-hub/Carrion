@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import styles from "./AuthModal.module.css";
@@ -36,8 +37,9 @@ export default function AuthModal({
     email: "",
     rememberMe: false,
   });
-  const { setIsAuthenticated } = useAuth();
+  const { setIsAuthenticated, checkAuthStatus } = useAuth();
   const { t } = useLanguage();
+  const router = useRouter();
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const API_URL = process.env.NEXT_PUBLIC_API_URL;
@@ -132,9 +134,14 @@ export default function AuthModal({
         });
 
         if (response.ok) {
+          await checkAuthStatus();
           setIsAuthenticated(true);
-          if (onSuccess) onSuccess();
-          else onClose();
+          if (onSuccess) {
+            onSuccess();
+          } else {
+            onClose();
+            router.push("/home");
+          }
         } else {
           const errorData = await response.json();
           setErrorMessage(
