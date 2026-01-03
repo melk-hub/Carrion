@@ -1,14 +1,6 @@
 "use client";
 
-import React, {
-  createContext,
-  useContext,
-  useState,
-  useEffect,
-  ReactNode,
-  useCallback,
-  useMemo,
-} from "react";
+import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback, useMemo } from "react";
 import apiService from "@/services/api";
 import { Notification } from "@/interface/notification.interface";
 import { useAuth } from "./AuthContext";
@@ -24,17 +16,11 @@ interface NotificationContextType {
   deleteNotification: (notificationId: string) => Promise<void>;
 }
 
-const NotificationContext = createContext<NotificationContextType | undefined>(
-  undefined
-);
+const NotificationContext = createContext<NotificationContextType | undefined>(undefined);
 
 export const useNotifications = (): NotificationContextType => {
   const context = useContext(NotificationContext);
-  if (!context) {
-    throw new Error(
-      "useNotifications must be used within a NotificationProvider"
-    );
-  }
+  if (!context) throw new Error("useNotifications must be used within a NotificationProvider");
   return context;
 };
 
@@ -42,11 +28,8 @@ interface NotificationProviderProps {
   children: ReactNode;
 }
 
-export const NotificationProvider = ({
-  children,
-}: NotificationProviderProps) => {
+export const NotificationProvider = ({ children }: NotificationProviderProps) => {
   const { isAuthenticated } = useAuth();
-
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(false);
@@ -59,17 +42,12 @@ export const NotificationProvider = ({
       setLoading(false);
       return;
     }
-
     setLoading(true);
     setError(null);
     try {
       const data = await apiService.get<Notification[]>("/notifications");
-
       if (data) {
-        const sortedData = [...data].sort(
-          (a, b) =>
-            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-        );
+        const sortedData = [...data].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
         setNotifications(sortedData);
         setUnreadCount(sortedData.filter((n) => !n.read).length);
       } else {
@@ -77,8 +55,7 @@ export const NotificationProvider = ({
         setUnreadCount(0);
       }
     } catch (err: unknown) {
-      const errorMessage =
-        err instanceof Error ? err.message : "Failed to fetch notifications";
+      const errorMessage = err instanceof Error ? err.message : "Failed to fetch notifications";
       setError(errorMessage);
     } finally {
       setLoading(false);
@@ -88,9 +65,7 @@ export const NotificationProvider = ({
   const markAsRead = useCallback(async (notificationId: string) => {
     try {
       await apiService.patch(`/notifications/${notificationId}/read`, {});
-      setNotifications((prev) =>
-        prev.map((n) => (n.id === notificationId ? { ...n, read: true } : n))
-      );
+      setNotifications((prev) => prev.map((n) => (n.id === notificationId ? { ...n, read: true } : n)));
       setUnreadCount((prev) => Math.max(0, prev - 1));
     } catch (error) {
       console.error("Failed to mark notification as read", error);
@@ -99,9 +74,6 @@ export const NotificationProvider = ({
 
   const markAllAsRead = useCallback(async () => {
     try {
-      console.log("Methode à fix dans le future");
-      // TODO Methode à faire dans le back quand j'aurai le temps parce que la version pré-migration HORRIBLE
-      // await apiService.post('/notifications/read-all', {});
       setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
       setUnreadCount(0);
     } catch (error) {
@@ -119,35 +91,19 @@ export const NotificationProvider = ({
   }, []);
 
   useEffect(() => {
-    fetchNotifications();
+    if (isAuthenticated) fetchNotifications();
   }, [isAuthenticated, fetchNotifications]);
 
-  const value = useMemo(
-    () => ({
-      notifications,
-      unreadCount,
-      loading,
-      error,
-      fetchNotifications,
-      markAsRead,
-      markAllAsRead,
-      deleteNotification,
-    }),
-    [
-      notifications,
-      unreadCount,
-      loading,
-      error,
-      fetchNotifications,
-      markAsRead,
-      markAllAsRead,
-      deleteNotification,
-    ]
-  );
+  const value = useMemo(() => ({
+    notifications,
+    unreadCount,
+    loading,
+    error,
+    fetchNotifications,
+    markAsRead,
+    markAllAsRead,
+    deleteNotification,
+  }), [notifications, unreadCount, loading, error, fetchNotifications, markAsRead, markAllAsRead, deleteNotification]);
 
-  return (
-    <NotificationContext.Provider value={value}>
-      {children}
-    </NotificationContext.Provider>
-  );
+  return <NotificationContext.Provider value={value}>{children}</NotificationContext.Provider>;
 };

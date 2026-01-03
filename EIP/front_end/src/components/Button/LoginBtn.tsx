@@ -22,21 +22,21 @@ const PrimaryButton = ({
     <button
       type="button"
       onClick={onClick}
-      className={`primary-button ${size} login-btn`}
+      className={styles.primaryButton + " " + size + " " + "login-btn"}
       disabled={disabled}
       style={style}
     >
       <Image
         src="/assets/carrion_logo.png"
         alt="Carrion"
-        className="carrion-logo"
+        className={styles.carrionLogo}
         width={24}
         height={24}
       />
-      <span className="text-button">
+      <span className={styles.textButton}>
         <b>{text}</b>
       </span>
-      <span className="hover-text-button">{hoverText}</span>
+      <span className={styles.hoverTextButton}>{hoverText}</span>
     </button>
   );
 };

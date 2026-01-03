@@ -82,7 +82,7 @@ export default function HomeClient({
       return () => clearTimeout(timer);
     }
     if (hasProfile && userProfile && !hasSeenSetup) {
-      const isLinked = (userProfile as any).googleId || (userProfile as any).outlookId;
+      const isLinked = userProfile.tokens.length > 0;
       if (!isLinked) {
         const timer = setTimeout(() => {
           setIsSetupModalOpen(true);

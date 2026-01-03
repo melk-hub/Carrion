@@ -10,9 +10,9 @@ interface CityOption {
 class ApiService {
   private isRefreshing: boolean = false;
   private refreshSubscribers: (() => Promise<void>)[] = [];
-  private _logoutCallback: (callApi?: boolean) => void = () => { };
+  private _logoutCallback: (callApi?: boolean) => void = () => {};
 
-  constructor() { }
+  constructor() {}
 
   public registerLogoutCallback(callback: (callApi?: boolean) => void) {
     this._logoutCallback = callback;
@@ -81,7 +81,8 @@ class ApiService {
     const response = await fetch(fullUrl, defaultOptions);
 
     if (response.status === 401 && !options.isRetry) {
-      const isAuthRoute = url.includes("/auth/login") || url.includes("/auth/refresh");
+      const isAuthRoute =
+        url.includes("/auth/login") || url.includes("/auth/refresh");
 
       if (isAuthRoute) {
         return response;
@@ -104,8 +105,7 @@ class ApiService {
           const jsonBody = JSON.parse(textBody);
           errorMessage = jsonBody.message || errorMessage;
         }
-      } catch {
-      }
+      } catch {}
 
       throw new Error(errorMessage || `API Error: ${response.status}`);
     }
@@ -120,7 +120,10 @@ class ApiService {
     try {
       return JSON.parse(text);
     } catch (e) {
-      console.warn(`[API] Warning: Failed to parse JSON from ${response.url}`, e);
+      console.warn(
+        `[API] Warning: Failed to parse JSON from ${response.url}`,
+        e
+      );
       return null;
     }
   }
@@ -133,15 +136,14 @@ class ApiService {
       const response = await this.request(url, { method: "GET", ...options });
       return await this.processResponse<T>(response);
     } catch (error) {
-      const quietRoutes = [
-        "/user/profile",
-        "/organization",
-        "/auth/refresh"
-      ];
+      const quietRoutes = ["/user/profile", "/organization", "/auth/refresh"];
 
-      const isQuietRoute = quietRoutes.some(route => url.includes(route));
+      const isQuietRoute = quietRoutes.some((route) => url.includes(route));
 
-      if (isQuietRoute || (error instanceof Error && error.message === "Token refresh failed")) {
+      if (
+        isQuietRoute ||
+        (error instanceof Error && error.message === "Token refresh failed")
+      ) {
         return null;
       }
       console.error(`GET ${url} failed:`, error);
@@ -214,7 +216,7 @@ class ApiService {
 
   public async delete<T>(
     url: string,
-    data: unknown,
+    data: unknown = {},
     options: ApiOptions = {}
   ): Promise<T | null> {
     try {

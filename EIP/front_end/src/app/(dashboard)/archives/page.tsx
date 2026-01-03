@@ -3,6 +3,8 @@ import ApiService from "@/services/api";
 import ArchivesClient from "@/app/(dashboard)/archives/ArchivesClient";
 import { Application } from "@/interface/application.interface";
 
+export const dynamic = "force-dynamic";
+
 async function getArchivedApplications() {
   try {
     const cookieStore = await cookies();

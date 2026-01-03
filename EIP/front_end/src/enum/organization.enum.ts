@@ -1,5 +1,5 @@
 export enum OrganizationRole {
-    OWNER,
-    TEACHER,
-    STUDENT,
+  OWNER = "OWNER",
+  TEACHER = "TEACHER",
+  STUDENT = "STUDENT",
 }

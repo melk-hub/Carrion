@@ -38,6 +38,7 @@ export class UserService {
         data: {
           ...createUserDto,
           email: normalizedEmail,
+          isEmailVerified: true,
         },
       });
     } catch (error) {
@@ -79,6 +80,31 @@ export class UserService {
         email: true,
         hashedRefreshToken: true,
         role: true,
+        isEmailVerified: true,
+        tokens: {
+          select: {
+            name: true,
+          },
+        },
+        userProfile: {
+          select: {
+            firstName: true,
+            lastName: true,
+            birthDate: true,
+            school: true,
+            city: true,
+            phoneNumber: true,
+            imageUrl: true,
+            personalDescription: true,
+            portfolioLink: true,
+            linkedin: true,
+            goal: true,
+            contractSought: true,
+            locationSought: true,
+            sector: true,
+            resume: true,
+          },
+        },
       },
     });
 

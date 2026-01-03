@@ -24,7 +24,7 @@ export default function Navbar({ children }: { children: React.ReactNode }) {
 
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const [avatarUrl, setAvatarUrl] = useState("/assets/avatar.png");
+  const [avatarUrl] = useState("/assets/avatar.png");
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -110,10 +110,10 @@ export default function Navbar({ children }: { children: React.ReactNode }) {
             />
             {isDropdownOpen && (
               <ul className={styles.dropdownMenu}>
-                <li onClick={() => {router.push("/profile"); setIsDropdownOpen(false);}}>
+                <li onClick={() => { router.push("/profile"); setIsDropdownOpen(false); }}>
                   {t("navbar.profile")}
                 </li>
-                <li onClick={() => {router.push("/settings"); setIsDropdownOpen(false);}}>
+                <li onClick={() => { router.push("/settings"); setIsDropdownOpen(false); }}>
                   {t("navbar.settings")}
                 </li>
                 <li onClick={handleLogout} style={{ color: "#ef4444" }}>
@@ -126,9 +126,8 @@ export default function Navbar({ children }: { children: React.ReactNode }) {
       </header>
 
       <aside
-        className={`${styles.sidebar} ${
-          sidebarCollapsed ? styles.collapsed : ""
-        }`}
+        className={`${styles.sidebar} ${sidebarCollapsed ? styles.collapsed : ""
+          }`}
       >
         <div>
           <ul className={styles.navbarMenu}>
@@ -136,9 +135,8 @@ export default function Navbar({ children }: { children: React.ReactNode }) {
               <li key={link.href}>
                 <Link
                   href={link.href}
-                  className={`${styles.navLink} ${
-                    pathname === link.href ? styles.active : ""
-                  }`}
+                  className={`${styles.navLink} ${pathname === link.href ? styles.active : ""
+                    }`}
                 >
                   <Image
                     src={link.icon}
@@ -159,9 +157,8 @@ export default function Navbar({ children }: { children: React.ReactNode }) {
             <li>
               <Link
                 href="/notification"
-                className={`${styles.navLink} ${
-                  pathname === "/notification" ? styles.active : ""
-                }`}
+                className={`${styles.navLink} ${pathname === "/notification" ? styles.active : ""
+                  }`}
               >
                 <div className={styles.notifications}>
                   <Image
@@ -196,9 +193,8 @@ export default function Navbar({ children }: { children: React.ReactNode }) {
       </aside>
 
       <main
-        className={`${styles.content} ${
-          sidebarCollapsed ? styles.collapsed : ""
-        }`}
+        className={`${styles.content} ${sidebarCollapsed ? styles.collapsed : ""
+          }`}
       >
         {children}
       </main>

@@ -24,7 +24,11 @@ async function bootstrap() {
 
   app.enableCors({
     origin: (origin, callback) => {
-      const allowedOrigins = [`${process.env.FRONT}`, `${process.env.BACK}`];
+      const allowedOrigins = [
+        `${process.env.FRONT}`,
+        `${process.env.BACK}`,
+        'localhost:8080',
+      ];
       if (allowedOrigins.includes(origin) || !origin) {
         callback(null, true);
       } else {

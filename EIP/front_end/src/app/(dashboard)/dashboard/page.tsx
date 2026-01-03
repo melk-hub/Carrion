@@ -3,6 +3,8 @@ import ApiService from "@/services/api";
 import DashboardClient from "@/app/(dashboard)/dashboard/DashboardClient";
 import { Application } from "@/interface/application.interface";
 
+export const dynamic = "force-dynamic";
+
 async function getDashboardData() {
   try {
     const cookieStore = await cookies();

@@ -70,7 +70,12 @@ export default function NotificationsClient() {
   const toggleSelection = (id: string) => {
     setSelectedNotifications((prev) => {
       const newSet = new Set(prev);
-      newSet.has(id) ? newSet.delete(id) : newSet.add(id);
+      if (newSet.has(id)) {
+        newSet.delete(id);
+      } else {
+        newSet.add(id);
+      }
+
       return newSet;
     });
   };
@@ -222,33 +227,29 @@ export default function NotificationsClient() {
               })}
             </button>
             <button
-              className={`${styles.filterButton} ${
-                filter === "POSITIVE" ? styles.active : ""
-              }`}
+              className={`${styles.filterButton} ${filter === "POSITIVE" ? styles.active : ""
+                }`}
               onClick={() => setFilter("POSITIVE")}
             >
               {t("notifications.filters.positive") as string}
             </button>
             <button
-              className={`${styles.filterButton} ${
-                filter === "WARNING" ? styles.active : ""
-              }`}
+              className={`${styles.filterButton} ${filter === "WARNING" ? styles.active : ""
+                }`}
               onClick={() => setFilter("WARNING")}
             >
               {t("notifications.filters.warning") as string}
             </button>
             <button
-              className={`${styles.filterButton} ${
-                filter === "NEGATIVE" ? styles.active : ""
-              }`}
+              className={`${styles.filterButton} ${filter === "NEGATIVE" ? styles.active : ""
+                }`}
               onClick={() => setFilter("NEGATIVE")}
             >
               {t("notifications.filters.negative") as string}
             </button>
             <button
-              className={`${styles.filterButton} ${
-                filter === "INFO" ? styles.active : ""
-              }`}
+              className={`${styles.filterButton} ${filter === "INFO" ? styles.active : ""
+                }`}
               onClick={() => setFilter("INFO")}
             >
               {t("notifications.filters.info") as string}
@@ -269,13 +270,11 @@ export default function NotificationsClient() {
         <div className={styles.notificationsList}>
           {filteredNotifications.length > 0 ? (
             filteredNotifications.map((notification) => (
-              <div  
+              <div
                 key={notification.id}
-                className={`${styles.notificationItem} ${styles[notification.type]} ${
-                  !notification.read ? styles.unread : ""
-                } ${
-                  selectedNotifications.has(notification.id) ? styles.selected : ""
-                }`}
+                className={`${styles.notificationItem} ${styles[notification.type]} ${!notification.read ? styles.unread : ""
+                  } ${selectedNotifications.has(notification.id) ? styles.selected : ""
+                  }`}
                 onClick={() => handleNotificationClick(notification)}
               >
                 <div
@@ -294,7 +293,7 @@ export default function NotificationsClient() {
                       {notification.titleKey
                         ? t(notification.titleKey, notification.variables as Record<string, string | number>)
                         : notification.title ||
-                          t("notifications.titles.application.updated")}
+                        t("notifications.titles.application.updated")}
                     </h3>
                     <span className={styles.notificationTime}>
                       {formatTimestamp(notification.createdAt)}
@@ -353,10 +352,10 @@ export default function NotificationsClient() {
                 {filter === "all"
                   ? t("shared.empty.noNotifications")
                   : t("notifications.empty.noFilteredNotifications", {
-                      filter: t(
-                        `notifications.filters.${filter.toLowerCase()}`
-                      ) as string,
-                    })}
+                    filter: t(
+                      `notifications.filters.${filter.toLowerCase()}`
+                    ) as string,
+                  })}
               </p>
             </div>
           )}

@@ -1,12 +1,11 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import InvitationClient from './InvitationClient';
-import { Metadata } from 'next';
-
-export const metadata: Metadata = {
-	title: 'Invitation - Rejoindre une organisation',
-	description: 'Vous avez été invité à rejoindre une équipe sur Carrion.',
-};
+import Loading from '@/components/Loading/Loading';
 
 export default function InvitationPage() {
-	return <InvitationClient />;
+	return (
+		<Suspense fallback={<Loading />}>
+			<InvitationClient />
+		</Suspense>
+	);
 }

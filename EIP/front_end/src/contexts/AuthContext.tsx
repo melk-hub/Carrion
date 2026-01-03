@@ -71,7 +71,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
           if (orgData) {
             setOrganizationMemberInfo(orgData);
           }
-        } catch (e) {
+        } catch {
           setOrganizationMemberInfo(null);
         }
       } else {
@@ -79,16 +79,14 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         setIsAuthenticated(false);
         setOrganizationMemberInfo(null);
       }
-    } catch (error) {
+    } catch {
       setUserProfile(null);
       setIsAuthenticated(false);
       setOrganizationMemberInfo(null);
     } finally {
-
       setLoadingAuth(false);
     }
   }, []);
-
 
   useEffect(() => {
     apiService.registerLogoutCallback(logOut);
@@ -97,7 +95,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   const getUserDisplayName = useCallback((): string => {
     if (!userProfile) return "Carrion";
-    const { firstName, lastName } = userProfile;
+    const { firstName, lastName } = userProfile.userProfile;
     return `${firstName || ""} ${lastName || ""}`.trim() || "Carrion";
   }, [userProfile]);
 

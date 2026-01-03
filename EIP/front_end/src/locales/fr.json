@@ -36,7 +36,9 @@
     "sending": "Envoi...",
     "saving": "Enregistrement...",
     "email": "Adresse Email",
-    "or": "ou"
+    "or": "ou",
+    "verifying": "Vérification...",
+    "success": "Succès !"
   },
   "shared": {
     "time": {
@@ -219,6 +221,10 @@
     "joinUs": "Nous rejoindre !",
     "loginSuccessRedirect": "Vous êtes connecté !",
     "invalidEmail": "Veuillez saisir une adresse e-mail valide.",
+    "emailVerified": "Email vérifié !",
+    "accountActive": "Votre compte est maintenant actif.",
+    "welcomeCarrion": "Bienvenue sur Carrion.",
+    "expiredLinkMessage": "Ce lien a expiré ou a déjà été utilisé.",
     "passwordInvalid": "Le mot de passe ne respecte pas tous les critères.",
     "criteria": {
       "length": "Au moins 8 caractères",
@@ -229,7 +235,14 @@
     "resetYourPassword": "Réinitialiser votre mot de passe",
     "forgotPasswordInstructions": "Veuillez entrer votre adresse e-mail. Nous vous enverrons un lien pour réinitialiser votre mot de passe.",
     "sendResetLink": "Envoyer le lien de réinitialisation",
-    "resetLinkSent": "Si un compte est associé à cet email, un lien de réinitialisation a été envoyé."
+    "resetLinkSent": "Si un compte est associé à cet email, un lien de réinitialisation a été envoyé.",
+    "newPassword": "Nouveau mot de passe",
+    "defineNewPassword": "Veuillez définir votre nouveau mot de passe sécurisé.",
+    "resetSuccess": "Mot de passe modifié avec succès !",
+    "resetPasswordSuccess": "Votre mot de passe a été réinitialisé.",
+    "redirectingToLogin": "Redirection vers la connexion...",
+    "invalidLinkTitle": "Lien invalide",
+    "invalidLinkMessage": "Ce lien a expiré ou n'existe pas."
   },
 
   "home": {
@@ -295,6 +308,7 @@
       "hours": "Il y a {{count}}h",
       "days": "Il y a {{count}}j"
     },
+    "dashboard": "Mon Espace",
     "objectives": {
       "weekly": "Objectif hebdomadaire",
       "applications": "Candidatures cette semaine",
@@ -302,7 +316,8 @@
       "accomplished": "Réalisé",
       "remaining": "Restant",
       "progress": "Progression"
-    }
+    },
+    "backToHome": "Retour à l'accueil"
   },
 
   "dashboard": {

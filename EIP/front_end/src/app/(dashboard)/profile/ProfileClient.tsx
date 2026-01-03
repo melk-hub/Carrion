@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useRef, useCallback, useEffect } from "react";
+import React, { useState, useRef, useEffect, useMemo } from "react";
 import Image from "next/image";
 import { CircleUserRound } from "lucide-react";
 import DatePicker, { registerLocale } from "react-datepicker";
@@ -31,6 +31,30 @@ interface ProfileClientProps {
   initialProfilePictureUrl: string | null;
   error: string | null;
 }
+const defaultProfile: UserProfile = {
+  id: "",
+  email: "",
+  username: "",
+  isEmailVerified: false,
+  tokens: [],
+  userProfile: {
+    firstName: "",
+    lastName: "",
+    birthDate: null,
+    school: "",
+    city: "",
+    phoneNumber: "",
+    imageUrl: "",
+    personalDescription: "",
+    portfolioLink: "",
+    linkedin: "",
+    goal: "",
+    contractSought: [],
+    locationSought: [],
+    sector: [],
+    resume: "",
+  },
+};
 
 export default function ProfileClient({
   initialProfile,
@@ -40,22 +64,36 @@ export default function ProfileClient({
   error: initialError,
 }: ProfileClientProps) {
   const { t } = useLanguage();
-
-  const [personalInfo, setPersonalInfo] = useState<Partial<UserProfile>>({
-    ...initialProfile,
-    birthDate: initialProfile?.birthDate
-      ? new Date(initialProfile.birthDate)
-      : undefined,
+  const [personalInfo, setPersonalInfo] = useState<UserProfile>(() => {
+    const baseProfile = initialProfile || defaultProfile;
+    return {
+      ...baseProfile,
+      userProfile: {
+        ...baseProfile.userProfile,
+        birthDate: baseProfile.userProfile.birthDate
+          ? new Date(baseProfile.userProfile.birthDate)
+          : null,
+      },
+    };
   });
 
   const [selectedCity, setSelectedCity] = useState<SelectOption | null>(
-    initialProfile?.city
-      ? { label: initialProfile.city, value: initialProfile.city }
+    initialProfile?.userProfile.city
+      ? {
+        label: initialProfile.userProfile.city,
+        value: initialProfile.userProfile.city,
+      }
       : null
   );
 
   useEffect(() => {
-    setPersonalInfo((prev) => ({ ...prev, city: selectedCity?.value || "" }));
+    setPersonalInfo((prev) => ({
+      ...prev,
+      userProfile: {
+        ...prev.userProfile,
+        city: selectedCity?.value || "",
+      },
+    }));
   }, [selectedCity]);
 
   const [connectedServices, setConnectedServices] =
@@ -69,16 +107,17 @@ export default function ProfileClient({
   const [uploadingCv, setUploadingCv] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const debouncedLoadCities = useCallback(
-    debounce(
-      (inputValue: string, callback: (options: SelectOption[]) => void) => {
-        if (inputValue.length < 2) return callback([]);
-        apiService
-          .fetchAndFormatCities(inputValue)
-          .then((options) => callback(options));
-      },
-      500
-    ),
+  const debouncedLoadCities = useMemo(
+    () =>
+      debounce(
+        (inputValue: string, callback: (options: SelectOption[]) => void) => {
+          if (inputValue.length < 2) return callback([]);
+          apiService
+            .fetchAndFormatCities(inputValue)
+            .then((options) => callback(options));
+        },
+        500
+      ),
     []
   );
 
@@ -93,7 +132,8 @@ export default function ProfileClient({
     )
       return;
     const disconnectPromise = apiService.delete(
-      `/user-profile/services/${serviceName}`
+      `/user-profile/services/${serviceName}`,
+      {}
     );
     toast.promise(disconnectPromise, {
       loading: `Déconnexion du service ${serviceDisplayName}...`,
@@ -109,7 +149,14 @@ export default function ProfileClient({
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setPersonalInfo((prev) => ({ ...prev, [name]: value }));
+
+    setPersonalInfo((prev) => ({
+      ...prev,
+      userProfile: {
+        ...prev.userProfile,
+        [name]: value,
+      },
+    }));
   };
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -154,7 +201,7 @@ export default function ProfileClient({
     if (!window.confirm(t("profile.removePictureConfirmation") as string))
       return;
     try {
-      await apiService.delete(`/s3/delete?filename=profile`);
+      await apiService.delete(`/s3/delete?filename=profile`, {});
       setUploadedImage(null);
       toast.success(t("profile.removePictureSuccess") as string);
     } catch (error: unknown) {
@@ -187,7 +234,7 @@ export default function ProfileClient({
       const newCvData = await apiService.get<{ signedUrl: string }>(
         `/s3/download?filename=cv`
       );
-      if (newCvData!.signedUrl) setCvUrl(newCvData!.signedUrl);
+      if (newCvData?.signedUrl) setCvUrl(newCvData.signedUrl);
       toast.success("CV téléchargé avec succès !");
     } catch (error: unknown) {
       toast.error(
@@ -202,7 +249,7 @@ export default function ProfileClient({
     if (!window.confirm("Êtes-vous sûr de vouloir supprimer votre CV ?"))
       return;
     try {
-      await apiService.delete(`/s3/delete?filename=cv`);
+      await apiService.delete(`/s3/delete?filename=cv`, {});
       setCvUrl(null);
       toast.success("CV supprimé avec succès !");
     } catch (error: unknown) {
@@ -216,9 +263,14 @@ export default function ProfileClient({
     e.preventDefault();
     const savePromise = apiService.post("/user-profile", {
       ...personalInfo,
-      birthDate: personalInfo.birthDate
-        ? (personalInfo.birthDate as Date).toISOString().split("T")[0]
-        : null,
+      userProfile: {
+        ...personalInfo.userProfile,
+        birthDate: personalInfo.userProfile.birthDate
+          ? (personalInfo.userProfile.birthDate as Date)
+            .toISOString()
+            .split("T")[0]
+          : null,
+      },
     });
     toast.promise(savePromise, {
       loading: "Enregistrement en cours...",
@@ -255,7 +307,9 @@ export default function ProfileClient({
       <main className={styles.profilePage}>
         <div className={styles.profileContainer}>
           <aside className={styles.profileRightColumn}>
-            <section className={styles.profileCard + " " + styles.profilePictureCard}>
+            <section
+              className={styles.profileCard + " " + styles.profilePictureCard}
+            >
               <div
                 className={styles.imageWrapper}
                 onClick={() => fileInputRef.current?.click()}
@@ -293,7 +347,8 @@ export default function ProfileClient({
                 )}
               </div>
               <h3 className={styles.profileName}>
-                {personalInfo.firstName || ""} {personalInfo.lastName || ""}
+                {personalInfo.userProfile.firstName || ""}{" "}
+                {personalInfo.userProfile.lastName || ""}
               </h3>
             </section>
             <ServicesCard
@@ -319,7 +374,7 @@ export default function ProfileClient({
                       id="lastName"
                       type="text"
                       name="lastName"
-                      value={personalInfo.lastName || ""}
+                      value={personalInfo.userProfile.lastName || ""}
                       onChange={handleChange}
                     />
                   </div>
@@ -331,7 +386,7 @@ export default function ProfileClient({
                       id="firstName"
                       type="text"
                       name="firstName"
-                      value={personalInfo.firstName || ""}
+                      value={personalInfo.userProfile.firstName || ""}
                       onChange={handleChange}
                     />
                   </div>
@@ -343,7 +398,7 @@ export default function ProfileClient({
                       id="phoneNumber"
                       type="tel"
                       name="phoneNumber"
-                      value={personalInfo.phoneNumber || ""}
+                      value={personalInfo.userProfile.phoneNumber || ""}
                       onChange={handleChange}
                     />
                   </div>
@@ -353,11 +408,18 @@ export default function ProfileClient({
                     </label>
                     <DatePicker
                       id="birthDate"
-                      selected={personalInfo.birthDate as Date | undefined}
+                      selected={
+                        personalInfo.userProfile.birthDate
+                          ? new Date(personalInfo.userProfile.birthDate)
+                          : null
+                      }
                       onChange={(date: Date | null) =>
                         setPersonalInfo((prev) => ({
                           ...prev,
-                          birthDate: date || undefined,
+                          userProfile: {
+                            ...prev.userProfile,
+                            birthDate: date,
+                          },
                         }))
                       }
                       locale="fr"
@@ -398,7 +460,7 @@ export default function ProfileClient({
                       id="school"
                       type="text"
                       name="school"
-                      value={personalInfo.school || ""}
+                      value={personalInfo.userProfile.school || ""}
                       onChange={handleChange}
                     />
                   </div>
@@ -410,7 +472,7 @@ export default function ProfileClient({
                       id="portfolioLink"
                       type="text"
                       name="portfolioLink"
-                      value={personalInfo.portfolioLink || ""}
+                      value={personalInfo.userProfile.portfolioLink || ""}
                       onChange={handleChange}
                     />
                   </div>
@@ -420,7 +482,7 @@ export default function ProfileClient({
                       id="linkedin"
                       type="text"
                       name="linkedin"
-                      value={personalInfo.linkedin || ""}
+                      value={personalInfo.userProfile.linkedin || ""}
                       onChange={handleChange}
                     />
                   </div>
@@ -449,14 +511,17 @@ export default function ProfileClient({
                       options={contractOptions}
                       value={getSelectedObjects(
                         contractOptions,
-                        personalInfo.contractSought || []
+                        personalInfo.userProfile.contractSought || []
                       )}
                       onChange={(selected: MultiValue<SelectOption>) =>
                         setPersonalInfo((prev) => ({
                           ...prev,
-                          contractSought: selected
-                            ? selected.map((s) => s.value)
-                            : [],
+                          userProfile: {
+                            ...prev.userProfile,
+                            contractSought: selected
+                              ? selected.map((s) => s.value)
+                              : [],
+                          },
                         }))
                       }
                       styles={multiSelectStyles}
@@ -475,12 +540,17 @@ export default function ProfileClient({
                       options={jobSectors}
                       value={getSelectedObjects(
                         jobSectors,
-                        personalInfo.sector || []
+                        personalInfo.userProfile.sector || []
                       )}
                       onChange={(selected: MultiValue<SelectOption>) =>
                         setPersonalInfo((prev) => ({
                           ...prev,
-                          sector: selected ? selected.map((s) => s.value) : [],
+                          userProfile: {
+                            ...prev.userProfile,
+                            sector: selected
+                              ? selected.map((s) => s.value)
+                              : [],
+                          },
                         }))
                       }
                       styles={multiSelectStyles}
@@ -498,14 +568,17 @@ export default function ProfileClient({
                       placeholder={t("profile.searchOrCreate") as string}
                       loadOptions={debouncedLoadCities}
                       value={getLocationObjects(
-                        personalInfo.locationSought || []
+                        personalInfo.userProfile.locationSought || []
                       )}
                       onChange={(selected: MultiValue<SelectOption>) =>
                         setPersonalInfo((prev) => ({
                           ...prev,
-                          locationSought: selected
-                            ? selected.map((s) => s.value)
-                            : [],
+                          userProfile: {
+                            ...prev.userProfile,
+                            locationSought: selected
+                              ? selected.map((s) => s.value)
+                              : [],
+                          },
                         }))
                       }
                       styles={multiSelectStyles}

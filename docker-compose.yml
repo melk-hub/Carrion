@@ -67,7 +67,7 @@ services:
 
   client_web:
     build:
-      context: ./EIP/front_end
+      context: ./EIP/front_end/
       dockerfile: Dockerfile.dev
     ports:
       - "8081:3000"

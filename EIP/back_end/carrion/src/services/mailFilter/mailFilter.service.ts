@@ -13,8 +13,8 @@ import { UpdateJobApply } from '@/jobApply/interface/jobApply.interface';
 import { OutlookMessage } from '@/webhooks/mail/outlook.types';
 import { createHash } from 'crypto';
 import { UserService } from '@/user/user.service';
-import Anthropic from '@anthropic-ai/sdk';
 import { EmailPreFilterService } from './prefilter.service';
+import { Mistral } from '@mistralai/mistralai';
 import {
   EmailAnalysisResult,
   ExistingJobComparisonDto,
@@ -62,7 +62,7 @@ function extractJsonFromString(str: string): any | null {
 @Injectable()
 export class MailFilterService {
   private readonly logger = new Logger(MailFilterService.name);
-  private readonly claudeAI: Anthropic;
+  private readonly mistralAI: Mistral;
 
   private processedEmails = new Set<string>();
   private readonly EMAIL_CACHE_TTL = 24 * 60 * 60 * 1000;
@@ -176,8 +176,8 @@ export class MailFilterService {
     private readonly preFilterService: EmailPreFilterService,
     private readonly prisma: PrismaService,
   ) {
-    this.claudeAI = new Anthropic({
-      apiKey: process.env.ANTHROPIC_API_KEY,
+    this.mistralAI = new Mistral({
+      apiKey: process.env.MISTRAL_API_KEY,
     });
 
     setInterval(
@@ -747,7 +747,7 @@ If validation fails → return null
           'Réponse trouvée en cache';
       } else {
         analysis.claudeAIUsed = true;
-        parsedData = await this.callclaudeAIWithFallback(
+        parsedData = await this.callMistralAIWithFallback(
           optimizedPrompt,
           emailContext,
           isComplex,
@@ -845,7 +845,7 @@ If validation fails → return null
   /**
    * Call claudeAI with fallback mechanism for better reliability
    */
-  private async callclaudeAIWithFallback(
+  private async callMistralAIWithFallback(
     prompt: string,
     emailContext: string,
     isComplex: boolean,
@@ -856,49 +856,47 @@ If validation fails → return null
     try {
       this.metrics.claudeAICalls++;
 
-      const response = await this.claudeAI.messages.create({
-        model: 'claude-sonnet-4-20250514',
-        system: prompt,
+      const response = await this.mistralAI.chat.complete({
+        model: 'mistral-small-latest',
+
         messages: [
           {
+            role: 'system',
+            content: prompt,
+          },
+          {
             role: 'user',
-            content: [
-              {
-                type: 'text',
-                text: emailContext,
-              },
-            ],
+            content: emailContext,
           },
         ],
         temperature: 0.3,
-        max_tokens: isComplex ? 1200 : 800,
       });
 
-      const rawResponse = response.content[0];
+      const rawResponse = response.choices[0].message.content;
       if (!rawResponse) {
-        throw new Error('ClaudeAI returned an empty response.');
+        throw new Error('MistralAI returned an empty response.');
       }
 
-      if (rawResponse.type !== 'text') {
-        throw new Error(
-          `ClaudeAI returned an unexpected content block type: ${rawResponse.type}`,
-        );
-      }
+      // if (rawResponse.type !== 'text') {
+      //   throw new Error(
+      //     `ClaudeAI returned an unexpected content block type: ${rawResponse.type}`,
+      //   );
+      // }
 
       const parsedData: ExtractedJobDataDto | null = extractJsonFromString(
-        rawResponse.text,
+        rawResponse as string,
       );
 
       return parsedData;
     } catch (error) {
       this.logger.warn(
-        `claudeAI call failed (attempt ${retryCount + 1}): ${error.message}`,
+        `mistralAI call failed (attempt ${retryCount + 1}): ${error.message}`,
       );
 
       if (retryCount < maxRetries) {
         const delay = Math.pow(2, retryCount) * 1000;
         await new Promise((resolve) => setTimeout(resolve, delay));
-        return this.callclaudeAIWithFallback(
+        return this.callMistralAIWithFallback(
           prompt,
           emailContext,
           isComplex,
@@ -912,7 +910,7 @@ If validation fails → return null
           emailContext.substring(0, 1000),
           false,
         );
-        return this.callclaudeAIWithFallback(
+        return this.callMistralAIWithFallback(
           simplifiedPrompt,
           emailContext.substring(0, 1000),
           false,

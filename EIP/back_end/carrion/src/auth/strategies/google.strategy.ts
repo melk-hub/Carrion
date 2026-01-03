@@ -21,6 +21,7 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
         'profile',
         'https://www.googleapis.com/auth/gmail.readonly',
       ],
+      proxy: true,
     });
   }
 
@@ -49,9 +50,7 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
           loggedInUserId = decodedState.sub;
           isLinkFlow = true;
         }
-      } catch (e) {
-        /* ignore */
-      }
+      } catch {}
     }
 
     const oauthProfile: CreateUserDto = {

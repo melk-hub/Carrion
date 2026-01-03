@@ -3,6 +3,8 @@ import {
   Inject,
   Injectable,
   UnauthorizedException,
+  NotFoundException,
+  BadRequestException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UserService } from '@/user/user.service';
@@ -44,6 +46,65 @@ export class AuthService {
     }
   }
 
+  @Cron(CronExpression.EVERY_DAY_AT_4AM, { name: 'token_cleanup' })
+  async handleTokenCleanup() {
+    this.logger.log(
+      'CRON: Démarrage du nettoyage des tokens expirés...',
+      LogCategory.CRON,
+    );
+    const now = new Date();
+
+    try {
+      const { count: resetCount } = await this.prisma.user.updateMany({
+        where: {
+          passwordResetExpires: { lt: now },
+          passwordResetToken: { not: null },
+        },
+        data: {
+          passwordResetToken: null,
+          passwordResetExpires: null,
+        },
+      });
+
+      const { count: verifyCount } = await this.prisma.user.updateMany({
+        where: {
+          verificationExpires: { lt: now },
+          verificationToken: { not: null },
+          isEmailVerified: false,
+        },
+        data: {
+          verificationToken: null,
+          verificationExpires: null,
+        },
+      });
+
+      const { count: inviteCount } =
+        await this.prisma.organizationInvitation.deleteMany({
+          where: {
+            expiresAt: { lt: now },
+          },
+        });
+
+      if (resetCount > 0 || verifyCount > 0 || inviteCount > 0) {
+        this.logger.log(
+          `CRON Terminé : ${resetCount} resets nettoyés, ${verifyCount} vérifs nettoyées, ${inviteCount} invitations supprimées.`,
+          LogCategory.CRON,
+        );
+      } else {
+        this.logger.log(
+          "CRON Terminé : Rien à nettoyer aujourd'hui.",
+          LogCategory.CRON,
+        );
+      }
+    } catch (error) {
+      this.logger.error(
+        'Erreur critique lors du nettoyage des tokens CRON',
+        error.stack,
+        LogCategory.CRON,
+      );
+    }
+  }
+
   initializeWebhookMonitoring(): void {
     this.logger.log('CRON job for webhook renewal is scheduled.');
   }
@@ -58,7 +119,6 @@ export class AuthService {
     const expiringTokens = await this.prisma.token.findMany({
       where: { webhookExpiry: { lte: thirtySixHoursFromNow } },
     });
-
     if (expiringTokens.length === 0) {
       this.logger.log(
         'CRON job complete. No webhooks needed renewal.',
@@ -66,7 +126,6 @@ export class AuthService {
       );
       return;
     }
-
     this.logger.log(
       `CRON job found ${expiringTokens.length} webhook(s) to renew.`,
     );
@@ -106,7 +165,6 @@ export class AuthService {
       new Date(tokenRecord.webhookExpiry) <
         new Date(Date.now() + 36 * 60 * 60 * 1000);
     if (!isWebhookExpiringSoon) return;
-
     this.logger.log(
       `Proactively renewing webhook for ${tokenRecord.name} user ${tokenRecord.userId}.`,
       LogCategory.WEBHOOK,
@@ -226,22 +284,30 @@ export class AuthService {
       data: { passwordResetToken, passwordResetExpires },
     });
     try {
-      const resetUrl = `${process.env.FRONT}/reset-password/${resetToken}`;
+      const frontUrl = process.env.FRONT || 'http://localhost:3000';
+      const resetUrl = `${frontUrl}/reset-password/${resetToken}`;
       const apiInstance = new SibApiV3Sdk.TransactionalEmailsApi();
       apiInstance.setApiKey(
         SibApiV3Sdk.TransactionalEmailsApiApiKeys.apiKey,
         process.env.BREVO_API_KEY,
       );
       const sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail();
-      sendSmtpEmail.subject = 'Your Password Reset Request';
-      sendSmtpEmail.htmlContent = `<p>Click here to reset: <a href="${resetUrl}">Reset Password</a></p>`;
+      sendSmtpEmail.subject = 'Réinitialisation de mot de passe - Carrion';
+      sendSmtpEmail.htmlContent = `
+      <div style="font-family: Arial, sans-serif; padding: 20px; color: #333;">
+      <h2 style="color: #0c1f3d;">Demande de réinitialisation</h2>
+      <p>Bonjour,</p>
+      <p>Vous avez demandé à réinitialiser votre mot de passe. Cliquez ci-dessous pour continuer :</p>
+      <a href="${resetUrl}" style="background-color: #0c1f3d; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block; margin: 20px 0;">Réinitialiser mon mot de passe</a><p style="font-size: 12px; color: #666;">Si vous n'êtes pas à l'origine de cette demande, ignorez cet email.</p>
+      </div>`;
       sendSmtpEmail.sender = {
         name: 'Carrion',
-        email: 'your-validated-sender@example.com',
+        email: process.env.SENDER_EMAIL || 'no-reply@carrion.app',
       };
       sendSmtpEmail.to = [{ email: user.email, name: user.username }];
       await apiInstance.sendTransacEmail(sendSmtpEmail);
     } catch (error) {
+      console.log(error);
       await this.prisma.user.update({
         where: { email },
         data: { passwordResetToken: null, passwordResetExpires: null },
@@ -254,22 +320,29 @@ export class AuthService {
     token: string,
     resetPasswordDto: ResetPasswordDto,
   ): Promise<void> {
-    const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
-    const user = await this.prisma.user.findUnique({
-      where: { passwordResetToken: hashedToken },
-    });
-    if (!user || user.passwordResetExpires < new Date())
+    try {
+      const hashedToken = crypto
+        .createHash('sha256')
+        .update(token)
+        .digest('hex');
+      const user = await this.prisma.user.findUnique({
+        where: { passwordResetToken: hashedToken },
+      });
+      if (!user || user.passwordResetExpires < new Date())
+        throw new UnauthorizedException('Invalid or expired token.');
+      const hashedPassword = await bcrypt.hash(resetPasswordDto.password, 10);
+      await this.prisma.user.update({
+        where: { id: user.id },
+        data: {
+          password: hashedPassword,
+          passwordResetToken: null,
+          passwordResetExpires: null,
+          hashedRefreshToken: null,
+        },
+      });
+    } catch {
       throw new UnauthorizedException('Invalid or expired token.');
-    const hashedPassword = await bcrypt.hash(resetPasswordDto.password, 10);
-    await this.prisma.user.update({
-      where: { id: user.id },
-      data: {
-        password: hashedPassword,
-        passwordResetToken: null,
-        passwordResetExpires: null,
-        hashedRefreshToken: null,
-      },
-    });
+    }
   }
 
   async saveTokens(
@@ -314,7 +387,16 @@ export class AuthService {
     isEmail: boolean,
   ): Promise<any> {
     const user = await this.userService.findByIdentifier(identifier, isEmail);
-    if (user && (await bcrypt.compare(password, user.password))) return user;
+
+    if (user && (await bcrypt.compare(password, user.password))) {
+      if (!user.isEmailVerified) {
+        throw new UnauthorizedException(
+          'Veuillez vérifier votre email avant de vous connecter.',
+        );
+      }
+
+      return user;
+    }
     return null;
   }
 
@@ -353,11 +435,90 @@ export class AuthService {
     if (await this.userService.findByIdentifier(createUserDto.username, false))
       throw new ConflictException('A user with this username already exists.');
     const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
+    const verificationToken = crypto.randomBytes(32).toString('hex');
+    const verificationExpires = new Date(Date.now() + 24 * 60 * 60 * 1000);
     const user = await this.userService.create({
       ...createUserDto,
       password: hashedPassword,
     });
+    await this.prisma.user.update({
+      where: { id: user.id },
+      data: { verificationToken, verificationExpires, isEmailVerified: false },
+    });
+    await this.sendVerificationEmail(
+      user.email,
+      user.username,
+      verificationToken,
+    );
     return this.login(user.id);
+  }
+
+  async sendVerificationEmail(
+    email: string,
+    username: string,
+    token: string,
+  ): Promise<void> {
+    try {
+      const frontUrl = process.env.FRONT || 'http://localhost:3000';
+      const verifyUrl = `${frontUrl}/verify-email/${token}`;
+      const apiInstance = new SibApiV3Sdk.TransactionalEmailsApi();
+      apiInstance.setApiKey(
+        SibApiV3Sdk.TransactionalEmailsApiApiKeys.apiKey,
+        process.env.BREVO_API_KEY,
+      );
+      const sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail();
+      sendSmtpEmail.subject = 'Vérifiez votre adresse email - Carrion';
+      sendSmtpEmail.htmlContent = `
+      <div style="font-family: Arial, sans-serif; padding: 20px; color: #333;">
+      <h2 style="color: #0c1f3d;">Bienvenue sur Carrion !</h2>
+      <p>Bonjour ${username},</p>
+      <p>Pour activer votre compte, veuillez confirmer votre email :</p>
+      <a href="${verifyUrl}" style="background-color: #0c1f3d; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block; margin: 20px 0;">Confirmer mon email</a>
+      <p style="font-size: 12px; color: #666;">Lien valide 24h.</p>
+      </div>`;
+      sendSmtpEmail.sender = {
+        name: 'Carrion',
+        email: process.env.SENDER_EMAIL || 'no-reply@carrion.app',
+      };
+      sendSmtpEmail.to = [{ email, name: username }];
+      await apiInstance.sendTransacEmail(sendSmtpEmail);
+    } catch (error) {
+      this.logger.error(
+        `Failed to send verification email to ${email}`,
+        error.stack,
+      );
+    }
+  }
+
+  async verifyEmail(token: string): Promise<void> {
+    const user = await this.prisma.user.findFirst({
+      where: { verificationToken: token },
+    });
+
+    if (!user) {
+      throw new NotFoundException('Lien de vérification invalide.');
+    }
+
+    if (user.verificationExpires && user.verificationExpires < new Date()) {
+      await this.prisma.user.update({
+        where: { id: user.id },
+        data: {
+          verificationToken: null,
+          verificationExpires: null,
+        },
+      });
+
+      throw new BadRequestException('Ce lien de vérification a expiré.');
+    }
+
+    await this.prisma.user.update({
+      where: { id: user.id },
+      data: {
+        isEmailVerified: true,
+        verificationToken: null,
+        verificationExpires: null,
+      },
+    });
   }
 
   async refreshTokens(refreshToken: string): Promise<any> {
@@ -519,9 +680,8 @@ export class AuthService {
     if (
       token.accessTokenValidity &&
       new Date(token.accessTokenValidity) > new Date(Date.now() + 5 * 60 * 1000)
-    ) {
+    )
       return token.accessToken;
-    }
     try {
       const refreshed =
         tokenName === 'Microsoft_oauth2'
@@ -607,6 +767,34 @@ export class AuthService {
     } catch (error) {
       await this.handleTokenRevocation(userId, 'Google_oauth2');
       throw error;
+    }
+  }
+
+  async verifyResetToken(token: string): Promise<void> {
+    const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
+
+    const user = await this.prisma.user.findFirst({
+      where: {
+        passwordResetToken: hashedToken,
+      },
+    });
+
+    if (!user) {
+      throw new BadRequestException("Ce lien est invalide ou n'existe pas.");
+    }
+
+    const now = new Date();
+
+    if (user.passwordResetExpires && user.passwordResetExpires < now) {
+      await this.prisma.user.update({
+        where: { id: user.id },
+        data: {
+          passwordResetToken: null,
+          passwordResetExpires: null,
+        },
+      });
+
+      throw new BadRequestException('Ce lien a expiré.');
     }
   }
 }

@@ -71,26 +71,8 @@ export class AuthController {
   @Post('signup')
   @ApiOperation({ summary: 'User signup' })
   async signUp(@Body() userInfo: CreateUserDto, @Res() res) {
-    const tokens = await this.authService.signUp(userInfo);
-    res.cookie('access_token', tokens.accessToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'Strict',
-      maxAge: 1000 * 60 * 60 * 24,
-    });
-
-    if (tokens.refreshToken) {
-      res.cookie('refresh_token', tokens.refreshToken, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'Strict',
-        maxAge: 1000 * 60 * 60 * 24 * 7,
-      });
-    }
-
-    return res
-      .status(HttpStatus.OK)
-      .send({ message: 'User created successfully' });
+    const result = await this.authService.signUp(userInfo);
+    return res.status(HttpStatus.OK).send(result);
   }
 
   @Public()
@@ -328,14 +310,34 @@ export class AuthController {
   }
 
   @Public()
-  @Post('reset-password/:token')
+  @Post('reset-password')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Reset user password' })
   async resetPassword(
-    @Param('token') token: string,
     @Body() resetPasswordDto: ResetPasswordDto,
   ): Promise<{ message: string }> {
-    await this.authService.resetPassword(token, resetPasswordDto);
+    await this.authService.resetPassword(
+      resetPasswordDto.token,
+      resetPasswordDto,
+    );
     return { message: 'Your password has been reset successfully.' };
+  }
+
+  @Public()
+  @Get('verify-email/:token')
+  @ApiOperation({ summary: 'Verify user email' })
+  async verifyEmail(@Param('token') token: string) {
+    await this.authService.verifyEmail(token);
+    return { message: 'Email verified successfully' };
+  }
+
+  @Public()
+  @Get('verify-reset-token/:token')
+  @ApiOperation({
+    summary: 'Vérifier la validité du token de reset mot de passe',
+  })
+  async verifyResetToken(@Param('token') token: string) {
+    await this.authService.verifyResetToken(token);
+    return { valid: true, message: 'Token valide' };
   }
 }

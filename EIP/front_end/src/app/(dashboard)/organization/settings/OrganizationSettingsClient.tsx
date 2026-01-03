@@ -156,7 +156,7 @@ export default function OrganizationSettingsClient() {
         role: selectedInviteRole
       });
       setInvitations(prev => prev.map(i =>
-        i.id === editingInvite.id ? { ...i, role: selectedInviteRole as OrganizationRole } : i
+        i.id === editingInvite.id ? { ...i, role: selectedInviteRole as unknown as OrganizationRole } : i
       ));
       toast.success(t("organization.success.roleUpdated") as string);
       setEditingInvite(null);

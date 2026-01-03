@@ -1,27 +1,46 @@
 "use client";
+
 import React from "react";
+import { usePathname } from "next/navigation";
+import Image from "next/image";
 import { useLanguage } from "../../contexts/LanguageContext";
 import styles from "./Dashboardcard.module.css";
-import Image from "next/image";
 import { ApplicationStatus } from "@/enum/application-status.enum";
 import { JobApply } from "@/interface/job-apply.interface";
+import { FiMapPin, FiCalendar, FiDollarSign } from "react-icons/fi";
 
 function ApplicationCard({
   application,
-  statusMap,
   onEdit,
   onDetails,
   onDelete,
   onArchive,
 }: {
   application: JobApply;
-  statusMap: Record<ApplicationStatus, string>;
   onEdit: (application: JobApply) => void;
   onDetails: (application: JobApply) => void;
   onDelete: (id: string) => void;
   onArchive: (id: string) => void;
 }) {
   const { t } = useLanguage();
+  const pathname = usePathname();
+
+  const getStatusLabel = (status: ApplicationStatus) => {
+    switch (status) {
+      case ApplicationStatus.APPLIED:
+        return t("dashboard.statuses.APPLIED");
+      case ApplicationStatus.PENDING:
+        return t("dashboard.statuses.PENDING");
+      case ApplicationStatus.REJECTED_BY_COMPANY:
+        return t("dashboard.statuses.REJECTED_BY_COMPANY");
+      case ApplicationStatus.INTERVIEW_SCHEDULED:
+        return t("dashboard.statuses.INTERVIEW");
+      case ApplicationStatus.OFFER_RECEIVED:
+        return t("dashboard.statuses.OFFER");
+      default:
+        return t("dashboard.unknownStatus");
+    }
+  };
 
   const getStatusClass = (status: ApplicationStatus) => {
     switch (status) {
@@ -58,6 +77,8 @@ function ApplicationCard({
     }).format(salary);
   };
 
+  const isArchivePage = pathname?.includes("/archives");
+
   return (
     <div
       className={`${styles.modernApplicationCard} ${getStatusClass(
@@ -68,33 +89,38 @@ function ApplicationCard({
         <div className={styles.companyLogoSection}>
           {application.imageUrl ? (
             <Image
-              src={application.imageUrl || "/placeholder.svg"}
+              src={application.imageUrl}
               alt={`${application.company} logo`}
               className={styles.modernCompanyLogo}
-              width={40}
-              height={40}
+              width={48}
+              height={48}
+              unoptimized
             />
           ) : (
             <div className={styles.modernLogoPlaceholder}>
-              <Image
-                src="/assets/avatar.png"
-                alt="Company"
-                className={styles.iconPlaceholder}
-                width={32}
-                height={32}
-              />
+              <span className={styles.logoInitial}>
+                {application.company ? application.company.charAt(0).toUpperCase() : "?"}
+              </span>
             </div>
           )}
         </div>
 
         <div className={styles.companyInfoSection}>
-          <h3 className={styles.modernCompanyName}>
-            {application.company || t("dashboard.unknownCompany")}
-          </h3>
+          <div className={styles.headerTopRow}>
+            <h3 className={styles.modernCompanyName}>
+              {application.company || t("dashboard.unknownCompany")}
+            </h3>
+            {application.contractType && (
+              <span className={styles.contractTypeBadge}>
+                {application.contractType}
+              </span>
+            )}
+          </div>
+
           <p className={styles.modernJobTitle}>
             {application.title || t("dashboard.unknownPosition")}
           </p>
-          <div className={styles.contractTypeBadge}>{application.contractType}</div>
+
           <div
             className={`${styles.modernStatusBadge} ${getStatusClass(
               application.status
@@ -102,7 +128,7 @@ function ApplicationCard({
           >
             <div className={styles.statusIndicator}></div>
             <span className={styles.statusText}>
-              {statusMap[application.status] || t("dashboard.unknownStatus")}
+              {getStatusLabel(application.status)}
             </span>
           </div>
         </div>
@@ -111,86 +137,19 @@ function ApplicationCard({
       <div className={styles.modernCardContent}>
         <div className={styles.infoGrid}>
           <div className={styles.infoItem}>
-            <div className={styles.infoIconWrapper}>
-              <Image
-                src="/assets/today.png"
-                alt="Date"
-                className={styles.infoIcon}
-                width={24}
-                height={24}
-              />
-            </div>
-            <div className={styles.infoContent}>
-              <span className={styles.infoLabel}>
-                {t("dashboard.applicationForm.applicationDate")}
-              </span>
-              <span className={styles.infoValue}>
-                {formatDate(application.createdAt)}
-              </span>
-            </div>
+            <FiMapPin className={styles.infoIcon} />
+            <span>{application.location || t("common.noLocation")}</span>
           </div>
 
-          {application.location && (
-            <div className={styles.infoItem}>
-              <div className={styles.infoIconWrapper}>
-                <Image
-                  src="/assets/map.png"
-                  alt="Location"
-                  className={styles.infoIcon}
-                  width={24}
-                  height={24}
-                />
-              </div>
-              <div className={styles.infoContent}>
-                <span className={styles.infoLabel}>
-                  {t("dashboard.applicationForm.location")}
-                </span>
-                <span className={styles.infoValue}>{application.location}</span>
-              </div>
-            </div>
-          )}
+          <div className={styles.infoItem}>
+            <FiCalendar className={styles.infoIcon} />
+            <span>{formatDate(application.appliedDate)}</span>
+          </div>
 
           {application.salary && (
             <div className={styles.infoItem}>
-              <div className={styles.infoIconWrapper}>
-                <Image
-                  src="/assets/money.png"
-                  alt="Salary"
-                  className={styles.infoIcon}
-                  width={24}
-                  height={24}
-                />
-              </div>
-              <div className={styles.infoContent}>
-                <span className={styles.infoLabel}>
-                  {t("dashboard.applicationForm.salary")}
-                </span>
-                <span className={styles.infoValue}>
-                  {formatSalary(application.salary)}
-                </span>
-              </div>
-            </div>
-          )}
-
-          {application.interviewDate && (
-            <div className={styles.infoItem}>
-              <div className={styles.infoIconWrapper}>
-                <Image
-                  src="/assets/interview.png"
-                  alt="Interview"
-                  className={styles.infoIcon}
-                  width={24}
-                  height={24}
-                />
-              </div>
-              <div className={styles.infoContent}>
-                <span className={styles.infoLabel}>
-                  {t("dashboard.applicationForm.interviewDate")}
-                </span>
-                <span className={styles.infoValue}>
-                  {formatDate(application.interviewDate)}
-                </span>
-              </div>
+              <FiDollarSign className={styles.infoIcon} />
+              <span>{formatSalary(application.salary)}</span>
             </div>
           )}
         </div>
@@ -198,38 +157,36 @@ function ApplicationCard({
 
       <div className={styles.modernCardActions}>
         <button
-          className={styles.modernActionButton + " " + styles.primary}
+          className={`${styles.modernActionButton} ${styles.primary}`}
           onClick={() => onDetails(application)}
+          title={t("common.details") as string}
         >
-          <span>{t("common.details")}</span>
+          {t("common.details")}
         </button>
 
         <div className={styles.secondaryActions}>
           <button
-            className={styles.modernActionButton + " " + styles.primary}
+            className={`${styles.modernActionButton} ${styles.secondary}`}
             onClick={() => onEdit(application)}
+            title={t("common.edit") as string}
           >
-            <span>{t("common.edit")}</span>
+            {t("common.edit")}
           </button>
 
           <button
-            className={styles.modernActionButton + " " + styles.secondary}
+            className={`${styles.modernActionButton} ${styles.secondary}`}
             onClick={() => onArchive(application.id)}
+            title={isArchivePage ? t("common.unarchive") as string : t("common.archive") as string}
           >
-            <span>
-              {location.pathname.includes("dashboard")
-                ? t("common.unarchive")
-                : location.pathname.includes("archives")
-                ? t("common.archive")
-                : t("common.unarchive")}
-            </span>
+            {isArchivePage ? t("common.unarchive") : t("common.archive")}
           </button>
 
           <button
-            className={styles.modernActionButton + " " + styles.danger}
+            className={`${styles.modernActionButton} ${styles.danger}`}
             onClick={() => onDelete(application.id)}
+            title={t("common.delete") as string}
           >
-            <span>{t("common.delete")}</span>
+            {t("common.delete")}
           </button>
         </div>
       </div>

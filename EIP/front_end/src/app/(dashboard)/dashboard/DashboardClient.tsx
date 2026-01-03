@@ -38,7 +38,7 @@ export default function DashboardClient({
   const [popupType, setPopupType] = useState<"add" | "edit" | "details" | null>(
     null
   );
-  const [error, setError] = useState<string | null>(initialError);
+  const [error] = useState<string | null>(initialError);
 
   const statusMap = useMemo(
     () => ({
@@ -101,7 +101,7 @@ export default function DashboardClient({
 
   const handleDeleteApplication = async (id: string) => {
     try {
-      await apiService.delete(`/job_applies/${id}`);
+      await apiService.delete(`/job_applies/${id}`, {});
       setApplications((prev) => prev.filter((app) => app.id !== id));
     } catch (err: unknown) {
       console.error(t("dashboard.errors.deleteError"), err);
@@ -111,7 +111,12 @@ export default function DashboardClient({
   const handleStatusChange = (statusKey: string) => {
     setSelectedStatuses((prev) => {
       const newSet = new Set(prev);
-      newSet.has(statusKey) ? newSet.delete(statusKey) : newSet.add(statusKey);
+      if (newSet.has(statusKey)) {
+        newSet.delete(statusKey);
+      } else {
+        newSet.add(statusKey);
+      }
+
       return newSet;
     });
   };
@@ -293,18 +298,16 @@ export default function DashboardClient({
               aria-label={t("shared.viewModes.label") as string}
             >
               <button
-                className={`${styles.toggleButton} ${
-                  viewMode === "grid" ? styles.active : ""
-                }`}
+                className={`${styles.toggleButton} ${viewMode === "grid" ? styles.active : ""
+                  }`}
                 onClick={() => setViewMode("grid")}
                 aria-pressed={viewMode === "grid"}
               >
                 {t("shared.viewModes.grid") as string}
               </button>
               <button
-                className={`${styles.toggleButton} ${
-                  viewMode === "list" ? styles.active : ""
-                }`}
+                className={`${styles.toggleButton} ${viewMode === "list" ? styles.active : ""
+                  }`}
                 onClick={() => setViewMode("list")}
                 aria-pressed={viewMode === "list"}
               >

@@ -89,7 +89,11 @@ export default function ArchivesClient({
   const handleStatusChange = (statusKey: string) => {
     setSelectedStatuses((prev) => {
       const newSet = new Set(prev);
-      newSet.has(statusKey) ? newSet.delete(statusKey) : newSet.add(statusKey);
+      if (newSet.has(statusKey)) {
+        newSet.delete(statusKey);
+      } else {
+        newSet.add(statusKey);
+      }
       return newSet;
     });
   };
@@ -238,17 +242,15 @@ export default function ArchivesClient({
             </div>
             <div className={styles.viewToggle}>
               <button
-                className={`${styles.toggleButton} ${
-                  viewMode === "grid" ? styles.active : ""
-                }`}
+                className={`${styles.toggleButton} ${viewMode === "grid" ? styles.active : ""
+                  }`}
                 onClick={() => setViewMode("grid")}
               >
                 {t("shared.viewModes.grid") as string}
               </button>
               <button
-                className={`${styles.toggleButton} ${
-                  viewMode === "list" ? styles.active : ""
-                }`}
+                className={`${styles.toggleButton} ${viewMode === "list" ? styles.active : ""
+                  }`}
                 onClick={() => setViewMode("list")}
               >
                 {t("shared.viewModes.list") as string}
