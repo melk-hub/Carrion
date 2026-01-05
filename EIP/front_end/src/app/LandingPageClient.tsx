@@ -72,7 +72,6 @@ function LandingPageContent() {
 			<LandingHeader />
 
 			<main className={styles.landingMainContent}>
-
 				<section className={styles.heroSection}>
 					<div className={`${styles.heroContent} ${styles.fadeIn}`}>
 						<div className={styles.heroDescription}>
@@ -248,7 +247,6 @@ function LandingPageContent() {
 					</div>
 				</section>
 			</main>
-
 		</div>
 	);
 }

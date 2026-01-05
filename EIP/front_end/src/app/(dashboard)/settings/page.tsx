@@ -1,15 +1,19 @@
+import { Suspense } from "react";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import ApiService from "@/services/api";
 import SettingsClient from "./SettingsClient";
+import Loading from "@/components/Loading/Loading";
 import { GoalSettings } from "@/interface/misc.interface";
+
+export const dynamic = "force-dynamic";
 
 async function getSettingsData() {
 	const cookieStore = await cookies();
 	const token = cookieStore.get("access_token");
 
 	if (!token) {
-		redirect("/settings");
+		redirect("/auth/signin");
 	}
 
 	const headers = { Cookie: `${token.name}=${token.value}` };
@@ -42,6 +46,8 @@ export default async function SettingsPage() {
 	const { initialGoalSettings, error } = await getSettingsData();
 
 	return (
-		<SettingsClient initialGoalSettings={initialGoalSettings} error={error} />
+		<Suspense fallback={<Loading />}>
+			<SettingsClient initialGoalSettings={initialGoalSettings} error={error} />
+		</Suspense>
 	);
 }

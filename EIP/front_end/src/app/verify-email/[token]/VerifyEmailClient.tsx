@@ -9,6 +9,15 @@ import { FiCheckCircle, FiXCircle, FiLoader } from "react-icons/fi";
 import LandingHeader from "@/components/LandingHeader/LandingHeader";
 import { useLanguage } from "@/contexts/LanguageContext";
 
+interface ApiError {
+	message?: string;
+	response?: {
+		data?: {
+			message?: string;
+		};
+	};
+}
+
 export default function VerifyEmailClient() {
 	const router = useRouter();
 	const { token } = useParams();
@@ -35,20 +44,20 @@ export default function VerifyEmailClient() {
 				}
 
 				setStatus("success");
-			} catch (error: any) {
-				console.error("Erreur catchée:", error);
+			} catch (err: unknown) {
+				const error = err as ApiError;
+				console.error(error);
 				setStatus("error");
 
-				const msg = error?.message || "";
-				const serverMsg = error?.response?.data?.message || "";
+				const msg = error.message || "";
+				const serverMsg = error.response?.data?.message || "";
 
 				if (
 					msg.toLowerCase().includes("expir") ||
 					serverMsg.toLowerCase().includes("expir")
 				) {
 					setErrorKey("auth.expiredLinkMessage");
-				}
-				else {
+				} else {
 					setErrorKey("auth.invalidLinkMessage");
 				}
 			}
@@ -56,7 +65,9 @@ export default function VerifyEmailClient() {
 
 		verifyToken();
 
-		return () => { effectRan.current = true; };
+		return () => {
+			effectRan.current = true;
+		};
 	}, [token]);
 
 	return (
@@ -64,7 +75,6 @@ export default function VerifyEmailClient() {
 			<LandingHeader forceVisible={true} />
 
 			<div className={styles.card}>
-
 				{status === "loading" && (
 					<div className={styles.content}>
 						<div className={styles.iconWrapper}>
@@ -82,7 +92,8 @@ export default function VerifyEmailClient() {
 						</div>
 						<h1 className={styles.title}>{t("auth.emailVerified")}</h1>
 						<p className={styles.description}>
-							{t("auth.accountActive")}<br />
+							{t("auth.accountActive")}
+							<br />
 							{t("auth.welcomeCarrion")}
 						</p>
 						<PrimaryButton
@@ -100,14 +111,16 @@ export default function VerifyEmailClient() {
 						</div>
 						<h1 className={styles.title}>{t("auth.invalidLinkTitle")}</h1>
 
-						<p className={styles.description}>
-							{t(errorKey)}
-						</p>
+						<p className={styles.description}>{t(errorKey)}</p>
 
 						<PrimaryButton
 							text={t("home.backToHome") as string}
 							onClick={() => router.push("/")}
-							style={{ marginTop: "1rem", backgroundColor: "#374151", width: "100%" }}
+							style={{
+								marginTop: "1rem",
+								backgroundColor: "#374151",
+								width: "100%",
+							}}
 						/>
 					</div>
 				)}

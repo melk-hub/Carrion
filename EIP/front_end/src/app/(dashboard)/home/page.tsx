@@ -9,6 +9,8 @@ import {
 
 import HomeClient, { HomeClientProps } from "./HomeClient";
 
+export const dynamic = "force-dynamic";
+
 interface Stats {
 	totalApplications: number;
 	applicationsToday: number;

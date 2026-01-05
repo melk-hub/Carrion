@@ -10,6 +10,8 @@ import {
 
 import StatisticsClient from "./StatisticsClient";
 
+export const dynamic = "force-dynamic";
+
 async function getStatisticsPageData() {
 	const cookieStore = await cookies();
 	const token = cookieStore.get("access_token");

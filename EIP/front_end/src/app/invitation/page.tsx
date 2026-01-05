@@ -1,11 +1,8 @@
-import React, { Suspense } from 'react';
+import React from 'react';
 import InvitationClient from './InvitationClient';
-import Loading from '@/components/Loading/Loading';
+
+export const dynamic = "force-dynamic";
 
 export default function InvitationPage() {
-	return (
-		<Suspense fallback={<Loading />}>
-			<InvitationClient />
-		</Suspense>
-	);
+	return <InvitationClient />;
 }

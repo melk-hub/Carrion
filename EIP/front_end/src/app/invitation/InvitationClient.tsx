@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import ApiService from "@/services/api";
 import { useAuth } from "@/contexts/AuthContext";
@@ -18,7 +18,16 @@ interface InvitationDetails {
 	inviter: { email: string; userProfile?: { firstName: string; lastName: string } };
 }
 
-export default function InvitationClient() {
+interface ApiError {
+	message?: string;
+	response?: {
+		data?: {
+			message?: string;
+		};
+	};
+}
+
+function InvitationContent() {
 	const router = useRouter();
 	const searchParams = useSearchParams();
 	const token = searchParams.get("token");
@@ -50,18 +59,22 @@ export default function InvitationClient() {
 				const response = await ApiService.get<InvitationDetails>(`/organization/invitation-details?token=${token}`);
 				if (!response) throw new Error("Empty_Response");
 				setDetails(response);
-			} catch (err: any) {
+			} catch (err: unknown) {
 				if (!errorToastShown.current) {
 					errorToastShown.current = true;
-					const msg = err?.message || "";
-					const serverMsg = err?.response?.data?.message || "";
+					const apiError = err as ApiError;
+					const msg = apiError.message || "";
+					const serverMsg = apiError.response?.data?.message || "";
+
 					let displayMessage = t("invitation.errors.invalid") as string;
+
 					if (msg.toLowerCase().includes("expir") || serverMsg.toLowerCase().includes("expir")) {
 						setError("Invitation expirée");
 						displayMessage = "Ce lien d'invitation a expiré.";
 					} else {
 						setError("Invitation invalide");
 					}
+
 					toast.error(displayMessage);
 					setTimeout(() => { router.push('/home'); }, 3000);
 				}
@@ -96,8 +109,9 @@ export default function InvitationClient() {
 			await ApiService.post("/organization/accept-invite", { token });
 			toast.success(t("invitation.success.joined") as string);
 			router.push("/organization");
-		} catch (err: any) {
-			const msg = err?.response?.data?.message || t("invitation.errors.acceptFailed") as string;
+		} catch (err: unknown) {
+			const apiError = err as ApiError;
+			const msg = apiError.response?.data?.message || (t("invitation.errors.acceptFailed") as string);
 			toast.error(msg);
 		} finally {
 			setIsAccepting(false);
@@ -182,5 +196,13 @@ export default function InvitationClient() {
 				</div>
 			</div>
 		</div>
+	);
+}
+
+export default function InvitationClient() {
+	return (
+		<Suspense fallback={<Loading />}>
+			<InvitationContent />
+		</Suspense>
 	);
 }

@@ -1,5 +1,6 @@
 {
   "common": {
+    "back": "Retour",
     "loading": "Chargement...",
     "loadingAuth": "Chargement de l'authentification...",
     "processing": "Traitement en cours...",

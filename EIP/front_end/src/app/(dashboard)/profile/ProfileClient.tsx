@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useRef, useEffect, useMemo } from "react";
+import React, { useState, useRef, useEffect, useMemo, Suspense } from "react";
 import Image from "next/image";
 import { CircleUserRound } from "lucide-react";
 import DatePicker, { registerLocale } from "react-datepicker";
@@ -8,7 +8,7 @@ import Select, { MultiValue, SingleValue, StylesConfig } from "react-select";
 import AsyncSelect from "react-select/async";
 import debounce from "lodash/debounce";
 import { fr } from "date-fns/locale/fr";
-import toast, { Toaster } from "react-hot-toast";
+import toast from "react-hot-toast";
 import "react-datepicker/dist/react-datepicker.css";
 import apiService from "@/services/api";
 import { jobSectors } from "@/data/jobSectors";
@@ -22,6 +22,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { ConnectedService, UserProfile } from "@/interface/user.interface";
 import { SelectOption } from "@/interface/misc.interface";
 import styles from "./Profile.module.css";
+import Loading from "@/components/Loading/Loading";
 
 registerLocale("fr", fr);
 
@@ -49,7 +50,7 @@ interface ProfileClientProps {
 	error: string | null;
 }
 
-export default function ProfileClient({
+function ProfileContent({
 	initialProfile,
 	initialServices,
 	initialCvUrl,
@@ -618,7 +619,14 @@ export default function ProfileClient({
 				onClose={() => setIsModalOpen(false)}
 				connectedServices={connectedServices}
 			/>
-			<Toaster position="top-center" />
 		</>
+	);
+}
+
+export default function ProfileClient(props: ProfileClientProps) {
+	return (
+		<Suspense fallback={<Loading />}>
+			<ProfileContent {...props} />
+		</Suspense>
 	);
 }

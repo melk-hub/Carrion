@@ -1,15 +1,19 @@
+import { Suspense } from "react";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import ApiService from "@/services/api";
 import ProfileClient from "./ProfileClient";
+import Loading from "@/components/Loading/Loading";
 import { UserProfile, ConnectedService } from "@/interface/user.interface";
+
+export const dynamic = "force-dynamic";
 
 async function getProfileData() {
 	const cookieStore = await cookies();
 	const token = cookieStore.get("access_token");
 
 	if (!token) {
-		redirect("/profile");
+		redirect("/auth/signin");
 	}
 
 	const headers = { Cookie: `${token.name}=${token.value}` };
@@ -59,5 +63,9 @@ async function getProfileData() {
 export default async function ProfilePage() {
 	const profileData = await getProfileData();
 
-	return <ProfileClient {...profileData} />;
+	return (
+		<Suspense fallback={<Loading />}>
+			<ProfileClient {...profileData} />
+		</Suspense>
+	);
 }

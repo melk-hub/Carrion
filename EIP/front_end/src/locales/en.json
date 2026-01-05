@@ -1,5 +1,6 @@
 {
   "common": {
+    "back": "Back",
     "loading": "Loading...",
     "loadingAuth": "Authentication loading...",
     "processing": "Processing...",
