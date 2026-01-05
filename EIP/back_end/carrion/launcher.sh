@@ -1,6 +1,8 @@
-#!/bin/bash
+#!/bin/sh
+# Utilisation de /bin/sh car on est sur Alpine Linux souvent
 
-npm run build
-npx prisma generate
+echo "Applying database migrations..."
 npx prisma migrate deploy
-npm run start
+
+echo "Starting application in production mode..."
+npm run start:prod

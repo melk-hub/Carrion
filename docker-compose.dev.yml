@@ -1,0 +1,31 @@
+version: "3.8"
+
+services:
+  db:
+    ports:
+      - "5432:5432" # On expose le port pour accéder à la DB depuis ton PC (DBeaver, etc.)
+
+  server:
+    build:
+      dockerfile: Dockerfile # Utilise un Dockerfile standard node, ou ton Dockerfile actuel
+    command: npm run start:dev # Commande de dev
+    ports:
+      - "8080:8080"
+    volumes:
+      # Montage du code pour le Hot-Reload
+      - ./EIP/back_end/carrion:/app
+      - /app/node_modules
+
+  client_web:
+    build:
+      dockerfile: Dockerfile.dev # Ton Dockerfile qui lance "npm run dev"
+    ports:
+      - "8081:3000" # Accès localhost:8081
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+      - NEXT_PUBLIC_API_URL=http://localhost:8080 # Le navigateur tape sur localhost en dev
+    volumes:
+      # Montage du code pour le Hot-Reload
+      - ./EIP/front_end:/app
+      - /app/node_modules
+      - /app/.next

@@ -1,0 +1,21 @@
+version: "3.8"
+
+services:
+  db:
+    restart: always
+
+  server:
+    build:
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "8080:8080"
+
+  client_web:
+    build:
+      dockerfile: Dockerfile
+      args:
+        - NEXT_PUBLIC_API_URL=http://${SERVER_IP}:${API_PORT}
+    restart: always
+    ports:
+      - "8081:3000"
