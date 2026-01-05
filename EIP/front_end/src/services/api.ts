@@ -20,7 +20,7 @@ class ApiService {
 
   private getBaseUrl(): string {
     if (typeof window === "undefined") {
-      return process.env.INTERNAL_API_URL || "http://server:8080";
+      return process.env.INTERNAL_API_URL || "http://localhost:8080";
     }
     return process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
   }
@@ -78,21 +78,30 @@ class ApiService {
       ...options,
     };
 
-    const response = await fetch(fullUrl, defaultOptions);
+    try {
+      const response = await fetch(fullUrl, defaultOptions);
 
-    if (response.status === 401 && !options.isRetry) {
-      const isAuthRoute =
-        url.includes("/auth/login") || url.includes("/auth/refresh");
+      if (response.status === 401 && !options.isRetry) {
+        const isAuthRoute =
+          url.includes("/auth/login") || url.includes("/auth/refresh");
 
-      if (isAuthRoute) {
-        return response;
+        if (isAuthRoute) {
+          return response;
+        }
+
+        return this.handleTokenRefresh(() =>
+          this.request(url, { ...options, isRetry: true })
+        );
       }
-
-      return this.handleTokenRefresh(() =>
-        this.request(url, { ...options, isRetry: true })
-      );
+      return response;
+    } catch (error) {
+      if (error instanceof TypeError && error.message.includes("fetch")) {
+        throw new Error(
+          `Network error: Unable to reach server at ${fullUrl}. Please check if the backend is running.`
+        );
+      }
+      throw error;
     }
-    return response;
   }
 
   private async processResponse<T>(response: Response): Promise<T | null> {

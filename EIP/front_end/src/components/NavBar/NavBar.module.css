@@ -36,7 +36,7 @@
   padding: 24px;
   color: var(--text-light);
   transition: width 0.3s ease, padding 0.3s ease;
-  position: sticky;
+  position: fixed;
   top: var(--topbar-height);
 }
 
@@ -52,6 +52,8 @@
 
   background-color: var(--background-color);
   border-top-left-radius: 20px;
+  overflow: auto;
+  height: calc(100vh - var(--topbar-height));
 }
 
 .collapsed .logoText,

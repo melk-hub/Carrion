@@ -451,7 +451,7 @@
       "salary": "Salary",
       "interview_date": "Interview date",
       "logo_url": "Logo URL",
-      "website": "Website",
+      "website": "Website / Portfolio",
       "placeholders": {
         "company": "Enter company name",
         "title": "Enter job title",
@@ -683,9 +683,11 @@
     "connectOutlook": "Connect Outlook",
     "allConnected": "All services are connected",
     "removePicture": "Remove profile picture",
-    "removePictureConfirmation": "Are you sure you want to delete your profile picture?",
-    "removePictureSuccess": "Profile picture deleted successfully!",
-    "removePictureError": "Error deleting profile picture."
+    "saving": "Saving...",
+    "saveSuccess": "Profile saved successfully!",
+    "removePictureConfirmation": "Are you sure you want to remove your profile picture?",
+    "removePictureSuccess": "Picture removed successfully.",
+    "removePictureError": "Error removing picture."
   },
   "settings": {
     "loading": "Loading settings...",
@@ -903,5 +905,13 @@
       "manualBtn": "I prefer manual entry",
       "profileNote": "Info: You can change your mind at any time."
     }
+  },
+
+  "notFound": {
+    "title": "Page Not Found",
+    "description": "Sorry, the page you are looking for does not exist or has been moved.",
+    "backHome": "Back to Home",
+    "errorCode": "Error 404",
+    "button": "Home"
   }
 }

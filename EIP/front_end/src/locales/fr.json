@@ -453,7 +453,7 @@
       "salary": "Salaire",
       "interview_date": "Date d'entretien",
       "logo_url": "Logo URL",
-      "website": "Site web",
+      "website": "Site web / Portfolio",
       "placeholders": {
         "company": "Saisissez le nom de l'entreprise",
         "title": "Saisissez l'intitulé du poste",
@@ -690,7 +690,9 @@
     "removePicture": "Supprimer la photo de profil",
     "removePictureConfirmation": "Êtes-vous sûr de vouloir supprimer votre photo de profil ?",
     "removePictureSuccess": "Photo de profil supprimée avec succès!",
-    "removePictureError": "Erreur lors de la suppression de la photo de profil."
+    "removePictureError": "Erreur lors de la suppression de la photo de profil.",
+    "saving": "Enregistrement en cours...",
+    "saveSuccess": "Profil enregistré avec succès !"
   },
 
   "settings": {
@@ -913,5 +915,13 @@
       "manualBtn": "Je préfère saisir manuellement",
       "profileNote": "Info : Vous pourrez changer d'avis à tout moment."
     }
+  },
+
+  "notFound": {
+    "title": "Page introuvable",
+    "description": "Désolé, la page que vous recherchez n'existe pas ou a été déplacée.",
+    "backHome": "Retour à l'accueil",
+    "errorCode": "Erreur 404",
+    "button": "Accueil"
   }
 }

@@ -8,7 +8,7 @@ export interface UserProfile {
   userProfile: {
     firstName: string;
     lastName: string;
-    birthDate: Date | null;
+    birthDate: Date;
     school: string;
     city: string;
     phoneNumber: string;

@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { format, subDays, isThisWeek, endOfWeek } from "date-fns";
 import apiService from "@/services/api";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useAuth } from "@/contexts/AuthContext";
 import styles from "./WeeklyGoalCard.module.css";
 import homeStyles from "../../app/(dashboard)/home/Home.module.css";
 
@@ -26,6 +27,7 @@ const WeeklyGoalCard = ({
 }: WeeklyGoalCardProps) => {
   const { t } = useLanguage();
   const router = useRouter();
+  const { isAuthenticated } = useAuth();
   const [stats, setStats] = useState<StatsData | null>(null);
   const [goalSettings, setGoalSettings] = useState<GoalSettings>({
     weeklyGoal: 5,
@@ -35,26 +37,20 @@ const WeeklyGoalCard = ({
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (!token) {
-      setError("Token d'authentification manquant.");
+    if (!isAuthenticated) {
       setLoading(false);
       return;
     }
 
-    fetchStats(token);
-    fetchGoalSettings(token);
-  }, []);
+    fetchStats();
+    fetchGoalSettings();
+  }, [isAuthenticated]);
 
-  const fetchStats = async (token: string) => {
+  const fetchStats = async () => {
     try {
       setLoading(true);
       setError(null);
-      const data = await apiService.get<StatsData>("/statistics", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const data = await apiService.get<StatsData>("/statistics");
       setStats(data);
     } catch (error: unknown) {
       if (error instanceof Error) {
@@ -66,17 +62,15 @@ const WeeklyGoalCard = ({
     }
   };
 
-  const fetchGoalSettings = async (token: string) => {
+  const fetchGoalSettings = async () => {
     try {
-      const data = await apiService.get<GoalSettings>("/settings/goal", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      setGoalSettings({
-        weeklyGoal: data!.weeklyGoal || 5,
-        monthlyGoal: data!.monthlyGoal || 20,
-      });
+      const data = await apiService.get<GoalSettings>("/settings/goal");
+      if (data) {
+        setGoalSettings({
+          weeklyGoal: data.weeklyGoal || 5,
+          monthlyGoal: data.monthlyGoal || 20,
+        });
+      }
     } catch (error) {
       console.error(
         "Erreur lors du chargement des paramètres d'objectif :",
@@ -166,10 +160,9 @@ const WeeklyGoalCard = ({
           </p>
           <button
             onClick={() => {
-              const token = localStorage.getItem("token");
-              if (token) {
-                fetchStats(token);
-                fetchGoalSettings(token);
+              if (isAuthenticated) {
+                fetchStats();
+                fetchGoalSettings();
               }
             }}
             style={{
