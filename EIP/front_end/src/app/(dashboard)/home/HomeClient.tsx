@@ -144,7 +144,7 @@ export default function HomeClient({
     if (notification.titleKey?.includes("application.updated")) return t("notifications.titles.application.updated") as string;
     if (notification.titleKey?.includes("application.created")) return t("notifications.titles.application.created") as string;
     if (notification.titleKey?.includes("interview")) return t("notifications.titles.interview") as string;
-    return notification.title || (t("notifications.titles.default") as string);
+    return notification.title || (t("notifications.default") as string);
   };
 
   const getRecentNotifications = () => {

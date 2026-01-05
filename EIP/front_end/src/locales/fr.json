@@ -54,7 +54,7 @@
       "pending": "En attente",
       "accepted": "Acceptées",
       "rejected": "Refusées",
-      "interview": "Entretien",
+      "interview_scheduled": "Entretien",
       "archived": "Archivées"
     },
     "stats": {
@@ -102,9 +102,11 @@
     "statistics": "Statistiques",
     "notification": "Notifications",
     "ranking": "Classement",
+    "friends": "Amis",
     "logout": "Déconnexion",
     "seeAll": "Voir toutes les notifications",
-    "organization": "Organisation"
+    "organization": "Organisation",
+    "subscribe": "Prendre une souscription"
   },
   "landing": {
     "title": "La plateforme idéale pour gérer ses candidatures",
@@ -341,6 +343,7 @@
       "APPLIED": "Postulée",
       "ACCEPTED": "Acceptée",
       "REJECTED": "Refusée",
+      "INTERVIEW_SCHEDULED": "Entretien",
       "INTERVIEW": "Entretien",
       "REJECTED_BY_COMPANY": "Refusée",
       "ON": "Acceptée",
@@ -483,6 +486,7 @@
 
   "notifications": {
     "title": "Notifications",
+    "default": "Une nouvelle notification est disponible",
     "loading": "Chargement des notifications...",
     "application": {
       "created": "Votre candidature chez {{company}} en tant que {{jobTitle}} a été enregistrée!",
@@ -630,6 +634,17 @@
     "userPosition": {
       "text": "Votre position : {{rank}}e",
       "goToButton": "Aller à ma position"
+    },
+    "search": {
+      "placeholder": "Rechercher par nom ou email...",
+      "results": "Résultats de recherche"
+    },
+    "friends": {
+      "add": "Ajouter",
+      "remove": "Retirer",
+      "title": "Mes amis",
+      "noFriends": "Vous n'avez pas encore d'amis. Ajoutez-en depuis le classement principal !",
+      "noFriendsData": "Aucun de vos amis n'a encore de candidatures."
     },
     "pagination": {
       "previous": "Précédent",
@@ -897,6 +912,22 @@
       "goToProfileBtn": "Configurer dans mon Profil",
       "manualBtn": "Je préfère saisir manuellement",
       "profileNote": "Info : Vous pourrez changer d'avis à tout moment."
+    }
+  },
+  "subscription": {
+    "title": "Souscription Premium",
+    "subtitle": "Passez à la version Premium et profitez de fonctionnalités exclusives",
+    "subscribe": "S'abonner",
+    "processing": "Traitement en cours...",
+    "features": {
+      "feature1": "Accès illimité à toutes les fonctionnalités",
+      "feature2": "Support prioritaire",
+      "feature3": "Statistiques avancées",
+      "feature4": "Export de données en illimité"
+    },
+    "errors": {
+      "createSession": "Erreur lors de la création de la session de paiement",
+      "generic": "Une erreur est survenue. Veuillez réessayer."
     }
   }
 }

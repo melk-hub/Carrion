@@ -224,7 +224,7 @@ const RecentApplicationsCard = ({
       <div className={styles.applicationsList}>
         {applications.map((application) => (
           <div className={styles.applicationItem} key={application.id}>
-            <div className={styles.companyLogo}>
+            {/* <div className={styles.companyLogo}>
               {application.imageUrl ? (
                 <Image
                   src={application.imageUrl}
@@ -237,7 +237,7 @@ const RecentApplicationsCard = ({
                   {getCompanyInitial(application.company)}
                 </div>
               )}
-            </div>
+            </div> */}
             <div className={styles.applicationInfo}>
               <h4>
                 {application.company ||

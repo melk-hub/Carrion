@@ -5,6 +5,7 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import cookieParser from 'cookie-parser';
 import { GlobalExceptionFilter } from './common/filters/global-exception.filter';
 import { AuthService } from './auth/auth.service';
+import { json } from 'express';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -21,6 +22,16 @@ async function bootstrap() {
   );
 
   app.use(cookieParser());
+  
+  // Configure body parser to preserve raw body for Stripe webhooks
+  app.use('/subscription/webhook', json({ 
+    verify: (req: any, res, buf) => {
+      if (buf && buf.length) {
+        req.rawBody = Buffer.from(buf);
+      }
+      return true;
+    }
+  }));
 
   app.enableCors({
     origin: (origin, callback) => {

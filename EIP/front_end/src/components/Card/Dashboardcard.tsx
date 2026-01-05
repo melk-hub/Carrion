@@ -1,5 +1,6 @@
 "use client";
 import React from "react";
+import { usePathname } from "next/navigation";
 import { useLanguage } from "../../contexts/LanguageContext";
 import styles from "./Dashboardcard.module.css";
 import Image from "next/image";
@@ -22,6 +23,7 @@ function ApplicationCard({
   onArchive: (id: string) => void;
 }) {
   const { t } = useLanguage();
+  const pathname = usePathname();
 
   const getStatusClass = (status: ApplicationStatus) => {
     switch (status) {
@@ -217,11 +219,9 @@ function ApplicationCard({
             onClick={() => onArchive(application.id)}
           >
             <span>
-              {location.pathname.includes("dashboard")
+              {pathname.includes("archives")
                 ? t("common.unarchive")
-                : location.pathname.includes("archives")
-                ? t("common.archive")
-                : t("common.unarchive")}
+                : t("common.archive")}
             </span>
           </button>
 

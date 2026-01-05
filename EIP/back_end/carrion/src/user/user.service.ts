@@ -272,4 +272,95 @@ export class UserService {
     );
     return usersWithAvatars;
   }
+
+  async getFriends(userId: string) {
+    const friendships = await this.prisma.friendship.findMany({
+      where: { userId },
+      include: {
+        friend: {
+          include: {
+            userProfile: true,
+          },
+        },
+      },
+    });
+
+    return friendships.map((friendship) => ({
+      id: friendship.friend.id,
+      username: friendship.friend.username,
+      email: friendship.friend.email,
+      firstName: friendship.friend.userProfile?.firstName,
+      lastName: friendship.friend.userProfile?.lastName,
+      createdAt: friendship.createdAt,
+    }));
+  }
+
+  async addFriend(userId: string, friendId: string) {
+    if (userId === friendId) {
+      throw new BadRequestException('Cannot add yourself as a friend');
+    }
+
+    // Vérifier que l'ami existe
+    const friend = await this.prisma.user.findUnique({
+      where: { id: friendId },
+    });
+
+    if (!friend) {
+      throw new NotFoundException('Friend not found');
+    }
+
+    // Vérifier si l'amitié existe déjà
+    const existingFriendship = await this.prisma.friendship.findUnique({
+      where: {
+        userId_friendId: {
+          userId,
+          friendId,
+        },
+      },
+    });
+
+    if (existingFriendship) {
+      throw new ConflictException('Friend already added');
+    }
+
+    return await this.prisma.friendship.create({
+      data: {
+        userId,
+        friendId,
+      },
+      include: {
+        friend: {
+          include: {
+            userProfile: true,
+          },
+        },
+      },
+    });
+  }
+
+  async removeFriend(userId: string, friendId: string) {
+    const friendship = await this.prisma.friendship.findUnique({
+      where: {
+        userId_friendId: {
+          userId,
+          friendId,
+        },
+      },
+    });
+
+    if (!friendship) {
+      throw new NotFoundException('Friendship not found');
+    }
+
+    await this.prisma.friendship.delete({
+      where: {
+        userId_friendId: {
+          userId,
+          friendId,
+        },
+      },
+    });
+
+    return { message: 'Friend removed successfully' };
+  }
 }

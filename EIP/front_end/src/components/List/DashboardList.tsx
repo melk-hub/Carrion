@@ -1,5 +1,6 @@
 "use client";
 import React from "react";
+import { usePathname } from "next/navigation";
 import { useLanguage } from "@/contexts/LanguageContext";
 import styles from "./DashboardList.module.css";
 import Image from "next/image";
@@ -22,6 +23,7 @@ function ApplicationList({
   onArchive: (id: string) => void;
 }) {
   const { t } = useLanguage();
+  const pathname = usePathname();
 
   const getStatusClass = (status: ApplicationStatus) => {
     switch (status) {
@@ -210,9 +212,7 @@ function ApplicationList({
             className={styles.modernListButton + " " + styles.secondary}
             onClick={() => onArchive(application.id)}
             title={
-              (location.pathname.includes("dashboard")
-                ? t("common.archive")
-                : location.pathname.includes("archive")
+              (pathname.includes("archives")
                 ? t("common.unarchive")
                 : t("common.archive")) as string
             }

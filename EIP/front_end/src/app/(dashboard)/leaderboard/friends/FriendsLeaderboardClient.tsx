@@ -1,14 +1,13 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import Image from "next/image";
 import { useLanguage } from "@/contexts/LanguageContext";
 import Loading from "@/components/Loading/Loading";
-import styles from "./Leaderboard.module.css";
+import styles from "../Leaderboard.module.css";
 import ApiService from "@/services/api";
 import { UserProfile } from "@/interface/user.interface";
 
-// --- Type Definitions ---
 interface User {
   id: string;
   avatar?: string;
@@ -28,16 +27,17 @@ interface RankingClientProps {
   error: string | null;
 }
 
-export default function RankingClient({
+export default function FriendsLeaderboardClient({
   initialUsersWithRank,
   initialTopThreeUsers,
   initialCurrentUser,
   error: initialError,
 }: RankingClientProps) {
   const [allUsers, setAllUsers] = useState<User[]>(initialUsersWithRank);
+  const [friends, setFriends] = useState<string[]>([]);
+  const [friendsUsers, setFriendsUsers] = useState<User[]>([]);
   const [paginatedUsers, setPaginatedUsers] = useState<User[]>([]);
-  const [topThreeUsers, setTopThreeUsers] =
-    useState<User[]>(initialTopThreeUsers);
+  const [topThreeUsers, setTopThreeUsers] = useState<User[]>([]);
   const [currentUser, setCurrentUser] = useState<User | null>(
     initialCurrentUser
   );
@@ -45,106 +45,8 @@ export default function RankingClient({
   const [error, setError] = useState<string | null>(initialError);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
-  const [searchQuery, setSearchQuery] = useState<string>("");
-  const [friends, setFriends] = useState<string[]>([]); // Liste des IDs d'amis
   const { t } = useLanguage();
   const usersPerPage = 10;
-
-  const applyFilters = (usersData: User[], page: number, query: string) => {
-    let filtered = usersData;
-
-    // Appliquer le filtre de recherche
-    if (query && query.length >= 2) {
-      filtered = usersData.filter(
-        (user) =>
-          user.username.toLowerCase().includes(query.toLowerCase()) ||
-          user.email.toLowerCase().includes(query.toLowerCase()) ||
-          (user.firstName &&
-            user.firstName.toLowerCase().includes(query.toLowerCase())) ||
-          (user.lastName &&
-            user.lastName.toLowerCase().includes(query.toLowerCase()))
-      );
-    }
-
-    // Recalculer les rangs pour les utilisateurs filtrés
-    const sorted = [...filtered].sort(
-      (a, b) => b.totalApplications - a.totalApplications
-    );
-    const withRank = sorted.map((user, index) => ({
-      ...user,
-      rank: index + 1,
-    }));
-
-    const total = Math.ceil(withRank.length / usersPerPage) || 1;
-    setTotalPages(total);
-    const startIndex = (page - 1) * usersPerPage;
-    const endIndex = startIndex + usersPerPage;
-    setPaginatedUsers(withRank.slice(startIndex, endIndex));
-    setCurrentPage(page);
-  };
-
-  const processAndSetUsers = (usersData: User[], page: number) => {
-    setAllUsers(usersData);
-    // Appliquer le filtre de recherche si présent
-    applyFilters(usersData, page, searchQuery);
-  };
-
-  useEffect(() => {
-    processAndSetUsers(initialUsersWithRank, 1);
-  }, [initialUsersWithRank]);
-
-  const fetchRanking = async (page = 1) => {
-    try {
-      setLoading(true);
-      setError(null);
-      const response: User[] | null = await ApiService.get('/user/all-users-ranking');
-      const currentUserResponse: UserProfile | null = await ApiService.get('/user/profile');
-
-      if (!currentUserResponse) throw new Error(t("ranking.errors.fetchError") as string);
-
-      if (!response || !Array.isArray(response))
-        throw new Error(t("ranking.warnings.noUserDataReceived") as string);
-
-      const sortedUsers = [...response].sort(
-        (a, b) => b.totalApplications - a.totalApplications
-      );
-      const usersWithRank = sortedUsers.map((user, index) => ({
-        ...user,
-        rank: index + 1,
-      }));
-      setTopThreeUsers(usersWithRank.slice(0, 3));
-
-      const currentUserWithRank = usersWithRank.find(
-        (user) => user.id === currentUserResponse.id
-      );
-      if (currentUserWithRank) {
-        setCurrentUser({
-          ...currentUserWithRank,
-          page: Math.ceil(currentUserWithRank.rank / usersPerPage),
-        });
-      }
-      processAndSetUsers(usersWithRank, page);
-      return usersWithRank;
-    } catch (err: unknown) {
-      if (err instanceof Error) {
-        setError(err.message || (t("ranking.errors.fetchError") as string));
-      }
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const goToPage = (page: number) => {
-    if (page >= 1 && page <= totalPages && page !== currentPage) {
-      applyFilters(allUsers, page, searchQuery);
-    }
-  };
-
-  const goToMyPosition = () => {
-    if (currentUser?.page && currentUser.page !== currentPage)
-      goToPage(currentUser.page);
-  };
 
   // Charger les amis depuis l'API au démarrage
   useEffect(() => {
@@ -161,10 +63,66 @@ export default function RankingClient({
     loadFriends();
   }, []);
 
-  // Recherche d'utilisateurs - filtre directement la liste
+  const [searchQuery, setSearchQuery] = useState<string>("");
+  const [searchResults, setSearchResults] = useState<User[]>([]);
+
+  // Filtrer les utilisateurs pour ne garder que les amis + l'utilisateur actuel
+  useEffect(() => {
+    // Toujours inclure l'utilisateur actuel
+    const friendsWithSelf = currentUser
+      ? [...new Set([...friends, currentUser.id])] // Utiliser Set pour éviter les doublons
+      : friends;
+
+    if (friendsWithSelf.length === 0) {
+      setFriendsUsers([]);
+      setTopThreeUsers([]);
+      setPaginatedUsers([]);
+      setTotalPages(1);
+      return;
+    }
+
+    const filtered = allUsers.filter((user) =>
+      friendsWithSelf.includes(user.id)
+    );
+    const sorted = [...filtered].sort(
+      (a, b) => b.totalApplications - a.totalApplications
+    );
+    const withRank = sorted.map((user, index) => ({
+      ...user,
+      rank: index + 1,
+    }));
+
+    setFriendsUsers(withRank);
+    setTopThreeUsers(withRank.slice(0, 3));
+
+    const total = Math.ceil(withRank.length / usersPerPage) || 1;
+    setTotalPages(total);
+    const startIndex = (currentPage - 1) * usersPerPage;
+    const endIndex = startIndex + usersPerPage;
+    setPaginatedUsers(withRank.slice(startIndex, endIndex));
+  }, [friends, allUsers, currentPage, currentUser]);
+
+  // Recherche d'amis potentiels
   const handleSearch = (query: string) => {
     setSearchQuery(query);
-    applyFilters(allUsers, 1, query);
+    if (query.length < 2) {
+      setSearchResults([]);
+      return;
+    }
+
+    // Rechercher dans tous les utilisateurs (pas seulement les amis)
+    const filtered = allUsers.filter(
+      (user) =>
+        (user.username.toLowerCase().includes(query.toLowerCase()) ||
+          user.email.toLowerCase().includes(query.toLowerCase()) ||
+          (user.firstName &&
+            user.firstName.toLowerCase().includes(query.toLowerCase())) ||
+          (user.lastName &&
+            user.lastName.toLowerCase().includes(query.toLowerCase()))) &&
+        user.id !== currentUser?.id && // Exclure l'utilisateur actuel
+        !friends.includes(user.id) // Exclure les amis déjà ajoutés
+    );
+    setSearchResults(filtered);
   };
 
   // Ajouter un ami
@@ -181,12 +139,72 @@ export default function RankingClient({
 
   // Retirer un ami
   const removeFriend = async (userId: string) => {
+    // Ne pas permettre de retirer l'utilisateur actuel
+    if (userId === currentUser?.id) return;
+
     try {
       await ApiService.delete(`/user/friends/${userId}`, {});
       setFriends(friends.filter((id) => id !== userId));
     } catch (e) {
       console.error("Error removing friend:", e);
     }
+  };
+
+  const fetchRanking = async (page = 1) => {
+    try {
+      setLoading(true);
+      setError(null);
+      const response: User[] | null = await ApiService.get(
+        "/user/all-users-ranking"
+      );
+      const currentUserResponse: UserProfile | null =
+        await ApiService.get("/user/profile");
+
+      if (!currentUserResponse)
+        throw new Error(t("ranking.errors.fetchError") as string);
+
+      if (!response || !Array.isArray(response))
+        throw new Error(
+          t("ranking.warnings.noUserDataReceived") as string
+        );
+
+      const sortedUsers = [...response].sort(
+        (a, b) => b.totalApplications - a.totalApplications
+      );
+      const usersWithRank = sortedUsers.map((user, index) => ({
+        ...user,
+        rank: index + 1,
+      }));
+
+      setAllUsers(usersWithRank);
+
+      const currentUserWithRank = usersWithRank.find(
+        (user) => user.id === currentUserResponse.id
+      );
+      if (currentUserWithRank) {
+        setCurrentUser({
+          ...currentUserWithRank,
+          page: Math.ceil(currentUserWithRank.rank / usersPerPage),
+        });
+      }
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message || (t("ranking.errors.fetchError") as string));
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const goToPage = (page: number) => {
+    if (page >= 1 && page <= totalPages && page !== currentPage) {
+      setCurrentPage(page);
+    }
+  };
+
+  const goToMyPosition = () => {
+    if (currentUser?.page && currentUser.page !== currentPage)
+      goToPage(currentUser.page);
   };
 
   const getRankIcon = (user: User) => {
@@ -237,14 +255,216 @@ export default function RankingClient({
     );
   }
 
-  if (!loading && allUsers.length === 0) {
+  // Même si pas d'amis, on affiche l'utilisateur actuel
+  // Si l'utilisateur actuel n'est pas dans friendsUsers mais existe, on l'affiche quand même
+  if (!loading && friendsUsers.length === 0 && currentUser) {
+    // Afficher uniquement l'utilisateur actuel
+    return (
+      <div className={styles.rankingPage}>
+        <div className={styles.rankingContainer}>
+          {error && (
+            <div className={styles.rankingErrorBanner}>
+              <span>⚠️ {error}</span>
+              <button onClick={() => setError(null)}>✕</button>
+            </div>
+          )}
+        <div className={styles.rankingSection}>
+          <div className={styles.rankingHeaderSection}>
+            <div className={styles.rankingTitleWithRefresh}>
+              <h2>
+                {t("ranking.complete.title") as string} - {t("ranking.friends.title") as string}
+              </h2>
+              <button
+                className={styles.rankingRefreshButton}
+                onClick={() => fetchRanking(currentPage)}
+                disabled={loading}
+                title={t("ranking.complete.refreshTitle") as string}
+              >
+                {t("ranking.complete.refreshButton") as string}
+              </button>
+            </div>
+            {/* Barre de recherche pour trouver des amis */}
+            <div className={styles.searchContainer}>
+              <input
+                type="text"
+                className={styles.searchInput}
+                placeholder={t("ranking.search.placeholder") as string}
+                value={searchQuery}
+                onChange={(e) => handleSearch(e.target.value)}
+              />
+              {searchQuery && (
+                <button
+                  className={styles.searchClearButton}
+                  onClick={() => {
+                    setSearchQuery("");
+                    setSearchResults([]);
+                  }}
+                >
+                  ✕
+                </button>
+              )}
+            </div>
+            {/* Résultats de recherche */}
+            {searchResults.length > 0 && (
+              <div className={styles.searchResults}>
+                <h3>{t("ranking.search.results") as string}</h3>
+                {searchResults.map((user) => (
+                  <div key={user.id} className={styles.searchResultItem}>
+                    <div className={styles.searchResultInfo}>
+                      <Image
+                        src={user.avatar || "/assets/avatar.png"}
+                        alt="avatar"
+                        width={40}
+                        height={40}
+                        className={styles.roundedFull}
+                      />
+                      <div>
+                        <h4>
+                          {user.firstName
+                            ? `${user.firstName} ${user.lastName}`
+                            : user.username}
+                        </h4>
+                        <p>{user.email}</p>
+                      </div>
+                    </div>
+                    <button
+                      className={`${styles.addFriendButton} ${
+                        friends.includes(user.id) ? styles.friendAdded : ""
+                      }`}
+                      onClick={() =>
+                        friends.includes(user.id)
+                          ? removeFriend(user.id)
+                          : addFriend(user.id)
+                      }
+                    >
+                      {friends.includes(user.id)
+                        ? t("ranking.friends.remove")
+                        : t("ranking.friends.add")}
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+              {/* Barre de recherche pour trouver des amis */}
+              <div className={styles.searchContainer}>
+                <input
+                  type="text"
+                  className={styles.searchInput}
+                  placeholder={t("ranking.search.placeholder") as string}
+                  value={searchQuery}
+                  onChange={(e) => handleSearch(e.target.value)}
+                />
+                {searchQuery && (
+                  <button
+                    className={styles.searchClearButton}
+                    onClick={() => {
+                      setSearchQuery("");
+                      setSearchResults([]);
+                    }}
+                  >
+                    ✕
+                  </button>
+                )}
+              </div>
+              {/* Résultats de recherche */}
+              {searchResults.length > 0 && (
+                <div className={styles.searchResults}>
+                  <h3>{t("ranking.search.results") as string}</h3>
+                  {searchResults.map((user) => (
+                    <div key={user.id} className={styles.searchResultItem}>
+                      <div className={styles.searchResultInfo}>
+                        <Image
+                          src={user.avatar || "/assets/avatar.png"}
+                          alt="avatar"
+                          width={40}
+                          height={40}
+                          className={styles.roundedFull}
+                        />
+                        <div>
+                          <h4>
+                            {user.firstName
+                              ? `${user.firstName} ${user.lastName}`
+                              : user.username}
+                          </h4>
+                          <p>{user.email}</p>
+                        </div>
+                      </div>
+                      <button
+                        className={`${styles.addFriendButton} ${
+                          friends.includes(user.id) ? styles.friendAdded : ""
+                        }`}
+                        onClick={() =>
+                          friends.includes(user.id)
+                            ? removeFriend(user.id)
+                            : addFriend(user.id)
+                        }
+                      >
+                        {friends.includes(user.id)
+                          ? t("ranking.friends.remove")
+                          : t("ranking.friends.add")}
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+            <div className={styles.rankingList}>
+              <div
+                className={`${styles.rankingItem} ${getRankClass(currentUser)} ${styles.currentUser}`}
+              >
+                <div className={styles.rankingPosition}>
+                  <span className={styles.rankingRankNumber}>
+                    {getRankIcon(currentUser)}
+                  </span>
+                </div>
+                <div className={styles.rankingUserAvatar}>
+                  <Image
+                    src={currentUser.avatar || "/assets/avatar.png"}
+                    alt="avatar"
+                    width={40}
+                    height={40}
+                    className={styles.roundedFull}
+                  />
+                </div>
+                <div className={styles.rankingUserInfo}>
+                  <h3>
+                    {currentUser.firstName
+                      ? `${currentUser.firstName} ${currentUser.lastName}`
+                      : currentUser.username}
+                    <span className={styles.rankingYouBadge}>
+                      {t("ranking.badges.you") as string}
+                    </span>
+                  </h3>
+                  <p>{currentUser.email}</p>
+                </div>
+                <div className={styles.rankingUserStats}>
+                  <div className={styles.rankingStatItemPrimary}>
+                    <span className={styles.rankingStatNumber}>
+                      {currentUser.totalApplications}
+                    </span>
+                    <span className={styles.rankingStatLabel}>
+                      {t("ranking.stats.totalApplications") as string}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!loading && friendsUsers.length === 0 && !currentUser) {
     return (
       <div className={styles.rankingPage}>
         <div className={styles.rankingContainer}>
           <div className={styles.rankingEmptyState}>
-            <h3>{t("ranking.empty.title") as string}</h3>
-            <p>{t("ranking.empty.description") as string}</p>
-            <p>{t("ranking.empty.futureInfo") as string}</p>
+            <h3>{t("ranking.friends.title") as string}</h3>
+            <p>
+              {t("ranking.friends.noFriendsData") ||
+                "Aucun de vos amis n'a encore de candidatures."}
+            </p>
             <button
               className={styles.rankingRetryButton}
               onClick={() => fetchRanking(1)}
@@ -269,7 +489,7 @@ export default function RankingClient({
         {topThreeUsers.length > 0 && (
           <div className={styles.podiumSection}>
             <h2 className={styles.podiumTitle}>
-              {t("ranking.podium.title") as string}
+              {t("ranking.podium.title") as string} - {t("ranking.friends.title") as string}
             </h2>
             <div className={styles.rankingPodium}>
               {topThreeUsers[1] && (
@@ -362,7 +582,9 @@ export default function RankingClient({
         <div className={styles.rankingSection}>
           <div className={styles.rankingHeaderSection}>
             <div className={styles.rankingTitleWithRefresh}>
-              <h2>{t("ranking.complete.title") as string}</h2>
+              <h2>
+                {t("ranking.complete.title") as string} - {t("ranking.friends.title") as string}
+              </h2>
               <button
                 className={styles.rankingRefreshButton}
                 onClick={() => fetchRanking(currentPage)}
@@ -372,28 +594,7 @@ export default function RankingClient({
                 {t("ranking.complete.refreshButton") as string}
               </button>
             </div>
-            {/* Barre de recherche */}
-            <div className={styles.searchContainer}>
-              <input
-                type="text"
-                className={styles.searchInput}
-                placeholder={t("ranking.search.placeholder") as string}
-                value={searchQuery}
-                onChange={(e) => handleSearch(e.target.value)}
-              />
-              {searchQuery && (
-                <button
-                  className={styles.searchClearButton}
-                  onClick={() => {
-                    setSearchQuery("");
-                    applyFilters(allUsers, 1, "");
-                  }}
-                >
-                  ✕
-                </button>
-              )}
-            </div>
-            {currentUser && (
+            {currentUser && friends.includes(currentUser.id) && (
               <div className={styles.rankingUserPositionInfo}>
                 <span>
                   {t("ranking.userPosition.text", { rank: currentUser.rank })}
@@ -454,26 +655,6 @@ export default function RankingClient({
                     </span>
                   </div>
                 </div>
-                {/* Bouton ajouter ami */}
-                {user.id !== currentUser?.id && (
-                  <button
-                    className={`${styles.addFriendButtonCard} ${
-                      friends.includes(user.id) ? styles.friendAdded : ""
-                    }`}
-                    onClick={() =>
-                      friends.includes(user.id)
-                        ? removeFriend(user.id)
-                        : addFriend(user.id)
-                    }
-                    title={
-                      friends.includes(user.id)
-                        ? (t("ranking.friends.remove") as string)
-                        : (t("ranking.friends.add") as string)
-                    }
-                  >
-                    {friends.includes(user.id) ? "✓" : "+"}
-                  </button>
-                )}
               </div>
             ))}
           </div>
@@ -528,3 +709,4 @@ export default function RankingClient({
     </div>
   );
 }
+
