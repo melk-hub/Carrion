@@ -7,5 +7,9 @@ RUN npm install
 
 COPY . .
 
+RUN chmod +x ./launcher.dev.sh
+
 EXPOSE 8080
-CMD ["./launcher.sh"]
+RUN npx prisma generate
+
+CMD ["sh", "./launcher.dev.sh"]

@@ -7,8 +7,7 @@ services:
 
   server:
     build:
-      dockerfile: Dockerfile
-    command: npm run start:dev
+      dockerfile: Dockerfile.dev
     ports:
       - "8080:8080"
     volumes:
