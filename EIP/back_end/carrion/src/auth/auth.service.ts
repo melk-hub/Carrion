@@ -298,7 +298,8 @@ export class AuthService {
       <h2 style="color: #0c1f3d;">Demande de réinitialisation</h2>
       <p>Bonjour,</p>
       <p>Vous avez demandé à réinitialiser votre mot de passe. Cliquez ci-dessous pour continuer :</p>
-      <a href="${resetUrl}" style="background-color: #0c1f3d; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block; margin: 20px 0;">Réinitialiser mon mot de passe</a><p style="font-size: 12px; color: #666;">Si vous n'êtes pas à l'origine de cette demande, ignorez cet email.</p>
+      <p>${resetUrl}</p>
+      <p style="font-size: 12px; color: #666;">Si vous n'êtes pas à l'origine de cette demande, ignorez cet email.</p>
       </div>`;
       sendSmtpEmail.sender = {
         name: 'Carrion',
@@ -473,7 +474,7 @@ export class AuthService {
       <h2 style="color: #0c1f3d;">Bienvenue sur Carrion !</h2>
       <p>Bonjour ${username},</p>
       <p>Pour activer votre compte, veuillez confirmer votre email :</p>
-      <a href="${verifyUrl}" style="background-color: #0c1f3d; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block; margin: 20px 0;">Confirmer mon email</a>
+      <p>${verifyUrl}</p>
       <p style="font-size: 12px; color: #666;">Lien valide 24h.</p>
       </div>`;
       sendSmtpEmail.sender = {

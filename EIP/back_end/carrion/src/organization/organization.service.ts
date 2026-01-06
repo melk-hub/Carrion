@@ -119,7 +119,14 @@ export class OrganizationService {
       );
       const sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail();
       sendSmtpEmail.subject = `Invitation à rejoindre ${organization.name} sur Carrion`;
-      sendSmtpEmail.htmlContent = `<div style="font-family: Arial, sans-serif; padding: 20px; color: #333;"><h2 style="color: #0c1f3d;">Vous êtes invité !</h2><p>Bonjour,</p><p><strong>${inviterName}</strong> vous a invité à rejoindre l'organisation <strong>${organization.name}</strong> en tant que <strong>${body.role}</strong>.</p><a href="${invitationUrl}" style="background-color: #0c1f3d; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block; margin: 20px 0;">Accepter l'invitation</a><p style="font-size: 12px; color: #666;">Ce lien est valide 7 jours.</p></div>`;
+      sendSmtpEmail.htmlContent = `
+			<div style="font-family: Arial, sans-serif; padding: 20px; color: #333;">
+			<h2 style="color: #0c1f3d;">Vous êtes invité !</h2>
+			<p>Bonjour,</p>
+			<p><strong>${inviterName}</strong> vous a invité à rejoindre l'organisation <strong>${organization.name}</strong> en tant que <strong>${body.role}</strong>.</p>
+			<p>${invitationUrl}</p>
+			<p style="font-size: 12px; color: #666;">Ce lien est valide 7 jours.</p>
+			</div>`;
       sendSmtpEmail.sender = {
         name: 'Carrion',
         email: process.env.SENDER_EMAIL || 'no-reply@carrion.app',
