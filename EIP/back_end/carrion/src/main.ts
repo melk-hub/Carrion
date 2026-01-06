@@ -27,6 +27,8 @@ async function bootstrap() {
       const allowedOrigins = [
         `${process.env.FRONT}`,
         `${process.env.BACK}`,
+        `${process.env.DOMAIN_NAME}`,
+        `${process.env.DOMAIN_NAME_WWW}`,
         'localhost:8080',
       ];
       if (allowedOrigins.includes(origin) || !origin) {
