@@ -1,0 +1,15 @@
+zhg-villon.fr {
+    handle /api/* {
+        reverse_proxy server:8080
+    }
+    handle /auth/* {
+        reverse_proxy server:8080
+    }
+    handle {
+        reverse_proxy client_web:3000
+    }
+}
+
+www.zhg-villon.fr {
+    redir https://zhg-villon.fr{uri}
+}
