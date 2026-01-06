@@ -22,6 +22,8 @@ async function bootstrap() {
 
   app.use(cookieParser());
 
+  app.setGlobalPrefix('api');
+
   app.enableCors({
     origin: (origin, callback) => {
       const allowedOrigins = [

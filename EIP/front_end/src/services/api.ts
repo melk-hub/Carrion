@@ -22,7 +22,9 @@ class ApiService {
     if (typeof window === "undefined") {
       return process.env.INTERNAL_API_URL || "http://localhost:8080";
     }
-    return process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
+    return (
+      process.env.NEXT_PUBLIC_API_URL + "/api" || "http://localhost:8080/api"
+    );
   }
 
   private handleLocalLogout() {
