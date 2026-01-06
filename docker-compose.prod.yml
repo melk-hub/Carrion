@@ -8,14 +8,30 @@ services:
     build:
       dockerfile: Dockerfile
     restart: always
-    ports:
-      - "8080:8080"
 
   client_web:
     build:
       dockerfile: Dockerfile
       args:
-        - NEXT_PUBLIC_API_URL=http://${SERVER_IP}:${API_PORT}
+        - NEXT_PUBLIC_API_URL=https://${DOMAIN_NAME}
+    restart: always
+
+  caddy:
+    image: caddy:latest
     restart: always
     ports:
-      - "8081:3000"
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
+    networks:
+      - api-tier
+    depends_on:
+      - server
+      - client_web
+
+volumes:
+  caddy_data:
+  caddy_config:
