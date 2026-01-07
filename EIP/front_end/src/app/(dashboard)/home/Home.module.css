@@ -404,3 +404,95 @@
     width: 100%;
   }
 }
+
+.companyLogo {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  margin-right: 1rem;
+  flex-shrink: 0;
+  overflow: hidden;
+  background-color: #f8fafc;
+  border: 1px solid #e2e8f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.placeholderLogo {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%);
+  color: #64748b;
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.modernStatusBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 0.35rem;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  width: fit-content;
+  white-space: nowrap;
+}
+
+.statusIndicator {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.status-accepted {
+  background-color: #ecfdf5;
+  color: #059669;
+  border: 1px solid #d1fae5;
+}
+.status-accepted .statusIndicator {
+  background-color: #10b981;
+}
+
+.status-pending {
+  background-color: #fffbeb;
+  color: #d97706;
+  border: 1px solid #fef3c7;
+}
+.status-pending .statusIndicator {
+  background-color: #f59e0b;
+}
+
+.status-refused {
+  background-color: #fef2f2;
+  color: #dc2626;
+  border: 1px solid #fee2e2;
+}
+.status-refused .statusIndicator {
+  background-color: #ef4444;
+}
+
+.status-interview {
+  background-color: #eff6ff;
+  color: #2563eb;
+  border: 1px solid #dbeafe;
+}
+.status-interview .statusIndicator {
+  background-color: #3b82f6;
+}
+
+.status-offer {
+  background-color: #ecfeff;
+  color: #0891b2;
+  border: 1px solid #cffafe;
+}
+.status-offer .statusIndicator {
+  background-color: #06b6d4;
+}
