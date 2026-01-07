@@ -17,6 +17,7 @@ const ToggleSwitch = ({ isChecked, setIsChecked }: ToggleSwitchProps) => {
     <label
       className={styles.reduceMotionToggle + " "  + styles.stReduceMotionToggleBtn}
       htmlFor="reduceMotionToggle"
+      style={{ marginLeft: isChecked ? '0px' : '40px' } as React.CSSProperties}
     >
       <input
         className={styles.reduceMotionToggleInput}

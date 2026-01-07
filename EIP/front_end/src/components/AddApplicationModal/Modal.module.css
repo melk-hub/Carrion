@@ -20,7 +20,7 @@
   max-width: 500px;
   max-height: 90vh;
   overflow-y: auto;
-  animation: modal-appear 0.3s ease-out;
+  animation: modalAppear 0.3s ease-out;
   position: relative;
   z-index: 10000;
 }
@@ -252,4 +252,55 @@
 .modalButton:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+.modalButton.cancel {
+  background-color: #ffffff;
+  color: #374151;
+  border: 2px solid #d1d5db;
+}
+
+.modalButton.cancel:hover:not(:disabled) {
+  background-color: #f9fafb;
+  border-color: #9ca3af;
+}
+
+.modalButton.confirm {
+  background-color: #132238;
+  color: white;
+  border: 2px solid transparent;
+}
+
+.modalButton.confirm:hover:not(:disabled) {
+  background-color: #2d3748;
+}
+
+.subscriptionContent {
+  /* Pas de padding supplémentaire car .modalContent a déjà un padding de 2rem */
+}
+
+.subscriptionSubtitle {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 1.5rem;
+  margin-top: 0;
+}
+
+.subscriptionFeatures {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 1.5rem 0;
+}
+
+.subscriptionFeatures li {
+  padding: 0.75rem 0;
+  font-size: 1rem;
+  color: #4b5563;
+  border-bottom: 1px solid #e5e7eb;
+  line-height: 1.5;
+}
+
+.subscriptionFeatures li:last-child {
+  border-bottom: none;
 }

@@ -75,11 +75,9 @@ export default function DashboardClient({
 	const handleUpdateApplication = async () => {
 		if (!selectedApplication) return;
 		try {
-			// eslint-disable-next-line @typescript-eslint/no-unused-vars
-			const { id, createdAt, ...updateData } = selectedApplication;
 			const updatedApp = await apiService.put<Application>(
-				`/job_applies/${selectedApplication.id}/status`,
-				updateData
+				`/job_applies/${selectedApplication.id}`,
+				selectedApplication
 			);
 			if (updatedApp) {
 				setApplications((prev) =>

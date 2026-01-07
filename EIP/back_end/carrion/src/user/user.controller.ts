@@ -121,4 +121,34 @@ export class UserController {
   async getUsersRanking() {
     return this.userService.getUsersRanking();
   }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('friends')
+  @ApiOperation({ summary: 'Get user friends list' })
+  @ApiResponse({ status: 200, description: 'Friends list retrieved successfully' })
+  async getFriends(@Req() req) {
+    return this.userService.getFriends(req.user.id);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('friends/:friendId')
+  @HttpCode(HttpStatus.CREATED)
+  @ApiOperation({ summary: 'Add a friend' })
+  @ApiResponse({ status: 201, description: 'Friend added successfully' })
+  @ApiResponse({ status: 400, description: 'Cannot add yourself as friend' })
+  @ApiResponse({ status: 404, description: 'Friend not found' })
+  @ApiResponse({ status: 409, description: 'Friend already added' })
+  async addFriend(@Req() req, @Param('friendId') friendId: string) {
+    return this.userService.addFriend(req.user.id, friendId);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Delete('friends/:friendId')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiOperation({ summary: 'Remove a friend' })
+  @ApiResponse({ status: 204, description: 'Friend removed successfully' })
+  @ApiResponse({ status: 404, description: 'Friendship not found' })
+  async removeFriend(@Req() req, @Param('friendId') friendId: string) {
+    return this.userService.removeFriend(req.user.id, friendId);
+  }
 }

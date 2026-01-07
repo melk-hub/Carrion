@@ -21,6 +21,7 @@ import { AchievementsModule } from './achievements/achievements.module';
 import { NotificationModule } from './notification/notification.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { OrganizationModule } from './organization/organization.module';
+import { SubscriptionModule } from './subscription/subscription.module';
 import { TasksService } from './tasks/tasks.service';
 
 @Module({
@@ -40,6 +41,7 @@ import { TasksService } from './tasks/tasks.service';
     AchievementsModule,
     NotificationModule,
     OrganizationModule,
+    SubscriptionModule,
     ScheduleModule.forRoot(),
   ],
   controllers: [AppController, MailFilterController, StatisticsController],

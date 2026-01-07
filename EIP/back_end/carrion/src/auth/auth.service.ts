@@ -9,7 +9,7 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import { UserService } from '@/user/user.service';
 import refreshJwtConfig from './config/refresh-jwt.config';
-import { ConfigType } from '@nestjs/config';
+import type { ConfigType } from '@nestjs/config';
 import * as argon2 from 'argon2';
 import { CreateUserDto } from '@/user/dto/create-user.dto';
 import { Role } from './enums/role.enum';

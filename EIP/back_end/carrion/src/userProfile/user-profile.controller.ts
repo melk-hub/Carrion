@@ -17,7 +17,7 @@ import { JwtAuthGuard } from '@/auth/guards/jwt/jwt-auth.guard';
 import { UserProfileService } from './user-profile.service';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { UserProfileDto } from './dto/user-profile.dto';
-import { Request } from 'express';
+import type { Request } from 'express';
 
 @ApiTags('user-profile')
 @Controller('user-profile')

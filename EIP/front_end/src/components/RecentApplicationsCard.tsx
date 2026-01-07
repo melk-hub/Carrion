@@ -3,7 +3,6 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useLanguage } from "../contexts/LanguageContext";
-import Image from "next/image";
 import styles from "../app/(dashboard)/home/Home.module.css";
 
 interface Application {
@@ -119,10 +118,6 @@ const RecentApplicationsCard = ({
 		return (t(statusKey) as string) || status;
 	};
 
-	const getCompanyInitial = (company?: string): string => {
-		return company ? company.charAt(0).toUpperCase() : "?";
-	};
-
 	if (loading) {
 		return (
 			<div className={`${styles.card} ${styles.recentApplications} ${className}`}>
@@ -224,20 +219,20 @@ const RecentApplicationsCard = ({
 			<div className={styles.applicationsList}>
 				{applications.map((application) => (
 					<div className={styles.applicationItem} key={application.id}>
-						<div className={styles.companyLogo}>
-							{application.imageUrl ? (
-								<Image
-									src={application.imageUrl}
-									alt={application.company || "Company logo"}
-									width={40}
-									height={40}
-								/>
-							) : (
-								<div className={styles.placeholderLogo}>
-									{getCompanyInitial(application.company)}
-								</div>
-							)}
-						</div>
+						{/* <div className={styles.companyLogo}>
+              {application.imageUrl ? (
+                <Image
+                  src={application.imageUrl}
+                  alt={application.company || "Company logo"}
+                  width={40}
+                  height={40}
+                />
+              ) : (
+                <div className={styles.placeholderLogo}>
+                  {getCompanyInitial(application.company)}
+                </div>
+              )}
+            </div> */}
 						<div className={styles.applicationInfo}>
 							<h4>
 								{application.company ||

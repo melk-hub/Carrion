@@ -165,11 +165,14 @@ function ApplicationCard({
 					</button>
 
 					<button
-						className={`${styles.modernActionButton} ${styles.secondary}`}
+						className={styles.modernActionButton + " " + styles.secondary}
 						onClick={() => onArchive(application.id)}
-						title={isArchivePage ? t("common.unarchive") as string : t("common.archive") as string}
 					>
-						{isArchivePage ? t("common.unarchive") : t("common.archive")}
+						<span>
+							{pathname.includes("archives")
+								? t("common.unarchive")
+								: t("common.archive")}
+						</span>
 					</button>
 
 					<button

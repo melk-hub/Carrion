@@ -33,6 +33,9 @@ model User {
   userOrganization        OrganizationMember[]     @relation("UserOrganization")
   organizationOwner       Organization?            @relation("OrganizationOwner")
   organizationInvitations OrganizationInvitation[]
+  subscription            Subscription?            @relation("UserSubscription")
+  friendships             Friendship[]            @relation("UserFriendships")
+  friendOf                Friendship[]             @relation("FriendOf")
 }
 
 model UserProfile {
@@ -241,4 +244,36 @@ enum OrganizationRole {
   OWNER
   TEACHER
   STUDENT
+}
+
+model Subscription {
+  id                String   @id @default(uuid()) @db.Uuid
+  userId            String   @unique @db.Uuid
+  stripeCustomerId  String?  @unique
+  stripeSubscriptionId String? @unique
+  status            SubscriptionStatus @default(INACTIVE)
+  currentPeriodEnd DateTime?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  user              User     @relation("UserSubscription", fields: [userId], references: [id], onDelete: Cascade)
+}
+
+enum SubscriptionStatus {
+  INACTIVE
+  ACTIVE
+  CANCELED
+  PAST_DUE
+}
+
+model Friendship {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @db.Uuid
+  friendId  String   @db.Uuid
+  createdAt DateTime @default(now())
+  user      User     @relation("UserFriendships", fields: [userId], references: [id], onDelete: Cascade)
+  friend    User     @relation("FriendOf", fields: [friendId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, friendId])
+  @@index([userId])
+  @@index([friendId])
 }

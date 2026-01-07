@@ -26,7 +26,7 @@ export default function ArchivesClient({
 	const [applications, setApplications] =
 		useState<Application[]>(initialApplications);
 	const [searchTerm, setSearchTerm] = useState<string>("");
-	const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+	const [viewMode] = useState<"grid" | "list">("grid");
 	const [sortBy, setSortBy] = useState<"date" | "status">("date");
 	const [selectedStatuses, setSelectedStatuses] = useState<Set<string>>(
 		new Set()
@@ -53,17 +53,14 @@ export default function ArchivesClient({
 	const handleUpdateApplication = async () => {
 		if (!selectedApplication) return;
 		try {
-			// eslint-disable-next-line @typescript-eslint/no-unused-vars
-			const { id, createdAt, ...updateData } = selectedApplication;
 			const updatedApp = await apiService.put<Application>(
 				`/job_applies/${selectedApplication.id}/archived-status`,
-				updateData
+				selectedApplication
 			);
-			if (updatedApp) {
-				setApplications((prev) =>
-					prev.map((app) => (app.id === updatedApp.id ? updatedApp : app))
-				);
-			}
+			console.log(updatedApp);
+			setApplications((prev) =>
+				prev.map((app) => (app.id === updatedApp!.id ? updatedApp! : app))
+			);
 			closePopup();
 		} catch (err: unknown) {
 			console.error(t("dashboard.errors.updateError"), err);
@@ -242,22 +239,24 @@ export default function ArchivesClient({
 								</option>
 							</select>
 						</div>
-						<div className={styles.viewToggle}>
-							<button
-								className={`${styles.toggleButton} ${viewMode === "grid" ? styles.active : ""
-									}`}
-								onClick={() => setViewMode("grid")}
-							>
-								{t("shared.viewModes.grid") as string}
-							</button>
-							<button
-								className={`${styles.toggleButton} ${viewMode === "list" ? styles.active : ""
-									}`}
-								onClick={() => setViewMode("list")}
-							>
-								{t("shared.viewModes.list") as string}
-							</button>
-						</div>
+						{/* <div className={styles.viewToggle}>
+              <button
+                className={`${styles.toggleButton} ${
+                  viewMode === "grid" ? styles.active : ""
+                }`}
+                onClick={() => setViewMode("grid")}
+              >
+                {t("shared.viewModes.grid") as string}
+              </button>
+              <button
+                className={`${styles.toggleButton} ${
+                  viewMode === "list" ? styles.active : ""
+                }`}
+                onClick={() => setViewMode("list")}
+              >
+                {t("shared.viewModes.list") as string}
+              </button>
+            </div> */}
 					</div>
 				</section>
 

@@ -10,16 +10,21 @@ import { useAuth } from "@/contexts/AuthContext";
 import ApiService from "@/services/api";
 import LanguageDropdown from "@/components/LanguageDropdown/LanguageDropdown";
 import ToggleSwitch from "@/components/ToggleSwitch/ToggleSwitch";
+import SubscriptionModal from "@/components/SubscriptionModal/SubscriptionModal";
 import styles from "./NavBar.module.css";
 
 export default function Navbar({ children }: { children: React.ReactNode }) {
 	const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+
 	const { setIsAuthenticated, organizationMemberInfo, userProfile } = useAuth();
+
 	const router = useRouter();
 	const pathname = usePathname();
 	const { t } = useLanguage();
 	const { unreadCount } = useNotifications();
+
 	const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+	const [isSubscriptionModalOpen, setIsSubscriptionModalOpen] = useState(false);
 	const dropdownRef = useRef<HTMLDivElement>(null);
 	const [avatarUrl, setAvatarUrl] = useState("/assets/avatar.png");
 
@@ -135,8 +140,6 @@ export default function Navbar({ children }: { children: React.ReactNode }) {
 							height={40}
 							className={styles.avatar}
 							onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-							onError={() => setAvatarUrl("/assets/avatar.png")}
-							unoptimized
 						/>
 						{isDropdownOpen && (
 							<ul className={styles.dropdownMenu}>
