@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useMemo } from "react";
+import { Search, FileText } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import apiService from "@/services/api";
 import ApplicationCard from "@/components/Card/Dashboardcard";
@@ -57,7 +58,6 @@ export default function ArchivesClient({
 				`/job_applies/${selectedApplication.id}/archived-status`,
 				selectedApplication
 			);
-			console.log(updatedApp);
 			setApplications((prev) =>
 				prev.map((app) => (app.id === updatedApp!.id ? updatedApp! : app))
 			);
@@ -166,7 +166,7 @@ export default function ArchivesClient({
 							value={searchTerm}
 							onChange={(e) => setSearchTerm(e.target.value)}
 						/>
-						<span className={styles.searchIcon}>🔍</span>
+						<Search className={styles.searchIcon} size={20} />
 					</div>
 				</header>
 
@@ -239,24 +239,6 @@ export default function ArchivesClient({
 								</option>
 							</select>
 						</div>
-						{/* <div className={styles.viewToggle}>
-              <button
-                className={`${styles.toggleButton} ${
-                  viewMode === "grid" ? styles.active : ""
-                }`}
-                onClick={() => setViewMode("grid")}
-              >
-                {t("shared.viewModes.grid") as string}
-              </button>
-              <button
-                className={`${styles.toggleButton} ${
-                  viewMode === "list" ? styles.active : ""
-                }`}
-                onClick={() => setViewMode("list")}
-              >
-                {t("shared.viewModes.list") as string}
-              </button>
-            </div> */}
 					</div>
 				</section>
 
@@ -282,7 +264,9 @@ export default function ArchivesClient({
 								))
 							) : (
 								<div className={styles.emptyState}>
-									<div className={styles.emptyIcon}>📄</div>
+									<div className={styles.emptyIcon}>
+										<FileText size={48} />
+									</div>
 									<h3 className={styles.emptyTitle}>
 										{t("archives.empty.title") as string}
 									</h3>
@@ -308,7 +292,9 @@ export default function ArchivesClient({
 								))
 							) : (
 								<div className={styles.emptyState}>
-									<div className={styles.emptyIcon}>📄</div>
+									<div className={styles.emptyIcon}>
+										<FileText size={48} />
+									</div>
 									<h3 className={styles.emptyTitle}>
 										{t("archives.empty.title") as string}
 									</h3>

@@ -325,6 +325,8 @@
 
   "dashboard": {
     "title": "Aperçu de vos candidatures",
+    "description": "Suivez vos candidatures et maximisez vos chances de succès",
+    "notSpecified": "Non spécifié",
     "addApplication": "AJOUTER UNE CANDIDATURE",
     "myApplications": "Mes candidatures",
     "unknownCompany": "Entreprise inconnue",
@@ -383,7 +385,8 @@
       "date": "Date de candidature: ",
       "location": "Lieu: ",
       "salary": "Salaire: ",
-      "close": "Fermer"
+      "close": "Fermer",
+      "contractType": "Type de contrat: "
     }
   },
   "archives": {

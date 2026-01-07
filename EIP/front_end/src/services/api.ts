@@ -72,7 +72,6 @@ class ApiService {
     options: ApiOptions = {}
   ): Promise<Response> {
     const fullUrl = `${this.getBaseUrl()}${url}`;
-    console.log(fullUrl);
     const defaultOptions: ApiOptions = {
       credentials: "include",
       headers: { "Content-Type": "application/json", ...options.headers },

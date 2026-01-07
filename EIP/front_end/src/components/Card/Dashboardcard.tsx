@@ -50,7 +50,11 @@ function ApplicationCard({
 		}
 	};
 
+	// Get the correct class name from the CSS module
+	const statusClassName = styles[getStatusClass(application.status)];
+
 	const formatDate = (date: string) => {
+		if (!date) return null;
 		return new Date(date).toLocaleDateString("fr-FR", {
 			day: "2-digit",
 			month: "2-digit",
@@ -59,7 +63,7 @@ function ApplicationCard({
 	};
 
 	const formatSalary = (salary: number | null) => {
-		if (!salary) return null;
+		if (salary === null || salary === undefined) return null;
 		return new Intl.NumberFormat("fr-FR", {
 			style: "currency",
 			currency: "EUR",
@@ -68,14 +72,8 @@ function ApplicationCard({
 		}).format(salary);
 	};
 
-	const isArchivePage = pathname?.includes("/archives");
-
 	return (
-		<div
-			className={`${styles.modernApplicationCard} ${getStatusClass(
-				application.status
-			)}`}
-		>
+		<div className={`${styles.modernApplicationCard} ${statusClassName || ''}`}>
 			<div className={styles.modernCardHeader}>
 				<div className={styles.companyLogoSection}>
 					{application.imageUrl ? (
@@ -90,7 +88,9 @@ function ApplicationCard({
 					) : (
 						<div className={styles.modernLogoPlaceholder}>
 							<span className={styles.logoInitial}>
-								{application.company ? application.company.charAt(0).toUpperCase() : "?"}
+								{application.company
+									? application.company.charAt(0).toUpperCase()
+									: "?"}
 							</span>
 						</div>
 					)}
@@ -112,11 +112,7 @@ function ApplicationCard({
 						{application.title || t("dashboard.unknownPosition")}
 					</p>
 
-					<div
-						className={`${styles.modernStatusBadge} ${getStatusClass(
-							application.status
-						)}`}
-					>
+					<div className={styles.modernStatusBadge}>
 						<div className={styles.statusIndicator}></div>
 						<span className={styles.statusText}>
 							{getStatusLabel(application.status)}
@@ -129,20 +125,30 @@ function ApplicationCard({
 				<div className={styles.infoGrid}>
 					<div className={styles.infoItem}>
 						<FiMapPin className={styles.infoIcon} />
-						<span>{application.location || t("common.noLocation")}</span>
+						<span>
+							{application.location
+								? application.location
+								: t("dashboard.notSpecified")}
+						</span>
 					</div>
 
 					<div className={styles.infoItem}>
 						<FiCalendar className={styles.infoIcon} />
-						<span>{formatDate(application.createdAt)}</span>
+						<span>
+							{application.createdAt
+								? formatDate(application.createdAt)
+								: t("dashboard.notSpecified")}
+						</span>
 					</div>
 
-					{application.salary && (
-						<div className={styles.infoItem}>
-							<FiDollarSign className={styles.infoIcon} />
-							<span>{formatSalary(application.salary)}</span>
-						</div>
-					)}
+					<div className={styles.infoItem}>
+						<FiDollarSign className={styles.infoIcon} />
+						<span>
+							{application.salary
+								? formatSalary(application.salary)
+								: t("dashboard.notSpecified")}
+						</span>
+					</div>
 				</div>
 			</div>
 
@@ -165,7 +171,7 @@ function ApplicationCard({
 					</button>
 
 					<button
-						className={styles.modernActionButton + " " + styles.secondary}
+						className={`${styles.modernActionButton} ${styles.secondary}`}
 						onClick={() => onArchive(application.id)}
 					>
 						<span>

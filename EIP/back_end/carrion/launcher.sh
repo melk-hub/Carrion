@@ -1,5 +1,4 @@
 #!/bin/sh
-# Utilisation de /bin/sh car on est sur Alpine Linux souvent
 
 echo "Applying database migrations..."
 npx prisma migrate deploy
