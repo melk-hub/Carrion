@@ -36,7 +36,7 @@ services:
     networks:
       - api-tier
     environment:
-      - INTERNAL_API_URL=http://server:8080
+      - INTERNAL_API_URL=http://server:8080/api
 
 networks:
   back-tier:

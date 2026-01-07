@@ -20,7 +20,7 @@ class ApiService {
 
   private getBaseUrl(): string {
     if (typeof window === "undefined") {
-      return process.env.INTERNAL_API_URL || "http://localhost:8080";
+      return process.env.INTERNAL_API_URL || "http://localhost:8080/api";
     }
     return process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/api";
   }
@@ -72,6 +72,7 @@ class ApiService {
     options: ApiOptions = {}
   ): Promise<Response> {
     const fullUrl = `${this.getBaseUrl()}${url}`;
+    console.log(fullUrl);
     const defaultOptions: ApiOptions = {
       credentials: "include",
       headers: { "Content-Type": "application/json", ...options.headers },
