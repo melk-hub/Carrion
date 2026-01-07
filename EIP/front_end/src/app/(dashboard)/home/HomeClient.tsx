@@ -163,7 +163,7 @@ export default function HomeClient({
 
 	const handleSaveNewApplication = async (applicationData: ApplicationFormData) => {
 		try {
-			await apiService.post("/job_applies", applicationData);
+			await apiService.post("/job_applies/jobApply", applicationData);
 			closeAddModal();
 			router.refresh();
 		} catch (err) {
