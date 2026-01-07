@@ -6,247 +6,177 @@ import styles from "./DashboardList.module.css";
 import Image from "next/image";
 import { ApplicationStatus } from "@/enum/application-status.enum";
 import { JobApply } from "@/interface/job-apply.interface";
+import {
+	Eye,
+	Pencil,
+	Archive,
+	Trash2,
+	MapPin,
+	Calendar,
+	DollarSign,
+	Building2,
+	ArchiveRestore
+} from "lucide-react";
 
 function ApplicationList({
-  application,
-  statusMap,
-  onEdit,
-  onDetails,
-  onDelete,
-  onArchive,
+	application,
+	statusMap,
+	onEdit,
+	onDetails,
+	onDelete,
+	onArchive,
 }: {
-  application: JobApply;
-  statusMap: Record<ApplicationStatus, string>;
-  onEdit: (application: JobApply) => void;
-  onDetails: (application: JobApply) => void;
-  onDelete: (id: string) => void;
-  onArchive: (id: string) => void;
+	application: JobApply;
+	statusMap: Record<ApplicationStatus, string>;
+	onEdit: (application: JobApply) => void;
+	onDetails: (application: JobApply) => void;
+	onDelete: (id: string) => void;
+	onArchive: (id: string) => void;
 }) {
-  const { t } = useLanguage();
-  const pathname = usePathname();
+	const { t } = useLanguage();
+	const pathname = usePathname();
 
-  const getStatusClass = (status: ApplicationStatus) => {
-    switch (status) {
-      case "APPLIED":
-        return "status-accepted";
-      case "PENDING":
-        return "status-pending";
-      case "REJECTED_BY_COMPANY":
-        return "status-refused";
-      default:
-        return "";
-    }
-  };
+	const getStatusClass = (status: ApplicationStatus) => {
+		switch (status) {
+			case ApplicationStatus.APPLIED:
+				return "status-accepted";
+			case ApplicationStatus.PENDING:
+				return "status-pending";
+			case ApplicationStatus.REJECTED_BY_COMPANY:
+				return "status-refused";
+			case ApplicationStatus.INTERVIEW_SCHEDULED:
+				return "status-interview";
+			case ApplicationStatus.OFFER_RECEIVED:
+				return "status-offer";
+			default:
+				return "";
+		}
+	};
 
-  const formatDate = (date: string) => {
-    return new Date(date).toLocaleDateString("fr-FR", {
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
-    });
-  };
+	const statusClassName = styles[getStatusClass(application.status)];
 
-  const formatSalary = (salary: number) => {
-    if (!salary) return null;
-    return new Intl.NumberFormat("fr-FR", {
-      style: "currency",
-      currency: "EUR",
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(salary);
-  };
+	const formatDate = (date: string) => {
+		if (!date) return null;
+		return new Date(date).toLocaleDateString("fr-FR", {
+			day: "2-digit",
+			month: "2-digit",
+			year: "numeric",
+		});
+	};
 
-  return (
-    <div
-      className={styles.modernApplicationListItem + ` ${getStatusClass(
-        application.status
-      )}`}
-    >
-      <div className={styles.modernListContent}>
-        <div className={styles.modernListLogo}>
-          {application.imageUrl ? (
-            <Image
-              src={application.imageUrl || "/placeholder.svg"}
-              alt={`${application.company} logo`}
-              className={styles.modernCompanyLogoList}
-              width={40}
-              height={40}
-            />
-          ) : (
-            <div className={styles.modernLogoPlaceholderList}>
-              <Image
-                src="/icons/company-placeholder.svg"
-                alt="Company"
-                className={styles.iconPlaceholder}
-                width={24}
-                height={24}
-              />
-            </div>
-          )}
-        </div>
+	const formatSalary = (salary: number | null) => {
+		if (!salary) return null;
+		return new Intl.NumberFormat("fr-FR", {
+			style: "currency",
+			currency: "EUR",
+			minimumFractionDigits: 0,
+			maximumFractionDigits: 0,
+		}).format(salary);
+	};
 
-        <div className={styles.modernListInfo}>
-          <h3 className={styles.modernCompanyNameList}>
-            {application.company || t("dashboard.unknownCompany")}
-          </h3>
-          <p className={styles.modernJobTitleList}>
-            {application.title || t("dashboard.unknownPosition")}
-          </p>
-          <div className={styles.contractTypeBadgeList}>
-            {application.contractType
-              ? t(`contractTypes.${application.contractType}`) ||
-                application.contractType
-              : t("contractTypes.FULL_TIME")}
-          </div>
-        </div>
+	const isArchivePage = pathname.includes("archives");
 
-        <div
-          className={styles.modernStatusBadgeList + ` ${getStatusClass(
-            application.status
-          )}`}
-        >
-          <div className={styles.statusIndicatorList}></div>
-          <span className={styles.statusTextList}>
-            {statusMap[application.status] || t("dashboard.unknownStatus")}
-          </span>
-        </div>
+	return (
+		<div className={`${styles.modernApplicationListItem} ${statusClassName || ''}`}>
 
-        <div className={styles.modernListDetails}>
-          <div className={styles.detailItemModern}>
-            <div className={styles.detailIconWrapper}>
-              <Image
-                src="/icons/calendar.svg"
-                alt="Date"
-                className={styles.detailIcon}
-                width={24}
-                height={24}
-              />
-            </div>
-            <div className={styles.detailContent}>
-              <span className={styles.detailLabel}>
-                {t("dashboard.applicationForm.applicationDate")}
-              </span>
-              <span className={styles.detailValue}>
-                {formatDate(application.createdAt)}
-              </span>
-            </div>
-          </div>
+			<div className={styles.modernListContent}>
 
-          {application.location && (
-            <div className={styles.detailItemModern}>
-              <div className={styles.detailIconWrapper}>
-                <Image
-                  src="/icons/location.svg"
-                  alt="Location"
-                  className={styles.detailIcon}
-                  width={24}
-                  height={24}
-                />
-              </div>
-              <div className={styles.detailContent}>
-                <span className={styles.detailLabel}>
-                  {t("dashboard.applicationForm.location")}
-                </span>
-                <span className={styles.detailValue}>{application.location}</span>
-              </div>
-            </div>
-          )}
+				<div className={styles.modernListLogo}>
+					{application.imageUrl ? (
+						<Image
+							src={application.imageUrl}
+							alt={`${application.company} logo`}
+							className={styles.modernCompanyLogoList}
+							width={48}
+							height={48}
+							unoptimized
+						/>
+					) : (
+						<div className={styles.modernLogoPlaceholderList}>
+							<Building2 size={20} />
+						</div>
+					)}
+				</div>
 
-          {application.salary && (
-            <div className={styles.detailItemModern}>
-              <div className={styles.detailIconWrapper}>
-                <Image
-                  src="/icons/salary.svg"
-                  alt="Salary"
-                  className={styles.detailIcon}
-                  width={24}
-                  height={24}
-                />
-              </div>
-              <div className={styles.detailContent}>
-                <span className={styles.detailLabel}>
-                  {t("dashboard.applicationForm.salary")}
-                </span>
-                <span className={styles.detailValue}>
-                  {formatSalary(application.salary)}
-                </span>
-              </div>
-            </div>
-          )}
-        </div>
+				<div className={styles.modernListInfo}>
+					<h3 className={styles.modernCompanyNameList}>
+						{application.company || t("dashboard.unknownCompany")}
+					</h3>
+					<p className={styles.modernJobTitleList}>
+						{application.title || t("dashboard.unknownPosition")}
+					</p>
+				</div>
 
-        <div className={styles.modernListActions}>
-          <button
-            className={styles.modernListButton + " " + styles.primary}
-            onClick={() => onDetails(application)}
-            title={t("common.details") as string}
-          >
-            <div className={styles.listButtonIconWrapper}>
-              <Image
-                src="/icons/eye.svg"
-                alt="Details"
-                className={styles.listButtonIcon}
-                width={24}
-                height={24}
-              />
-            </div>
-          </button>
+				<div className={styles.modernStatusBadgeList}>
+					<div className={styles.statusIndicatorList}></div>
+					<span className={styles.statusTextList}>
+						{statusMap[application.status] || t("dashboard.unknownStatus")}
+					</span>
+				</div>
 
-          <button
-            className={styles.modernListButton + " " + styles.secondary}
-            onClick={() => onEdit(application)}
-            title={t("common.edit") as string}
-          >
-            <div className={styles.listButtonIconWrapper}>
-              <Image
-                src="/icons/edit.svg"
-                alt="Edit"
-                className={styles.listButtonIcon}
-                width={24}
-                height={24}
-              />
-            </div>
-          </button>
+				<div className={styles.modernListDetails}>
 
-          <button
-            className={styles.modernListButton + " " + styles.secondary}
-            onClick={() => onArchive(application.id)}
-            title={
-              (pathname.includes("archives")
-                ? t("common.unarchive")
-                : t("common.archive")) as string
-            }
-          >
-            <div className={styles.listButtonIconWrapper}>
-              <Image
-                src="/icons/edit.svg"
-                alt="Edit"
-                className={styles.listButtonIcon}
-                width={24}
-                height={24}
-              />
-            </div>
-          </button>
+					<div className={styles.detailItemModern}>
+						<Calendar size={16} className={styles.detailIcon} />
+						<span className={styles.detailText}>
+							{formatDate(application.createdAt)}
+						</span>
+					</div>
 
-          <button
-            className={styles.modernListButton + " " + styles.danger}
-            onClick={() => onDelete(application.id)}
-            title={t("common.delete") as string}
-          >
-            <div className={styles.listButtonIconWrapper}>
-              <Image
-                src="/icons/trash.svg"
-                alt="Delete"
-                className={styles.listButtonIcon}
-                width={24}
-                height={24}
-              />
-            </div>
-          </button>
-        </div>
-      </div>
-    </div>
-  );
+					<div className={styles.detailItemModern}>
+						<MapPin size={16} className={styles.detailIcon} />
+						<span className={styles.detailText}>
+							{application.location || t("dashboard.notSpecified")}
+						</span>
+					</div>
+
+					<div className={styles.detailItemModern}>
+						<DollarSign size={16} className={styles.detailIcon} />
+						<span className={styles.detailText}>
+							{application.salary
+								? formatSalary(application.salary)
+								: t("dashboard.notSpecified")}
+						</span>
+					</div>
+				</div>
+
+				<div className={styles.modernListActions}>
+					<button
+						className={`${styles.modernListButton} ${styles.primary}`}
+						onClick={() => onDetails(application)}
+						title={t("common.details") as string}
+					>
+						<Eye size={18} />
+					</button>
+
+					<button
+						className={`${styles.modernListButton} ${styles.secondary}`}
+						onClick={() => onEdit(application)}
+						title={t("common.edit") as string}
+					>
+						<Pencil size={18} />
+					</button>
+
+					<button
+						className={`${styles.modernListButton} ${styles.secondary}`}
+						onClick={() => onArchive(application.id)}
+						title={isArchivePage ? t("common.unarchive") as string : t("common.archive") as string}
+					>
+						{isArchivePage ? <ArchiveRestore size={18} /> : <Archive size={18} />}
+					</button>
+
+					<button
+						className={`${styles.modernListButton} ${styles.danger}`}
+						onClick={() => onDelete(application.id)}
+						title={t("common.delete") as string}
+					>
+						<Trash2 size={18} />
+					</button>
+				</div>
+
+			</div>
+		</div>
+	);
 }
 
 export default ApplicationList;
