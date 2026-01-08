@@ -11,6 +11,7 @@ import ApiService from "@/services/api";
 import LanguageDropdown from "@/components/LanguageDropdown/LanguageDropdown";
 import ToggleSwitch from "@/components/ToggleSwitch/ToggleSwitch";
 import SubscriptionModal from "@/components/SubscriptionModal/SubscriptionModal";
+import SubscriptionModal from "@/components/SubscriptionModal/SubscriptionModal";
 import styles from "./NavBar.module.css";
 
 export default function Navbar({ children }: { children: React.ReactNode }) {
