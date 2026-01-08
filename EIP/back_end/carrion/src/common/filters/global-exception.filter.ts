@@ -22,19 +22,6 @@ export class GlobalExceptionFilter implements ExceptionFilter {
     let message = 'Internal server error';
     let error = 'Internal Server Error';
 
-    // Log the full error for debugging
-    this.logger.error(
-      `Exception caught: ${JSON.stringify({
-        url: request.url,
-        method: request.method,
-        body: request.body,
-        params: request.params,
-        query: request.query,
-        exception: exception instanceof Error ? exception.message : exception,
-        stack: exception instanceof Error ? exception.stack : undefined,
-      })}`,
-    );
-
     if (exception instanceof HttpException) {
       // Handle NestJS HTTP exceptions
       status = exception.getStatus();
@@ -81,6 +68,21 @@ export class GlobalExceptionFilter implements ExceptionFilter {
         status = HttpStatus.BAD_REQUEST;
         error = 'Validation Error';
       }
+    }
+
+    // Log the error (except for 401 Unauthorized which are expected for expired tokens)
+    if (status !== HttpStatus.UNAUTHORIZED) {
+      this.logger.error(
+        `Exception caught: ${JSON.stringify({
+          url: request.url,
+          method: request.method,
+          body: request.body,
+          params: request.params,
+          query: request.query,
+          exception: exception instanceof Error ? exception.message : String(exception),
+          stack: exception instanceof Error ? exception.stack : undefined,
+        })}`,
+      );
     }
 
     // Ensure we don't expose sensitive information in production

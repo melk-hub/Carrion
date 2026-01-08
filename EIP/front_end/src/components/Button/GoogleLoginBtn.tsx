@@ -7,15 +7,11 @@ const GoogleLoginButton = () => {
   const GOOGLE_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
   const redirectUri = process.env.NEXT_PUBLIC_GOOGLE_REDIRECT_URI;
   const { t } = useLanguage();
-  if (!redirectUri) {
-    throw new Error(
-      "Environment variable NEXT_PUBLIC_GOOGLE_REDIRECT_URI is required but not defined."
-    );
-  }
-  if (!GOOGLE_ID) {
-    throw new Error(
-      "Environment variable NEXT_PUBLIC_GOOGLE_CLIENT_ID is required but not defined."
-    );
+  
+  // Si les variables d'environnement ne sont pas définies, ne pas afficher le bouton
+  if (!redirectUri || !GOOGLE_ID) {
+    console.warn('Google OAuth not configured. Missing environment variables.');
+    return null;
   }
   const scopes = [
     "https://www.googleapis.com/auth/userinfo.email",

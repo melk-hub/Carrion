@@ -58,6 +58,7 @@ async function bootstrap() {
         `${process.env.DOMAIN_NAME}`,
         `${process.env.DOMAIN_NAME_WWW}`,
         'localhost:8080',
+        'http://localhost:3000',
       ];
       if (allowedOrigins.includes(origin) || !origin) {
         callback(null, true);

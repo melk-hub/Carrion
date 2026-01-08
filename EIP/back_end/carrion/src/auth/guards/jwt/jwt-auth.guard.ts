@@ -31,7 +31,7 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
       // Essayer d'abord l'authentification normale
       const result = await super.canActivate(context);
       return result as boolean;
-    } catch {
+    } catch (error) {
       // Si l'authentification échoue, essayer de rafraîchir le token
       const refreshToken = request.cookies?.['refresh_token'];
 
@@ -65,7 +65,10 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
             return true;
           }
         } catch (refreshError) {
-          console.log('Token refresh failed:', refreshError.message);
+          // Log uniquement en mode debug, pas pour les erreurs normales d'expiration
+          if (process.env.NODE_ENV === 'development') {
+            console.log('Token refresh failed:', refreshError.message);
+          }
         }
       }
 

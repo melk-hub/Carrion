@@ -1,7 +1,6 @@
 "use client";
 import React from "react";
 import { usePathname } from "next/navigation";
-import { usePathname } from "next/navigation";
 import { useLanguage } from "@/contexts/LanguageContext";
 import styles from "./DashboardList.module.css";
 import Image from "next/image";
