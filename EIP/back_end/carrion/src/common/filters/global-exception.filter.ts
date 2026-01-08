@@ -13,6 +13,23 @@ import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 export class GlobalExceptionFilter implements ExceptionFilter {
   private readonly logger = new Logger(GlobalExceptionFilter.name);
 
+  private getDefaultErrorForStatus(status: number): string {
+    switch (status) {
+      case HttpStatus.UNAUTHORIZED:
+        return 'Unauthorized';
+      case HttpStatus.FORBIDDEN:
+        return 'Forbidden';
+      case HttpStatus.NOT_FOUND:
+        return 'Not Found';
+      case HttpStatus.BAD_REQUEST:
+        return 'Bad Request';
+      case HttpStatus.CONFLICT:
+        return 'Conflict';
+      default:
+        return 'Internal Server Error';
+    }
+  }
+
   catch(exception: unknown, host: ArgumentsHost): void {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
@@ -28,9 +45,17 @@ export class GlobalExceptionFilter implements ExceptionFilter {
       const responseBody = exception.getResponse();
       if (typeof responseBody === 'string') {
         message = responseBody;
+        // Set appropriate error based on status code
+        if (status === HttpStatus.UNAUTHORIZED) {
+          error = 'Unauthorized';
+        } else if (status === HttpStatus.NOT_FOUND) {
+          error = 'Not Found';
+        } else if (status === HttpStatus.BAD_REQUEST) {
+          error = 'Bad Request';
+        }
       } else if (typeof responseBody === 'object' && responseBody !== null) {
         message = (responseBody as any).message || message;
-        error = (responseBody as any).error || error;
+        error = (responseBody as any).error || this.getDefaultErrorForStatus(status);
       }
     } else if (exception instanceof PrismaClientKnownRequestError) {
       // Handle Prisma specific errors

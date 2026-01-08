@@ -527,21 +527,42 @@ export class AuthService {
       const decoded = this.jwtService.verify(refreshToken, {
         secret: this.refreshTokenConfig.secret,
       });
-      if (!decoded?.sub) return null;
-      const user = await this.userService.findOne(decoded.sub);
-      if (
-        !user ||
-        !user.hashedRefreshToken ||
-        !(await argon2.verify(user.hashedRefreshToken, refreshToken))
-      )
+      if (!decoded?.sub) {
+        if (process.env.NODE_ENV === 'development') {
+          this.logger.log('Refresh token decode failed: no sub in payload');
+        }
         return null;
+      }
+      const user = await this.userService.findOne(decoded.sub);
+      if (!user) {
+        if (process.env.NODE_ENV === 'development') {
+          this.logger.log(`Refresh token failed: user ${decoded.sub} not found`);
+        }
+        return null;
+      }
+      if (!user.hashedRefreshToken) {
+        if (process.env.NODE_ENV === 'development') {
+          this.logger.log(`Refresh token failed: user ${decoded.sub} has no hashedRefreshToken`);
+        }
+        return null;
+      }
+      const isValid = await argon2.verify(user.hashedRefreshToken, refreshToken);
+      if (!isValid) {
+        if (process.env.NODE_ENV === 'development') {
+          this.logger.log(`Refresh token failed: hash verification failed for user ${decoded.sub}`);
+        }
+        return null;
+      }
       const tokens = await this.generateTokens(user.id);
       await this.userService.updateHashedRefreshToken(
         user.id,
         await argon2.hash(tokens.refreshToken),
       );
       return { ...tokens, userId: user.id };
-    } catch {
+    } catch (error) {
+      if (process.env.NODE_ENV === 'development') {
+        this.logger.log(`Refresh token error: ${error instanceof Error ? error.message : String(error)}`);
+      }
       return null;
     }
   }

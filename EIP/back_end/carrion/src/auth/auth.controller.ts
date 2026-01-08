@@ -102,12 +102,30 @@ export class AuthController {
   async refreshAccessToken(@Req() req, @Res() res) {
     try {
       const refreshToken = req.cookies?.['refresh_token'];
-      if (!refreshToken)
-        return res.status(401).json({ message: 'No refresh token provided' });
+      
+      // Log for debugging (only in development)
+      if (process.env.NODE_ENV === 'development') {
+        Logger.debug(`Refresh attempt - cookies present: ${!!req.cookies}, refresh_token: ${!!refreshToken}`);
+      }
+      
+      if (!refreshToken) {
+        // Clear any invalid cookies
+        res.clearCookie('access_token');
+        res.clearCookie('refresh_token');
+        return res.status(401).json({ message: 'No refresh token provided. Please log in again.' });
+      }
 
       const tokens = await this.authService.refreshTokens(refreshToken);
-      if (!tokens)
-        return res.status(401).json({ message: 'Invalid refresh token' });
+      if (!tokens) {
+        // Log for debugging (only in development)
+        if (process.env.NODE_ENV === 'development') {
+          Logger.debug('Token refresh failed: invalid or expired refresh token');
+        }
+        // Clear invalid cookies
+        res.clearCookie('access_token');
+        res.clearCookie('refresh_token');
+        return res.status(401).json({ message: 'Invalid or expired refresh token. Please log in again.' });
+      }
 
       res.cookie('access_token', tokens.accessToken, {
         httpOnly: true,
@@ -127,7 +145,10 @@ export class AuthController {
       return res.status(200).json({ message: 'Token refreshed successfully' });
     } catch (error) {
       Logger.error(error);
-      return res.status(401).json({ message: 'Token refresh failed' });
+      // Clear cookies on error
+      res.clearCookie('access_token');
+      res.clearCookie('refresh_token');
+      return res.status(401).json({ message: 'Token refresh failed. Please log in again.' });
     }
   }
 

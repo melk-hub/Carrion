@@ -57,17 +57,24 @@ async function bootstrap() {
         `${process.env.BACK}`,
         `${process.env.DOMAIN_NAME}`,
         `${process.env.DOMAIN_NAME_WWW}`,
-        'localhost:8080',
         'http://localhost:3000',
+        'http://localhost:3001',
+        'http://127.0.0.1:3000',
+        'http://127.0.0.1:3001',
+        'http://localhost:8080',
+        'http://127.0.0.1:8080',
       ];
-      if (allowedOrigins.includes(origin) || !origin) {
+      // Allow requests with no origin (like mobile apps or curl requests)
+      if (!origin || allowedOrigins.includes(origin)) {
         callback(null, true);
       } else {
+        console.warn(`CORS blocked origin: ${origin}`);
         callback(new Error('Not allowed by CORS'));
       }
     },
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     credentials: true,
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
   });
 
   const config = new DocumentBuilder()
