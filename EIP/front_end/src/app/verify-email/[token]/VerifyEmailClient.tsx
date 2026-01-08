@@ -97,8 +97,8 @@ export default function VerifyEmailClient() {
 							{t("auth.welcomeCarrion")}
 						</p>
 						<PrimaryButton
-							text={t("auth.signIn") as string}
-							onClick={() => router.push("/?auth=signin")}
+							text={t("home.dashboard") as string}
+							onClick={() => router.push("/home")}
 							style={{ marginTop: "1rem", width: "100%" }}
 						/>
 					</div>
