@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsString } from 'class-validator';
-import { GmailMessage } from '@/webhooks/mail/gmail.types';
+import type { GmailMessage } from '@/webhooks/mail/gmail.types';
 
 export class ExtractInfoDto {
   @ApiProperty({

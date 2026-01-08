@@ -6,14 +6,19 @@ import {
   Request,
   Res,
   Headers,
-  RawBodyRequest,
   Req,
   HttpCode,
   HttpStatus,
 } from '@nestjs/common';
+import type { RawBodyRequest } from '@nestjs/common';
 import { SubscriptionService } from './subscription.service';
 import { JwtAuthGuard } from '../auth/guards/jwt/jwt-auth.guard';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 import { ApiCookieAuth } from '@nestjs/swagger';
 import { Public } from '../auth/decorators/public.decorator';
 import { ConfigService } from '@nestjs/config';
@@ -42,7 +47,7 @@ export class SubscriptionController {
   async createCheckoutSession(@Request() req, @Res() res) {
     try {
       const userId = req.user.id;
-      
+
       // Récupérer l'email depuis la base de données
       const user = await this.prisma.user.findUnique({
         where: { id: userId },
@@ -75,7 +80,9 @@ export class SubscriptionController {
     @Headers('stripe-signature') signature: string,
   ) {
     const stripeSecretKey = this.configService.get<string>('STRIPE_SECRET_KEY');
-    const webhookSecret = this.configService.get<string>('STRIPE_WEBHOOK_SECRET');
+    const webhookSecret = this.configService.get<string>(
+      'STRIPE_WEBHOOK_SECRET',
+    );
 
     if (!stripeSecretKey) {
       return { error: 'STRIPE_SECRET_KEY is not configured' };
@@ -91,11 +98,7 @@ export class SubscriptionController {
 
     try {
       const rawBody = req.rawBody || Buffer.from(JSON.stringify(req.body));
-      event = stripe.webhooks.constructEvent(
-        rawBody,
-        signature,
-        webhookSecret,
-      );
+      event = stripe.webhooks.constructEvent(rawBody, signature, webhookSecret);
     } catch (err) {
       return { error: `Webhook signature verification failed: ${err.message}` };
     }
@@ -116,4 +119,3 @@ export class SubscriptionController {
     return this.subscriptionService.getSubscriptionStatus(req.user.id);
   }
 }
-

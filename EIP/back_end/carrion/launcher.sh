@@ -1,6 +1,7 @@
-#!/bin/bash
+#!/bin/sh
 
-npm run build
-npx prisma generate
+echo "Applying database migrations..."
 npx prisma migrate deploy
-npm run start
+
+echo "Starting application in production mode..."
+npm run start:prod

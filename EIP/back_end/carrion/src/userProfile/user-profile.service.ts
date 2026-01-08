@@ -22,7 +22,7 @@ export class UserProfileService {
     userProfileInfo: UserProfileDto,
   ): Promise<string> {
     try {
-      let returnMessage = "";
+      let returnMessage = '';
       const profileData = {
         ...userProfileInfo,
         birthDate: userProfileInfo.birthDate
@@ -39,7 +39,7 @@ export class UserProfileService {
           where: { userId },
           data: { ...profileData },
         });
-        Logger.log("Updated")
+        Logger.log('Updated');
         returnMessage = 'User profile updated';
       } else {
         await this.prisma.userProfile.create({
@@ -48,8 +48,8 @@ export class UserProfileService {
         returnMessage = 'User profile created';
       }
       await this.prisma.user.update({
-          where: { id: userId },
-          data: { hasProfile: true },
+        where: { id: userId },
+        data: { hasProfile: true },
       });
       return returnMessage;
     } catch (error) {

@@ -1,7 +1,8 @@
 {
   "common": {
+    "back": "Back",
     "loading": "Loading...",
-    "loadingAuth": "Loading authentication...",
+    "loadingAuth": "Authentication loading...",
     "processing": "Processing...",
     "redirecting": "Redirecting...",
     "cancel": "Cancel",
@@ -11,7 +12,7 @@
     "archive": "Archive",
     "unarchive": "Unarchive",
     "add": "Add",
-    "update": "Edit",
+    "update": "Update",
     "close": "Close",
     "confirm": "Confirm",
     "yes": "Yes",
@@ -30,8 +31,15 @@
     "previous": "Previous",
     "next": "Next",
     "unauthorized": "Access denied",
+    "view": "View",
+    "manage": "Manage",
+    "send": "Send",
+    "sending": "Sending...",
+    "saving": "Saving...",
     "email": "Email Address",
-    "or": "or"
+    "or": "or",
+    "verifying": "Verifying...",
+    "success": "Success!"
   },
   "shared": {
     "time": {
@@ -41,8 +49,7 @@
       "hours": "{{hours}}h",
       "days": "{{days}}d",
       "hoursAgo": "{{count}}h ago",
-      "daysAgo": "{{count}}d ago",
-      "back": "Back"
+      "daysAgo": "{{count}}d ago"
     },
     "status": {
       "read": "Read",
@@ -51,25 +58,28 @@
       "accepted": "Accepted",
       "rejected": "Rejected",
       "interview_scheduled": "Interview",
+      "interview_scheduled": "Interview",
       "archived": "Archived"
     },
     "stats": {
       "total": "Total",
       "pending": "Pending",
       "accepted": "Accepted",
-      "refused": "Rejected",
+      "refused": "Refused",
+      "offers": "Offers",
+      "interviews": "Interviews",
       "applications": "Applications",
       "totalApplications": "Total applications"
     },
     "empty": {
       "title": "No data",
       "noNotifications": "You have no notifications at the moment",
-      "noFilteredNotifications": "No notification found for {{filter}}."
+      "noFilteredNotifications": "No {{filter}} notifications found."
     },
     "errors": {
-      "fetchError": "Error while fetching data:",
-      "updateError": "Error while updating:",
-      "addError": "Error while adding:",
+      "fetchError": "Error fetching data:",
+      "updateError": "Error during update:",
+      "addError": "Error adding:",
       "deleteError": "Error:"
     },
     "viewModes": {
@@ -84,7 +94,7 @@
       "status": "Status"
     },
     "unknown": "Unknown",
-    "unknownPosition": "Unspecified position",
+    "unknownPosition": "Unknown position",
     "loading": "Loading..."
   },
   "navbar": {
@@ -97,8 +107,11 @@
     "notification": "Notifications",
     "ranking": "Ranking",
     "friends": "Friends",
+    "friends": "Friends",
     "logout": "Logout",
     "seeAll": "View all notifications",
+    "organization": "Organization",
+    "subscribe": "Subscribe"
     "organization": "Organization",
     "subscribe": "Subscribe"
   },
@@ -106,8 +119,8 @@
     "title": "The ideal platform to manage your applications",
     "subtitle": "Simplify your job search with Carrion",
     "getStarted": "Get started now",
-    "login": "Log in",
-    "language": "French",
+    "login": "Login",
+    "language": "English",
     "footer": "Footer TBD",
     "stats": {
       "users": "Active users",
@@ -117,9 +130,9 @@
     "services": {
       "title": "Our Services",
       "tracking": {
-        "title": "Track your personal applications",
+        "title": "Tracking your personal applications",
         "points": [
-          "Manage all your applications through an intuitive dashboard.",
+          "Manage all your applications via an intuitive dashboard.",
           "Easily track statuses and add key notes.",
           "Never miss an important opportunity again."
         ]
@@ -129,55 +142,55 @@
         "points": [
           "Set and track your job search goals.",
           "Receive targeted advice to stay on track.",
-          "Reach your career goals on time."
+          "Achieve your professional goals on time."
         ]
       },
       "reminders": {
         "title": "Personalized reminders and notifications",
         "points": [
           "Receive automatic reminders (follow-ups, interviews...).",
-          "Get alerts for upcoming important steps.",
+          "Be alerted to important next steps.",
           "Stay perfectly organized and proactive."
         ]
       },
       "documents": {
-        "title": "Professional document space",
+        "title": "Professional documents space",
         "points": [
-          "Centralize all your key documents (CV, letters, portfolios...).",
-          "Easily manage and find your important files.",
-          "Access everything, anywhere, to simplify your process."
+          "Centralize all your key documents (resumes, cover letters, portfolios...)",
+          "Easily manage and retrieve your important files",
+          "Access everything, everywhere, to simplify all your procedures"
         ]
       }
     },
     "howItWorks": {
-      "title": "How does it work?",
+      "title": "How it works?",
       "centralize": {
-        "title": "Easily Centralize",
+        "title": "Centralize Easily",
         "description": "Add your applications (internships or jobs) and essential documents. Carrion simplifies your organization from the start."
       },
       "track": {
         "title": "Track Your Progress",
-        "description": "Visualize each step's progress thanks to our automated tracking. See where you stand at a glance."
+        "description": "Visualize the progress of each step thanks to our automated tracking. Assess where you stand at a glance."
       },
       "optimize": {
-        "title": "Optimize to Succeed",
-        "description": "Use tracking insights to adjust your approach and maximize your chances of success."
+        "title": "Optimize For Success",
+        "description": "Use tracking insights to adjust your approach and maximize your chances of success in your search."
       }
     },
     "testimonials": {
       "title": "What our users say",
       "testimonial1": {
-        "content": "Thanks to Carrion, I was able to organize all my applications and land my ideal job in 3 months!",
+        "content": "Thanks to Carrion, I was able to organize all my applications and find my ideal job in 3 months!",
         "author": "Marie Dubois",
         "position": "Frontend Developer"
       },
       "testimonial2": {
-        "content": "The interface is intuitive and the automatic reminders helped me avoid missing important opportunities.",
+        "content": "The interface is intuitive and the automatic reminders helped me avoid losing important opportunities.",
         "author": "Thomas Martin",
         "position": "IT Engineer"
       },
       "testimonial3": {
-        "content": "An essential tool for every job seeker. Goal tracking really kept me motivated!",
+        "content": "an essential tool for all job seekers. Goal tracking really motivated me!",
         "author": "Sophie Laurent",
         "position": "UX/UI Designer"
       }
@@ -189,59 +202,71 @@
     }
   },
   "auth": {
-    "signIn": "Sign In",
-    "signUp": "Sign Up",
+    "signIn": "Sign in",
+    "signUp": "Sign up",
     "email": "Email",
     "password": "Password",
-    "confirmPassword": "Confirm Password",
+    "confirmPassword": "Confirm password",
     "firstName": "First Name",
     "lastName": "Last Name",
     "username": "Username",
-    "birthDate": "Birth Date",
-    "rememberMe": "Remember Me",
-    "forgotPassword": "Forgot Password?",
+    "birthDate": "Date of birth",
+    "rememberMe": "Remember me",
+    "forgotPassword": "Forgot password?",
     "dontHaveAccount": "Don't have an account?",
     "alreadyHaveAccount": "Already have an account?",
     "loginWithGoogle": "Login with Google",
     "loginWithOutlook": "Login with Outlook",
     "authenticationFailed": "Authentication failed",
     "authenticationSuccess": "Authentication successful",
-    "backToLogin": "Back to Login",
+    "backToLogin": "Back to login",
     "emailOrUsername": "Email / Username",
-    "loginError": "Incorrect credentials.",
+    "loginError": "Invalid credentials.",
     "genericError": "An error occurred. Please try again later.",
     "passwordMismatch": "Passwords do not match!",
-    "registerError": "Registration error.",
+    "registerError": "Error during registration.",
     "joinUs": "Join us!",
     "loginSuccessRedirect": "You are logged in!",
     "invalidEmail": "Please enter a valid email address.",
-    "passwordInvalid": "Password does not meet all the requirements.",
+    "passwordInvalid": "Password does not meet all criteria.",
+    "emailVerified": "Email Verified!",
+    "accountActive": "Your account is now active.",
+    "welcomeCarrion": "Welcome to Carrion.",
+    "expiredLinkMessage": "This link has expired or has already been used.",
     "criteria": {
-      "length": "At least 8 characters long",
-      "letter": "Contains at least one letter",
-      "number": "Contains at least one number",
-      "special": "Contains at least one special character (@$!%*#?&)"
+      "length": "At least 8 characters",
+      "letter": "Contains a letter",
+      "number": "Contains a number",
+      "special": "Contains a special character (@$!%*#?&)"
     },
-    "resetYourPassword": "Reset Your Password",
+    "resetYourPassword": "Reset your password",
     "forgotPasswordInstructions": "Please enter your email address. We will send you a link to reset your password.",
-    "sendResetLink": "Send Reset Link",
-    "resetLinkSent": "If an account is associated with this email, a reset link has been sent."
+    "sendResetLink": "Send reset link",
+    "resetLinkSent": "If an account is associated with this email, a reset link has been sent.",
+    "newPassword": "New password",
+    "defineNewPassword": "Please define your new secure password.",
+    "resetSuccess": "Password changed successfully!",
+    "resetPasswordSuccess": "Your password has been reset.",
+    "redirectingToLogin": "Redirecting to login...",
+    "invalidLinkTitle": "Invalid link",
+    "invalidLinkMessage": "This link has expired or does not exist."
   },
   "home": {
+    "dashboard": "Dashboard",
     "welcomeMessage": "Organize your job search with Carrion",
     "welcome": "Welcome to Carrion!",
     "description": "Your application management platform",
-    "getStarted": "Get started",
+    "getStarted": "Get Started",
     "recentApplications": "Recent applications",
-    "quickStats": "Quick statistics",
+    "quickStats": "Quick stats",
     "totalApplications": "Total applications",
     "pendingApplications": "Pending",
     "acceptedApplications": "Accepted",
     "recentStatusChange": "Recent status change",
-    "rankingMessage": "You are first! Well, I think...",
+    "rankingMessage": "You are first! I think...",
     "recentActivity": "Recent activity",
     "lastModifications": "Last modifications",
-    "noActivity": "No activity yet",
+    "noActivity": "No recent activity",
     "seeAllApplications": "See all applications",
     "seeAll": "See all",
     "seeMore": "See more",
@@ -253,7 +278,7 @@
     "myInformation": "My information",
     "noApplications": "No applications",
     "noApplicationsMessage": "Your applications will appear here",
-    "error": "Loading error",
+    "error": "Loading error: ",
     "stats": {
       "totalApplications": "Total applications",
       "todayApplications": "Today",
@@ -297,12 +322,14 @@
       "accomplished": "Accomplished",
       "remaining": "Remaining",
       "progress": "Progress"
-    }
+    },
+    "backToHome": "Back to home"
   },
-
   "dashboard": {
     "title": "Overview of your applications",
     "addApplication": "ADD AN APPLICATION",
+    "description": "Track your applications and maximize your chances of success.",
+    "notSpecified": "Not specified",
     "myApplications": "My applications",
     "unknownCompany": "Unknown company",
     "unknownStatus": "Unknown status",
@@ -316,7 +343,7 @@
     },
     "filters": {
       "all": "All",
-      "pending": "Awaiting response",
+      "pending": "Pending response",
       "accepted": "Accepted",
       "rejected": "Rejected"
     },
@@ -332,10 +359,11 @@
       "interviewDate": "Interview date"
     },
     "statuses": {
-      "PENDING": "Awaiting response",
+      "PENDING": "Pending response",
       "APPLIED": "Applied",
       "ACCEPTED": "Accepted",
       "REJECTED": "Rejected",
+      "INTERVIEW_SCHEDULED": "Interview",
       "INTERVIEW_SCHEDULED": "Interview",
       "INTERVIEW": "Interview",
       "REJECTED_BY_COMPANY": "Rejected",
@@ -353,14 +381,15 @@
       "description": "Start tracking your job applications by adding your first application"
     },
     "details": {
-      "details": "Details of the application:",
+      "details": "Application details:",
       "company": "Company: ",
       "position": "Position: ",
       "status": "Status: ",
       "date": "Application date: ",
       "location": "Location: ",
       "salary": "Salary: ",
-      "close": "Close"
+      "close": "Close",
+      "contractType": "Contract Type: "
     }
   },
   "archives": {
@@ -399,26 +428,26 @@
     "weekAverage": "Weekly average",
     "monthAverage": "Monthly average",
     "evolution": "Evolution of your applications",
-    "success": "Achievements reached:",
-    "congratulations": "Congrats, you have sent",
-    "again": "Still",
+    "success": "Successes achieved:",
+    "congratulations": "Congratulations, you sent",
+    "again": "Again",
     "nextStep": "Applications to send before the next milestone",
     "finish": "You have reached all milestones!",
     "personalGoal": "Your personal goal:",
     "objective": "Objective",
-    "accomplished": "Achieved:",
+    "accomplished": "Accomplished:",
     "remaining": "Remaining:",
     "days": "d",
-    "repartition": "Repartition by status",
+    "repartition": "Distribution by status",
     "weekly": "weekly",
     "monthly": "monthly",
     "week": "Week",
     "month": "Month",
-    "performance": "Performances",
+    "performance": "Performance",
     "streakRecord": "Streak record",
     "weeklyComparison": "Weekly comparison",
     "detailedStats": "Detailed statistics",
-    "interview": "Interview gotten",
+    "interview": "Interviews landed",
     "lastApplication": "Last application",
     "bestStreak": "Best streak",
     "offersReceived": "Offers received"
@@ -434,12 +463,12 @@
       "salary": "Salary",
       "interview_date": "Interview date",
       "logo_url": "Logo URL",
-      "website": "Website",
+      "website": "Website / Portfolio",
       "placeholders": {
         "company": "Enter company name",
         "title": "Enter job title",
         "location": "City, region or remote",
-        "salary": "Monthly amount",
+        "salary": "Amount per month",
         "logo_url": "https://example.com",
         "website": "Company website URL",
         "interviewDateTime": "Select date and time",
@@ -458,12 +487,12 @@
     }
   },
   "contractTypes": {
-    "CDI": "Permanent contract (CDI)",
-    "CDD": "Fixed-term contract (CDD)",
+    "CDI": "Permanent Contract (CDI)",
+    "CDD": "Fixed-Term Contract (CDD)",
     "FREELANCE": "Freelance / Independent",
     "INTERNSHIP": "Internship",
     "APPRENTICESHIP": "Apprenticeship / Work-study",
-    "TEMPORARY": "Temporary assignment",
+    "TEMPORARY": "Temporary Mission",
     "PART_TIME": "Part-time",
     "FULL_TIME": "Full-time"
   },
@@ -479,19 +508,20 @@
   "notifications": {
     "title": "Notifications",
     "default": "A new notification is available",
+    "default": "A new notification is available",
     "loading": "Loading notifications...",
     "application": {
-      "created": "Your application at {{company}} for {{jobTitle}} has been saved!",
-      "deleted": "Your application at {{company}} for {{jobTitle}} has been deleted!",
+      "created": "Your application at {{company}} as {{jobTitle}} has been saved!",
+      "deleted": "Your application at {{company}} as {{jobTitle}} has been deleted!",
       "updated": {
-        "base": "Your application at {{company}} for {{jobTitle}} has been updated: "
+        "base": "Your application at {{company}} as {{jobTitle}} has been modified: "
       },
-      "archived": "Your application at {{company}} for {{jobTitle}} has been archived!",
-      "unarchived": "Your application at {{company}} for {{jobTitle}} has been unarchived!"
+      "archived": "Your application at {{company}} as {{jobTitle}} has been archived!",
+      "unarchived": "Your application at {{company}} as {{jobTitle}} has been unarchived!"
     },
     "archive": {
-      "deleted": "Your archived application at {{company}} for {{jobTitle}} has been deleted!",
-      "updated": "Your archived application at {{company}} for {{jobTitle}} has been updated!"
+      "deleted": "Your application at {{company}} as {{jobTitle}} has been deleted!",
+      "updated": "Your application at {{company}} as {{jobTitle}} has been modified!"
     },
     "goal": {
       "weekly": {
@@ -505,15 +535,15 @@
     },
     "titles": {
       "application": {
-        "created": "Application creation",
-        "deleted": "Application deletion",
-        "updated": "Application update",
+        "created": "Application created",
+        "deleted": "Application deleted",
+        "updated": "Application modified",
         "archived": "Application archived",
         "unarchived": "Application unarchived"
       },
       "archive": {
-        "deleted": "Archived application deletion",
-        "updated": "Archived application update"
+        "deleted": "Archived application deleted",
+        "updated": "Archived application modified"
       },
       "goal": {
         "weekly": "Weekly goal set",
@@ -523,13 +553,13 @@
       }
     },
     "changes": {
-      "status": " Status: from {{from}} to {{to}}",
-      "location": " Location: from {{from}} to {{to}}",
-      "salary": " Salary: from {{from}} to {{to}}",
-      "contractType": " Contract type: from {{from}} to {{to}}",
-      "interview": " Interview date: from {{from}} to {{to}}",
-      "title": " Position: from {{from}} to {{to}}",
-      "company": " Company: from {{from}} to {{to}}"
+      "status": " Status: {{from}} to {{to}}",
+      "location": " Location: {{from}} to {{to}}",
+      "salary": " Salary: {{from}} to {{to}}",
+      "contractType": " Contract type: {{from}} to {{to}}",
+      "interview": " Interview date: {{from}} to {{to}}",
+      "title": " Position: {{from}} to {{to}}",
+      "company": " Company: {{from}} to {{to}}"
     },
     "noLocation": "Not specified",
     "noSalary": "Not specified",
@@ -560,7 +590,7 @@
       "unread": "Unread ({{count}})",
       "read": "Read ({{count}})",
       "positive": "Success",
-      "warning": "Warnings",
+      "warning": "Alerts",
       "negative": "Errors",
       "info": "Information"
     },
@@ -584,7 +614,7 @@
   },
   "ranking": {
     "warnings": {
-      "noUserDataReceived": "No user data received or data invalid",
+      "noUserDataReceived": "No user data received or invalid data",
       "noUsersFound": "No users found"
     },
     "errors": {
@@ -620,11 +650,22 @@
     "complete": {
       "title": "Complete Ranking",
       "refreshButton": "Refresh",
-      "refreshTitle": "Refresh the ranking"
+      "refreshTitle": "Refresh ranking"
     },
     "userPosition": {
       "text": "Your position: {{rank}}th",
       "goToButton": "Go to my position"
+    },
+    "search": {
+      "placeholder": "Search by name or email...",
+      "results": "Search results"
+    },
+    "friends": {
+      "add": "Add",
+      "remove": "Remove",
+      "title": "My friends",
+      "noFriends": "You don't have any friends yet. Add some from the main leaderboard!",
+      "noFriendsData": "None of your friends have applications yet."
     },
     "search": {
       "placeholder": "Search by name or email...",
@@ -647,28 +688,27 @@
       "totalApplications": "Total applications"
     }
   },
-
   "profile": {
     "loading": "Loading profile...",
-    "personalInfo": "Personal Informations",
+    "personalInfo": "Personal information",
     "phone": "Phone number",
     "school": "School / University",
-    "search": "Search your city",
+    "search": "Search for your city",
     "picture": "Profile picture",
     "CV": "My CV",
     "upload": "CV uploaded",
-    "visualize": "Visualize my CV",
+    "visualize": "View my CV",
     "modify": "Modify my CV",
     "delete": "Delete my CV",
     "add": "Add a CV",
-    "noCV": "No CV uploaded",
-    "preferences": "Seache preferences",
+    "noCV": "No CV added",
+    "preferences": "Search preferences",
     "contractType": "Contract type",
-    "selectContract": "Select your contract type",
-    "sector": "Sector of activity",
-    "selectSector": "Select your sector of activity",
-    "location": "Location preferences",
-    "searchOrCreate": "Search or create a location",
+    "selectContract": "Select a contract type",
+    "sector": "Activity sector",
+    "selectSector": "Select an activity sector",
+    "location": "Desired work location",
+    "searchOrCreate": "Search or create a city",
     "saveChanges": "Save changes",
     "services": "Connected services",
     "noServices": "No connected services",
@@ -679,81 +719,80 @@
     "connectOutlook": "Connect Outlook",
     "allConnected": "All services are connected",
     "removePicture": "Remove profile picture",
+    "saving": "Saving...",
+    "saveSuccess": "Profile saved successfully!",
     "removePictureConfirmation": "Are you sure you want to remove your profile picture?",
-    "removePictureSuccess": "Your profile picture has been successfully removed!",
-    "removePictureError": "An error occurred while removing your profile picture."
+    "removePictureSuccess": "Picture removed successfully.",
+    "removePictureError": "Error removing picture."
   },
-
   "settings": {
     "loading": "Loading settings...",
     "title": "Settings",
-    "description": "Manage your preferences and objectives",
-    "confirmDisconnect": "Are you sure you want to disconnect ALL your services ? You will have to reconnect them manually in order to get back all the functionnalities associated.",
-    "pendingDisconnect": "Disconnecting every services...",
-    "successDisconnect": "All your services have been successfully disconnected.",
-    "errorDisconnect": "An error occurred while disconnecting your services.",
+    "description": "Configure your preferences and goals",
+    "confirmDisconnect": "Are you sure you want to disconnect ALL your services? You will need to link them manually to regain associated features.",
+    "pendingDisconnect": "Disconnecting all services...",
+    "sucessDisconnect": "All services have been disconnected successfully.",
+    "errorDisconnect": "Error disconnecting services.",
     "tryAgain": "Please try again.",
     "deleteAccount": "Delete my account",
-    "deleteAccountDescription": "This will permanently delete your account and all your data.",
+    "deleteAccountDescription": "Deleting your Carrion account will remove all your data.",
     "confirmDeleteAccount": "Are you sure you want to delete your account? This action is irreversible and will delete all your data.",
-    "deletingAccount": "Deleting your account...",
-    "successDeleteAccount": "Your account has been successfully deleted.",
-    "errorDeleteAccount": "An error occurred while deleting your account.",
+    "deletingAccount": "Deleting account...",
+    "successDeleteAccount": "Your account has been deleted successfully.",
+    "errorDeleteAccount": "Account deletion failed.",
     "account": "Account",
-    "accountDescription": "Manage your connected services and your account",
+    "accountDescription": "Manage your connected services and account",
     "disconnectServices": "Disconnect all services",
-    "disconnectServicesDescription": "This will remove all your connected services.",
+    "disconnectServicesDescription": "This will revoke access to all connected services.",
     "disconnecting": "Disconnecting...",
     "disconnectEverything": "Disconnect all your services",
-    "objectives": "Applications objectives",
-    "objectivesDescription": "Set your weekly and monthly application goals to stay motivated",
+    "objectives": "Application goals",
+    "objectivesDescription": "Set your application goals to stay motivated",
     "weeklyGoal": "Weekly goal",
-    "weeklyGoalDescription": "Number of applications to send this week",
+    "weeklyGoalDescription": "Number of applications to send per week",
     "monthlyGoal": "Monthly goal",
-    "monthlyGoalDescription": "Number of applications to send this month",
-    "save": "Save your objectives",
-    "saving": "Saving your objectives...",
-    "successSave": "Your objectives have been successfully saved.",
+    "monthlyGoalDescription": "Number of applications to send per month",
+    "save": "Save your goals",
+    "saving": "Saving your goals...",
+    "successSave": "Your goals have been saved successfully.",
     "notifications": "Notifications",
     "notificationsDescription": "Manage your notification preferences",
-    "availableSoon": "This feature will be available soon",
+    "availableSoon": "This feature will be available soon!",
     "appearance": "Appearance",
-    "appearanceDescription": "Customize the look of Carrion"
+    "appearanceDescription": "Customize the appearance of Carrion"
   },
-
   "dailyTip": {
     "title": "Tip of the day",
     "moreButton": "More tips",
     "tip1": "Customize your cover letter for each application. Recruiters appreciate candidates who show genuine interest in their company.",
-    "tip2": "Use relevant keywords in your CV related to the job offer. It improves your chances of being spotted by automatic screening systems.",
-    "tip3": "Prepare 3-4 relevant questions to ask at the end of the interview. It shows your interest in the position and company.",
-    "tip4": "Create an online portfolio to showcase your achievements and projects. A link in your CV can make a difference.",
-    "tip5": "Follow companies you are interested in on LinkedIn. It keeps you informed about their news and opportunities.",
+    "tip2": "Use relevant keywords in your CV related to the job offer. This improves your chances of being spotted by automatic sorting systems.",
+    "tip3": "Prepare 3-4 relevant questions to ask at the end of the interview. This shows your interest in the position and the company.",
+    "tip4": "Create an online portfolio to showcase your achievements and projects. A link in your CV can make the difference.",
+    "tip5": "Follow companies you are interested in on LinkedIn. This keeps you informed about their news and opportunities.",
     "tip6": "Politely follow up on your applications after 1-2 weeks without a response. A simple message can revive your file.",
-    "tip7": "Adapt your CV for each position by highlighting the most relevant skills for the offer.",
+    "tip7": "Adapt your CV to each position by highlighting the most relevant skills for the offer.",
     "tip8": "Prepare concrete examples of your achievements using the STAR method (Situation, Task, Action, Result).",
-    "tip9": "Optimize your LinkedIn profile with a professional photo and catchy summary. It is often the first contact with recruiters.",
-    "tip10": "Practice presenting your background in 2 minutes. This short presentation is often requested at the start of the interview.",
-    "tip11": "Find out your interviewer's name before the interview. Personalizing your exchanges creates a better connection.",
-    "tip12": "Keep a dashboard of your applications to avoid duplicates and ensure effective tracking.",
-    "tip13": "Highlight your soft skills with precise examples. Human skills are increasingly sought after.",
-    "tip14": "Prepare short and long versions of your CV depending on the application type (spontaneous or in response to an offer).",
-    "tip15": "Use Google Alerts to be informed of new offers in your field and news about your target companies.",
-    "tip16": "Manage your e-reputation by checking what appears when searching your name on Google. Remove unprofessional content.",
-    "tip17": "Attend networking events in your sector. Internal recommendations increase your chances of being hired.",
-    "tip18": "Prepare questions about company culture during interviews. It shows you project yourself for the long term.",
-    "tip19": "Regularly update your skills with online training. Mention your recent certifications.",
-    "tip20": "Create several versions of your CV for different types of jobs while keeping coherence in your background.",
+    "tip9": "Optimize your LinkedIn profile with a professional photo and a catchy summary. It is often the first contact with recruiters.",
+    "tip10": "Practice presenting your background in 2 minutes. This short presentation is often requested at the start of an interview.",
+    "tip11": "Find out the name of your interviewer before the interview. Personalizing your exchanges creates a better connection.",
+    "tip12": "Keep a dashboard of your applications to avoid duplicates and ensure effective follow-up.",
+    "tip13": "Highlight your soft skills with specific examples. Human skills are increasingly sought after.",
+    "tip14": "Prepare short and long versions of your CV depending on the type of application (spontaneous or in response to an offer).",
+    "tip15": "Use Google Alerts to be informed of new offers in your field and news from your target companies.",
+    "tip16": "Take care of your e-reputation by checking what appears when your name is typed into Google. Delete unprofessional content.",
+    "tip17": "Participate in networking events in your sector. Internal recommendations increase your chances of being hired.",
+    "tip18": "Prepare questions about company culture during interviews. This shows that you are projecting yourself long-term.",
+    "tip19": "Regularly update your skills with online courses. Mention your recent certifications.",
+    "tip20": "Create multiple versions of your CV for different types of positions while maintaining consistency in your background.",
     "tip21": "Prepare for difficult questions like 'Tell me about your weaknesses' by turning your answers positively.",
     "tip22": "Use numbers to quantify your achievements: X% increase, Y€ budget managed, team of Z people.",
-    "tip23": "Arrive 10-15 minutes early to your interviews. It allows you to settle calmly and make a good impression.",
-    "tip24": "Prepare a plan B for video interviews: test your connection, lighting, and have a backup phone number.",
-    "tip25": "Send a thank-you message within 24 hours after the interview. It strengthens your motivation and professionalism.",
+    "tip23": "Arrive 10-15 minutes early for your interviews. This allows you to settle in calmly and make a good impression.",
+    "tip24": "Prepare a Plan B for your video interviews: check your connection, lighting, and have a backup phone number.",
+    "tip25": "Send a thank you message within 24 hours after the interview. This reinforces your motivation and professionalism.",
     "tip26": "Analyze job offers to identify the most sought-after skills in your sector and develop them.",
-    "tip27": "Create a diverse contact network: former colleagues, professors, professionals in your sector.",
-    "tip28": "Stay authentic during interviews. Recruiters can spot candidates who play a role rather than being themselves."
+    "tip27": "Create a diverse network of contacts: former colleagues, professors, professionals in your sector.",
+    "tip28": "Stay authentic during interviews. Recruiters know how to detect candidates who are playing a role rather than being themselves."
   },
-
   "organization": {
     "header": {
       "title": "Organization: {{name}}",
@@ -766,21 +805,21 @@
       "label": "Organization Statistics",
       "members": {
         "label": "Members",
-        "trend": "Active members"
+        "trend": "Active people"
       },
       "applications": {
         "label": "Applications",
         "trend": "Team total",
-        "tooltip": "Total number of applications sent by all members since organization creation."
+        "tooltip": "Total number of applications sent by all members since the creation of the organization."
       },
       "activity": {
         "label": "Activity",
-        "tooltip": "Calculated based on members who created or archived an application in the last 7 days.",
-        "trend": "{{count}} active members"
+        "tooltip": "Calculated on members having created or archived an application in the last 7 days.",
+        "trend": "{{count}} active students"
       }
     },
     "table": {
-      "title": "Member List",
+      "title": "Member list",
       "user": "User",
       "email": "Email",
       "role": "Role",
@@ -789,30 +828,30 @@
       "invitedBy": "Invited by",
       "expires": "Expires on",
       "stats": {
-        "active": "{{count}} active",
+        "active": "{{count}} ongoing",
         "total": "{{count}} total"
       }
     },
     "viewAs": {
-      "title": "Preview: {{name}}",
-      "placeholder": "Here will be displayed applications for {{name}}"
+      "title": "Overview: {{name}}",
+      "placeholder": "Here will appear the applications of {{name}}"
     },
     "settings": {
       "title": "Settings"
     },
     "invitations": {
       "title": "Pending invitations",
-      "add": "+ Invite member",
+      "add": "+ Invite a member",
       "empty": "No pending invitations."
     },
     "dangerZone": {
       "title": "Danger Zone",
       "transferTitle": "Transfer organization ownership",
       "transferWarning": "Warning: By transferring ownership, you will automatically become a TEACHER member and lose your full administration rights.",
-      "selectPlaceholder": "Select new director...",
-      "transferButton": "Transfer ownership",
+      "selectPlaceholder": "Choose the new director...",
+      "transferButton": "Transfer rights",
       "leaveTitle": "Leave organization",
-      "leaveWarning": "You will lose access to this workspace. You will need a new invitation to return.",
+      "leaveWarning": "You will lose access to this workspace. You will need to be invited again to return.",
       "leaveButton": "Leave organization"
     },
     "modals": {
@@ -825,14 +864,14 @@
         "confirm": "Do you want to cancel the invitation sent to {{email}}? The link will become invalid."
       },
       "editRole": {
-        "title": "Edit Role",
-        "newRole": "New Role",
+        "title": "Edit role",
+        "newRole": "New role",
         "description": "Change access level for {{name}}."
       },
       "kick": {
-        "title": "Remove member",
+        "title": "Kick a member",
         "description": "Are you sure you want to remove {{name}} from the organization? This action is irreversible.",
-        "confirmButton": "Remove member"
+        "confirmButton": "Kick member"
       },
       "leave": {
         "title": "Leave organization",
@@ -840,9 +879,9 @@
       }
     },
     "actions": {
-      "viewUser": "View applications for {{name}}",
-      "editRole": "Edit role for {{name}}",
-      "kickUser": "Remove {{name}}",
+      "viewUser": "View applications of {{name}}",
+      "editRole": "Edit role of {{name}}",
+      "kickUser": "Kick {{name}}",
       "revoke": "Revoke"
     },
     "success": {
@@ -855,32 +894,31 @@
     },
     "error": {
       "update": "Unable to update role.",
-      "delete": "Error removing member.",
+      "delete": "Error during kicking.",
       "owner": {
         "select": "Please select a new director",
-        "change": "Error changing ownership"
+        "change": "Error changing owner"
       },
       "emailRequired": "Email is required",
       "invite": "Error sending invitation.",
-      "leave": "Error while trying to leave the organization."
+      "leave": "Error attempting to leave the organization."
     }
   },
-
   "invitation": {
     "errors": {
-      "missingToken": "Missing invitation link.",
+      "missingToken": "Invitation link missing.",
       "invalid": "This invitation does not exist or has expired.",
       "emailMismatch": "Connection refused: The account {{currentEmail}} does not match the invitation for {{targetEmail}}.",
-      "acceptFailed": "Error accepting invitation."
+      "acceptFailed": "Error accepting."
     },
     "success": {
-      "connected": "Login successful!",
+      "connected": "Connection successful!",
       "joined": "Welcome to the team!"
     },
     "ui": {
-      "invalidTitle": "Invalid Link",
+      "invalidTitle": "Invalid link",
       "redirecting": "Redirecting to home...",
-      "title": "Invitation Received",
+      "title": "Invitation received",
       "invitedBy": "invites you to join the organization:",
       "role": "Role:",
       "reservedFor": "This invitation is reserved for the address:"
@@ -893,13 +931,12 @@
       "login": "I already have an account"
     }
   },
-
   "setup": {
     "choice": {
-      "title": "How do you want to manage your applications?",
-      "description": "Carrion offers two modes of operation. You can use both simultaneously.",
+      "title": "How would you like to manage your applications?",
+      "description": "Carrion offers you two modes of operation. You can use both simultaneously.",
       "autoTitle": "Automatic Mode",
-      "autoDesc": "Link your mailbox. We automatically detect and add your applications.",
+      "autoDesc": "Link your mailbox. We detect and add your applications automatically.",
       "goToProfileBtn": "Configure in my Profile",
       "manualBtn": "I prefer manual entry",
       "profileNote": "Info: You can change your mind at any time."
@@ -920,5 +957,13 @@
       "createSession": "Error creating payment session",
       "generic": "An error occurred. Please try again."
     }
+  },
+
+  "notFound": {
+    "title": "Page Not Found",
+    "description": "Sorry, the page you are looking for does not exist or has been moved.",
+    "backHome": "Back to Home",
+    "errorCode": "Error 404",
+    "button": "Home"
   }
 }

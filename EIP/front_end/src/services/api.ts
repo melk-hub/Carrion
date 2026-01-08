@@ -10,9 +10,9 @@ interface CityOption {
 class ApiService {
   private isRefreshing: boolean = false;
   private refreshSubscribers: (() => Promise<void>)[] = [];
-  private _logoutCallback: (callApi?: boolean) => void = () => { };
+  private _logoutCallback: (callApi?: boolean) => void = () => {};
 
-  constructor() { }
+  constructor() {}
 
   public registerLogoutCallback(callback: (callApi?: boolean) => void) {
     this._logoutCallback = callback;
@@ -20,9 +20,9 @@ class ApiService {
 
   private getBaseUrl(): string {
     if (typeof window === "undefined") {
-      return process.env.INTERNAL_API_URL || "http://localhost:8080";
+      return process.env.INTERNAL_API_URL || "http://localhost:8080/api";
     }
-    return process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
+    return process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/api";
   }
 
   private handleLocalLogout() {
@@ -82,7 +82,8 @@ class ApiService {
       const response = await fetch(fullUrl, defaultOptions);
 
       if (response.status === 401 && !options.isRetry) {
-        const isAuthRoute = url.includes("/auth/login") || url.includes("/auth/refresh");
+        const isAuthRoute =
+          url.includes("/auth/login") || url.includes("/auth/refresh");
 
         if (isAuthRoute) {
           return response;
@@ -94,9 +95,10 @@ class ApiService {
       }
       return response;
     } catch (error) {
-      // Gérer les erreurs réseau (Failed to fetch, CORS, etc.)
       if (error instanceof TypeError && error.message.includes("fetch")) {
-        throw new Error(`Network error: Unable to reach server at ${fullUrl}. Please check if the backend is running.`);
+        throw new Error(
+          `Network error: Unable to reach server at ${fullUrl}. Please check if the backend is running.`
+        );
       }
       throw error;
     }
@@ -112,8 +114,7 @@ class ApiService {
           const jsonBody = JSON.parse(textBody);
           errorMessage = jsonBody.message || errorMessage;
         }
-      } catch {
-      }
+      } catch {}
 
       throw new Error(errorMessage || `API Error: ${response.status}`);
     }
@@ -128,7 +129,10 @@ class ApiService {
     try {
       return JSON.parse(text);
     } catch (e) {
-      console.warn(`[API] Warning: Failed to parse JSON from ${response.url}`, e);
+      console.warn(
+        `[API] Warning: Failed to parse JSON from ${response.url}`,
+        e
+      );
       return null;
     }
   }
@@ -141,21 +145,14 @@ class ApiService {
       const response = await this.request(url, { method: "GET", ...options });
       return await this.processResponse<T>(response);
     } catch (error) {
-      const quietRoutes = [
-        "/user/profile",
-        "/organization",
-        "/auth/refresh",
-        "/notifications"
-      ];
+      const quietRoutes = ["/user/profile", "/organization", "/auth/refresh"];
 
-      const isQuietRoute = quietRoutes.some(route => url.includes(route));
-      const isNetworkError = error instanceof Error && error.message.includes("Network error");
+      const isQuietRoute = quietRoutes.some((route) => url.includes(route));
 
-      if (isQuietRoute || isNetworkError || (error instanceof Error && error.message === "Token refresh failed")) {
-        // Pour les erreurs réseau, logger en mode warning plutôt qu'error
-        if (isNetworkError) {
-          console.warn(`GET ${url} network error (backend may be down):`, error.message);
-        }
+      if (
+        isQuietRoute ||
+        (error instanceof Error && error.message === "Token refresh failed")
+      ) {
         return null;
       }
       console.error(`GET ${url} failed:`, error);
@@ -228,7 +225,7 @@ class ApiService {
 
   public async delete<T>(
     url: string,
-    data: unknown,
+    data: unknown = {},
     options: ApiOptions = {}
   ): Promise<T | null> {
     try {

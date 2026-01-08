@@ -16,6 +16,9 @@ model User {
   password                String
   passwordResetToken      String?                  @unique
   passwordResetExpires    DateTime?
+  isEmailVerified         Boolean                  @default(false)
+  verificationToken       String?                  @unique
+  verificationExpires     DateTime?
   hasProfile              Boolean                  @default(false)
   createdAt               DateTime                 @default(now())
   role                    Role                     @default(VISITOR)
@@ -158,7 +161,7 @@ model Organization {
   id                      String                   @id @default(uuid()) @db.Uuid
   name                    String                   @unique
   ownerUserId             String                   @unique @db.Uuid
-  owner                    User                     @relation("OrganizationOwner", fields: [ownerUserId], references: [id])
+  owner                    User                    @relation("OrganizationOwner", fields: [ownerUserId], references: [id], onDelete: Cascade)
   organizationMember      OrganizationMember[]     @relation("OrganizationManyToMany")
   organizationInvitations OrganizationInvitation[]
 }
@@ -168,7 +171,7 @@ model OrganizationMember {
   userId         String           @db.Uuid
   organizationId String           @db.Uuid
   userRole       OrganizationRole
-  user           User             @relation("UserOrganization", fields: [userId], references: [id])
+  user           User             @relation("UserOrganization", fields: [userId], references: [id], onDelete: Cascade)
   organization   Organization     @relation("OrganizationManyToMany", fields: [organizationId], references: [id])
 
   @@unique([userId, organizationId])
@@ -183,7 +186,7 @@ model OrganizationInvitation {
   organizationId String           @db.Uuid
   organization   Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   inviterUserId  String           @db.Uuid
-  inviter        User             @relation(fields: [inviterUserId], references: [id])
+  inviter        User             @relation(fields: [inviterUserId], references: [id], onDelete: Cascade)
   createdAt      DateTime         @default(now())
 
   @@unique([organizationId, email])

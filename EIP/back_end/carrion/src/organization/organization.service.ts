@@ -5,6 +5,7 @@ import {
   Injectable,
   InternalServerErrorException,
   NotFoundException,
+  Logger,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { OrganizationRole } from '@prisma/client';
@@ -20,10 +21,11 @@ import {
   RevokeOrganizationInvitationDTO,
 } from './dto/organization.dto';
 import { randomBytes } from 'crypto';
+import * as SibApiV3Sdk from '@getbrevo/brevo';
 
 @Injectable()
 export class OrganizationService {
-  constructor(private prisma: PrismaService) { }
+  constructor(private prisma: PrismaService) {}
 
   async getUserOrganization(userId: string) {
     try {
@@ -45,17 +47,15 @@ export class OrganizationService {
           userRole: body.role as unknown as OrganizationRole,
         },
       });
-
       return {
         status: 201,
         message: 'User added to organization successfully.',
       };
     } catch (error) {
-      if (error.code === 'P2002') {
+      if (error.code === 'P2002')
         throw new ConflictException(
           'This user already exist in this organization',
         );
-      }
       throw new InternalServerErrorException(
         'Unknown error unable to process with the request',
       );
@@ -74,20 +74,29 @@ export class OrganizationService {
             organizationId: body.organizationId,
           },
         },
-        select: { userRole: true },
+        select: {
+          userRole: true,
+          user: {
+            select: {
+              email: true,
+              userProfile: { select: { firstName: true, lastName: true } },
+            },
+          },
+        },
       });
-
       if (!requester) throw new ForbiddenException('Member not found');
-
       if (
         requester.userRole === OrganizationRole.TEACHER &&
         (body.role as unknown as string) !== OrganizationRole.STUDENT
       ) {
         throw new ForbiddenException('Teachers can only invite Students.');
       }
-
+      const organization = await this.prisma.organization.findUnique({
+        where: { id: body.organizationId },
+        select: { name: true },
+      });
+      if (!organization) throw new NotFoundException('Organization not found');
       const token = randomBytes(32).toString('hex');
-
       await this.prisma.organizationInvitation.create({
         data: {
           token: token,
@@ -98,12 +107,41 @@ export class OrganizationService {
           role: body.role as unknown as OrganizationRole,
         },
       });
-
+      const frontUrl = process.env.FRONT || 'http://localhost:3000';
+      const invitationUrl = `${frontUrl}/invitation?token=${token}`;
+      const inviterName = requester.user.userProfile?.firstName
+        ? `${requester.user.userProfile.firstName} ${requester.user.userProfile.lastName}`
+        : requester.user.email;
+      const apiInstance = new SibApiV3Sdk.TransactionalEmailsApi();
+      apiInstance.setApiKey(
+        SibApiV3Sdk.TransactionalEmailsApiApiKeys.apiKey,
+        process.env.BREVO_API_KEY,
+      );
+      const sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail();
+      sendSmtpEmail.subject = `Invitation à rejoindre ${organization.name} sur Carrion`;
+      sendSmtpEmail.htmlContent = `
+			<div style="font-family: Arial, sans-serif; padding: 20px; color: #333;">
+			<h2 style="color: #0c1f3d;">Vous êtes invité !</h2>
+			<p>Bonjour,</p>
+			<p><strong>${inviterName}</strong> vous a invité à rejoindre l'organisation <strong>${organization.name}</strong> en tant que <strong>${body.role}</strong>.</p>
+			<p>${invitationUrl}</p>
+			<p style="font-size: 12px; color: #666;">Ce lien est valide 7 jours.</p>
+			</div>`;
+      sendSmtpEmail.sender = {
+        name: 'Carrion',
+        email: process.env.SENDER_EMAIL || 'no-reply@carrion.app',
+      };
+      sendSmtpEmail.to = [{ email: body.email }];
+      await apiInstance.sendTransacEmail(sendSmtpEmail);
       return { status: 201, message: 'Invitation sent successfully.' };
     } catch (error) {
       if (error.code == 'P2002')
         throw new ConflictException('This user already received an invitation');
-      if (error instanceof ForbiddenException) throw error;
+      if (
+        error instanceof ForbiddenException ||
+        error instanceof NotFoundException
+      )
+        throw error;
       throw new InternalServerErrorException('Error sending invitation');
     }
   }
@@ -123,10 +161,8 @@ export class OrganizationService {
         },
       },
     });
-
     const oneWeekAgo = new Date();
     oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
-
     const membersList = await this.prisma.organizationMember.findMany({
       where: { organizationId: body.organizationId },
       select: {
@@ -137,9 +173,7 @@ export class OrganizationService {
             id: true,
             email: true,
             userProfile: { select: { firstName: true, lastName: true } },
-            _count: {
-              select: { jobApplies: true, archivedJobApplies: true },
-            },
+            _count: { select: { jobApplies: true, archivedJobApplies: true } },
             jobApplies: {
               where: { createdAt: { gte: oneWeekAgo } },
               select: { id: true },
@@ -152,14 +186,12 @@ export class OrganizationService {
         },
       },
     });
-
     const orgTotalJobApply = membersList.reduce(
       (acc, cur) =>
-      (acc +=
-        cur.user._count.archivedJobApplies + cur.user._count.jobApplies),
+        (acc +=
+          cur.user._count.archivedJobApplies + cur.user._count.jobApplies),
       0,
     );
-
     return {
       organization: organizationInfo,
       members: membersList,
@@ -177,7 +209,6 @@ export class OrganizationService {
           'You can only choose between STUDENT and TEACHER',
         );
       }
-
       await this.prisma.organizationMember.update({
         where: {
           userId_organizationId: {
@@ -187,23 +218,16 @@ export class OrganizationService {
         },
         data: { userRole: body.role as unknown },
       });
-
-      return {
-        statusCode: 200,
-        message: 'User role edited successfully',
-      };
+      return { statusCode: 200, message: 'User role edited successfully' };
     } catch (error) {
-      if (error.code) {
+      if (error.code)
         throw new InternalServerErrorException(
           "An error occurred while trying to edit this user's role",
         );
-      }
-      if (error.response.statusCode === 403) {
+      if (error.response.statusCode === 403)
         throw new ForbiddenException(error.response.message);
-      }
-      if (error.response.statusCode === 404) {
+      if (error.response.statusCode === 404)
         throw new NotFoundException(error.response.message);
-      }
     }
   }
 
@@ -216,23 +240,16 @@ export class OrganizationService {
             organizationId: body.organizationId,
           },
         },
-        select: {
-          userRole: true,
-        },
+        select: { userRole: true },
       });
-
-      if (!kickedUser || !kickedUser.userRole) {
+      if (!kickedUser || !kickedUser.userRole)
         throw new NotFoundException(
           "The user being kicked doesn't exist in this organization",
         );
-      }
-
-      if (kickedUser.userRole === OrganizationRole.OWNER) {
+      if (kickedUser.userRole === OrganizationRole.OWNER)
         throw new ForbiddenException(
           "You can't kick another OWNER from the organization, please contact Carrion for more information.",
         );
-      }
-
       await this.prisma.organizationMember.delete({
         where: {
           userId_organizationId: {
@@ -241,23 +258,16 @@ export class OrganizationService {
           },
         },
       });
-
-      return {
-        statusCode: 200,
-        message: 'Member kicked successfully',
-      };
+      return { statusCode: 200, message: 'Member kicked successfully' };
     } catch (error) {
-      if (error.code) {
+      if (error.code)
         throw new InternalServerErrorException(
           'An error occurred while trying to kick this member',
         );
-      }
-      if (error.response.statusCode === 403) {
+      if (error.response.statusCode === 403)
         throw new ForbiddenException(error.response.message);
-      }
-      if (error.response.statusCode === 404) {
+      if (error.response.statusCode === 404)
         throw new NotFoundException(error.response.message);
-      }
     }
   }
 
@@ -270,31 +280,14 @@ export class OrganizationService {
           email: true,
           role: true,
           expiresAt: true,
-          inviter: {
-            select: {
-              id: true,
-              email: true,
-            },
-          },
+          inviter: { select: { id: true, email: true } },
         },
       });
-
       const memberList = await this.prisma.organizationMember.findMany({
         where: { organizationId },
-        select: {
-          user: {
-            select: {
-              id: true,
-              email: true,
-            },
-          },
-        },
+        select: { user: { select: { id: true, email: true } } },
       });
-
-      return {
-        invitationList: invitationList,
-        memberList: memberList,
-      };
+      return { invitationList: invitationList, memberList: memberList };
     } catch (error) {
       throw new InternalServerErrorException(
         "Error occurred while trying to get data from organization's settings",
@@ -316,7 +309,6 @@ export class OrganizationService {
         },
         data: { userRole: 'TEACHER' },
       });
-
       const updateUser2 = this.prisma.organizationMember.update({
         where: {
           userId_organizationId: {
@@ -326,16 +318,10 @@ export class OrganizationService {
         },
         data: { userRole: 'OWNER' },
       });
-
       const updateOrg = this.prisma.organization.update({
-        where: {
-          id: body.organizationId,
-        },
-        data: {
-          ownerUserId: body.newOwnerId,
-        },
+        where: { id: body.organizationId },
+        data: { ownerUserId: body.newOwnerId },
       });
-
       await this.prisma.$transaction([updateUser1, updateUser2, updateOrg]);
       return {
         statusCode: 200,
@@ -359,16 +345,12 @@ export class OrganizationService {
         },
         select: { userRole: true },
       });
-
-      if (requester?.userRole !== OrganizationRole.OWNER) {
+      if (requester?.userRole !== OrganizationRole.OWNER)
         throw new ForbiddenException('Only Owners can edit invitation roles.');
-      }
-
       await this.prisma.organizationInvitation.update({
         where: { id: body.invitationId, organizationId: body.organizationId },
         data: { role: body.role as unknown as OrganizationRole },
       });
-
       return {
         statusCode: 200,
         message: 'Invitation role updated successfully',
@@ -388,9 +370,7 @@ export class OrganizationService {
         where: { id: body.invitationId, organizationId: body.organizationId },
         select: { role: true },
       });
-
       if (!invitation) throw new NotFoundException('Invitation not found');
-
       const requester = await this.prisma.organizationMember.findUnique({
         where: {
           userId_organizationId: {
@@ -400,22 +380,17 @@ export class OrganizationService {
         },
         select: { userRole: true },
       });
-
       if (!requester) throw new ForbiddenException('Requester not found');
-
       if (
         requester.userRole === OrganizationRole.TEACHER &&
         invitation.role !== OrganizationRole.STUDENT
-      ) {
+      )
         throw new ForbiddenException(
           'Teachers can only revoke Student invitations.',
         );
-      }
-
       await this.prisma.organizationInvitation.delete({
         where: { id: body.invitationId },
       });
-
       return {
         statusCode: 200,
         message: 'The invitation has been deleted successfully',
@@ -440,16 +415,21 @@ export class OrganizationService {
         inviter: {
           select: {
             email: true,
-            userProfile: { select: { firstName: true, lastName: true } }
-          }
-        }
-      }
+            userProfile: { select: { firstName: true, lastName: true } },
+          },
+        },
+      },
     });
+    if (!invitation)
+      throw new NotFoundException('Invitation introuvable ou invalide.');
 
-    if (!invitation) throw new NotFoundException("Invitation introuvable ou invalide.");
-    if (new Date() > invitation.expiresAt) throw new BadRequestException("Cette invitation a expiré.");
+    if (new Date() > invitation.expiresAt) {
+      await this.prisma.organizationInvitation.delete({
+        where: { id: invitation.id },
+      });
+      throw new BadRequestException('Cette invitation a expiré.');
+    }
 
-    console.log("invitation trouvée");
     return invitation;
   }
 
@@ -458,27 +438,34 @@ export class OrganizationService {
       const invitation = await tx.organizationInvitation.findUnique({
         where: { token },
       });
+      if (!invitation) throw new NotFoundException('Invitation invalide.');
 
-      if (!invitation) throw new NotFoundException("Invitation invalide.");
-      if (new Date() > invitation.expiresAt) throw new BadRequestException("Invitation expirée.");
+      if (new Date() > invitation.expiresAt) {
+        throw new BadRequestException('Invitation expirée.');
+      }
 
       const user = await tx.user.findUnique({ where: { id: userId } });
-
-      if (!user || user.email.toLowerCase() !== invitation.email.toLowerCase()) {
+      if (!user || user.email.toLowerCase() !== invitation.email.toLowerCase())
         throw new ForbiddenException(
-          `Cette invitation est réservée à l'adresse ${invitation.email}. Vous êtes connecté avec ${user?.email}.`
+          `Cette invitation est réservée à l'adresse ${invitation.email}. Vous êtes connecté avec ${user?.email}.`,
         );
-      }
-
       const existingMember = await tx.organizationMember.findUnique({
-        where: { userId_organizationId: { userId, organizationId: invitation.organizationId } }
+        where: {
+          userId_organizationId: {
+            userId,
+            organizationId: invitation.organizationId,
+          },
+        },
       });
-
       if (existingMember) {
-        await tx.organizationInvitation.delete({ where: { id: invitation.id } });
-        return { status: 200, message: "Vous êtes déjà membre de cette organisation." };
+        await tx.organizationInvitation.delete({
+          where: { id: invitation.id },
+        });
+        return {
+          status: 200,
+          message: 'Vous êtes déjà membre de cette organisation.',
+        };
       }
-
       await tx.organizationMember.create({
         data: {
           userId,
@@ -486,12 +473,8 @@ export class OrganizationService {
           userRole: invitation.role,
         },
       });
-
-      await tx.organizationInvitation.delete({
-        where: { id: invitation.id },
-      });
-
-      return { status: 201, message: "Invitation acceptée avec succès !" };
+      await tx.organizationInvitation.delete({ where: { id: invitation.id } });
+      return { status: 201, message: 'Invitation acceptée avec succès !' };
     });
   }
 
@@ -505,31 +488,28 @@ export class OrganizationService {
           },
         },
       });
-
-      if (!member) {
-        throw new NotFoundException("Vous ne faites pas partie de cette organisation.");
-      }
-
-      // Règle cruciale : Un OWNER ne peut pas quitter sans transférer
-      if (member.userRole === OrganizationRole.OWNER) {
-        throw new ForbiddenException(
-          "Le propriétaire ne peut pas quitter l'organisation. Vous devez transférer la propriété ou supprimer l'organisation."
+      if (!member)
+        throw new NotFoundException(
+          'Vous ne faites pas partie de cette organisation.',
         );
-      }
-
-      await this.prisma.organizationMember.delete({
-        where: { id: member.id },
-      });
-
+      if (member.userRole === OrganizationRole.OWNER)
+        throw new ForbiddenException(
+          "Le propriétaire ne peut pas quitter l'organisation. Vous devez transférer la propriété ou supprimer l'organisation.",
+        );
+      await this.prisma.organizationMember.delete({ where: { id: member.id } });
       return {
         statusCode: 200,
         message: "Vous avez quitté l'organisation avec succès.",
       };
     } catch (error) {
-      if (error instanceof ForbiddenException || error instanceof NotFoundException) {
+      if (
+        error instanceof ForbiddenException ||
+        error instanceof NotFoundException
+      )
         throw error;
-      }
-      throw new InternalServerErrorException("Erreur lors de la tentative de quitter l'organisation.");
+      throw new InternalServerErrorException(
+        "Erreur lors de la tentative de quitter l'organisation.",
+      );
     }
   }
 }

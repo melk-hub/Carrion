@@ -1,5 +1,6 @@
 {
   "common": {
+    "back": "Retour",
     "loading": "Chargement...",
     "loadingAuth": "Chargement de l'authentification...",
     "processing": "Traitement en cours...",
@@ -36,7 +37,9 @@
     "sending": "Envoi...",
     "saving": "Enregistrement...",
     "email": "Adresse Email",
-    "or": "ou"
+    "or": "ou",
+    "verifying": "Vérification...",
+    "success": "Succès !"
   },
   "shared": {
     "time": {
@@ -54,6 +57,7 @@
       "pending": "En attente",
       "accepted": "Acceptées",
       "rejected": "Refusées",
+      "interview_scheduled": "Entretien",
       "interview_scheduled": "Entretien",
       "archived": "Archivées"
     },
@@ -103,8 +107,11 @@
     "notification": "Notifications",
     "ranking": "Classement",
     "friends": "Amis",
+    "friends": "Amis",
     "logout": "Déconnexion",
     "seeAll": "Voir toutes les notifications",
+    "organization": "Organisation",
+    "subscribe": "Prendre une souscription"
     "organization": "Organisation",
     "subscribe": "Prendre une souscription"
   },
@@ -221,6 +228,10 @@
     "joinUs": "Nous rejoindre !",
     "loginSuccessRedirect": "Vous êtes connecté !",
     "invalidEmail": "Veuillez saisir une adresse e-mail valide.",
+    "emailVerified": "Email vérifié !",
+    "accountActive": "Votre compte est maintenant actif.",
+    "welcomeCarrion": "Bienvenue sur Carrion.",
+    "expiredLinkMessage": "Ce lien a expiré ou a déjà été utilisé.",
     "passwordInvalid": "Le mot de passe ne respecte pas tous les critères.",
     "criteria": {
       "length": "Au moins 8 caractères",
@@ -231,7 +242,14 @@
     "resetYourPassword": "Réinitialiser votre mot de passe",
     "forgotPasswordInstructions": "Veuillez entrer votre adresse e-mail. Nous vous enverrons un lien pour réinitialiser votre mot de passe.",
     "sendResetLink": "Envoyer le lien de réinitialisation",
-    "resetLinkSent": "Si un compte est associé à cet email, un lien de réinitialisation a été envoyé."
+    "resetLinkSent": "Si un compte est associé à cet email, un lien de réinitialisation a été envoyé.",
+    "newPassword": "Nouveau mot de passe",
+    "defineNewPassword": "Veuillez définir votre nouveau mot de passe sécurisé.",
+    "resetSuccess": "Mot de passe modifié avec succès !",
+    "resetPasswordSuccess": "Votre mot de passe a été réinitialisé.",
+    "redirectingToLogin": "Redirection vers la connexion...",
+    "invalidLinkTitle": "Lien invalide",
+    "invalidLinkMessage": "Ce lien a expiré ou n'existe pas."
   },
 
   "home": {
@@ -297,6 +315,7 @@
       "hours": "Il y a {{count}}h",
       "days": "Il y a {{count}}j"
     },
+    "dashboard": "Mon Espace",
     "objectives": {
       "weekly": "Objectif hebdomadaire",
       "applications": "Candidatures cette semaine",
@@ -304,11 +323,14 @@
       "accomplished": "Réalisé",
       "remaining": "Restant",
       "progress": "Progression"
-    }
+    },
+    "backToHome": "Retour à l'accueil"
   },
 
   "dashboard": {
     "title": "Aperçu de vos candidatures",
+    "description": "Suivez vos candidatures et maximisez vos chances de succès",
+    "notSpecified": "Non spécifié",
     "addApplication": "AJOUTER UNE CANDIDATURE",
     "myApplications": "Mes candidatures",
     "unknownCompany": "Entreprise inconnue",
@@ -344,6 +366,7 @@
       "ACCEPTED": "Acceptée",
       "REJECTED": "Refusée",
       "INTERVIEW_SCHEDULED": "Entretien",
+      "INTERVIEW_SCHEDULED": "Entretien",
       "INTERVIEW": "Entretien",
       "REJECTED_BY_COMPANY": "Refusée",
       "ON": "Acceptée",
@@ -367,7 +390,8 @@
       "date": "Date de candidature: ",
       "location": "Lieu: ",
       "salary": "Salaire: ",
-      "close": "Fermer"
+      "close": "Fermer",
+      "contractType": "Type de contrat: "
     }
   },
   "archives": {
@@ -441,7 +465,7 @@
       "salary": "Salaire",
       "interview_date": "Date d'entretien",
       "logo_url": "Logo URL",
-      "website": "Site web",
+      "website": "Site web / Portfolio",
       "placeholders": {
         "company": "Saisissez le nom de l'entreprise",
         "title": "Saisissez l'intitulé du poste",
@@ -486,6 +510,7 @@
 
   "notifications": {
     "title": "Notifications",
+    "default": "Une nouvelle notification est disponible",
     "default": "Une nouvelle notification est disponible",
     "loading": "Chargement des notifications...",
     "application": {
@@ -646,6 +671,17 @@
       "noFriends": "Vous n'avez pas encore d'amis. Ajoutez-en depuis le classement principal !",
       "noFriendsData": "Aucun de vos amis n'a encore de candidatures."
     },
+    "search": {
+      "placeholder": "Rechercher par nom ou email...",
+      "results": "Résultats de recherche"
+    },
+    "friends": {
+      "add": "Ajouter",
+      "remove": "Retirer",
+      "title": "Mes amis",
+      "noFriends": "Vous n'avez pas encore d'amis. Ajoutez-en depuis le classement principal !",
+      "noFriendsData": "Aucun de vos amis n'a encore de candidatures."
+    },
     "pagination": {
       "previous": "Précédent",
       "next": "Suivant",
@@ -690,7 +726,9 @@
     "removePicture": "Supprimer la photo de profil",
     "removePictureConfirmation": "Êtes-vous sûr de vouloir supprimer votre photo de profil ?",
     "removePictureSuccess": "Photo de profil supprimée avec succès!",
-    "removePictureError": "Erreur lors de la suppression de la photo de profil."
+    "removePictureError": "Erreur lors de la suppression de la photo de profil.",
+    "saving": "Enregistrement en cours...",
+    "saveSuccess": "Profil enregistré avec succès !"
   },
 
   "settings": {
@@ -929,5 +967,13 @@
       "createSession": "Erreur lors de la création de la session de paiement",
       "generic": "Une erreur est survenue. Veuillez réessayer."
     }
+  },
+
+  "notFound": {
+    "title": "Page introuvable",
+    "description": "Désolé, la page que vous recherchez n'existe pas ou a été déplacée.",
+    "backHome": "Retour à l'accueil",
+    "errorCode": "Erreur 404",
+    "button": "Accueil"
   }
 }

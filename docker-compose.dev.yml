@@ -1,0 +1,28 @@
+version: "3.8"
+
+services:
+  db:
+    ports:
+      - "5432:5432"
+
+  server:
+    build:
+      dockerfile: Dockerfile.dev
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./EIP/back_end/carrion:/app
+      - /app/node_modules
+
+  client_web:
+    build:
+      dockerfile: Dockerfile.dev
+    ports:
+      - "8081:3000"
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+      - NEXT_PUBLIC_API_URL=http://localhost:8080/api
+    volumes:
+      - ./EIP/front_end:/app
+      - /app/node_modules
+      - /app/.next

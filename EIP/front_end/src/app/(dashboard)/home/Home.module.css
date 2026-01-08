@@ -70,7 +70,6 @@
 
 .mainGrid {
   display: grid;
-
   grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
   gap: 2rem;
   margin-bottom: 2rem;
@@ -118,6 +117,7 @@
 
 .seeAllBtn:hover {
   transform: translateY(-1px);
+  opacity: 0.9;
 }
 
 .actionsGrid {
@@ -185,19 +185,24 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  font-size: 0.8rem;
 }
 
-.positive {
-  background-color: var(--success-color);
+.timelineDot.positive {
+  background-color: var(--success-color, #48bb78);
+  color: white;
 }
-.warning {
-  background-color: var(--warning-color);
+.timelineDot.warning {
+  background-color: var(--warning-color, #ecc94b);
+  color: white;
 }
-.negative {
-  background-color: var(--error-color);
+.timelineDot.negative {
+  background-color: var(--error-color, #f56565);
+  color: white;
 }
-.info {
-  background-color: var(--info-color);
+.timelineDot.info {
+  background-color: var(--info-color, #4299e1);
+  color: white;
 }
 
 .timelineContent :global(h4) {
@@ -211,7 +216,6 @@
   font-size: 0.9rem;
   color: #718096;
   margin: 0 0 0.25rem 0;
-
   word-break: break-word;
 }
 
@@ -220,10 +224,118 @@
   color: #a0aec0;
 }
 
+.applicationsList {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.applicationItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 0.5rem;
+  border-bottom: 1px solid #edf2f7;
+  transition: background-color 0.2s ease, transform 0.2s ease;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.applicationItem:hover {
+  background-color: #f8fafc;
+  transform: translateX(4px);
+}
+
+.applicationItem:last-child {
+  border-bottom: none;
+}
+
+.applicationInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  flex: 1;
+  margin-right: 1rem;
+  min-width: 0;
+}
+
+.applicationInfo h4 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-dark, #2d3748);
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.applicationInfo p {
+  font-size: 0.875rem;
+  color: #718096;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.status {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: capitalize;
+  width: fit-content;
+  white-space: nowrap;
+}
+
+.status.applied,
+.status.pending {
+  background-color: #ebf8ff;
+  color: #2b6cb0;
+  border: 1px solid #bee3f8;
+}
+
+.status.interview,
+.status.interview_scheduled {
+  background-color: #fffff0;
+  color: #b7791f;
+  border: 1px solid #fefcbf;
+}
+
+.status.offer,
+.status.offer_received,
+.status.accepted {
+  background-color: #f0fff4;
+  color: #2f855a;
+  border: 1px solid #c6f6d5;
+}
+
+.status.rejected,
+.status.rejected_by_company {
+  background-color: #fff5f5;
+  color: #c53030;
+  border: 1px solid #fed7d7;
+}
+
+.applicationTime {
+  flex-shrink: 0;
+  font-size: 0.75rem;
+  color: #718096;
+  font-weight: 500;
+  background: #edf2f7;
+  padding: 0.35rem 0.65rem;
+  border-radius: 6px;
+  white-space: nowrap;
+}
+
 .homeErrorState {
   padding: 2rem;
   text-align: center;
-  color: var(--error-color);
+  color: var(--error-color, #e53e3e);
+  font-weight: 500;
 }
 
 @media (max-width: 1120px) {
@@ -274,4 +386,113 @@
   .welcomeContent :global(h1) {
     font-size: 2rem;
   }
+
+  .applicationItem {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+
+  .applicationTime {
+    align-self: flex-end;
+    font-size: 0.7rem;
+    margin-top: -0.5rem;
+  }
+
+  .applicationInfo {
+    margin-right: 0;
+    width: 100%;
+  }
+}
+
+.companyLogo {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  margin-right: 1rem;
+  flex-shrink: 0;
+  overflow: hidden;
+  background-color: #f8fafc;
+  border: 1px solid #e2e8f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.placeholderLogo {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%);
+  color: #64748b;
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.modernStatusBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 0.35rem;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  width: fit-content;
+  white-space: nowrap;
+}
+
+.statusIndicator {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.status-accepted {
+  background-color: #ecfdf5;
+  color: #059669;
+  border: 1px solid #d1fae5;
+}
+.status-accepted .statusIndicator {
+  background-color: #10b981;
+}
+
+.status-pending {
+  background-color: #fffbeb;
+  color: #d97706;
+  border: 1px solid #fef3c7;
+}
+.status-pending .statusIndicator {
+  background-color: #f59e0b;
+}
+
+.status-refused {
+  background-color: #fef2f2;
+  color: #dc2626;
+  border: 1px solid #fee2e2;
+}
+.status-refused .statusIndicator {
+  background-color: #ef4444;
+}
+
+.status-interview {
+  background-color: #eff6ff;
+  color: #2563eb;
+  border: 1px solid #dbeafe;
+}
+.status-interview .statusIndicator {
+  background-color: #3b82f6;
+}
+
+.status-offer {
+  background-color: #ecfeff;
+  color: #0891b2;
+  border: 1px solid #cffafe;
+}
+.status-offer .statusIndicator {
+  background-color: #06b6d4;
 }

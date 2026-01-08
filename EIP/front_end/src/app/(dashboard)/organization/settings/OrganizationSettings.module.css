@@ -37,6 +37,7 @@
   cursor: pointer;
   font-weight: 600;
   transition: all 0.2s;
+  white-space: nowrap;
 }
 
 .backButton:hover {
@@ -196,6 +197,7 @@
 .tableWrapper {
   overflow-x: auto;
   margin-top: 1rem;
+  -webkit-overflow-scrolling: touch;
 }
 
 .table {
@@ -203,6 +205,7 @@
   border-collapse: collapse;
   text-align: left;
   font-size: 0.9rem;
+  min-width: 600px;
 }
 
 .table th {
@@ -231,6 +234,7 @@
   font-size: 0.7rem;
   font-weight: 700;
   text-transform: uppercase;
+  white-space: nowrap;
 }
 
 .roleOwner {
@@ -270,6 +274,7 @@
   display: flex;
   align-items: center;
   gap: 0.4rem;
+  white-space: nowrap;
 }
 
 .editButton:hover {
@@ -291,11 +296,50 @@
   display: flex;
   align-items: center;
   gap: 0.4rem;
+  white-space: nowrap;
 }
 
 .revokeButton:hover {
   background-color: #fef2f2;
   border-color: #fca5a5;
+}
+
+.paginationContainer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+.pageButton {
+  background-color: white;
+  border: 1px solid #d1d5db;
+  color: #374151;
+  padding: 0.4rem 0.8rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.pageButton:hover:not(:disabled) {
+  background-color: #f3f4f6;
+  border-color: #9ca3af;
+}
+
+.pageButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background-color: #f9fafb;
+}
+
+.pageInfo {
+  font-size: 0.9rem;
+  color: #6b7280;
+  font-weight: 500;
 }
 
 .modalOverlay {
@@ -310,6 +354,7 @@
   align-items: center;
   z-index: 100;
   backdrop-filter: blur(2px);
+  padding: 1rem;
 }
 
 .modalContent {
@@ -321,6 +366,8 @@
   box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
     0 10px 10px -5px rgba(0, 0, 0, 0.04);
   animation: modalPop 0.2s ease-out;
+  max-height: 90vh;
+  overflow-y: auto;
 }
 
 .modalTitle {
@@ -382,5 +429,153 @@
   to {
     opacity: 1;
     transform: scale(1);
+  }
+}
+
+@media (max-width: 1250px) {
+  .container {
+    padding: 1.5rem;
+  }
+
+  .table,
+  .table tbody,
+  .table tr,
+  .table td {
+    display: block;
+    width: 100%;
+  }
+
+  .table thead {
+    display: none;
+  }
+
+  .table tbody {
+    display: grid;
+
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .table tr {
+    background-color: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.75rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    height: 100%;
+  }
+
+  .table td {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.25rem 0;
+    border-bottom: 1px solid #f3f4f6;
+    text-align: right;
+    font-size: 0.95rem;
+    overflow: hidden;
+  }
+
+  .table td:last-child {
+    border-bottom: none;
+    margin-top: auto;
+    padding-top: 1rem;
+  }
+
+  .table td::before {
+    content: attr(data-label);
+    font-weight: 600;
+    color: #6b7280;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    text-align: left;
+    margin-right: 1rem;
+    flex-shrink: 0;
+  }
+
+  .cellContent {
+    text-align: right;
+    word-break: break-all;
+    min-width: 0;
+  }
+
+  .actionsCellMobile {
+    display: block !important;
+  }
+  .actionsCellMobile::before {
+    display: none;
+  }
+
+  .actionsCell {
+    width: 100%;
+    justify-content: space-between;
+    gap: 0.75rem;
+  }
+
+  .editButton,
+  .revokeButton {
+    flex: 1;
+    justify-content: center;
+    padding: 0.75rem;
+  }
+
+  .settingsHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 1.5rem;
+  }
+
+  .backButton {
+    align-self: flex-start;
+  }
+
+  .card > div:first-child {
+    flex-direction: column;
+    align-items: flex-start !important;
+    gap: 1rem;
+  }
+
+  .card > div:first-child button {
+    width: 100%;
+  }
+}
+
+@media (max-width: 1024px) {
+  .table tbody {
+    gap: 1rem;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  }
+  .card {
+    padding: 1.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 1rem;
+  }
+
+  .table tbody {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .formActions,
+  .modalActions {
+    flex-direction: column;
+    width: 100%;
+    gap: 0.75rem;
+  }
+
+  .saveButton,
+  .dangerButton,
+  .cancelButton,
+  .deleteButton {
+    width: 100%;
   }
 }

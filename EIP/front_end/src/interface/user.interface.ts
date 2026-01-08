@@ -2,23 +2,29 @@ import { JobApply } from "./job-apply.interface";
 
 export interface UserProfile {
   id: string;
-  username: string;
   email: string;
-  firstName: string;
-  lastName: string;
-  birthDate: Date;
-  school: string;
-  city: string;
-  phoneNumber: string;
-  imageUrl: string;
-  personalDescription: string;
-  portfolioLink: string;
-  linkedin: string;
-  goal: string;
-  contractSought: string[];
-  locationSought: string[];
-  sector: string[];
-  resume: string;
+  username: string;
+  isEmailVerified: boolean;
+  userProfile: {
+    firstName: string;
+    lastName: string;
+    birthDate: Date;
+    school: string;
+    city: string;
+    phoneNumber: string;
+    imageUrl: string;
+    personalDescription: string;
+    portfolioLink: string;
+    linkedin: string;
+    goal: string;
+    contractSought: string[];
+    locationSought: string[];
+    sector: string[];
+    resume: string;
+  };
+  tokens: {
+    name: string;
+  }[];
 }
 
 export interface ConnectedService {
@@ -27,16 +33,16 @@ export interface ConnectedService {
 }
 
 export interface UserStats {
-  id: string,
-  username: string,
-  email: string,
-  firstName: string,
-  lastName: string,
-  avatar: string,
-  totalApplications: number,
-  acceptedApplications: number,
-  pendingApplications: number,
-  rejectedApplications: number,
+  id: string;
+  username: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  avatar: string;
+  totalApplications: number;
+  acceptedApplications: number;
+  pendingApplications: number;
+  rejectedApplications: number;
 }
 
 export interface UserRankingInfo {

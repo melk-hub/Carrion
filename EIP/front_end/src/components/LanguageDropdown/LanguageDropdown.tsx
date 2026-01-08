@@ -72,15 +72,16 @@ const LanguageDropdown = ({ className = "", style = {} }) => {
           {languages.map((language) => (
             <button
               key={language.code}
-              className={`${styles.languageOption} ${
-                currentLanguage === language.code ? "active" : ""
-              }`}
+              className={`${styles.languageOption} ${currentLanguage === language.code ? "active" : ""
+                }`}
               onClick={() => handleLanguageSelect(language.code)}
             >
-              <img
+              <Image
                 src={language.flag}
                 alt={language.name}
                 className={styles.flagIcon}
+                width={24}
+                height={24}
               />
               <span className={styles.languageName}>{language.name}</span>
             </button>

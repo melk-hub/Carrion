@@ -42,6 +42,7 @@ export class AuthController {
   async login(@Request() req, @Res() res) {
     const { rememberMe = false } = req.body;
     const tokens = await this.authService.login(req.user.id, rememberMe);
+
     const cookieMaxAge = rememberMe
       ? 1000 * 60 * 60 * 24 * 15
       : 1000 * 60 * 60 * 24;
@@ -49,7 +50,7 @@ export class AuthController {
     res.cookie('access_token', tokens.accessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'Strict',
+      sameSite: 'strict',
       maxAge: cookieMaxAge,
     });
 
@@ -57,40 +58,42 @@ export class AuthController {
       res.cookie('refresh_token', tokens.refreshToken, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
-        sameSite: 'Strict',
+        sameSite: 'strict',
         maxAge: 1000 * 60 * 60 * 24 * 7,
       });
     }
 
     return res
       .status(HttpStatus.OK)
-      .send({ message: 'User logged in successfully' });
+      .send({ id: req.user.id, message: 'User logged in successfully' });
   }
 
   @Public()
   @Post('signup')
   @ApiOperation({ summary: 'User signup' })
   async signUp(@Body() userInfo: CreateUserDto, @Res() res) {
-    const tokens = await this.authService.signUp(userInfo);
-    res.cookie('access_token', tokens.accessToken, {
+    const result = await this.authService.signUp(userInfo);
+
+    res.cookie('access_token', result.accessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'Strict',
+      sameSite: 'strict',
       maxAge: 1000 * 60 * 60 * 24,
     });
 
-    if (tokens.refreshToken) {
-      res.cookie('refresh_token', tokens.refreshToken, {
+    if (result.refreshToken) {
+      res.cookie('refresh_token', result.refreshToken, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
-        sameSite: 'Strict',
+        sameSite: 'strict',
         maxAge: 1000 * 60 * 60 * 24 * 7,
       });
     }
 
-    return res
-      .status(HttpStatus.OK)
-      .send({ message: 'User created successfully' });
+    return res.status(HttpStatus.CREATED).send({
+      id: result.id,
+      message: 'User registered and logged in successfully',
+    });
   }
 
   @Public()
@@ -101,15 +104,18 @@ export class AuthController {
       const refreshToken = req.cookies?.['refresh_token'];
       if (!refreshToken)
         return res.status(401).json({ message: 'No refresh token provided' });
+
       const tokens = await this.authService.refreshTokens(refreshToken);
       if (!tokens)
         return res.status(401).json({ message: 'Invalid refresh token' });
+
       res.cookie('access_token', tokens.accessToken, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'strict',
         maxAge: 1000 * 60 * 60 * 24 * 7,
       });
+
       if (tokens.refreshToken) {
         res.cookie('refresh_token', tokens.refreshToken, {
           httpOnly: true,
@@ -235,6 +241,7 @@ export class AuthController {
   async googleCallback(@Req() req, @Res() res) {
     const user = req.user as any;
     if (!user || user.redirected) return;
+
     const twentyFiveMinutesInDays = 25 / (60 * 24);
     await this.authService.saveTokens(
       user.id,
@@ -245,20 +252,25 @@ export class AuthController {
       user.providerId,
       user.oauthEmail,
     );
+
     try {
       await this.authService.createGmailWebhook(user.accessToken, user.id);
     } catch (error) {
       Logger.error(error);
     }
+
     if (user.isLinkFlow)
       return res.redirect(`${process.env.FRONT}/profile?link_success=google`);
+
     const tokens = await this.authService.login(user.id);
+
     res.cookie('access_token', tokens.accessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',
       maxAge: 1000 * 60 * 60 * 24 * 7,
     });
+
     if (tokens.refreshToken) {
       res.cookie('refresh_token', tokens.refreshToken, {
         httpOnly: true,
@@ -267,6 +279,7 @@ export class AuthController {
         maxAge: 1000 * 60 * 60 * 24 * 30,
       });
     }
+
     res.redirect(`${process.env.FRONT}/?auth=success`);
   }
 
@@ -276,6 +289,7 @@ export class AuthController {
   async microsoftCallback(@Req() req, @Res() res) {
     const user = req.user as any;
     if (!user || user.redirected) return;
+
     const twentyFiveMinutesInDays = 25 / (60 * 24);
     await this.authService.saveTokens(
       user.id,
@@ -286,22 +300,27 @@ export class AuthController {
       user.providerId,
       user.oauthEmail,
     );
+
     try {
       await this.authService.createOutlookWebhook(user.accessToken, user.id);
     } catch (error) {
       Logger.error(error);
     }
+
     if (user.isLinkFlow)
       return res.redirect(
         `${process.env.FRONT}/profile?link_success=microsoft`,
       );
+
     const tokens = await this.authService.login(user.id);
+
     res.cookie('access_token', tokens.accessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',
       maxAge: 1000 * 60 * 60 * 24 * 7,
     });
+
     if (tokens.refreshToken) {
       res.cookie('refresh_token', tokens.refreshToken, {
         httpOnly: true,
@@ -310,6 +329,7 @@ export class AuthController {
         maxAge: 1000 * 60 * 60 * 24 * 30,
       });
     }
+
     res.redirect(`${process.env.FRONT}/?auth=success`);
   }
 
@@ -328,14 +348,34 @@ export class AuthController {
   }
 
   @Public()
-  @Post('reset-password/:token')
+  @Post('reset-password')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Reset user password' })
   async resetPassword(
-    @Param('token') token: string,
     @Body() resetPasswordDto: ResetPasswordDto,
   ): Promise<{ message: string }> {
-    await this.authService.resetPassword(token, resetPasswordDto);
+    await this.authService.resetPassword(
+      resetPasswordDto.token,
+      resetPasswordDto,
+    );
     return { message: 'Your password has been reset successfully.' };
+  }
+
+  @Public()
+  @Get('verify-email/:token')
+  @ApiOperation({ summary: 'Verify user email' })
+  async verifyEmail(@Param('token') token: string) {
+    await this.authService.verifyEmail(token);
+    return { message: 'Email verified successfully' };
+  }
+
+  @Public()
+  @Get('verify-reset-token/:token')
+  @ApiOperation({
+    summary: 'Vérifier la validité du token de reset mot de passe',
+  })
+  async verifyResetToken(@Param('token') token: string) {
+    await this.authService.verifyResetToken(token);
+    return { valid: true, message: 'Token valide' };
   }
 }

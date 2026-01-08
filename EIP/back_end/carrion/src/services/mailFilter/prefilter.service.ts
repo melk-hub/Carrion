@@ -56,7 +56,6 @@ export interface FilteringStats {
   runtime: number;
   processingRate: number;
   filteringEfficiency: number;
-  // Legacy compatibility for dashboard
   filteredBySender: number;
   filteredByContent: number;
   filteredByML: number;
@@ -96,15 +95,19 @@ export class EmailPreFilterService {
         'config',
         'recruitment-patterns.json',
       );
-      const configData = fs.readFileSync(configPath, 'utf8');
-      this.config = JSON.parse(configData);
-      this.logger.log('Smart prefilter configuration loaded successfully');
+
+      if (fs.existsSync(configPath)) {
+        const configData = fs.readFileSync(configPath, 'utf8');
+        this.config = JSON.parse(configData);
+        this.logger.log('Smart prefilter configuration loaded from file');
+        return;
+      }
+      throw new Error('Config file not found, using default');
     } catch (error) {
-      this.logger.error(
-        'Failed to load recruitment patterns configuration:',
-        error,
+      this.logger.warn(
+        'Using internal default configuration (Pattern file missing or invalid)',
       );
-      // Default configuration in case of error
+
       this.config = {
         recruitmentIndicators: {
           strong: {
@@ -117,17 +120,64 @@ export class EmailPreFilterService {
               'offer',
               'recruitment',
               'recrutement',
+
+              'stage',
+              'internship',
+              'alternance',
+              'apprenticeship',
+              'test technique',
+              'technical test',
+              'coding game',
+              'offre',
+              'proposition',
             ],
-            senders: ['rh@', 'hr@', 'recrutement@', 'recruitment@'],
-            domains: ['linkedin.com', 'indeed.com'],
+            senders: [
+              'rh@',
+              'hr@',
+              'recrutement@',
+              'recruitment@',
+              'talent@',
+              'careers@',
+            ],
+            domains: [
+              'linkedin.com',
+              'indeed.com',
+              'wttj.co',
+              'welcometothejungle.com',
+            ],
           },
           medium: {
-            subjects: ['opportunity', 'opportunité', 'position', 'poste'],
+            subjects: [
+              'opportunity',
+              'opportunité',
+              'position',
+              'poste',
+
+              'engineer',
+              'ingénieur',
+              'développeur',
+              'developer',
+              'data',
+              'devops',
+              'mlops',
+            ],
             content: [
               'nous recherchons',
               'we are looking',
               'hiring',
               'embauche',
+
+              'rendez-vous',
+              'disponibilités',
+              'availabilities',
+              'creneaux',
+              'visio',
+              'call',
+              'appel',
+              'test technique',
+              'entretien',
+              'suite à notre échange',
+              'suite à votre candidature',
             ],
           },
         },
@@ -145,6 +195,8 @@ export class EmailPreFilterService {
             'marketing',
             'password',
             'security',
+            'solde',
+            'discount',
           ],
         },
         scoring: {
@@ -172,13 +224,12 @@ export class EmailPreFilterService {
     const subjectLower = subject.toLowerCase();
     const senderLower = sender.toLowerCase();
     const emailTextLower = emailText.toLowerCase();
+
     let score = 0;
     const strongIndicators: string[] = [];
     const mediumIndicators: string[] = [];
     const exclusionFound: string[] = [];
 
-    // SPECIAL CASE: LinkedIn job application confirmation emails
-    // These emails contain "unsubscribe" but are legitimate recruitment emails
     const isLinkedInJobConfirmation = this.isLinkedInJobConfirmation(
       subjectLower,
       senderLower,
@@ -188,11 +239,11 @@ export class EmailPreFilterService {
     if (isLinkedInJobConfirmation) {
       this.stats.processedByClaude++;
       this.logger.log(
-        `LinkedIn job confirmation detected - bypassing normal filtering. Subject: "${subject}"`,
+        `LinkedIn job confirmation detected. Subject: "${subject}"`,
       );
       return {
         shouldProcess: true,
-        score: 25, // High score for LinkedIn confirmations
+        score: 25,
         confidence: 0.95,
         reason:
           'LinkedIn job application confirmation email - automatically processed',
@@ -208,19 +259,24 @@ export class EmailPreFilterService {
       };
     }
 
-    // 1. Check for obvious exclusions first (highest priority)
     for (const pattern of this.config.exclusionPatterns.obvious) {
       if (
         subjectLower.includes(pattern) ||
         senderLower.includes(pattern) ||
         emailTextLower.includes(pattern)
       ) {
-        exclusionFound.push(pattern);
-        score += this.config.scoring.exclusionPenalty;
+        const isSafeRecruitment =
+          this.config.recruitmentIndicators.strong.subjects.some((s) =>
+            subjectLower.includes(s),
+          );
+
+        if (!isSafeRecruitment) {
+          exclusionFound.push(pattern);
+          score += this.config.scoring.exclusionPenalty;
+        }
       }
     }
 
-    // If strong exclusion found, filter directly
     if (exclusionFound.length > 0 && score <= -10) {
       this.stats.filteredOut++;
       return {
@@ -240,9 +296,6 @@ export class EmailPreFilterService {
       };
     }
 
-    // 2. Positive scoring for recruitment indicators
-
-    // Strong indicators in subject
     for (const pattern of this.config.recruitmentIndicators.strong.subjects) {
       if (subjectLower.includes(pattern)) {
         strongIndicators.push(`subject:${pattern}`);
@@ -250,7 +303,6 @@ export class EmailPreFilterService {
       }
     }
 
-    // Strong indicators in sender
     for (const pattern of this.config.recruitmentIndicators.strong.senders) {
       if (senderLower.includes(pattern)) {
         strongIndicators.push(`sender:${pattern}`);
@@ -258,7 +310,6 @@ export class EmailPreFilterService {
       }
     }
 
-    // Recruitment domains
     for (const domain of this.config.recruitmentIndicators.strong.domains) {
       if (senderLower.includes(domain)) {
         strongIndicators.push(`domain:${domain}`);
@@ -266,7 +317,6 @@ export class EmailPreFilterService {
       }
     }
 
-    // Medium indicators in subject
     for (const pattern of this.config.recruitmentIndicators.medium.subjects) {
       if (subjectLower.includes(pattern)) {
         mediumIndicators.push(`subject:${pattern}`);
@@ -274,7 +324,6 @@ export class EmailPreFilterService {
       }
     }
 
-    // Medium indicators in content
     for (const pattern of this.config.recruitmentIndicators.medium.content) {
       if (emailTextLower.includes(pattern)) {
         mediumIndicators.push(`content:${pattern}`);
@@ -282,13 +331,13 @@ export class EmailPreFilterService {
       }
     }
 
-    // 3. Final decision based on score
     const shouldProcess = score >= this.config.thresholds.processWithClaude;
     const confidence = this.calculateConfidence(
       score,
       strongIndicators.length,
       exclusionFound.length,
     );
+
     if (shouldProcess) {
       this.stats.processedByClaude++;
       if (score >= this.config.thresholds.certainRecruitment) {
@@ -331,11 +380,8 @@ export class EmailPreFilterService {
     strongCount: number,
     exclusionCount: number,
   ): number {
-    // Base confidence on score
     let confidence = Math.min(Math.max(score / 20, 0), 1);
-    // Bonus for strong indicators
     confidence += strongCount * 0.1;
-    // Penalty for exclusions
     confidence -= exclusionCount * 0.2;
     return Math.min(Math.max(confidence, 0), 1);
   }
@@ -356,10 +402,9 @@ export class EmailPreFilterService {
       runtime,
       processingRate,
       filteringEfficiency,
-      // Legacy compatibility mappings
-      filteredBySender: 0, // Not tracked in new system
-      filteredByContent: this.stats.filteredOut, // Map to filteredOut
-      filteredByML: 0, // Not used in new system
+      filteredBySender: 0,
+      filteredByContent: this.stats.filteredOut,
+      filteredByML: 0,
       passedToClaudeAI: this.stats.processedByClaude,
       filteringRate: filteringEfficiency,
       efficiency: {
@@ -381,13 +426,11 @@ export class EmailPreFilterService {
     };
   }
 
-  // Method to reload configuration without restart
   reloadConfiguration(): void {
     this.loadConfiguration();
     this.logger.log('Configuration reloaded');
   }
 
-  // Method to add patterns dynamically (for maintenance)
   addExclusionPattern(pattern: string): void {
     if (!this.config.exclusionPatterns.obvious.includes(pattern)) {
       this.config.exclusionPatterns.obvious.push(pattern);
@@ -416,10 +459,7 @@ export class EmailPreFilterService {
     sender: string,
     emailText: string,
   ): boolean {
-    // Check if it's from LinkedIn
     const isLinkedInSender = sender.includes('linkedin.com');
-
-    // Check for job application confirmation patterns
     const jobConfirmationPatterns = [
       'candidature a été envoyée',
       'candidature envoyée',
@@ -433,7 +473,6 @@ export class EmailPreFilterService {
       (pattern) => subject.includes(pattern) || emailText.includes(pattern),
     );
 
-    // Check for job-related content
     const jobContentPatterns = [
       'développeur',
       'developer',

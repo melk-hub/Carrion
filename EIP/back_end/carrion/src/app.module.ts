@@ -22,6 +22,7 @@ import { NotificationModule } from './notification/notification.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { OrganizationModule } from './organization/organization.module';
 import { SubscriptionModule } from './subscription/subscription.module';
+import { TasksService } from './tasks/tasks.service';
 
 @Module({
   imports: [
@@ -44,6 +45,6 @@ import { SubscriptionModule } from './subscription/subscription.module';
     ScheduleModule.forRoot(),
   ],
   controllers: [AppController, MailFilterController, StatisticsController],
-  providers: [AppService, MailFilterService, StatisticsService],
+  providers: [AppService, MailFilterService, StatisticsService, TasksService],
 })
 export class AppModule {}

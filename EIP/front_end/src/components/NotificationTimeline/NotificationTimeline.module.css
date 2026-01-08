@@ -1,17 +1,16 @@
-/* Notification Timeline Component - Style original de Home.css */
 .timeline {
   position: relative;
 }
 
-.timeline-item {
+.timelineItem {
   display: flex;
   align-items: flex-start;
   margin-bottom: 1.5rem;
   position: relative;
 }
 
-.timeline-item:not(:last-child)::after {
-  content: '';
+.timelineItem:not(:last-child)::after {
+  content: "";
   position: absolute;
   left: 12px;
   top: 30px;
@@ -20,7 +19,7 @@
   background: #e2e8f0;
 }
 
-.timeline-dot {
+.timelineDot {
   width: 24px;
   height: 24px;
   border-radius: 50%;
@@ -34,39 +33,39 @@
   font-size: 12px;
 }
 
-.timeline-dot.accepted,
-.timeline-dot.positive {
+.timelineDot.accepted,
+.timelineDot.positive {
   background: var(--success-color);
 }
 
-.timeline-dot.pending,
-.timeline-dot.warning {
+.timelineDot.pending,
+.timelineDot.warning {
   background: var(--warning-color);
 }
 
-.timeline-dot.interview,
-.timeline-dot.info {
+.timelineDot.interview,
+.timelineDot.info {
   background: var(--info-color);
 }
 
-.timeline-dot.negative {
+.timelineDot.negative {
   background: var(--error-color);
 }
 
-.timeline-content h4 {
+.timelineContent h4 {
   font-size: 1rem;
   font-weight: 600;
   color: var(--text-dark);
   margin: 0 0 0.25rem 0;
 }
 
-.timeline-content p {
+.timelineContent p {
   font-size: 0.9rem;
   color: var(--text-light);
   margin: 0 0 0.25rem 0;
 }
 
-.timeline-time {
+.timelineTime {
   font-size: 0.8rem;
   color: var(--text-light);
-} 
+}

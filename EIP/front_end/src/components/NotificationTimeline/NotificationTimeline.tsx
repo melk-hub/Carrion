@@ -3,8 +3,8 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import styles from "./NotificationTimeline.module.css";
 import { Notification } from '@/interface/notification.interface';
 
-const NotificationTimeline = ({ 
-  notifications = [], 
+const NotificationTimeline = ({
+  notifications = [],
   showOnlyUnread = false,
   maxItems = 5,
   className = ''
@@ -14,16 +14,16 @@ const NotificationTimeline = ({
   // Filtrer les notifications selon les paramètres
   const filteredNotifications = React.useMemo(() => {
     let filtered = notifications;
-    
+
     if (showOnlyUnread) {
       filtered = filtered.filter((notification: Notification) => !notification.read);
     }
-    
+
     // Trier par date (plus récent en premier)
-    filtered = filtered.sort((a: Notification, b: Notification) => 
+    filtered = filtered.sort((a: Notification, b: Notification) =>
       new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     );
-    
+
     // Limiter le nombre d'éléments
     return filtered.slice(0, maxItems);
   }, [notifications, showOnlyUnread, maxItems]);
@@ -71,17 +71,17 @@ const NotificationTimeline = ({
 
   const getNotificationMessage = (notification: Notification) => {
     const { variables } = notification;
-    
+
     if (variables?.company && variables?.jobTitle) {
       return `${variables.company} - ${variables.jobTitle}`;
     }
-    
+
     if (notification.message) {
-      return notification.message.length > 60 
+      return notification.message.length > 60
         ? notification.message.substring(0, 60) + '...'
         : notification.message;
     }
-    
+
     return t('notifications.message.default') || 'Notification';
   };
 
@@ -107,7 +107,7 @@ const NotificationTimeline = ({
           <div className="timeline-dot info">📋</div>
           <div className="timeline-content">
             <h4>
-              {showOnlyUnread 
+              {showOnlyUnread
                 ? t('shared.empty.noNotifications') || 'Aucune notification non lue'
                 : t('home.noActivity') || 'Aucune activité récente'
               }
@@ -120,16 +120,16 @@ const NotificationTimeline = ({
   }
 
   return (
-    <div className={`timeline ${className}`}>
+    <div className={styles.timeline + " " + className}>
       {filteredNotifications.map((notification: Notification) => (
-        <div className="timeline-item" key={notification.id}>
-          <div className={`timeline-dot ${getNotificationTypeClass(notification.type)}`}>
+        <div className={styles.timelineItem} key={notification.id}>
+          <div className={styles.timelineDot + " " + getNotificationTypeClass(notification.type)}>
             {getNotificationIcon(notification.type)}
           </div>
-          <div className="timeline-content">
+          <div className={styles.timelineContent}>
             <h4>{notification.titleKey}</h4>
             <p>{getNotificationMessage(notification)}</p>
-            <span className="timeline-time">
+            <span className={styles.timelineTime}>
               {formatTimestamp(notification.createdAt)}
             </span>
           </div>

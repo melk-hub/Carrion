@@ -1,0 +1,39 @@
+version: "3.8"
+
+services:
+  db:
+    restart: always
+    ports:
+      - "127.0.0.1:5432:5432"
+
+  server:
+    build:
+      dockerfile: Dockerfile
+    restart: always
+
+  client_web:
+    build:
+      dockerfile: Dockerfile
+      args:
+        - NEXT_PUBLIC_API_URL=https://${DOMAIN_NAME}/api
+    restart: always
+
+  caddy:
+    image: caddy:latest
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
+    networks:
+      - api-tier
+    depends_on:
+      - server
+      - client_web
+
+volumes:
+  caddy_data:
+  caddy_config:

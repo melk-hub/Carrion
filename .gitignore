@@ -1,84 +1,33 @@
-############################
-# Dependencies
-############################
-node_modules/
-.pnp/
-.pnp.js
+.DS_Store
+Thumbs.db
+*.swp
 
-############################
-# Build outputs
-############################
-# NestJS
-dist/
-build/
-
-# Next.js
-.next/
-out/
-
-############################
-# Environment variables
-############################
-.env
-.env.*
-!.env.example
-
-############################
-# Logs
-############################
-logs/
+.idea/
+.vscode/
+*.sublime-workspace
+.history/*
 *.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 
-############################
-# Runtime data
-############################
-pids/
-*.pid
-*.seed
-*.pid.lock
+**/node_modules/
 
-############################
-# Coverage
-############################
-coverage/
-.nyc_output/
+.env
+.env.*
+!.env.example
 
-############################
-# Cache
-############################
-.cache/
-.eslintcache
-.swc/
+**/dist/
+**/build/
+**/.next/
+**/out/
+**/coverage/
 
-############################
-# IDE / Editor
-############################
-.vscode/
-!.vscode/extensions.json
-.idea/
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
+EIP/back_end/carrion/src/**/*.js
+EIP/back_end/carrion/src/**/*.js.map
+EIP/back_end/carrion/src/**/*.d.ts
 
-############################
-# OS files
-############################
-.DS_Store
-Thumbs.db
-
-############################
-# Testing
-############################
-jest.config.ts.bak
-test-results/
-
-############################
-# Misc
-############################
-*.tgz
-*.bak
+**/.vercel
+*.tsbuildinfo
+next-env.d.ts

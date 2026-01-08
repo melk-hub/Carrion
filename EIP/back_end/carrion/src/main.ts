@@ -33,9 +33,32 @@ async function bootstrap() {
     }
   }));
 
+  // Configure body parser to preserve raw body for Stripe webhooks
+  app.use(
+    '/subscription/webhook',
+    json({
+      verify: (req: any, res, buf) => {
+        if (buf && buf.length) {
+          req.rawBody = Buffer.from(buf);
+        }
+        return true;
+      },
+    }),
+  );
+
+  app.use(json());
+
+  app.setGlobalPrefix('api');
+
   app.enableCors({
     origin: (origin, callback) => {
-      const allowedOrigins = [`${process.env.FRONT}`, `${process.env.BACK}`];
+      const allowedOrigins = [
+        `${process.env.FRONT}`,
+        `${process.env.BACK}`,
+        `${process.env.DOMAIN_NAME}`,
+        `${process.env.DOMAIN_NAME_WWW}`,
+        'localhost:8080',
+      ];
       if (allowedOrigins.includes(origin) || !origin) {
         callback(null, true);
       } else {
