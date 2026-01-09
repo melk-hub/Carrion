@@ -41,21 +41,26 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
           const tokens = await this.authService.refreshTokens(refreshToken);
 
           if (tokens) {
+            // Helper function to get cookie options (same as in AuthController)
+            const getCookieOptions = (maxAge: number) => {
+              const isProduction = process.env.NODE_ENV === 'production';
+              const cookieOptions: any = {
+                httpOnly: true,
+                secure: isProduction,
+                sameSite: isProduction ? 'lax' : 'strict', // Use 'lax' in production for cross-subdomain support
+                maxAge,
+              };
+              if (isProduction && process.env.COOKIE_DOMAIN) {
+                cookieOptions.domain = process.env.COOKIE_DOMAIN;
+              }
+              return cookieOptions;
+            };
+
             // Mettre à jour les cookies avec les nouveaux tokens
-            response.cookie('access_token', tokens.accessToken, {
-              httpOnly: true,
-              secure: process.env.NODE_ENV === 'production',
-              sameSite: 'strict',
-              maxAge: 1000 * 60 * 60 * 24 * 7, // 7 jours au lieu de 1
-            });
+            response.cookie('access_token', tokens.accessToken, getCookieOptions(1000 * 60 * 60 * 24 * 7));
 
             if (tokens.refreshToken) {
-              response.cookie('refresh_token', tokens.refreshToken, {
-                httpOnly: true,
-                secure: process.env.NODE_ENV === 'production',
-                sameSite: 'strict',
-                maxAge: 1000 * 60 * 60 * 24 * 30, // 30 jours
-              });
+              response.cookie('refresh_token', tokens.refreshToken, getCookieOptions(1000 * 60 * 60 * 24 * 30));
             }
 
             // Attacher l'utilisateur à la requête

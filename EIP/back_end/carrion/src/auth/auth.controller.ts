@@ -34,6 +34,33 @@ export class AuthController {
     private readonly jwtService: JwtService,
   ) {}
 
+  /**
+   * Helper function to get cookie options based on environment
+   * In production, uses 'lax' for sameSite to allow cross-subdomain cookies
+   */
+  private getCookieOptions(maxAge: number): {
+    httpOnly: boolean;
+    secure: boolean;
+    sameSite: 'strict' | 'lax' | 'none';
+    maxAge: number;
+    domain?: string;
+  } {
+    const isProduction = process.env.NODE_ENV === 'production';
+    const cookieOptions: any = {
+      httpOnly: true,
+      secure: isProduction,
+      sameSite: isProduction ? 'lax' : 'strict', // Use 'lax' in production for cross-subdomain support
+      maxAge,
+    };
+
+    // In production, set domain if specified to allow cross-subdomain cookies
+    if (isProduction && process.env.COOKIE_DOMAIN) {
+      cookieOptions.domain = process.env.COOKIE_DOMAIN;
+    }
+
+    return cookieOptions;
+  }
+
   @Public()
   @HttpCode(HttpStatus.OK)
   @UseGuards(LocalAuthGuard)
@@ -47,20 +74,10 @@ export class AuthController {
       ? 1000 * 60 * 60 * 24 * 15
       : 1000 * 60 * 60 * 24;
 
-    res.cookie('access_token', tokens.accessToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      maxAge: cookieMaxAge,
-    });
+    res.cookie('access_token', tokens.accessToken, this.getCookieOptions(cookieMaxAge));
 
     if (tokens.refreshToken) {
-      res.cookie('refresh_token', tokens.refreshToken, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'strict',
-        maxAge: 1000 * 60 * 60 * 24 * 7,
-      });
+      res.cookie('refresh_token', tokens.refreshToken, this.getCookieOptions(1000 * 60 * 60 * 24 * 7));
     }
 
     return res
@@ -74,20 +91,10 @@ export class AuthController {
   async signUp(@Body() userInfo: CreateUserDto, @Res() res) {
     const result = await this.authService.signUp(userInfo);
 
-    res.cookie('access_token', result.accessToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      maxAge: 1000 * 60 * 60 * 24,
-    });
+    res.cookie('access_token', result.accessToken, this.getCookieOptions(1000 * 60 * 60 * 24));
 
     if (result.refreshToken) {
-      res.cookie('refresh_token', result.refreshToken, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'strict',
-        maxAge: 1000 * 60 * 60 * 24 * 7,
-      });
+      res.cookie('refresh_token', result.refreshToken, this.getCookieOptions(1000 * 60 * 60 * 24 * 7));
     }
 
     return res.status(HttpStatus.CREATED).send({
@@ -127,20 +134,18 @@ export class AuthController {
         return res.status(401).json({ message: 'Invalid or expired refresh token. Please log in again.' });
       }
 
-      res.cookie('access_token', tokens.accessToken, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'strict',
-        maxAge: 1000 * 60 * 60 * 24 * 7,
-      });
+      // Debug logs
+      if (process.env.NODE_ENV === 'development') {
+        Logger.debug(`Setting cookies - accessToken: ${!!tokens.accessToken} (${tokens.accessToken?.length || 0} chars), refreshToken: ${!!tokens.refreshToken} (${tokens.refreshToken?.length || 0} chars)`);
+        if (!tokens.accessToken || !tokens.refreshToken) {
+          Logger.error('ERROR: Tokens are empty when setting cookies!');
+        }
+      }
+
+      res.cookie('access_token', tokens.accessToken, this.getCookieOptions(1000 * 60 * 60 * 24 * 7));
 
       if (tokens.refreshToken) {
-        res.cookie('refresh_token', tokens.refreshToken, {
-          httpOnly: true,
-          secure: process.env.NODE_ENV === 'production',
-          sameSite: 'strict',
-          maxAge: 1000 * 60 * 60 * 24 * 30,
-        });
+        res.cookie('refresh_token', tokens.refreshToken, this.getCookieOptions(1000 * 60 * 60 * 24 * 30));
       }
       return res.status(200).json({ message: 'Token refreshed successfully' });
     } catch (error) {

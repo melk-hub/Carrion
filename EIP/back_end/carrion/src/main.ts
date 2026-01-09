@@ -52,24 +52,46 @@ async function bootstrap() {
 
   app.enableCors({
     origin: (origin, callback) => {
+      // Helper function to clean URLs (remove trailing slashes and paths)
+      const cleanOrigin = (url: string | undefined): string | undefined => {
+        if (!url) return undefined;
+        try {
+          const urlObj = new URL(url);
+          return `${urlObj.protocol}//${urlObj.host}`;
+        } catch {
+          return url.replace(/\/+$/, '').replace(/\/api.*$/, '');
+        }
+      };
+
+      // Build allowed origins list, cleaning them to remove paths
       const allowedOrigins = [
-        `${process.env.FRONT}`,
-        `${process.env.BACK}`,
-        `${process.env.DOMAIN_NAME}`,
-        `${process.env.DOMAIN_NAME_WWW}`,
+        cleanOrigin(process.env.FRONT),
+        cleanOrigin(process.env.BACK), // Remove /api from BACK
+        cleanOrigin(process.env.DOMAIN_NAME),
+        cleanOrigin(process.env.DOMAIN_NAME_WWW),
         'http://localhost:3000',
         'http://localhost:3001',
         'http://127.0.0.1:3000',
         'http://127.0.0.1:3001',
         'http://localhost:8080',
         'http://127.0.0.1:8080',
-      ];
+      ].filter(Boolean) as string[]; // Remove undefined values
+
       // Allow requests with no origin (like mobile apps or curl requests)
-      if (!origin || allowedOrigins.includes(origin)) {
+      if (!origin) {
+        callback(null, true);
+        return;
+      }
+
+      // Check if origin is in allowed list
+      if (allowedOrigins.includes(origin)) {
         callback(null, true);
       } else {
-        console.warn(`CORS blocked origin: ${origin}`);
-        callback(new Error('Not allowed by CORS'));
+        // Always log CORS errors for debugging (important for production issues)
+        console.error(`[CORS] Blocked origin: ${origin}`);
+        console.error(`[CORS] Allowed origins: ${allowedOrigins.join(', ')}`);
+        console.error(`[CORS] Environment variables - FRONT: ${process.env.FRONT}, BACK: ${process.env.BACK}, DOMAIN_NAME: ${process.env.DOMAIN_NAME}`);
+        callback(new Error(`Not allowed by CORS: ${origin}`));
       }
     },
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',

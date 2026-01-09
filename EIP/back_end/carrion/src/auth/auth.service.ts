@@ -419,14 +419,49 @@ export class AuthService {
   ): Promise<{ accessToken: string; refreshToken: string }> {
     const payload = { sub: userId };
     const accessTokenExpiresIn = rememberMe ? '15d' : '1d';
+    
+    // Validate JWT secret is configured
+    if (!process.env.JWT_SECRET) {
+      throw new Error('JWT_SECRET is not configured in environment variables');
+    }
+    if (!process.env.REFRESH_JWT_SECRET) {
+      throw new Error('REFRESH_JWT_SECRET is not configured in environment variables');
+    }
+    
+    // Validate refreshTokenConfig
+    if (!this.refreshTokenConfig?.secret) {
+      throw new Error('Refresh token configuration is missing secret');
+    }
+    
+    const accessToken = await this.jwtService.signAsync(payload, {
+      secret: process.env.JWT_SECRET,
+      expiresIn: accessTokenExpiresIn,
+    });
+    
+    const refreshToken = await this.jwtService.signAsync(
+      payload,
+      {
+        secret: this.refreshTokenConfig.secret,
+        expiresIn: this.refreshTokenConfig.expiresIn,
+      },
+    );
+    
+    // Debug logs
+    if (process.env.NODE_ENV === 'development') {
+      this.logger.log(`generateTokens for user ${userId} - accessToken: ${!!accessToken} (${accessToken?.length || 0} chars), refreshToken: ${!!refreshToken} (${refreshToken?.length || 0} chars)`);
+      if (!accessToken || !refreshToken) {
+        this.logger.log('ERROR: JWT service returned empty tokens!');
+        this.logger.log(`refreshTokenConfig: ${JSON.stringify({ secret: !!this.refreshTokenConfig.secret, expiresIn: this.refreshTokenConfig.expiresIn })}`);
+      }
+    }
+    
+    if (!accessToken || !refreshToken) {
+      throw new Error('Failed to generate tokens - JWT service returned empty values');
+    }
+    
     return {
-      accessToken: await this.jwtService.signAsync(payload, {
-        expiresIn: accessTokenExpiresIn,
-      }),
-      refreshToken: await this.jwtService.signAsync(
-        payload,
-        this.refreshTokenConfig,
-      ),
+      accessToken,
+      refreshToken,
     };
   }
 
@@ -554,6 +589,20 @@ export class AuthService {
         return null;
       }
       const tokens = await this.generateTokens(user.id);
+      
+      // Debug logs
+      if (process.env.NODE_ENV === 'development') {
+        this.logger.log(`Generated tokens - accessToken: ${!!tokens.accessToken}, refreshToken: ${!!tokens.refreshToken}`);
+        this.logger.log(`AccessToken length: ${tokens.accessToken?.length || 0}, RefreshToken length: ${tokens.refreshToken?.length || 0}`);
+      }
+      
+      if (!tokens.accessToken || !tokens.refreshToken) {
+        if (process.env.NODE_ENV === 'development') {
+          this.logger.log('ERROR: Generated tokens are empty or undefined!');
+        }
+        return null;
+      }
+      
       await this.userService.updateHashedRefreshToken(
         user.id,
         await argon2.hash(tokens.refreshToken),
